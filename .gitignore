@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Executables & Tunnels
+cloudflared.exe
+*.exe
+
+# Logs & Debug
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Agent files & Temporary scratch files
+.agents/
+scratch_*.js

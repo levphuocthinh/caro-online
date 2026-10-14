@@ -1,0 +1,19 @@
+{
+  "name": "caro-online",
+  "version": "1.0.0",
+  "description": "Game Cờ Caro Online - Chơi với bạn bè & Đánh với AI thông minh",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "online": ".\\cloudflared.exe tunnel --url http://localhost:3000",
+    "test": "node tests/runner.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "localtunnel": "^2.0.2",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.4"
+  }
+}

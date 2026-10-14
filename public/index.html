@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="pastel">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#fff0f5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Caro Online</title>
+
+  <!-- Favicon biểu tượng dấu chân mèo trong suốt (Khớp logo web) -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+  <link rel="alternate icon" type="image/x-icon" href="/favicon.ico?v=2">
+  <link rel="apple-touch-icon" href="/favicon.svg?v=2">
+
+  <!-- Google Fonts: Nunito & Quicksand (Bo tròn, siêu dễ thương) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons (Vector chuyên nghiệp, sắc nét) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Canvas pháo hoa ăn mừng -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Thanh điều hướng trên cùng -->
+  <header class="app-header">
+    <div class="logo-area" id="btn-home">
+      <span class="logo-icon"><i class="fa-solid fa-paw"></i></span>
+      <div class="logo-titles">
+        <span class="logo-title" data-i18n="logo_title">Caro Online</span>
+        <span class="logo-subtitle" data-i18n="logo_subtitle">Bé Miu & Bé Thỏ</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <!-- BỘ CHỌN NGOẠI NGỮ CÓ LÁ CỜ SVG TỪNG NƯỚC -->
+      <div class="custom-lang-selector" id="custom-lang-selector">
+        <button class="lang-trigger" id="lang-trigger" type="button" aria-haspopup="true" aria-expanded="false" title="Chọn ngôn ngữ / Select language">
+          <span class="selected-flag" id="selected-flag">
+            <svg viewBox="0 0 30 20" width="22" height="15" class="svg-flag"><rect width="30" height="20" fill="#da251d" rx="2"/><polygon points="15,4 17.35,11.23 11.19,6.76 18.81,6.76 12.65,11.23" fill="#ff0"/></svg>
+          </span>
+          <span class="selected-lang-name" id="selected-lang-name">Tiếng Việt</span>
+          <span class="lang-caret"><i class="fa-solid fa-chevron-down"></i></span>
+        </button>
+        <div class="lang-dropdown-menu" id="lang-dropdown-menu">
+          <div class="lang-option active" data-lang="vi">
+            <span class="opt-flag"><svg viewBox="0 0 30 20" width="22" height="15" class="svg-flag"><rect width="30" height="20" fill="#da251d" rx="2"/><polygon points="15,4 17.35,11.23 11.19,6.76 18.81,6.76 12.65,11.23" fill="#ff0"/></svg></span>
+            <span class="opt-name">Tiếng Việt</span>
+          </div>
+          <div class="lang-option" data-lang="en">
+            <span class="opt-flag"><svg viewBox="0 0 60 30" width="22" height="15" class="svg-flag"><rect width="60" height="30" fill="#012169" rx="2"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="3.5"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg></span>
+            <span class="opt-name">English</span>
+          </div>
+          <div class="lang-option" data-lang="ja">
+            <span class="opt-flag"><svg viewBox="0 0 30 20" width="22" height="15" class="svg-flag"><rect width="30" height="20" fill="#fff" rx="2" stroke="#cbd5e1" stroke-width="0.5"/><circle cx="15" cy="10" r="6" fill="#bc002d"/></svg></span>
+            <span class="opt-name">日本語</span>
+          </div>
+          <div class="lang-option" data-lang="ko">
+            <span class="opt-flag"><svg viewBox="0 0 30 20" width="22" height="15" class="svg-flag"><rect width="30" height="20" fill="#fff" rx="2" stroke="#cbd5e1" stroke-width="0.5"/><circle cx="15" cy="10" r="5" fill="#cd2e3a"/><path d="M15,5 a5,5 0 0,0 0,10 a2.5,2.5 0 0,0 0,-5 a2.5,2.5 0 0,1 0,-5" fill="#0047a0"/><g stroke="#000" stroke-width="0.8"><line x1="6" y1="4" x2="8" y2="6"/><line x1="5" y1="5" x2="7" y2="7"/><line x1="4" y1="6" x2="6" y2="8"/><line x1="24" y1="4" x2="22" y2="6"/><line x1="25" y1="5" x2="23" y2="7"/><line x1="26" y1="6" x2="24" y2="8"/></g></svg></span>
+            <span class="opt-name">한국어</span>
+          </div>
+          <div class="lang-option" data-lang="zh">
+            <span class="opt-flag"><svg viewBox="0 0 30 20" width="22" height="15" class="svg-flag"><rect width="30" height="20" fill="#de2910" rx="2"/><polygon points="5,3 6.18,6.62 3.09,4.38 6.91,4.38 3.82,6.62" fill="#ffde00"/><circle cx="10" cy="2" r="0.7" fill="#ffde00"/><circle cx="12" cy="4" r="0.7" fill="#ffde00"/><circle cx="12" cy="7" r="0.7" fill="#ffde00"/><circle cx="10" cy="9" r="0.7" fill="#ffde00"/></svg></span>
+            <span class="opt-name">中文</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-icon" id="btn-mobile-chat-toggle" title="Mở chat">
+        <i class="fa-solid fa-comments"></i>
+        <span class="badge-dot" id="chat-unread-dot" style="display: none;"></span>
+      </button>
+      <button class="btn-icon" id="btn-sound-toggle" title="Bật/Tắt âm thanh"><i class="fa-solid fa-volume-high"></i></button>
+      <button class="btn-icon" id="btn-help-modal" title="Hướng dẫn & Luật chơi"><i class="fa-solid fa-circle-question"></i></button>
+    </div>
+  </header>
+
+  <!-- MÀN HÌNH SẢNH CHỜ (LOBBY) -->
+  <main class="screen active" id="screen-lobby">
+    <div class="lobby-container">
+      <div class="hero-box">
+        <div class="hero-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="hero_badge">Bàn cờ ngọt ngào kết nối bạn bè</span></div>
+        <h1 class="hero-title" data-i18n="hero_title">Caro <span class="gradient-text">Online</span></h1>
+        <p class="hero-subtitle" data-i18n="hero_subtitle">Cùng thi đấu Caro online qua mạng cực vui, chia sẻ link chơi ngay trên điện thoại hoặc đọ tài với Bé Bot AI nhí nhảnh!</p>
+      </div>
+
+      <div class="mode-cards">
+        <!-- Chế độ 1: Chơi Online -->
+        <div class="card-mode card-online" id="card-mode-online">
+          <span class="badge"><i class="fa-solid fa-wifi"></i> <span data-i18n="online_badge">Online Vui Nhộn</span></span>
+          <div class="card-icon-fa icon-online"><i class="fa-solid fa-users"></i></div>
+          <h2 class="card-title" data-i18n="online_title">Chơi Online với Bạn Bè</h2>
+          <p class="card-desc" data-i18n="online_desc">Tạo phòng riêng siêu cute, copy link gửi Zalo / Messenger cho bạn bè vào chơi ngay có chat và thả tim!</p>
+          <button class="card-btn btn-cute-primary" id="btn-open-create-room">
+            <i class="fa-solid fa-plus-circle"></i> <span data-i18n="btn_create_room">Tạo Phòng Ngay</span>
+          </button>
+          <button class="card-btn btn-cute-secondary" id="btn-open-join-room">
+            <i class="fa-solid fa-key"></i> <span data-i18n="btn_join_room">Nhập Mã Phòng</span>
+          </button>
+        </div>
+
+        <!-- Chế độ 2: Đánh với AI -->
+        <div class="card-mode card-ai" id="card-mode-ai">
+          <span class="badge"><i class="fa-solid fa-microchip"></i> <span data-i18n="ai_badge">Bé Bot AI</span></span>
+          <div class="card-icon-fa icon-ai"><i class="fa-solid fa-robot"></i></div>
+          <h2 class="card-title" data-i18n="ai_title">Đấu Với Bé Bot AI</h2>
+          <p class="card-desc" data-i18n="ai_desc">Rèn luyện thế trận cùng Bé Bot AI thông minh, biết trò chuyện nhí nhảnh và có 3 cấp độ từ Dễ tới Cao Thủ!</p>
+          <button class="card-btn btn-cute-green" id="btn-open-ai-setup">
+            <i class="fa-solid fa-gamepad"></i> <span data-i18n="btn_ai_start">Đấu Với Bé Bot</span>
+          </button>
+        </div>
+
+        <!-- Chế độ 3: 2 Người cùng máy -->
+        <div class="card-mode card-local" id="card-mode-local">
+          <span class="badge"><i class="fa-solid fa-mobile-screen"></i> <span data-i18n="local_badge">Chơi Cùng Máy</span></span>
+          <div class="card-icon-fa icon-local"><i class="fa-solid fa-people-arrows"></i></div>
+          <h2 class="card-title" data-i18n="local_title">2 Người Trên Một Máy</h2>
+          <p class="card-desc" data-i18n="local_desc">Chuyền tay nhau chơi luân phiên trên cùng màn hình điện thoại, iPad hoặc máy tính mà không cần mạng!</p>
+          <button class="card-btn btn-cute-amber" id="btn-start-local">
+            <i class="fa-solid fa-play"></i> <span data-i18n="btn_local_start">Chơi Ngay Nè</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CÁC GAME KHÁC ĐANG PHÁT TRIỂN (COMING SOON) -->
+      <div class="coming-soon-box">
+        <div class="coming-soon-header">
+          <span class="coming-soon-title"><i class="fa-solid fa-cubes"></i> <span data-i18n="coming_header">Các Game Khác Đang Phát Triển</span></span>
+          <span class="coming-soon-tag"><i class="fa-solid fa-clock"></i> <span data-i18n="coming_badge">Sắp ra mắt</span></span>
+        </div>
+        <div class="coming-soon-grid">
+          <div class="coming-card" title="Bấm để xem thông tin">
+            <div class="coming-icon-fa"><i class="fa-solid fa-chess-knight"></i></div>
+            <div class="coming-info">
+              <div class="coming-name" data-i18n="chess_title">Cờ Vua (Chess Online)</div>
+              <div class="coming-status" data-i18n="chess_desc">Đang hoàn thiện luật phong cấp & thời gian... 85%</div>
+            </div>
+            <span class="coming-badge"><i class="fa-solid fa-clock"></i> <span data-i18n="coming_badge">Sắp ra mắt</span></span>
+          </div>
+
+          <div class="coming-card" title="Bấm để xem thông tin">
+            <div class="coming-icon-fa"><i class="fa-solid fa-chess-board"></i></div>
+            <div class="coming-info">
+              <div class="coming-name" data-i18n="xiangqi_title">Cờ Tướng (Xiangqi Online)</div>
+              <div class="coming-status" data-i18n="xiangqi_desc">Đang thiết kế quân cờ gỗ truyền thống... 70%</div>
+            </div>
+            <span class="coming-badge"><i class="fa-solid fa-clock"></i> <span data-i18n="coming_badge">Sắp ra mắt</span></span>
+          </div>
+
+          <div class="coming-card" title="Bấm để xem thông tin">
+            <div class="coming-icon-fa"><i class="fa-solid fa-dice"></i></div>
+            <div class="coming-info">
+              <div class="coming-name" data-i18n="ludo_title">Cờ Cá Ngựa (Ludo Party)</div>
+              <div class="coming-status" data-i18n="ludo_desc">Đang xây dựng phòng 4 người online... 60%</div>
+            </div>
+            <span class="coming-badge"><i class="fa-solid fa-clock"></i> <span data-i18n="coming_badge">Sắp ra mắt</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MÀN HÌNH BÀN CỜ ĐẤU (GAMEPLAY) -->
+  <main class="screen" id="screen-game">
+    <!-- Cặp thẻ người chơi trên Mobile / Tablet & Desktop -->
+    <div class="players-top-bar">
+      <!-- Người chơi X (Bé Mèo) -->
+      <div class="player-card" id="card-player-x">
+        <div class="player-avatar avatar-x">🐱</div>
+        <div class="player-info">
+          <div class="player-name">
+            <span id="name-player-x">Bé Mèo 1</span>
+            <span class="player-tag" id="tag-player-x">Bạn (X)</span>
+          </div>
+          <div class="player-status" id="status-player-x">Đang suy nghĩ... 💭</div>
+        </div>
+        <div class="turn-timer" id="timer-player-x">--</div>
+      </div>
+
+      <div class="vs-badge">🌸 VS 🌸</div>
+
+      <!-- Người chơi O (Bé Thỏ) -->
+      <div class="player-card" id="card-player-o">
+        <div class="player-avatar avatar-o">🐰</div>
+        <div class="player-info">
+          <div class="player-name">
+            <span id="name-player-o">Bé Thỏ 2</span>
+            <span class="player-tag" id="tag-player-o">Đối thủ (O)</span>
+          </div>
+          <div class="player-status" id="status-player-o">Chờ đối thủ... 🐾</div>
+        </div>
+        <div class="turn-timer" id="timer-player-o">--</div>
+      </div>
+    </div>
+
+    <div class="game-layout">
+      <!-- Cột trái: Điều khiển (Desktop) -->
+      <div class="game-sidebar-left">
+        <div class="game-controls-box">
+          <button class="ctrl-btn ctrl-share" id="btn-share-room">
+            <i class="fa-solid fa-share-nodes"></i> <span data-i18n="btn_share">Sao chép Link mời bạn</span>
+          </button>
+          <button class="ctrl-btn ctrl-draw" id="btn-offer-draw">
+            <i class="fa-solid fa-handshake"></i> <span data-i18n="btn_draw">Cầu hòa đối phương</span>
+          </button>
+          <button class="ctrl-btn ctrl-surrender" id="btn-surrender">
+            <i class="fa-solid fa-flag"></i> <span data-i18n="btn_surrender">Xin đầu hàng</span>
+          </button>
+          <button class="ctrl-btn ctrl-leave" id="btn-leave-game">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> <span data-i18n="btn_leave">Rời về sảnh chính</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cột giữa: Bàn cờ Caro -->
+      <div class="board-area">
+        <div class="spectator-badge" id="spectator-badge" style="display: none;">
+          <i class="fa-solid fa-eye"></i> <span>Chế độ Khán Giả</span>
+        </div>
+        <div class="board-status-banner" id="game-status-banner">
+          <span id="banner-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+          <span id="banner-text">Lượt của Bé Mèo (X) đi trước nè</span>
+        </div>
+
+        <div class="board-container" id="board-container">
+          <div class="caro-grid" id="caro-grid">
+            <!-- Các ô cờ được sinh tự động bằng JS -->
+          </div>
+        </div>
+
+        <!-- Thanh công cụ điều khiển nhanh trên Mobile & iPad -->
+        <div class="mobile-action-bar">
+          <button class="m-btn m-btn-primary" id="btn-mobile-chat">
+            <i class="fa-solid fa-comments"></i> <span data-i18n="m_chat">Chat</span>
+          </button>
+          <button class="m-btn" id="btn-mobile-share">
+            <i class="fa-solid fa-user-plus"></i> <span data-i18n="m_invite">Mời bạn</span>
+          </button>
+          <button class="m-btn" id="btn-mobile-draw">
+            <i class="fa-solid fa-handshake"></i> <span data-i18n="m_draw">Hòa</span>
+          </button>
+          <button class="m-btn m-btn-danger" id="btn-mobile-surrender">
+            <i class="fa-solid fa-flag"></i> <span data-i18n="m_surrender">Hàng</span>
+          </button>
+          <button class="m-btn" id="btn-mobile-leave">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> <span data-i18n="m_lobby">Về sảnh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Lớp nền mờ khi mở chat drawer trên mobile -->
+      <div class="chat-drawer-backdrop" id="chat-drawer-backdrop"></div>
+
+      <!-- Cột phải / Drawer trên Mobile: Chat & Phản ứng -->
+      <div class="game-sidebar-right" id="chat-sidebar">
+        <div class="chat-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-comments" style="color: #ff3366;"></i>
+            <span data-i18n="chat_title">Tám Chuyện & Tương Tác</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);" id="room-code-tag">Phòng: ----</span>
+            <span class="spectator-counter" id="spectator-counter" style="display: none;" title="Số khán giả đang theo dõi">
+              <i class="fa-solid fa-eye"></i> <span id="spectator-count-val">0</span>
+            </span>
+          </div>
+          <button class="btn-close-chat" id="btn-close-chat" title="Đóng chat"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-bubble system" data-i18n="chat_welcome">Chào mừng bạn vào ván cờ! Hãy gửi lời chào dễ thương tới đối thủ nhé!</div>
+        </div>
+        <div class="reaction-bar">
+          <button class="btn-reaction" data-emoji="💖" title="Yêu thích">💖</button>
+          <button class="btn-reaction" data-emoji="🌸" title="Bông hoa">🌸</button>
+          <button class="btn-reaction" data-emoji="🐾" title="Dấu chân">🐾</button>
+          <button class="btn-reaction" data-emoji="🐱" title="Bé mèo">🐱</button>
+          <button class="btn-reaction" data-emoji="🐰" title="Bé thỏ">🐰</button>
+          <button class="btn-reaction" data-emoji="🍓" title="Dâu tây">🍓</button>
+          <button class="btn-reaction" data-emoji="🥺" title="Cầu xin">🥺</button>
+          <button class="btn-reaction" data-emoji="✨" title="Lấp lánh">✨</button>
+          <button class="btn-reaction" data-emoji="🎉" title="Ăn mừng">🎉</button>
+          <button class="btn-reaction" data-emoji="🍰" title="Bánh ngọt">🍰</button>
+        </div>
+        <div class="chat-input-area">
+          <input type="text" id="chat-input" class="chat-input" placeholder="Nhắn gì đó cute đi..." data-i18n-placeholder="chat_placeholder" maxlength="150" autocomplete="off">
+          <button class="chat-send-btn" id="btn-send-chat" title="Gửi tin nhắn"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: TẠO PHÒNG MỚI -->
+  <div class="modal-overlay" id="modal-create-room">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-plus-circle modal-icon"></i> <span data-i18n="modal_create_title">Tạo Phòng Chơi Online</span></h3>
+        <button class="modal-close" data-close="modal-create-room"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_player_name">Tên dễ thương của bạn:</label>
+        <input type="text" id="create-player-name" class="form-input" placeholder="VD: Bé Miu Miu" data-i18n-placeholder="placeholder_name" value="Bé Mèo 1">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_board_size">Kích thước bàn cờ:</label>
+        <select id="create-board-size" class="form-select">
+          <option value="15" selected>15 x 15 (Chuẩn thi đấu - vừa vặn Mobile/iPad)</option>
+          <option value="19">19 x 19 (Rộng rãi tha hồ bay bổng)</option>
+          <option value="12">12 x 12 (Nhanh gọn lẹ)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_rule">Luật chiến thắng:</label>
+        <select id="create-rule" class="form-select">
+          <option value="standard" selected>Luật tự do (Đủ 5 con liên tiếp là thắng)</option>
+          <option value="block2ends">Luật chặn 2 đầu (Bị chặn cả 2 đầu chưa thắng)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_turn_time">Thời gian suy nghĩ mỗi lượt:</label>
+        <select id="create-turn-time" class="form-select">
+          <option value="30" selected>30 giây (Chuẩn vui nhộn)</option>
+          <option value="60">60 giây (Thư thái ngắm hoa)</option>
+          <option value="0">Không giới hạn thời gian</option>
+        </select>
+      </div>
+      <div class="modal-btn-row">
+        <button class="btn-secondary" data-close="modal-create-room" data-i18n="btn_cancel">Hủy</button>
+        <button class="btn-primary" id="btn-confirm-create-room">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_create_room">Tạo Phòng Ngay</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NHẬP MÃ PHÒNG -->
+  <div class="modal-overlay" id="modal-join-room">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-key modal-icon"></i> <span data-i18n="modal_join_title">Vào Phòng Của Bạn Bè</span></h3>
+        <button class="modal-close" data-close="modal-join-room"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_player_name">Tên dễ thương của bạn:</label>
+        <input type="text" id="join-player-name" class="form-input" placeholder="Nhập tên của bạn..." data-i18n-placeholder="placeholder_join_name" value="Bé Thỏ 2">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_room_code">Mã phòng bạn bè gửi:</label>
+        <input type="text" id="join-room-code" class="form-input" placeholder="VD: CARO88" data-i18n-placeholder="placeholder_room_code" style="text-transform: uppercase; font-weight: 800; letter-spacing: 2px;">
+      </div>
+      <div class="modal-btn-row">
+        <button class="btn-secondary" data-close="modal-join-room" data-i18n="btn_cancel">Hủy</button>
+        <button class="btn-primary" id="btn-confirm-join-room">
+          <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="btn_join_now">Vào Phòng Ngay</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CÀI ĐẶT CHƠI VỚI AI -->
+  <div class="modal-overlay" id="modal-ai-setup">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-robot modal-icon"></i> <span data-i18n="modal_ai_title">Cài Đặt Đấu Với Bé Bot AI</span></h3>
+        <button class="modal-close" data-close="modal-ai-setup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_ai_difficulty">Mức độ thông minh của Bot:</label>
+        <select id="ai-difficulty" class="form-select">
+          <option value="hard" selected>Cao thủ (Bắt bài siêu đỉnh, phản đòn cực gắt)</option>
+          <option value="medium">Vừa tầm (Biết tấn công và phòng ngự)</option>
+          <option value="easy">Dễ thương (Tập chơi thư giãn, nhẹ nhàng)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_ai_symbol">Chọn quân cờ bạn muốn cầm:</label>
+        <select id="ai-player-symbol" class="form-select">
+          <option value="X" selected>🐱 Bé Mèo (X) - Bạn đi trước</option>
+          <option value="O">🐰 Bé Thỏ (O) - Nhường Bot AI đi trước</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_board_size">Kích thước bàn cờ:</label>
+        <select id="ai-board-size" class="form-select">
+          <option value="15" selected>15 x 15 (Chuẩn thi đấu)</option>
+          <option value="19">19 x 19 (Rộng)</option>
+          <option value="12">12 x 12 (Nhanh)</option>
+        </select>
+      </div>
+      <div class="modal-btn-row">
+        <button class="btn-secondary" data-close="modal-ai-setup" data-i18n="btn_cancel">Hủy</button>
+        <button class="btn-primary" id="btn-confirm-ai-start">
+          <i class="fa-solid fa-gamepad"></i> <span data-i18n="btn_ai_start">Bắt Đầu Đấu Nè</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: KẾT QUẢ VÁN ĐẤU -->
+  <div class="modal-overlay" id="modal-game-over">
+    <div class="modal-content" style="text-align: center;">
+      <div class="game-over-icon-box" id="game-over-icon"><i class="fa-solid fa-trophy"></i></div>
+      <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 8px;" id="game-over-title">Chiến Thắng Rực Rỡ!</h2>
+      <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 24px; line-height: 1.5;" id="game-over-desc">Bạn đã hoàn thành chuỗi 5 quân liên tiếp siêu cấp xuất sắc!</p>
+      <div class="modal-btn-row">
+        <button class="btn-secondary" id="btn-game-over-lobby">
+          <i class="fa-solid fa-house"></i> <span data-i18n="btn_lobby">Về Sảnh</span>
+        </button>
+        <button class="btn-primary" id="btn-game-over-rematch">
+          <i class="fa-solid fa-rotate-right"></i> <span data-i18n="btn_rematch">Chơi Lại Ván Mới</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: HƯỚNG DẪN & LUẬT CHƠI -->
+  <div class="modal-overlay" id="modal-help">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-book-open modal-icon"></i> <span data-i18n="modal_help_title">Luật Chơi & Hướng Dẫn</span></h3>
+        <button class="modal-close" data-close="modal-help"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div style="font-size: 14.5px; line-height: 1.6; color: var(--text-main); max-height: 60vh; overflow-y: auto;" data-i18n="help_content">
+        <p><b>1. Mục tiêu chiến thắng:</b> Người chơi nào xếp được một chuỗi <b>5 quân cờ liên tiếp</b> (hàng ngang, cột dọc hoặc đường chéo) trước sẽ giành chiến thắng!</p>
+        <br>
+        <p><b>2. Luật tự do:</b> Chỉ cần đủ 5 quân liên tiếp là thắng ngay, bất kể 2 đầu có bị chặn hay không.</p>
+        <br>
+        <p><b>3. Luật chặn 2 đầu:</b> Nếu có 5 quân liên tiếp nhưng cả 2 đầu đều bị đối thủ chặn đứng thì chưa tính thắng, phải tiếp tục mở đường cờ khác.</p>
+        <br>
+        <p><b>4. Chơi Online trên Điện Thoại & iPad:</b></p>
+        <p>• Bấm nút <b>"Mời bạn"</b> để copy link và gửi cho bạn bè qua Zalo hoặc Messenger.</p>
+        <p>• Người nhận chỉ cần chạm vào link, bấm <b>"Vào Phòng Ngay"</b> là bắt đầu trận đấu ngay lập tức!</p>
+        <p>• Bấm nút <b>"Chat"</b> ở thanh công cụ dưới đáy để gửi tin nhắn ngọt ngào và thả cảm xúc!</p>
+      </div>
+      <div class="modal-btn-row" style="margin-top: 20px;">
+        <button class="btn-primary" data-close="modal-help">
+          <i class="fa-solid fa-check"></i> <span data-i18n="btn_understood">Đã Hiểu Rõ Nè</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container chứa các thông báo Toast Glassmorphism -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Thư viện Socket.io -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- Chạy ứng dụng bằng ES Module hiện đại -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

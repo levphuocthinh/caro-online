@@ -1,0 +1,826 @@
+/* ===================================================
+   BOARD.CSS: Thẻ người chơi, Bàn cờ Kawaii, Quân cờ & Bouncy Pop
+   =================================================== */
+
+/* Thanh người chơi trên đỉnh bàn cờ */
+.players-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 12px auto;
+}
+
+.vs-badge {
+  font-size: 13px;
+  font-weight: 900;
+  color: #ff3366;
+  background: rgba(255, 51, 102, 0.2);
+  border: 1.5px solid rgba(255, 51, 102, 0.45);
+  padding: 5px 12px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(255, 51, 102, 0.25);
+}
+
+.player-card {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--shadow-kawaii);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.player-card.active-turn {
+  border-color: #ff3366;
+  box-shadow: 0 0 24px rgba(255, 51, 102, 0.55);
+  transform: translateY(-3px) scale(1.02);
+}
+
+.player-card.active-turn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(to bottom, #38bdf8, #ff3366, #ff9800);
+  border-radius: 4px;
+}
+
+.player-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.player-card.active-turn .player-avatar {
+  animation: avatarBounce 1.5s infinite ease-in-out;
+}
+
+@keyframes avatarBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.1); }
+}
+
+.player-avatar.avatar-x {
+  background: var(--color-x-bg);
+  border: 2px solid var(--color-x);
+}
+
+.player-avatar.avatar-o {
+  background: var(--color-o-bg);
+  border: 2px solid var(--color-o);
+}
+
+.player-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.player-name {
+  font-size: 14.5px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-main);
+  min-width: 0;
+}
+
+.player-name span:first-child,
+#name-player-x,
+#name-player-o {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-tag {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(255, 51, 102, 0.2);
+  color: #ff3366;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.player-status {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.turn-timer {
+  font-size: 20px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: #38bdf8;
+  flex-shrink: 0;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.turn-timer.warning {
+  color: #ff3366;
+  text-shadow: 0 0 12px rgba(255, 51, 102, 0.8);
+  animation: pulseTimer 0.8s infinite;
+}
+
+@keyframes pulseTimer {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.18); opacity: 0.75; }
+}
+
+/* ===================================================
+   BỐ CỤC GAMEPLAY (DESKTOP & MOBILE)
+   =================================================== */
+.game-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.game-sidebar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  max-height: calc(100vh - 165px);
+  max-height: calc(100dvh - 165px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.game-controls-box {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-kawaii);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.ctrl-btn {
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-glass);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  font-weight: 800;
+  font-size: 13.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ctrl-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: #ff3366;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 6px 14px rgba(255, 51, 102, 0.3);
+}
+
+.ctrl-btn:active {
+  transform: scale(0.95);
+}
+
+.ctrl-share {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.ctrl-draw {
+  background: rgba(255, 152, 0, 0.15);
+  border-color: rgba(255, 152, 0, 0.4);
+  color: #ff9800;
+}
+
+.ctrl-surrender {
+  color: #ff3366;
+  background: rgba(255, 51, 102, 0.12);
+  border-color: rgba(255, 51, 102, 0.35);
+}
+
+.ctrl-leave {
+  color: #cbd5e1;
+}
+
+/* ===================================================
+   KHU VỰC BÀN CỜ CARO GLASSMORPHISM
+   =================================================== */
+.board-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.board-status-banner {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-glass);
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-kawaii);
+  color: var(--text-main);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  flex-shrink: 0;
+}
+
+.board-container {
+  background: var(--bg-board);
+  border: 3.5px solid #a855f7;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(168, 85, 247, 0.35);
+  padding: 6px;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  width: min(100%, min(90vw, 68vh));
+  width: min(100%, min(90vw, 68dvh));
+  height: auto;
+  max-width: 580px;
+  max-height: 68vh;
+  max-height: 68dvh;
+  display: flex;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.board-container::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.caro-grid {
+  display: grid;
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+  grid-template-rows: repeat(15, minmax(0, 1fr));
+  gap: 1.5px;
+  background-color: var(--board-grid);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1.5px solid var(--board-grid);
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  touch-action: manipulation;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.caro-grid::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.caro-cell {
+  background-color: var(--board-cell);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(9px, 2.2vw, 22px);
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  position: relative;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.caro-cell:hover:not(.occupied) {
+  background-color: var(--board-cell-hover);
+}
+
+.caro-cell:active:not(.occupied) {
+  background-color: rgba(255, 51, 102, 0.3);
+  transform: scale(0.92);
+}
+
+/* Hiệu ứng nảy kẹo ngọt khi đặt quân (Pop Squash) */
+.caro-cell.cell-x {
+  color: var(--color-x);
+  text-shadow: 0 0 14px var(--color-x-glow);
+  animation: popSquash 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.caro-cell.cell-o {
+  color: var(--color-o);
+  text-shadow: 0 0 14px var(--color-o-glow);
+  animation: popSquash 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes popSquash {
+  0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+  60% { transform: scale(1.25) rotate(4deg); }
+  85% { transform: scale(0.95) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* Đốm đánh dấu nước đi vừa xong */
+.caro-cell.last-move::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  bottom: 3px;
+  right: 3px;
+  box-shadow: 0 0 12px var(--accent-gold);
+  animation: blinkLastMove 1.2s infinite ease-in-out;
+}
+
+@keyframes blinkLastMove {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* Hàng thắng 5 quân tỏa sáng lấp lánh */
+.caro-cell.winning-cell {
+  background-color: rgba(255, 152, 0, 0.45) !important;
+  animation: winningRainbow 1.2s infinite alternate ease-in-out;
+  z-index: 2;
+  border-radius: 6px;
+}
+
+@keyframes winningRainbow {
+  0% { transform: scale(1); filter: brightness(1); }
+  100% { transform: scale(1.08); filter: brightness(1.3); text-shadow: 0 0 18px #ff9800; }
+}
+
+/* ===================================================
+   THANH CÔNG CỤ DƯỚI ĐÁY TRÊN MOBILE & IPAD
+   =================================================== */
+.mobile-action-bar {
+  display: none;
+  width: min(94vw, 580px);
+  margin-top: 10px;
+  gap: 6px;
+  justify-content: space-between;
+}
+
+.m-btn {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 4px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-size: 12.5px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.15s;
+  touch-action: manipulation;
+}
+
+.m-btn:active {
+  transform: scale(0.92);
+}
+
+.m-btn-primary {
+  background: linear-gradient(135deg, #ff3366, #a855f7);
+  color: white;
+  border-color: rgba(255, 51, 102, 0.5);
+}
+
+.m-btn-danger {
+  color: #ff3366;
+  background: rgba(255, 51, 102, 0.15);
+  border-color: rgba(255, 51, 102, 0.4);
+}
+
+/* ===================================================
+   GIAO DIỆN DÀNH RIÊNG CHO MOBILE PHONES (< 768px)
+   =================================================== */
+@media (max-width: 767px) {
+  .game-layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .game-sidebar-left {
+    display: none;
+  }
+  .mobile-action-bar {
+    display: flex;
+  }
+  .board-container {
+    width: min(94vw, calc(100dvh - 210px), 520px);
+    height: min(94vw, calc(100dvh - 210px), 520px);
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    border-width: 2.5px;
+    border-radius: 18px;
+    padding: 4px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.25);
+  }
+  .caro-grid {
+    border-radius: 13px;
+    gap: 1px;
+  }
+  .caro-cell {
+    font-size: clamp(12px, 3.6vw, 22px);
+  }
+  .caro-cell.last-move::after {
+    width: 5px;
+    height: 5px;
+    bottom: 2px;
+    right: 2px;
+  }
+}
+
+/* ===================================================
+   TỐI ƯU HÓA IPAD & TABLET (768px - 1199px) & MÀN HÌNH THẤP
+   Hỗ trợ 3 cột mượt mà cả Chân dung (Portrait) & Nằm ngang (Landscape)
+   =================================================== */
+@media (min-width: 768px) and (max-width: 1199px), (max-height: 720px) and (min-width: 768px) {
+  .game-layout {
+    grid-template-columns: 155px minmax(0, 1fr) 250px;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .game-sidebar-left {
+    display: flex;
+    max-height: calc(100vh - 165px);
+    max-height: calc(100dvh - 165px);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-action-bar {
+    display: none;
+  }
+
+  .game-controls-box {
+    padding: 12px 10px;
+    gap: 8px;
+  }
+
+  .ctrl-btn {
+    padding: 9px 10px;
+    font-size: 12px;
+    gap: 6px;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .ctrl-btn i {
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+
+  .board-container {
+    width: min(100%, min(90vw, 68vh));
+    width: min(100%, min(90vw, 68dvh));
+    height: auto;
+    aspect-ratio: 1 / 1;
+    max-height: 68vh;
+    max-height: 68dvh;
+  }
+
+  .board-status-banner {
+    padding: 6px 14px;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .players-top-bar {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .player-card {
+    padding: 7px 10px;
+    gap: 8px;
+  }
+
+  .player-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+
+  .player-name {
+    font-size: 13px;
+  }
+
+  .turn-timer {
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+  .game-layout {
+    grid-template-columns: 135px minmax(0, 1fr) 220px;
+    gap: 10px;
+  }
+
+  .game-controls-box {
+    padding: 10px 8px;
+    gap: 6px;
+  }
+
+  .ctrl-btn {
+    padding: 8px 8px;
+    font-size: 11.5px;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 640px) {
+  .players-top-bar {
+    gap: 4px;
+    margin-bottom: 6px;
+    width: 100%;
+    padding: 0;
+  }
+
+  .player-card {
+    padding: 6px 8px;
+    gap: 6px;
+    border-radius: var(--radius-md);
+    min-width: 0;
+    flex: 1;
+  }
+
+  .player-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+
+  .player-name {
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .player-name span:first-child,
+  #name-player-x,
+  #name-player-o {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 76px;
+    flex-shrink: 1;
+  }
+
+  .player-tag {
+    font-size: 9px;
+    padding: 1.5px 5px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .player-status {
+    font-size: 10.5px;
+  }
+
+  .turn-timer {
+    font-size: 16px;
+  }
+
+  .vs-badge {
+    font-size: 10px;
+    font-weight: 900;
+    padding: 3px 6px;
+    border-radius: 12px;
+  }
+
+  .board-status-banner {
+    padding: 5px 14px;
+    font-size: 12px;
+    margin-bottom: 6px;
+    max-width: 95vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-action-bar {
+    width: 100%;
+    max-width: min(94vw, calc(100dvh - 210px), 520px);
+    margin-top: 8px;
+    gap: 5px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .m-btn {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 48px;
+    padding: 5px 2px;
+    border-radius: 12px;
+    gap: 2px;
+  }
+
+  .m-btn i {
+    font-size: 13.5px;
+  }
+
+  .m-btn span {
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+  }
+}
+
+@media (max-width: 380px) {
+  .player-card {
+    padding: 4px 5px;
+    gap: 4px;
+  }
+
+  .player-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
+
+  .player-name span:first-child,
+  #name-player-x,
+  #name-player-o {
+    max-width: 52px;
+  }
+
+  .player-tag {
+    font-size: 8px;
+    padding: 1px 3px;
+  }
+
+  .vs-badge {
+    font-size: 8.5px;
+    padding: 2px 4px;
+  }
+
+  .turn-timer {
+    font-size: 14.5px;
+  }
+
+  .board-container {
+    width: min(96vw, calc(100dvh - 200px));
+    height: min(96vw, calc(100dvh - 200px));
+    padding: 3px;
+    border-width: 2px;
+  }
+
+  .m-btn {
+    min-height: 44px;
+    padding: 4px 1px;
+    gap: 1px;
+  }
+
+  .m-btn i {
+    font-size: 12px;
+  }
+
+  .m-btn span {
+    font-size: 9px;
+  }
+}
+
+/* Tối ưu hóa khi xoay ngang điện thoại (Mobile Landscape) */
+@media (max-height: 480px) and (orientation: landscape) {
+  .players-top-bar {
+    margin-bottom: 4px;
+    gap: 6px;
+  }
+
+  .player-card {
+    padding: 3px 6px;
+  }
+
+  .player-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+  }
+
+  .board-status-banner {
+    margin-bottom: 4px;
+    padding: 3px 10px;
+    font-size: 11px;
+  }
+
+  .board-container {
+    width: min(90vw, calc(100dvh - 130px));
+    height: min(90vw, calc(100dvh - 130px));
+    padding: 3px;
+    border-width: 2px;
+  }
+
+  .mobile-action-bar {
+    margin-top: 4px;
+  }
+
+  .m-btn {
+    min-height: 38px;
+    flex-direction: row;
+    gap: 4px;
+    padding: 3px 6px;
+  }
+
+  .m-btn span {
+    font-size: 10px;
+  }
+}
+
+/* Badge trạng thái Khán giả */
+.spectator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+  border-radius: 20px;
+  background: rgba(56, 189, 248, 0.16);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  font-size: 11.5px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}

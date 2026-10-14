@@ -1,0 +1,505 @@
+/* ===================================================
+   LOBBY.CSS: Giao diện Sảnh chờ Kawaii & Thẻ chế độ chơi
+   =================================================== */
+
+.lobby-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+  gap: 22px;
+  padding: 10px 0 24px 0;
+}
+
+.hero-box {
+  text-align: center;
+  max-width: 600px;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  background: rgba(255, 51, 102, 0.2);
+  border: 1.5px solid rgba(255, 51, 102, 0.45);
+  color: #ff3366;
+  font-size: 12.5px;
+  font-weight: 800;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(255, 51, 102, 0.25);
+}
+
+.hero-title {
+  font-size: clamp(28px, 6.5vw, 42px);
+  font-weight: 900;
+  line-height: 1.25;
+  margin-bottom: 10px;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #ff3366, #ff9800, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.hero-subtitle {
+  color: var(--text-muted);
+  font-size: clamp(14px, 3.8vw, 16px);
+  padding: 0 14px;
+  line-height: 1.6;
+  font-weight: 600;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Danh sách thẻ chế độ */
+.mode-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 980px;
+}
+
+.card-mode {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  box-shadow: var(--shadow-kawaii);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.card-mode:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: #ff3366;
+  box-shadow: 0 18px 40px -8px rgba(255, 51, 102, 0.45);
+}
+
+.card-mode .badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 11.5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: 800;
+  background: rgba(255, 152, 0, 0.18);
+  color: #ff9800;
+  border: 1px solid rgba(255, 152, 0, 0.4);
+}
+
+.card-icon-fa {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-mode:hover .card-icon-fa {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+.icon-online {
+  background: linear-gradient(135deg, rgba(255, 51, 102, 0.25), rgba(192, 132, 252, 0.35));
+  border: 1.5px solid rgba(255, 51, 102, 0.55);
+  color: #ff5588;
+}
+
+.icon-ai {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(56, 189, 248, 0.35));
+  border: 1.5px solid rgba(16, 185, 129, 0.55);
+  color: #10b981;
+}
+
+.icon-local {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(251, 191, 36, 0.35));
+  border: 1.5px solid rgba(245, 158, 11, 0.55);
+  color: #f59e0b;
+}
+
+.card-icon {
+  font-size: 42px;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+  animation: floatIcon 3s infinite ease-in-out;
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+.card-desc {
+  color: var(--text-muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+  margin-bottom: 20px;
+  font-weight: 600;
+  flex: 1;
+}
+
+/* Các kiểu nút kẹo ngọt (Cute Buttons) */
+.card-btn {
+  width: 100%;
+  padding: 13px 18px;
+  border-radius: var(--radius-md);
+  font-size: 14.5px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.card-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.card-btn:active {
+  transform: scale(0.95);
+}
+
+.card-btn + .card-btn,
+.card-mode .card-btn + .card-btn,
+.card-online .card-btn + .card-btn {
+  margin-top: 10px !important;
+}
+
+.btn-cute-primary {
+  background: linear-gradient(135deg, #ff3366, #ff758f, #a855f7);
+  color: white;
+  box-shadow: 0 6px 18px rgba(255, 51, 102, 0.4);
+}
+.btn-cute-primary:hover {
+  box-shadow: 0 8px 24px rgba(255, 51, 102, 0.55);
+}
+
+.btn-cute-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  border: 1.5px solid var(--border-glass);
+}
+.btn-cute-secondary:hover {
+  border-color: #38bdf8;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.btn-cute-green {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+}
+
+.btn-cute-amber {
+  background: linear-gradient(135deg, #ff9800, #f59e0b);
+  color: white;
+  box-shadow: 0 6px 18px rgba(255, 152, 0, 0.4);
+}
+
+/* ===================================================
+   CÁC GAME KHÁC ĐANG PHÁT TRIỂN (COMING SOON)
+   =================================================== */
+.coming-soon-box {
+  width: 100%;
+  max-width: 980px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  padding: 22px;
+  box-shadow: var(--shadow-kawaii);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.coming-soon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.coming-soon-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coming-soon-tag {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #ff9800;
+  background: rgba(255, 152, 0, 0.18);
+  border: 1px solid rgba(255, 152, 0, 0.4);
+  padding: 4px 12px;
+  border-radius: 16px;
+}
+
+.coming-soon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+.coming-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px dashed rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.coming-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: #38bdf8;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 20px rgba(56, 189, 248, 0.25);
+}
+
+.coming-card:active {
+  transform: scale(0.97);
+}
+
+.coming-icon,
+.coming-icon-fa {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #c084fc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.coming-card:hover .coming-icon-fa {
+  transform: scale(1.12);
+  background: rgba(192, 132, 252, 0.25);
+  border-color: #ff3366;
+  color: #ff758f;
+}
+
+.coming-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.coming-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coming-status {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.coming-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #ff3366;
+  background: rgba(255, 51, 102, 0.15);
+  border: 1px solid rgba(255, 51, 102, 0.35);
+  padding: 3px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+/* ===================================================
+   MOBILE OPTIMIZATION (Giao diện chuẩn Game Mobile gọn gàng)
+   =================================================== */
+@media (max-width: 640px) {
+  .lobby-container {
+    min-height: auto;
+    gap: 12px;
+    padding: 6px 0 20px 0;
+  }
+
+  .hero-box {
+    margin-bottom: 2px;
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    margin-bottom: 6px;
+  }
+
+  .hero-title {
+    font-size: 21px;
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
+    font-size: 12.5px;
+    line-height: 1.4;
+    padding: 0 8px;
+    max-width: 320px;
+    margin: 0 auto;
+    opacity: 0.9;
+  }
+
+  .mode-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card-mode {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .card-mode .badge {
+    top: 12px;
+    right: 12px;
+    font-size: 10.5px;
+    padding: 3px 9px;
+  }
+
+  .card-icon-fa {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+
+  .card-desc {
+    font-size: 12.5px;
+    line-height: 1.45;
+    margin-bottom: 12px;
+  }
+
+  .card-btn {
+    padding: 11px 14px;
+    font-size: 13.5px;
+    border-radius: 12px;
+    min-height: 44px;
+    height: auto;
+  }
+
+  .card-btn + .card-btn,
+  .card-online .card-btn + .card-btn,
+  .card-mode .card-btn + .card-btn {
+    margin-top: 10px !important;
+  }
+
+  .coming-soon-box {
+    padding: 14px 12px;
+    border-radius: 18px;
+    margin-top: 4px;
+  }
+
+  .coming-soon-header {
+    margin-bottom: 10px;
+  }
+
+  .coming-soon-title {
+    font-size: 14.5px;
+  }
+
+  .coming-soon-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .coming-card {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .coming-card .coming-badge {
+    display: none; /* Đã có badge ở header, ẩn ở từng card trên mobile để tên và mô tả thoáng đãng */
+  }
+
+  .coming-icon-fa {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 17px;
+  }
+
+  .coming-name {
+    font-size: 13.5px;
+  }
+
+  .coming-status {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-title {
+    font-size: 19px;
+  }
+
+  .card-mode {
+    padding: 14px 12px;
+  }
+
+  .card-title {
+    font-size: 16px;
+  }
+
+  .card-desc {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+}
+
