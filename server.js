@@ -40,3 +40,22 @@ server.listen(PORT, () => {
   }
   console.log(`===============================================`);
 });
+
+// Giám sát lỗi tiến trình toàn cục để ngăn server crash trên hosting Render / VPS
+process.on('uncaughtException', (err) => {
+  console.error('[Process Error] Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[Process Error] Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Graceful shutdown khi container hoặc hosting gửi tín hiệu dừng
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully...');
+  server.close(() => {
+    console.log('Caro server closed.');
+    process.exit(0);
+  });
+});
+

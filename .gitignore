@@ -16,3 +16,7 @@ Thumbs.db
 # Agent files & Temporary scratch files
 .agents/
 scratch_*.js
+*.tmp
+.env
+.env.*
+
