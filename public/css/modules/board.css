@@ -294,6 +294,7 @@
   box-sizing: border-box;
   aspect-ratio: 1 / 1;
   overflow: hidden;
+  isolation: isolate;
   width: min(100%, min(90vw, 68vh));
   width: min(100%, min(90vw, 68dvh));
   height: auto;
@@ -301,8 +302,6 @@
   max-height: 68vh;
   max-height: 68dvh;
   display: flex;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -358,8 +357,10 @@
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
-.caro-cell:hover:not(.occupied) {
-  background-color: var(--board-cell-hover);
+@media (hover: hover) and (pointer: fine) {
+  .caro-cell:hover:not(.occupied) {
+    background-color: var(--board-cell-hover);
+  }
 }
 
 .caro-cell:active:not(.occupied) {
@@ -463,9 +464,13 @@
 }
 
 .m-btn-danger {
-  color: #ff3366;
-  background: rgba(255, 51, 102, 0.15);
-  border-color: rgba(255, 51, 102, 0.4);
+  color: #ffffff;
+  background: rgba(255, 51, 102, 0.22);
+  border-color: rgba(255, 51, 102, 0.5);
+}
+
+.m-btn-danger i {
+  color: #ff4d6d;
 }
 
 /* ===================================================
@@ -490,7 +495,10 @@
     border-width: 2.5px;
     border-radius: 18px;
     padding: 4px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(168, 85, 247, 0.25);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    isolation: isolate;
   }
   .caro-grid {
     border-radius: 13px;
@@ -677,10 +685,13 @@
   .mobile-action-bar {
     width: 100%;
     max-width: min(94vw, calc(100dvh - 210px), 520px);
-    margin-top: 8px;
+    margin-top: 10px;
+    margin-bottom: 4px;
     gap: 5px;
     display: flex;
     justify-content: space-between;
+    position: relative;
+    z-index: 2;
   }
 
   .m-btn {
@@ -747,6 +758,9 @@
     height: min(96vw, calc(100dvh - 200px));
     padding: 3px;
     border-width: 2px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    isolation: isolate;
   }
 
   .m-btn {
