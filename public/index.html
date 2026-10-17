@@ -273,24 +273,27 @@
           <!-- Render động toàn bộ 8 game thẻ to -->
         </div>
 
-        <!-- DOCK 6 NÚT TRÒN ĐIỀU KHIỂN ĐẶC TRƯNG CỦA MẪU 1 -->
+        <!-- DOCK NÚT SQUIRCLE ĐIỀU KHIỂN (THAY THẾ ICON TRÒN CŨ BẰNG ICON SQUIRCLE RỰC RỠ NHƯ MẪU 1) -->
         <div class="hub-console-dock" id="hub-console-dock">
-          <button class="hub-dock-btn dock-news" data-dock-action="news" title="Tin mới & Sự kiện">
-            <i class="fa-regular fa-comment-dots"></i>
+          <button class="hub-dock-btn hub-bubble-btn bubble-news active-cyan" data-dock-action="all" type="button" title="Tất cả Game & Tin tức" data-i18n-title="bubble_all">
+            <i class="fa-regular fa-newspaper"></i>
           </button>
-          <button class="hub-dock-btn dock-shop" data-dock-action="shop" title="Cửa hàng Game">
-            <i class="fa-solid fa-bag-shopping"></i>
+          <button class="hub-dock-btn hub-bubble-btn bubble-classic" data-dock-action="classic" type="button" title="Cờ Truyền Thống" data-i18n-title="bubble_classic">
+            <i class="fa-solid fa-chess-knight"></i>
           </button>
-          <button class="hub-dock-btn dock-trophy" data-dock-action="trophy" title="Thành tựu & Cúp">
+          <button class="hub-dock-btn hub-bubble-btn bubble-modern" data-dock-action="boardgame" type="button" title="Board Game Hiện Đại" data-i18n-title="bubble_boardgame">
+            <i class="fa-solid fa-dice-d20"></i>
+          </button>
+          <button class="hub-dock-btn hub-bubble-btn bubble-trophy" data-dock-action="trophy" type="button" title="Thành tựu & Cúp" data-i18n-title="bubble_trophy">
             <i class="fa-solid fa-trophy"></i>
           </button>
-          <button class="hub-dock-btn dock-guide" data-dock-action="guide" title="Cẩm nang & Hướng dẫn">
+          <button class="hub-dock-btn hub-bubble-btn bubble-guide" data-dock-action="guide" type="button" title="Cẩm nang & Hướng dẫn" data-i18n-title="bubble_guide">
             <i class="fa-solid fa-book-open"></i>
           </button>
-          <button class="hub-dock-btn dock-theme active-cyan-dock" data-dock-action="theme" title="Chuyển chế độ Sáng / Tối">
+          <button class="hub-dock-btn hub-bubble-btn bubble-theme" data-dock-action="theme" type="button" title="Chuyển chế độ Sáng / Tối" data-i18n-title="tip_theme">
             <i class="fa-solid fa-gear"></i>
           </button>
-          <button class="hub-dock-btn dock-sound" data-dock-action="sound" title="Âm thanh trò chơi">
+          <button class="hub-dock-btn hub-bubble-btn bubble-sound" data-dock-action="sound" type="button" title="Âm thanh trò chơi" data-i18n-title="tip_sound">
             <i class="fa-solid fa-volume-high"></i>
           </button>
         </div>

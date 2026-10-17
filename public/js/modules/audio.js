@@ -25,32 +25,125 @@ export class SoundManager {
     return this.muted;
   }
 
-  // Âm thanh tương tác chuyển màn hình / chọn mục UI nhanh gọn, êm tai
-  playMoveSound() {
+  // Tiếng "Pop" bong bóng siêu cute (Cute Pop - cho nút bấm, chọn game, tab)
+  playCutePop() {
     if (this.muted) return;
     this.init();
     if (!this.ctx) return;
-
     try {
       const t = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, t);
-      osc.frequency.exponentialRampToValueAtTime(880, t + 0.05);
+      osc.frequency.setValueAtTime(540, t);
+      osc.frequency.exponentialRampToValueAtTime(1080, t + 0.045);
 
-      gain.gain.setValueAtTime(0.2, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      gain.gain.setValueAtTime(0.28, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.075);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start(t);
-      osc.stop(t + 0.06);
-    } catch {
-      // Bỏ qua nếu audio context bị khóa
-    }
+      osc.stop(t + 0.075);
+
+      // Thêm tiếng ping lấp lánh tinh nghịch
+      const ping = this.ctx.createOscillator();
+      const pingGain = this.ctx.createGain();
+      ping.type = 'triangle';
+      ping.frequency.setValueAtTime(1620, t + 0.015);
+      pingGain.gain.setValueAtTime(0.12, t + 0.015);
+      pingGain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+      ping.connect(pingGain);
+      pingGain.connect(this.ctx.destination);
+      ping.start(t + 0.015);
+      ping.stop(t + 0.09);
+    } catch (_) {}
+  }
+
+  // Tiếng Chime leng keng dễ thương (Cute Musical Chime - khi đổi ngôn ngữ, mở cẩm nang, đổi theme)
+  playCuteChime() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      // 3 nốt nhạc vui tươi: Đô 6 (1046.5Hz) -> Mi 6 (1318.5Hz) -> Sol 6 (1567.9Hz)
+      const notes = [1046.5, 1318.5, 1567.9];
+      notes.forEach((freq, idx) => {
+        const t = this.ctx.currentTime + idx * 0.055;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t);
+
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.18);
+      });
+    } catch (_) {}
+  }
+
+  // Tiếng lướt chuyển cảnh êm ái (Cute Swoosh / Slide - khi icon trượt xuống/lên giữa 2 chế độ)
+  playCuteWhoosh() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(420, t);
+      osc.frequency.exponentialRampToValueAtTime(840, t + 0.06);
+      osc.frequency.exponentialRampToValueAtTime(620, t + 0.14);
+
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.15);
+    } catch (_) {}
+  }
+
+  // Tiếng gõ kẹo ngọt ngào (Cute Tap - cho các phím nhỏ, đóng mở)
+  playCuteTap() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(780, t);
+      osc.frequency.exponentialRampToValueAtTime(390, t + 0.04);
+
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.05);
+    } catch (_) {}
+  }
+
+  // Âm thanh tương tác chuyển màn hình / chọn mục UI nhanh gọn, êm tai
+  playMoveSound() {
+    this.playCutePop();
   }
 
   // Tiếng "Pop! / Bloop" bong bóng khi đặt cờ

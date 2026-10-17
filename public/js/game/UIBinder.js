@@ -44,6 +44,7 @@ export class UIBinder {
     if (langSelector && langTrigger) {
       langTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
+        try { soundManager.playCutePop(); } catch (_) {}
         const isOpen = langSelector.classList.toggle('open');
         langTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
@@ -51,6 +52,7 @@ export class UIBinder {
       document.querySelectorAll('.lang-option').forEach(option => {
         option.addEventListener('click', (e) => {
           e.stopPropagation();
+          try { soundManager.playCuteChime(); } catch (_) {}
           const lang = option.dataset.lang;
           if (lang) {
             i18n.setLanguage(lang);
@@ -75,6 +77,17 @@ export class UIBinder {
         }
       });
     }
+
+    // Âm thanh dễ thương khi bấm các nút tương tác trên toàn hệ thống
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button, .lang-option, .hub-bubble-btn, .hub-dock-btn, .hub-game-tile, .hub-home-card, .hub-filter-tab, .hub-menu-item, .card-mode, .btn-icon');
+      if (!btn) return;
+      if (btn.classList.contains('lang-option')) {
+        soundManager.playCuteChime();
+      } else {
+        soundManager.playCutePop();
+      }
+    });
 
     // Sự kiện khi bấm vào các game đang phát triển ở trang Caro
     document.querySelectorAll('.coming-card').forEach(card => {
@@ -470,6 +483,7 @@ export class UIBinder {
     let isDetailViewOpen = true;
 
     const renderSelectedGame = (gameId, openDetail = null) => {
+      const prevOpenState = isDetailViewOpen;
       if (openDetail !== null) {
         isDetailViewOpen = Boolean(openDetail);
       }
@@ -481,6 +495,8 @@ export class UIBinder {
 
       const detailStage = document.getElementById('hub-detail-stage');
       const homeStage = document.getElementById('hub-home-stage');
+      const headerBubbles = document.getElementById('hub-header-bubbles');
+      const consoleDock = document.getElementById('hub-console-dock');
 
       if (isDetailViewOpen) {
         // ========================================================
@@ -493,6 +509,20 @@ export class UIBinder {
         if (homeStage) {
           homeStage.classList.add('is-hidden');
           homeStage.style.display = 'none';
+        }
+
+        // Animation icon bay ngược lên lại Header khi từ Home vào Detail
+        if (headerBubbles) {
+          headerBubbles.classList.remove('in-home-mode', 'anim-descend');
+          if (prevOpenState === false) {
+            headerBubbles.classList.add('anim-ascend');
+          }
+        }
+        if (consoleDock) {
+          consoleDock.classList.remove('anim-dock-in');
+          if (prevOpenState === false) {
+            consoleDock.classList.add('anim-dock-out');
+          }
         }
 
         // 1.1. Cập nhật Tháp Thống Nhất Cột Trái (Left Tower: Card + Close + Menu Đỏ)
@@ -556,7 +586,7 @@ export class UIBinder {
             tile.addEventListener('click', () => {
               const gId = tile.dataset.gameId;
               if (!gId) return;
-              try { soundManager.playMoveSound(); } catch (_) {}
+              try { soundManager.playCutePop(); } catch (_) {}
               renderSelectedGame(gId, true);
             });
           });
@@ -592,7 +622,7 @@ export class UIBinder {
 
           newsGrid.querySelectorAll('.hub-news-card').forEach(card => {
             card.addEventListener('click', () => {
-              try { soundManager.playMoveSound(); } catch (_) {}
+              try { soundManager.playCutePop(); } catch (_) {}
               if (!info.playable) {
                 showComingToast();
                 return;
@@ -616,6 +646,19 @@ export class UIBinder {
         if (homeStage) {
           homeStage.classList.remove('is-hidden');
           homeStage.style.display = 'flex';
+        }
+
+        // Animation icon từ Header bay xuống đáy Dock (Descend) theo yêu cầu người dùng
+        if (headerBubbles) {
+          headerBubbles.classList.remove('anim-ascend');
+          headerBubbles.classList.add('anim-descend');
+          setTimeout(() => {
+            if (!isDetailViewOpen) headerBubbles.classList.add('in-home-mode');
+          }, 380);
+        }
+        if (consoleDock) {
+          consoleDock.classList.remove('anim-dock-out');
+          consoleDock.classList.add('anim-dock-in');
         }
 
         const homeCarousel = document.getElementById('hub-home-carousel');
@@ -661,7 +704,7 @@ export class UIBinder {
                 triggerEnterSelectedGame();
                 return;
               }
-              try { soundManager.playMoveSound(); } catch (_) {}
+              try { soundManager.playCuteWhoosh(); } catch (_) {}
               renderSelectedGame(gId, true);
             });
           });
@@ -680,10 +723,10 @@ export class UIBinder {
       triggerEnterSelectedGame();
     });
 
-    // Nút Close đóng / thu gọn chuyển sang Chế độ Toàn Cảnh (Mẫu 1)
+    // Nút Close đóng / thu gọn chuyển sang Chế độ Toàn Cảnh (Mẫu 1) có âm thanh lướt cute
     const closeDrawerHandler = (e) => {
       if (e) e.stopPropagation();
-      try { soundManager.playMoveSound(); } catch (_) {}
+      try { soundManager.playCuteWhoosh(); } catch (_) {}
       renderSelectedGame(selectedGameId, false);
     };
 
@@ -699,6 +742,7 @@ export class UIBinder {
           return;
         }
 
+        try { soundManager.playCutePop(); } catch (_) {}
         menuItems.forEach(m => m.classList.remove('active-cyan'));
         item.classList.add('active-cyan');
 
@@ -712,10 +756,12 @@ export class UIBinder {
             showComingToast();
           }
         } else if (action === 'guide') {
+          soundManager.playCuteChime();
           CaroModal.open('modal-help');
         } else if (action === 'sound') {
           document.getElementById('btn-sound-toggle')?.click();
         } else if (action === 'achievements') {
+          soundManager.playCuteChime();
           CaroModal.showToast(`🏆 Hệ thống Thành tựu của ${gamesCatalog[selectedGameId]?.coverTitle || 'Game'} đã ghi nhận tiến độ của bạn!`);
         } else if (action === 'news') {
           document.querySelector('.hub-news-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -727,21 +773,23 @@ export class UIBinder {
       });
     });
 
-    // DOCK 6 NÚT TRÒN ĐIỀU KHIỂN ĐẶC TRƯNG MẪU 1
+    // DOCK NÚT SQUIRCLE ĐIỀU KHIỂN ĐẶC TRƯNG MẪU 1 (THAY THẾ CHO ICON TRÒN)
     const dockButtons = document.querySelectorAll('#hub-console-dock .hub-dock-btn');
     dockButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        try { soundManager.playMoveSound(); } catch (_) {}
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        try { soundManager.playCutePop(); } catch (_) {}
         const action = btn.dataset.dockAction;
-        if (action === 'news') {
-          CaroModal.showToast('📰 Cập nhật tin tức & sự kiện mới nhất từ cộng đồng Boardgame Friends!');
-        } else if (action === 'shop') {
-          CaroModal.showToast('🛍️ Cửa hàng Boardgame Friends: Tính năng vật phẩm & theme sẽ sớm ra mắt!');
+        if (action === 'all' || action === 'classic' || action === 'boardgame') {
+          applyHubFilter(action);
         } else if (action === 'trophy') {
+          try { soundManager.playCuteChime(); } catch (_) {}
           CaroModal.showToast('🏆 Bạn đã mở khóa 18 Huy chương Đồng, 12 Bạc và 3 Vàng trên Cổng Game!');
         } else if (action === 'guide') {
+          try { soundManager.playCuteChime(); } catch (_) {}
           CaroModal.open('modal-help');
         } else if (action === 'theme') {
+          try { soundManager.playCuteChime(); } catch (_) {}
           document.getElementById('btn-theme-toggle')?.click();
         } else if (action === 'sound') {
           document.getElementById('btn-sound-toggle')?.click();
@@ -749,15 +797,20 @@ export class UIBinder {
       });
     });
 
-    // Sự kiện lọc danh mục trên thanh Sub-nav & Bubble Header
+    // Sự kiện lọc danh mục trên thanh Sub-nav, Bubble Header & Dock Squircle
     const applyHubFilter = (filterType) => {
-      try { soundManager.playMoveSound(); } catch (_) {}
+      try { soundManager.playCutePop(); } catch (_) {}
       currentFilterType = filterType;
       document.querySelectorAll('.hub-filter-tab').forEach(tab => {
         tab.classList.toggle('active', tab.dataset.hubFilter === filterType);
       });
-      document.querySelectorAll('.hub-bubble-btn').forEach(btn => {
+      document.querySelectorAll('.hub-header-bubbles .hub-bubble-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.hubBubble === filterType);
+      });
+      document.querySelectorAll('#hub-console-dock .hub-dock-btn').forEach(btn => {
+        const isAct = btn.dataset.dockAction === filterType;
+        btn.classList.toggle('active-cyan', isAct);
+        btn.classList.toggle('active', isAct);
       });
 
       renderSelectedGame(selectedGameId, isDetailViewOpen);
@@ -768,15 +821,17 @@ export class UIBinder {
     });
 
     // 5 Icon Tròn trên thanh Header (Lọc danh mục, Cẩm nang & Thành tựu)
-    document.querySelectorAll('.hub-bubble-btn').forEach(btn => {
+    document.querySelectorAll('.hub-header-bubbles .hub-bubble-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        try { soundManager.playMoveSound(); } catch (_) {}
+        try { soundManager.playCutePop(); } catch (_) {}
         const bType = btn.dataset.hubBubble;
         if (bType === 'all' || bType === 'classic' || bType === 'boardgame') {
           applyHubFilter(bType);
         } else if (bType === 'guide') {
+          try { soundManager.playCuteChime(); } catch (_) {}
           CaroModal.open('modal-help');
         } else if (bType === 'trophy') {
+          try { soundManager.playCuteChime(); } catch (_) {}
           CaroModal.showToast('🏆 Bạn đã mở khóa 18 Huy chương Đồng, 12 Bạc và 3 Vàng trên Cổng Game!');
         }
       });
