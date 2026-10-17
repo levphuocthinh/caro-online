@@ -25,6 +25,34 @@ export class SoundManager {
     return this.muted;
   }
 
+  // Âm thanh tương tác chuyển màn hình / chọn mục UI nhanh gọn, êm tai
+  playMoveSound() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, t);
+      osc.frequency.exponentialRampToValueAtTime(880, t + 0.05);
+
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.06);
+    } catch {
+      // Bỏ qua nếu audio context bị khóa
+    }
+  }
+
   // Tiếng "Pop! / Bloop" bong bóng khi đặt cờ
   playPiece() {
     if (this.muted) return;

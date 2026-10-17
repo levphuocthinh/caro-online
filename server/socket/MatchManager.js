@@ -28,11 +28,6 @@ class MatchManager {
       return;
     }
 
-    if (room.currentTurn !== playerSymbol) {
-      socket.emit('error_message', { message: 'Chưa tới lượt của bạn!' });
-      return;
-    }
-
     const { row, col } = moveData;
     if (
       !Number.isInteger(row) ||
@@ -43,6 +38,11 @@ class MatchManager {
       col >= room.boardSize
     ) {
       socket.emit('error_message', { message: 'Nước đi không hợp lệ!' });
+      return;
+    }
+
+    if (room.currentTurn !== playerSymbol) {
+      socket.emit('error_message', { message: 'Chưa tới lượt của bạn!' });
       return;
     }
 

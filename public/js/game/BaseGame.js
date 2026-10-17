@@ -14,6 +14,7 @@ export class BaseGame {
     this.state = state;
 
     // DOM Elements
+    this.screenHub = document.getElementById('screen-hub');
     this.screenLobby = document.getElementById('screen-lobby');
     this.screenGame = document.getElementById('screen-game');
     this.bannerText = document.getElementById('banner-text');
@@ -29,13 +30,67 @@ export class BaseGame {
     this.tagPlayerO = document.getElementById('tag-player-o');
   }
 
-  // Chuyển đổi màn hình (Sảnh chờ <-> Bàn cờ)
-  switchToScreen(screen) {
-    if (this.screenLobby) this.screenLobby.classList.remove('active');
-    if (this.screenGame) this.screenGame.classList.remove('active');
-    if (screen) screen.classList.add('active');
-    document.body.classList.toggle('in-game', screen === this.screenGame);
-    window.scrollTo(0, 0);
+  // Chuyển đổi màn hình (Cổng Game Hub <-> Sảnh Caro <-> Bàn cờ)
+  switchToScreen(screen, pushState = true) {
+    CaroModal.closeAll();
+    if (typeof document !== 'undefined') {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+      const target = typeof screen === 'string' ? document.getElementById(screen) : screen;
+      if (target) {
+        target.classList.add('active');
+      }
+
+      const isGame = target?.id === 'screen-game';
+      const isHub = target?.id === 'screen-hub';
+      const isLobby = target?.id === 'screen-lobby';
+
+      if (document.body) {
+        document.body.classList.toggle('in-game', isGame);
+        document.body.classList.toggle('in-hub', isHub);
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      if (typeof window.scrollTo === 'function') {
+        window.scrollTo(0, 0);
+      }
+
+      // Đồng bộ URL và Browser History (Hỗ trợ nút Back/Forward mặc định của trình duyệt)
+      if (window.history && window.location) {
+        const targetId = typeof screen === 'string' ? screen : screen?.id;
+        const isGame = targetId === 'screen-game';
+        const isLobby = targetId === 'screen-lobby';
+
+        let targetHash = '';
+        let pageTitle = 'Lycngames — Boardgame Friends';
+
+        if (isLobby) {
+          targetHash = '#caro';
+          pageTitle = 'Caro Online — Sảnh Chờ | Lycngames';
+        } else if (isGame) {
+          targetHash = '#game';
+          pageTitle = 'Caro Online — Bàn Cờ Đang Đấu | Lycngames';
+        } else {
+          targetHash = '';
+          pageTitle = 'Lycngames — Boardgame Friends';
+        }
+
+        if (typeof document !== 'undefined') {
+          document.title = pageTitle;
+        }
+
+        if (pushState && typeof window.history.pushState === 'function') {
+          const currentHash = window.location.hash || '';
+          if (currentHash !== targetHash) {
+            const targetUrl = targetHash
+              ? (window.location.pathname + (window.location.search || '') + targetHash)
+              : (window.location.pathname + (window.location.search || ''));
+            window.history.pushState({ screen: targetId || 'screen-hub' }, pageTitle, targetUrl);
+          }
+        }
+      }
+    }
   }
 
   // Cập nhật lượt đi và viền sáng phát sáng
@@ -125,11 +180,10 @@ export class BaseGame {
     this.backToLobby();
   }
 
-  backToLobby() {
+  backToLobby(pushState = true) {
     caroTimer.stop();
     caroChat.closeDrawer();
     this.state.reset();
-    window.history.replaceState({}, document.title, window.location.pathname);
-    this.switchToScreen(this.screenLobby);
+    this.switchToScreen(this.screenLobby, pushState);
   }
 }

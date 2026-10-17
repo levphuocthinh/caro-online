@@ -150,6 +150,31 @@ body {
   white-space: nowrap;
 }
 
+/* Kiểu chữ Logo gốc riêng cho Game Caro */
+.logo-title-caro {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.4px;
+  background: linear-gradient(135deg, #ff3366, #ff758c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.logo-subtitle-caro {
+  font-size: 11px;
+  font-weight: 700;
+  color: #d8b4fe;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.logo-icon-caro i {
+  color: #ff3366 !important;
+  font-size: 22px;
+}
+
 .header-actions {
   display: flex;
   align-items: center;

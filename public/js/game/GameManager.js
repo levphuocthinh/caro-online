@@ -27,6 +27,7 @@ export class GameManager {
     this.setupChat();
     UIBinder.bind(this);
     this.fetchServerInfo();
+    this.setupHistoryRouting();
     this.checkUrlForRoom();
   }
 
@@ -89,6 +90,7 @@ export class GameManager {
     const urlParams = new URLSearchParams(window.location.search);
     const roomFromUrl = urlParams.get('room');
     if (roomFromUrl) {
+      this.openCaroLobby();
       const joinCodeInput = document.getElementById('join-room-code');
       const joinNameInput = document.getElementById('join-player-name');
       if (joinCodeInput) joinCodeInput.value = roomFromUrl.toUpperCase();
@@ -98,6 +100,19 @@ export class GameManager {
       CaroModal.open('modal-join-room');
       CaroModal.showToast(`Đã nhận link phòng ${roomFromUrl.toUpperCase()}! Bấm "Vào Phòng Ngay" để chơi.`);
     }
+  }
+
+  openHub(pushState = true) {
+    CaroModal.closeAll();
+    if (this.state.gameMode === 'online') {
+      caroOnline.disconnect();
+    }
+    this.localGame.switchToScreen('screen-hub', pushState);
+  }
+
+  openCaroLobby(pushState = true) {
+    CaroModal.closeAll();
+    this.localGame.switchToScreen('screen-lobby', pushState);
   }
 
   handleSurrender() {
@@ -141,6 +156,11 @@ export class GameManager {
   }
 
   confirmLeaveGame() {
+    const screenLobby = document.getElementById('screen-lobby');
+    if (screenLobby && screenLobby.classList.contains('active')) {
+      this.openHub();
+      return;
+    }
     if (this.state.gameMode && !this.state.isGameOver) {
       if (!confirm(i18n.getText('confirm_leave'))) {
         return;
@@ -149,13 +169,107 @@ export class GameManager {
     this.backToLobby();
   }
 
-  backToLobby() {
-    if (this.state.gameMode === 'online') {
-      this.onlineGame.backToLobby();
-    } else if (this.state.gameMode === 'ai') {
-      this.aiGame.backToLobby();
-    } else {
-      this.localGame.backToLobby();
+  confirmLeaveToHub() {
+    const screenLobby = document.getElementById('screen-lobby');
+    if (screenLobby && screenLobby.classList.contains('active')) {
+      this.openHub();
+      return;
     }
+    if (this.state.gameMode && !this.state.isGameOver) {
+      if (!confirm(i18n.getText('confirm_leave'))) {
+        return;
+      }
+    }
+    this.openHub();
+  }
+
+  backToLobby(pushState = true) {
+    if (this.state.gameMode === 'online') {
+      this.onlineGame.backToLobby(pushState);
+    } else if (this.state.gameMode === 'ai') {
+      this.aiGame.backToLobby(pushState);
+    } else {
+      this.localGame.backToLobby(pushState);
+    }
+  }
+
+  setupHistoryRouting() {
+    if (typeof window === 'undefined') return;
+
+    // 1. Đồng bộ URL ban đầu khi người dùng truy cập trang
+    const initialHash = window.location.hash;
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasRoomParam = urlParams.has('room');
+
+    if (hasRoomParam || initialHash === '#caro' || initialHash === '#lobby') {
+      this.openCaroLobby(false);
+      if (window.history && typeof window.history.replaceState === 'function') {
+        window.history.replaceState({ screen: 'screen-lobby' }, document.title, window.location.pathname + window.location.search + '#caro');
+      }
+    } else {
+      this.openHub(false);
+      if (window.history && typeof window.history.replaceState === 'function') {
+        window.history.replaceState({ screen: 'screen-hub' }, document.title, window.location.pathname + (window.location.search || ''));
+      }
+    }
+
+    // 2. Lắng nghe sự kiện nút Back và Forward mặc định của trình duyệt
+    window.addEventListener('popstate', (e) => {
+      CaroModal.closeAll();
+
+      const state = e.state;
+      const hash = window.location.hash;
+      let targetScreen = 'screen-hub';
+
+      if (state && state.screen) {
+        targetScreen = state.screen;
+      } else if (hash === '#caro' || hash === '#lobby') {
+        targetScreen = 'screen-lobby';
+      } else if (hash === '#game' || hash === '#play') {
+        targetScreen = 'screen-game';
+      } else {
+        targetScreen = 'screen-hub';
+      }
+
+      const currentActive = document.querySelector('.screen.active');
+      const currentScreenId = currentActive?.id || 'screen-hub';
+
+      if (currentScreenId === targetScreen) {
+        return;
+      }
+
+      // Khi người dùng bấm Back lúc đang trong trận đấu cờ
+      if (currentScreenId === 'screen-game') {
+        if (this.state.gameMode && !this.state.isGameOver) {
+          const wantLeave = confirm(i18n.getText('confirm_leave'));
+          if (!wantLeave) {
+            // Khôi phục lại trạng thái bàn cờ #game trong history nếu người dùng hủy rời trận
+            if (window.history && typeof window.history.pushState === 'function') {
+              window.history.pushState({ screen: 'screen-game' }, document.title, window.location.pathname + window.location.search + '#game');
+            }
+            return;
+          }
+        }
+        // Dọn dẹp trận đấu và chuyển màn hình (không pushState thêm)
+        this.backToLobby(false);
+        if (targetScreen === 'screen-hub') {
+          this.openHub(false);
+        }
+        return;
+      }
+
+      // Điều hướng giữa Sảnh Caro và Cổng Game Hub
+      if (targetScreen === 'screen-hub') {
+        this.openHub(false);
+      } else if (targetScreen === 'screen-lobby') {
+        this.openCaroLobby(false);
+      } else if (targetScreen === 'screen-game') {
+        if (this.state.gameMode) {
+          this.localGame.switchToScreen('screen-game', false);
+        } else {
+          this.openCaroLobby(false);
+        }
+      }
+    });
   }
 }

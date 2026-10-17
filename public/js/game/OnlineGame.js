@@ -258,10 +258,10 @@ export class OnlineGame extends BaseGame {
     caroOnline.makeMove(r, c);
   }
 
-  backToLobby() {
+  backToLobby(pushState = true) {
     UIBinder.updateSpectatorUI(false);
     this.updateSpectatorCount(0);
     caroOnline.disconnect();
-    super.backToLobby();
+    super.backToLobby(pushState);
   }
 }

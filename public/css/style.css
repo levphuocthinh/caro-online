@@ -3,6 +3,7 @@
    =================================================== */
 
 @import url('modules/base.css');
+@import url('modules/hub.css');
 @import url('modules/lobby.css');
 @import url('modules/board.css');
 @import url('modules/chat.css');

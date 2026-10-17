@@ -280,9 +280,10 @@ describe('Tier 2: Adversarial Move Payloads & Server Stress Testing', () => {
         p2.emit('make_move', { row: (i * 2) % 15, col: (i * 5) % 15 });
       }
 
-      await sleep(200);
+      await sleep(600);
 
       // Verify server is alive and responding
+      p1.removeAllListeners('error_message');
       const p1Err = waitForEvent(p1, 'error_message');
       p1.emit('make_move', { row: -99, col: -99 });
       const err = await p1Err;

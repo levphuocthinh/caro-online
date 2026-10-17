@@ -18,6 +18,12 @@ export const CaroModal = {
     }
   },
 
+  closeAll() {
+    if (typeof document === 'undefined') return;
+    const activeModals = document.querySelectorAll ? document.querySelectorAll('.modal-overlay.active') : [];
+    activeModals.forEach(m => this.close(m));
+  },
+
   show(modalId) {
     this.open(modalId);
   },

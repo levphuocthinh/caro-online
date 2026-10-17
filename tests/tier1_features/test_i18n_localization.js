@@ -97,4 +97,26 @@ describe('Feature 14: Localization Engine & Metadata', () => {
     assertEqual(eventReceived.lang, 'en');
     assertTruthy(eventReceived.dict);
   });
+
+  test('Hub console and catalog keys exist and localize across all 5 languages', async () => {
+    const { i18n } = await getI18n();
+    const hubKeys = [
+      'tab_all_games', 'tab_recent_games', 'hub_back_btn',
+      'hint_click_game', 'hint_click_playing', 'hint_scroll_games',
+      'menu_close', 'menu_achievements', 'menu_friends', 'menu_news', 'menu_modes', 'menu_soundtrack', 'menu_guide',
+      'hub_caro_title', 'hub_caro_studio', 'hub_splendor_title', 'hub_catan_title',
+      'news_cap_1', 'news_cap_2', 'news_cap_3'
+    ];
+
+    const langs = ['vi', 'en', 'ja', 'ko', 'zh'];
+    for (const lang of langs) {
+      i18n.setLanguage(lang);
+      for (const k of hubKeys) {
+        const text = i18n.getText(k);
+        assertTruthy(text, `Key "${k}" should have non-empty text in "${lang}"`);
+        assertNotEqual(text, k, `Key "${k}" should not be returned as raw key in "${lang}"`);
+      }
+    }
+  });
 });
+

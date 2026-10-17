@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#fff0f5">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Caro Online</title>
+  <title>Lycngames — Boardgame Friends</title>
 
   <!-- Google tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-02668FG5HT"></script>
@@ -31,21 +31,59 @@
   <!-- Font Awesome 6 Icons (Vector chuyên nghiệp, sắc nét) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=2.5">
 </head>
-<body>
+<body class="in-hub">
   <!-- Canvas pháo hoa ăn mừng -->
   <canvas id="confetti-canvas"></canvas>
 
   <!-- Thanh điều hướng trên cùng -->
   <header class="app-header">
-    <div class="logo-area" id="btn-home">
-      <span class="logo-icon"><i class="fa-solid fa-paw"></i></span>
-      <div class="logo-titles">
-        <span class="logo-title" data-i18n="logo_title">Caro Online</span>
-        <span class="logo-subtitle" data-i18n="logo_subtitle">Bé Miu & Bé Thỏ</span>
+    <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+      <button class="btn-back-hub" id="btn-back-to-hub" type="button" style="display: none;" title="Quay về Cổng Game Tổng Hợp" data-i18n-title="tip_back_hub">
+        <i class="fa-solid fa-table-cells-large"></i> <span data-i18n="hub_back_btn">Cổng Game</span>
+      </button>
+
+      <div class="logo-area" id="btn-home" title="Lycngames - Boardgame Friends">
+        <!-- Logo Hub (Hiện khi ở Cổng Game) -->
+        <div class="logo-content-hub">
+          <span class="logo-icon"><i class="fa-solid fa-gamepad"></i></span>
+          <div class="logo-titles">
+            <span class="logo-title" data-i18n="logo_title">Lycngames</span>
+            <span class="logo-subtitle" data-i18n="logo_subtitle">Boardgame Friends</span>
+          </div>
+        </div>
+
+        <!-- Logo Caro gốc (Hiện khi ở trong Game Caro - Khớp 100% Ảnh gốc) -->
+        <div class="logo-content-caro" style="display: none;">
+          <span class="logo-icon logo-icon-caro"><i class="fa-solid fa-paw"></i></span>
+          <div class="logo-titles">
+            <span class="logo-title logo-title-caro">Caro Online</span>
+            <span class="logo-subtitle logo-subtitle-caro">Bé Miu &amp; Bé Thỏ</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Cụm Icon Tròn Danh mục & Tiện ích Web Hub -->
+    <div class="hub-header-bubbles" id="hub-header-bubbles">
+      <button class="hub-bubble-btn bubble-news active" data-hub-bubble="all" type="button" title="Tất cả Game" data-i18n-title="bubble_all">
+        <i class="fa-regular fa-newspaper"></i>
+      </button>
+      <button class="hub-bubble-btn bubble-classic" data-hub-bubble="classic" type="button" title="Cờ Truyền Thống" data-i18n-title="bubble_classic">
+        <i class="fa-solid fa-chess-knight"></i>
+      </button>
+      <button class="hub-bubble-btn bubble-modern" data-hub-bubble="boardgame" type="button" title="Board Game Hiện Đại" data-i18n-title="bubble_boardgame">
+        <i class="fa-solid fa-dice-d20"></i>
+      </button>
+      <button class="hub-bubble-btn bubble-trophy" data-hub-bubble="trophy" type="button" title="Thành tựu & Danh hiệu" data-i18n-title="bubble_trophy">
+        <i class="fa-solid fa-trophy"></i>
+      </button>
+      <button class="hub-bubble-btn bubble-guide" data-hub-bubble="guide" type="button" title="Cẩm nang & Luật chơi" data-i18n-title="bubble_guide">
+        <i class="fa-solid fa-book-open"></i>
+      </button>
+    </div>
+
     <div class="header-actions">
       <!-- BỘ CHỌN NGOẠI NGỮ CÓ LÁ CỜ SVG TỪNG NƯỚC -->
       <div class="custom-lang-selector" id="custom-lang-selector">
@@ -80,17 +118,190 @@
         </div>
       </div>
 
-      <button class="btn-icon" id="btn-mobile-chat-toggle" title="Mở chat">
+      <button class="btn-icon" id="btn-mobile-chat-toggle" title="Mở chat" data-i18n-title="m_chat">
         <i class="fa-solid fa-comments"></i>
         <span class="badge-dot" id="chat-unread-dot" style="display: none;"></span>
       </button>
-      <button class="btn-icon" id="btn-sound-toggle" title="Bật/Tắt âm thanh"><i class="fa-solid fa-volume-high"></i></button>
-      <button class="btn-icon" id="btn-help-modal" title="Hướng dẫn & Luật chơi"><i class="fa-solid fa-circle-question"></i></button>
+      <button class="btn-icon" id="btn-sound-toggle" title="Bật/Tắt âm thanh" data-i18n-title="tip_sound"><i class="fa-solid fa-volume-high"></i></button>
+      <button class="btn-icon" id="btn-theme-toggle" title="Chuyển chế độ Sáng / Tối" data-i18n-title="tip_theme"><i class="fa-solid fa-moon"></i></button>
+      <button class="btn-icon" id="btn-help-modal" title="Hướng dẫn & Luật chơi" data-i18n-title="tip_help"><i class="fa-solid fa-circle-question"></i></button>
+
+      <!-- Đồng hồ số trực tiếp -->
+      <div class="hub-clock-box" title="Giờ hệ thống" data-i18n-title="tip_clock">
+        <span id="hub-live-clock">12:00</span>
+      </div>
     </div>
   </header>
 
-  <!-- MÀN HÌNH SẢNH CHỜ (LOBBY) -->
-  <main class="screen active" id="screen-lobby">
+  <!-- =========================================================================
+       MÀN HÌNH 1: TRANG TỔNG HỢP GAME (CONSOLE WEB HUB - THEO MẪU THIẾT KẾ)
+       ========================================================================= -->
+  <main class="screen active" id="screen-hub">
+    <div class="hub-wrapper">
+      <!-- Thanh lọc danh mục kiểu Console (★ Featured | Recent | Cờ Truyền Thống | Board Game) -->
+      <div class="hub-filter-bar" role="tablist">
+        <button class="hub-filter-tab active" data-hub-filter="all" type="button">
+          <i class="fa-solid fa-star"></i> <span data-i18n="tab_all_games">Tất cả Game</span>
+        </button>
+        <button class="hub-filter-tab" data-hub-filter="recent" type="button">
+          <i class="fa-solid fa-clock-rotate-left"></i> <span data-i18n="tab_recent_games">Chơi gần đây</span>
+        </button>
+        <button class="hub-filter-tab" data-hub-filter="classic" type="button" id="tab-classic">
+          <i class="fa-solid fa-chess"></i> <span data-i18n="tab_classic_chess">Cờ Truyền Thống</span>
+        </button>
+        <button class="hub-filter-tab" data-hub-filter="boardgame" type="button" id="tab-modern">
+          <i class="fa-solid fa-dice-d20"></i> <span data-i18n="tab_modern_boardgame">Board Game Hiện Đại</span>
+        </button>
+      </div>
+
+      <!-- 2. KHUNG CHI TIẾT GAME (MẪU 2: media_1792258754852_d649e8ef.png) - PHÓNG TO, THẲNG THỚM, CÂN ĐỐI -->
+      <div class="hub-detail-stage" id="hub-detail-stage">
+        <!-- CỘT TRÁI: THÁP GAME THỐNG NHẤT (CARD ĐANG CHỌN + CLOSE + MENU ĐỎ - 220px, 0px GAP) -->
+        <aside class="hub-left-tower" id="hub-left-tower">
+          <!-- Card game trên đỉnh tháp (220px x 220px, phóng to theo mẫu) -->
+          <div class="hub-tower-card" id="hub-tower-card" data-game-id="caro">
+            <div class="tile-art-bg art-caro" id="hub-tower-art"></div>
+            <span class="tile-top-tag tag-ready" id="hub-tower-tag" data-i18n="tag_play_now">PLAY NOW</span>
+            <div class="tile-center-logo" id="hub-tower-logo">
+              <span id="hub-tower-icon-wrapper"><i class="fa-solid fa-paw" id="hub-tower-icon"></i></span>
+              <span class="tile-game-name" id="hub-tower-name">Caro Online</span>
+            </div>
+            <div class="tile-bottom-strip" id="hub-tower-strip" data-i18n="strip_caro">CỜ CHIẾN THUẬT</div>
+            <button class="hub-playing-pill" id="btn-hub-play-pill" type="button" title="Bắt đầu chơi game" data-i18n-title="tip_start_game">
+              <span class="hub-pill-avatar" id="hub-pill-ava">🐱</span>
+              <span class="hub-pill-text" id="hub-pill-label" data-i18n="pill_playing">Playing</span>
+            </button>
+          </div>
+
+          <!-- Nút Close dính liền ngay dưới Card, 0px gap -->
+          <button class="hub-menu-close-bar" id="btn-hub-close-drawer" type="button" title="Đóng thông tin game (Close)" data-i18n-title="tip_close_drawer">
+            <span data-i18n="menu_close">Close</span> <i class="fa-solid fa-chevron-up"></i>
+          </button>
+
+          <!-- Menu dọc phong cách Nintendo Console dính liền ngay dưới Close, 0px gap -->
+          <nav class="hub-tower-menu" id="hub-tower-menu">
+            <button class="hub-menu-item active-cyan" data-hub-action="achievements" type="button">
+              <span data-i18n="menu_achievements">Achievements</span>
+            </button>
+            <button class="hub-menu-item" data-hub-action="friends" type="button">
+              <span data-i18n="menu_friends">Friends</span>
+            </button>
+            <button class="hub-menu-item" data-hub-action="news" type="button">
+              <span data-i18n="menu_news">News</span>
+            </button>
+            <button class="hub-menu-item" data-hub-action="recent-posts" type="button">
+              <span data-i18n="menu_recent_posts">Recent Posts</span>
+            </button>
+            <button class="hub-menu-item" data-hub-action="addons" type="button">
+              <span data-i18n="menu_addons">Add-Ons</span>
+            </button>
+            <button class="hub-menu-item" data-hub-action="sound" type="button">
+              <span data-i18n="menu_soundtrack">Soundtrack</span>
+            </button>
+            <button class="hub-menu-item" data-hub-action="guide" type="button">
+              <span data-i18n="menu_guide">Guide</span>
+            </button>
+          </nav>
+        </aside>
+
+        <!-- CỘT PHẢI: HÀNG CÁC GAME KHÁC Ở TRÊN + CHI TIẾT GAME Ở DƯỚI -->
+        <div class="hub-right-stage" id="hub-right-stage">
+          <!-- 1. Dải ô vuông các game khác nằm ngang (220px x 220px, to rõ, cuộn mượt) -->
+          <section class="hub-other-games-section">
+            <div class="hub-other-games-row" id="hub-other-games-row">
+              <!-- Render động toàn bộ các game còn lại theo thứ tự, không ẩn mất game nào -->
+            </div>
+          </section>
+
+          <!-- 2. Khu vực Chi tiết Game & Tin tức (Phóng to, cân đối) -->
+          <section class="hub-dropdown-details-col" id="hub-dropdown-details-col">
+            <div class="hub-selected-info">
+              <div class="hub-title-row">
+                <h1 class="hub-big-title" id="hub-selected-title">Caro Online</h1>
+              </div>
+
+              <div class="hub-studio-row">
+                <span class="hub-studio-pill" id="hub-studio-pill"><i class="fa-solid fa-gamepad"></i> Game Studio</span>
+                <span id="hub-selected-studio">Lycngames • Boardgame Friends</span>
+              </div>
+
+              <div class="hub-stats-friends-row">
+                <div class="hub-medals">
+                  <span class="medal-item medal-bronze"><i class="fa-solid fa-certificate"></i> <span id="hub-medal-1">18</span></span>
+                  <span class="medal-item medal-silver"><i class="fa-solid fa-certificate"></i> <span id="hub-medal-2">12</span></span>
+                  <span class="medal-item medal-gold"><i class="fa-solid fa-certificate"></i> <span id="hub-medal-3">3</span></span>
+                  <span class="medal-item medal-trophy"><i class="fa-solid fa-trophy"></i></span>
+                </div>
+
+                <div class="hub-friends-playing">
+                  <div class="avatar-stack">
+                    <span class="stack-ava stack-ava-1">🐱</span>
+                    <span class="stack-ava stack-ava-2">🐰</span>
+                    <span class="stack-ava stack-ava-3">🦊</span>
+                    <span class="stack-ava stack-ava-4">🐼</span>
+                  </div>
+                  <span class="friends-text" id="hub-selected-social">+8 người bạn cũng đang yêu thích trò chơi này trên Web.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Khu vực News 16:9 Phóng to -->
+            <div class="hub-news-section">
+              <div class="hub-news-header-row">
+                <h3 class="hub-news-heading" id="hub-news-heading" data-i18n="menu_news">News</h3>
+                <button class="hub-news-feed-btn" type="button" title="All News"><i class="fa-regular fa-newspaper"></i></button>
+              </div>
+              <div class="hub-news-grid" id="hub-news-grid">
+                <!-- Fill động qua JS -->
+              </div>
+            </div>
+
+            <!-- Header bài viết gần đây (Recent Posts) -->
+            <div class="hub-recent-posts-section">
+              <h4 class="hub-recent-posts-heading" data-i18n="menu_recent_posts">Recent Posts</h4>
+              <p class="hub-recent-empty" data-i18n="hub_recent_empty">Chưa có bài thảo luận mới nào từ cộng đồng.</p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- 3. KHUNG TRANG CHỦ / TOÀN CẢNH (MẪU 1: media_1792258800495_24267be0.png) -->
+      <!-- Hiển thị khi người dùng bấm Close thu gọn drawer -->
+      <div class="hub-home-stage" id="hub-home-stage" style="display: none;">
+        <!-- Dải Game Toàn Cảnh (Thẻ 240px x 240px, siêu to, rực rỡ) -->
+        <div class="hub-home-carousel" id="hub-home-carousel">
+          <!-- Render động toàn bộ 8 game thẻ to -->
+        </div>
+
+        <!-- DOCK 6 NÚT TRÒN ĐIỀU KHIỂN ĐẶC TRƯNG CỦA MẪU 1 -->
+        <div class="hub-console-dock" id="hub-console-dock">
+          <button class="hub-dock-btn dock-news" data-dock-action="news" title="Tin mới & Sự kiện">
+            <i class="fa-regular fa-comment-dots"></i>
+          </button>
+          <button class="hub-dock-btn dock-shop" data-dock-action="shop" title="Cửa hàng Game">
+            <i class="fa-solid fa-bag-shopping"></i>
+          </button>
+          <button class="hub-dock-btn dock-trophy" data-dock-action="trophy" title="Thành tựu & Cúp">
+            <i class="fa-solid fa-trophy"></i>
+          </button>
+          <button class="hub-dock-btn dock-guide" data-dock-action="guide" title="Cẩm nang & Hướng dẫn">
+            <i class="fa-solid fa-book-open"></i>
+          </button>
+          <button class="hub-dock-btn dock-theme active-cyan-dock" data-dock-action="theme" title="Chuyển chế độ Sáng / Tối">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+          <button class="hub-dock-btn dock-sound" data-dock-action="sound" title="Âm thanh trò chơi">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+        </div>
+      </div>
+      </div>
+    </main>
+
+  <!-- =========================================================================
+       MÀN HÌNH 2: TRANG RIÊNG KHI VÀO GAME CARO (GIỮ NGUYÊN THIẾT KẾ CARO CỦA BẠN)
+       ========================================================================= -->
+  <main class="screen" id="screen-lobby">
     <div class="lobby-container">
       <div class="hero-box">
         <div class="hero-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="hero_badge">Bàn cờ ngọt ngào kết nối bạn bè</span></div>
@@ -133,42 +344,6 @@
           <button class="card-btn btn-cute-amber" id="btn-start-local">
             <i class="fa-solid fa-play"></i> <span data-i18n="btn_local_start">Chơi Ngay Nè</span>
           </button>
-        </div>
-      </div>
-
-      <!-- CÁC GAME KHÁC ĐANG PHÁT TRIỂN (COMING SOON) -->
-      <div class="coming-soon-box">
-        <div class="coming-soon-header">
-          <span class="coming-soon-title"><i class="fa-solid fa-cubes"></i> <span data-i18n="coming_header">Các Game Khác Đang Phát Triển</span></span>
-          <span class="coming-soon-tag"><i class="fa-solid fa-clock"></i> <span data-i18n="coming_badge">Sắp ra mắt</span></span>
-        </div>
-        <div class="coming-soon-grid">
-          <div class="coming-card" title="Bấm để xem thông tin">
-            <div class="coming-icon-fa"><i class="fa-solid fa-chess-knight"></i></div>
-            <div class="coming-info">
-              <div class="coming-name" data-i18n="chess_title">Cờ Vua (Chess Online)</div>
-              <div class="coming-status" data-i18n="chess_desc">Đang hoàn thiện luật phong cấp & thời gian... 85%</div>
-            </div>
-            <span class="coming-badge"><i class="fa-solid fa-clock"></i> <span data-i18n="coming_badge">Sắp ra mắt</span></span>
-          </div>
-
-          <div class="coming-card" title="Bấm để xem thông tin">
-            <div class="coming-icon-fa"><i class="fa-solid fa-chess-board"></i></div>
-            <div class="coming-info">
-              <div class="coming-name" data-i18n="xiangqi_title">Cờ Tướng (Xiangqi Online)</div>
-              <div class="coming-status" data-i18n="xiangqi_desc">Đang thiết kế quân cờ gỗ truyền thống... 70%</div>
-            </div>
-            <span class="coming-badge"><i class="fa-solid fa-clock"></i> <span data-i18n="coming_badge">Sắp ra mắt</span></span>
-          </div>
-
-          <div class="coming-card" title="Bấm để xem thông tin">
-            <div class="coming-icon-fa"><i class="fa-solid fa-dice"></i></div>
-            <div class="coming-info">
-              <div class="coming-name" data-i18n="ludo_title">Cờ Cá Ngựa (Ludo Party)</div>
-              <div class="coming-status" data-i18n="ludo_desc">Đang xây dựng phòng 4 người online... 60%</div>
-            </div>
-            <span class="coming-badge"><i class="fa-solid fa-clock"></i> <span data-i18n="coming_badge">Sắp ra mắt</span></span>
-          </div>
         </div>
       </div>
     </div>
@@ -229,7 +404,7 @@
       <!-- Cột giữa: Bàn cờ Caro -->
       <div class="board-area">
         <div class="spectator-badge" id="spectator-badge" style="display: none;">
-          <i class="fa-solid fa-eye"></i> <span>Chế độ Khán Giả</span>
+          <i class="fa-solid fa-eye"></i> <span data-i18n="spectator_mode_label">Chế độ Khán Giả</span>
         </div>
         <div class="board-status-banner" id="game-status-banner">
           <span id="banner-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
@@ -276,7 +451,7 @@
               <i class="fa-solid fa-eye"></i> <span id="spectator-count-val">0</span>
             </span>
           </div>
-          <button class="btn-close-chat" id="btn-close-chat" title="Đóng chat"><i class="fa-solid fa-xmark"></i></button>
+          <button class="btn-close-chat" id="btn-close-chat" title="Đóng chat" data-i18n-title="tip_close_chat"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="chat-messages" id="chat-messages">
           <div class="chat-bubble system" data-i18n="chat_welcome">Chào mừng bạn vào ván cờ! Hãy gửi lời chào dễ thương tới đối thủ nhé!</div>
@@ -295,7 +470,7 @@
         </div>
         <div class="chat-input-area">
           <input type="text" id="chat-input" class="chat-input" placeholder="Nhắn gì đó cute đi..." data-i18n-placeholder="chat_placeholder" maxlength="150" autocomplete="off">
-          <button class="chat-send-btn" id="btn-send-chat" title="Gửi tin nhắn"><i class="fa-solid fa-paper-plane"></i></button>
+          <button class="chat-send-btn" id="btn-send-chat" title="Gửi tin nhắn" data-i18n-title="tip_send_chat"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
       </div>
     </div>
@@ -451,6 +626,9 @@
     </div>
   </div>
 
+
+
+
   <!-- Container chứa các thông báo Toast Glassmorphism -->
   <div class="toast-container" id="toast-container"></div>
 
@@ -458,6 +636,6 @@
   <script src="/socket.io/socket.io.js"></script>
 
   <!-- Chạy ứng dụng bằng ES Module hiện đại -->
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/main.js?v=2.2"></script>
 </body>
 </html>
