@@ -525,7 +525,18 @@ export class UIBinder {
           }
         }
 
-        // 1.1. Cập nhật Tháp Thống Nhất Cột Trái (Left Tower: Card + Close + Menu Đỏ)
+        // 1.1. Cập nhật Tháp Thống Nhất Cột Trái (Left Tower: Card + Close + Menu đồng bộ màu nền game)
+        const tower = document.getElementById('hub-left-tower');
+        if (tower && info.towerColor) {
+          tower.style.setProperty('--tower-theme', info.towerColor);
+          tower.style.setProperty('--tower-theme-dark', info.towerDark || info.towerColor);
+        }
+
+        const studioPill = document.getElementById('hub-studio-pill');
+        if (studioPill && info.towerColor) {
+          studioPill.style.background = `linear-gradient(135deg, ${info.towerColor}, ${info.towerDark || info.towerColor})`;
+        }
+
         const towerCard = document.getElementById('hub-tower-card');
         if (towerCard) {
           towerCard.dataset.gameId = selectedGameId;

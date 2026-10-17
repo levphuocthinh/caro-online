@@ -304,8 +304,10 @@ body.in-hub .hub-header-bubbles {
   display: none !important;
 }
 
-/* THÁP THỐNG NHẤT CỘT TRÁI (CARD ĐANG CHỌN + CLOSE + MENU ĐỎ) - PHÓNG TO 220px, 0px GAP */
+/* THÁP THỐNG NHẤT CỘT TRÁI (CARD ĐANG CHỌN + CLOSE + MENU ĐỒNG BỘ THEO MÀU NỀN GAME) - PHÓNG TO 220px, 0px GAP */
 .hub-left-tower {
+  --tower-theme: #e60012;
+  --tower-theme-dark: #b3000e;
   width: 220px !important;
   min-width: 220px !important;
   max-width: 220px !important;
@@ -314,13 +316,14 @@ body.in-hub .hub-header-bubbles {
   flex-direction: column !important;
   border-radius: 18px !important;
   overflow: hidden !important;
-  background: #e60012 !important;
+  background: linear-gradient(180deg, var(--tower-theme) 0%, var(--tower-theme-dark) 100%) !important;
   border: 3.5px solid #00e5ff !important;
   outline: 2.5px solid #ffffff;
   outline-offset: -5px;
   box-shadow: 0 0 0 3px #00e5ff, 0 0 28px rgba(0, 229, 255, 0.75), 0 16px 36px rgba(0, 0, 0, 0.3) !important;
   box-sizing: border-box !important;
   z-index: 10;
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 }
 
 /* Card game trên đỉnh tháp - Phóng to 220px x 220px */
@@ -368,7 +371,7 @@ body.in-hub .hub-header-bubbles {
   width: 100% !important;
   padding: 10px 16px !important;
   background: #ffffff !important;
-  color: #e60012 !important;
+  color: var(--tower-theme, #e60012) !important;
   border: none !important;
   border-bottom: 1.5px solid rgba(0, 0, 0, 0.08) !important;
   font-size: 14.5px !important;
@@ -377,7 +380,7 @@ body.in-hub .hub-header-bubbles {
   align-items: center !important;
   justify-content: space-between !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.25s ease !important;
   margin: 0 !important;
   border-radius: 0 !important;
   box-sizing: border-box !important;
@@ -385,28 +388,29 @@ body.in-hub .hub-header-bubbles {
 
 body.in-hub.theme-dark .hub-menu-close-bar {
   background: #181b26 !important;
-  color: #ff4757 !important;
+  color: var(--tower-theme, #ff4757) !important;
   border-bottom: 1.5px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .hub-menu-close-bar:hover {
-  background: #fff5f5 !important;
-  color: #ff1a2b !important;
+  background: #ffffff !important;
+  filter: brightness(0.96);
 }
 
 body.in-hub.theme-dark .hub-menu-close-bar:hover {
   background: #202434 !important;
-  color: #ff6b81 !important;
+  filter: brightness(1.15);
 }
 
-/* Menu dọc Nintendo Red */
+/* Menu dọc đồng bộ màu nền game */
 .hub-tower-menu {
   display: flex !important;
   flex-direction: column !important;
   gap: 4px !important;
   padding: 8px !important;
-  background: #e60012 !important;
+  background: transparent !important;
   box-sizing: border-box !important;
+  transition: background 0.35s ease;
 }
 
 .hub-menu-item {
