@@ -482,14 +482,36 @@ export class UIBinder {
     let currentFilterType = 'all';
     let isDetailViewOpen = true;
 
-    const renderSelectedGame = (gameId, openDetail = null) => {
+    const getFilteredGameIds = () => allGameIds.filter(gId => {
+      const item = gamesCatalog[gId];
+      if (!item) return false;
+      if (currentFilterType === 'classic') return item.category === 'classic';
+      if (currentFilterType === 'boardgame') return item.category === 'boardgame';
+      if (currentFilterType === 'recent') return gId === 'caro' || gId === 'splendor' || gId === 'catan';
+      return true;
+    });
+
+    const renderSelectedGame = (gameId, openDetail = null, slideDir = null) => {
       const prevOpenState = isDetailViewOpen;
       if (openDetail !== null) {
         isDetailViewOpen = Boolean(openDetail);
       }
+
+      const filteredIds = getFilteredGameIds();
+      const prevIdx = filteredIds.indexOf(selectedGameId);
+
       if (gameId && gamesCatalog[gameId]) {
         selectedGameId = gameId;
       }
+      if (!filteredIds.includes(selectedGameId) && filteredIds.length > 0) {
+        selectedGameId = filteredIds[0];
+      }
+
+      const activeIdx = filteredIds.indexOf(selectedGameId);
+      if (slideDir === null && prevIdx !== -1 && activeIdx !== -1 && activeIdx !== prevIdx) {
+        slideDir = activeIdx > prevIdx ? 'left' : 'right';
+      }
+
       const info = gamesCatalog[selectedGameId];
       if (!info) return;
 
@@ -500,7 +522,7 @@ export class UIBinder {
 
       if (isDetailViewOpen) {
         // ========================================================
-        // 1. CHẾ ĐỘ CHI TIẾT GAME (MẪU 2: media_1792258754852_d649e8ef.png)
+        // 1. CHẾ ĐỘ CHI TIẾT GAME / DROPDOWN CENTER (MẪU 2: media_1792258754852_d649e8ef.png)
         // ========================================================
         if (detailStage) {
           detailStage.classList.remove('is-hidden');
@@ -525,7 +547,43 @@ export class UIBinder {
           }
         }
 
-        // 1.1. Cập nhật Tháp Thống Nhất Cột Trái (Left Tower: Card + Close + Menu đồng bộ màu nền game)
+        // 1.0. Cập nhật Khay Peek Bên Trái Tháp (#hub-left-peek-slot)
+        // Nếu đang ở Game số 1 (activeIdx === 0): Không có game trước đó -> giữ nguyên bên trái.
+        // Nếu bấm hoặc lướt qua Game >= số 2 (activeIdx >= 1): Đẩy game trước đó sang bên trái tháp giống mẫu Nintendo Switch!
+        const leftPeekSlot = document.getElementById('hub-left-peek-slot');
+        if (leftPeekSlot) {
+          if (activeIdx > 0) {
+            const prevGameId = filteredIds[activeIdx - 1];
+            const prevItem = gamesCatalog[prevGameId];
+            leftPeekSlot.classList.add('has-peek');
+            leftPeekSlot.innerHTML = prevItem ? `
+              <div class="hub-game-tile ${prevItem.artClass} ${prevItem.playable ? 'playable' : ''}" data-game-id="${prevGameId}" title="${prevItem.coverTitle}">
+                <div class="tile-art-bg ${prevItem.artClass}"></div>
+                <span class="tile-top-tag ${prevItem.playable ? 'tag-ready' : ''}">${prevItem.badge}</span>
+                <div class="tile-center-logo">
+                  <span>${prevItem.iconHtml}</span>
+                  <span class="tile-game-name">${prevItem.coverTitle}</span>
+                </div>
+                <div class="tile-bottom-strip">${prevItem.stripText}</div>
+              </div>
+            ` : '';
+            const peekTile = leftPeekSlot.querySelector('.hub-game-tile');
+            if (peekTile) {
+              if (slideDir) {
+                peekTile.classList.add(slideDir === 'left' ? 'anim-push-left' : 'anim-push-right');
+              }
+              peekTile.addEventListener('click', () => {
+                try { soundManager.playCutePop(); } catch (_) {}
+                renderSelectedGame(prevGameId, true, 'right');
+              });
+            }
+          } else {
+            leftPeekSlot.classList.remove('has-peek');
+            leftPeekSlot.innerHTML = '';
+          }
+        }
+
+        // 1.1. Cập nhật Tháp Thống Nhất Cột Trái / Center Dropdown (Card + Close + Menu đồng bộ màu nền game)
         const tower = document.getElementById('hub-left-tower');
         if (tower && info.towerColor) {
           tower.style.setProperty('--tower-theme', info.towerColor);
@@ -540,6 +598,12 @@ export class UIBinder {
         const towerCard = document.getElementById('hub-tower-card');
         if (towerCard) {
           towerCard.dataset.gameId = selectedGameId;
+          if (slideDir) {
+            towerCard.classList.remove('anim-push-left', 'anim-push-right');
+            void towerCard.offsetWidth;
+            towerCard.classList.add(slideDir === 'left' ? 'anim-push-left' : 'anim-push-right');
+          }
+
           const towerArt = document.getElementById('hub-tower-art');
           if (towerArt) towerArt.className = `tile-art-bg ${info.artClass}`;
 
@@ -565,20 +629,23 @@ export class UIBinder {
           if (pillLabel) pillLabel.textContent = info.playable ? i18n.getText('pill_playing') : i18n.getText('coming_badge');
         }
 
-        // 1.2. Cập nhật Hàng Game Khác Nằm Ngang Cột Phải (Phóng to 220px, Không ẩn bất kỳ game nào)
+        // 1.2. Cập nhật Hàng Game Khác Nằm Ngang Cột Phải (Đẩy các game trước đó sang trái, xếp các game tiếp theo ở bên phải)
         const otherRow = document.getElementById('hub-other-games-row');
         if (otherRow) {
-          const otherIds = allGameIds.filter(gId => {
-            if (gId === selectedGameId) return false;
-            const item = gamesCatalog[gId];
-            if (!item) return false;
-            if (currentFilterType === 'classic') return item.category === 'classic';
-            if (currentFilterType === 'boardgame') return item.category === 'boardgame';
-            if (currentFilterType === 'recent') return gId === 'caro' || gId === 'splendor' || gId === 'catan';
-            return true;
-          });
+          const rightIds = activeIdx >= 0
+            ? [
+                ...filteredIds.slice(activeIdx + 1),
+                ...filteredIds.slice(0, Math.max(0, activeIdx - 1))
+              ]
+            : filteredIds.filter(gId => gId !== selectedGameId);
 
-          otherRow.innerHTML = otherIds.map(gId => {
+          if (slideDir) {
+            otherRow.classList.remove('anim-push-left', 'anim-push-right');
+            void otherRow.offsetWidth;
+            otherRow.classList.add(slideDir === 'left' ? 'anim-push-left' : 'anim-push-right');
+          }
+
+          otherRow.innerHTML = rightIds.map(gId => {
             const item = gamesCatalog[gId];
             return `
               <div class="hub-game-tile ${item.artClass} ${item.playable ? 'playable' : ''}" data-game-id="${gId}" title="${item.coverTitle}">
@@ -598,7 +665,7 @@ export class UIBinder {
               const gId = tile.dataset.gameId;
               if (!gId) return;
               try { soundManager.playCutePop(); } catch (_) {}
-              renderSelectedGame(gId, true);
+              renderSelectedGame(gId, true, 'left');
             });
           });
         }
@@ -719,9 +786,122 @@ export class UIBinder {
               renderSelectedGame(gId, true);
             });
           });
+
+          const activeHomeCard = homeCarousel.querySelector('.hub-home-card.selected');
+          if (activeHomeCard && typeof activeHomeCard.scrollIntoView === 'function') {
+            try {
+              activeHomeCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            } catch (_) {}
+          }
         }
       }
     };
+
+    // Hàm lướt ngang từng nấc (Step) khi đang ở chế độ Dropdown Center
+    // Lướt phải (direction = 1): đẩy game hiện tại sang khay peek trái, đưa game kế tiếp vào Center Dropdown
+    // Lướt trái (direction = -1): kéo game bên trái vào lại Center Dropdown, đẩy các game khác sang phải
+    let lastDropdownStepTime = 0;
+    const stepDropdownGame = (direction) => {
+      const now = Date.now();
+      if (now - lastDropdownStepTime < 210) return;
+
+      const filteredIds = getFilteredGameIds();
+      if (filteredIds.length <= 1) return;
+
+      const curIdx = filteredIds.indexOf(selectedGameId);
+      if (curIdx === -1) return;
+
+      if (direction < 0 && curIdx === 0) {
+        // Đang ở Game số 1 (đầu danh sách) thì dừng ở vị trí số 1
+        return;
+      }
+
+      let nextIdx = curIdx + direction;
+      if (nextIdx >= filteredIds.length) {
+        nextIdx = 0;
+      }
+      if (nextIdx < 0) {
+        nextIdx = 0;
+      }
+
+      lastDropdownStepTime = now;
+      try { soundManager.playCutePop(); } catch (_) {}
+      renderSelectedGame(filteredIds[nextIdx], true, direction > 0 ? 'left' : 'right');
+    };
+
+    // Lăn chuột (Wheel) hoặc vuốt ngang Trackpad trên dải thẻ game để lướt Dropdown Center
+    const detailStageEl = document.getElementById('hub-detail-stage');
+    if (detailStageEl) {
+      detailStageEl.addEventListener('wheel', (e) => {
+        if (!isDetailViewOpen) return;
+        const onCardsStrip = e.target.closest('.hub-other-games-section, #hub-left-peek-slot, #hub-tower-card');
+        const isHorizontalSwipe = Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10;
+
+        if (onCardsStrip || isHorizontalSwipe) {
+          const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+          if (Math.abs(delta) > 6) {
+            e.preventDefault();
+            stepDropdownGame(delta > 0 ? 1 : -1);
+          }
+        }
+      }, { passive: false });
+
+      // Hỗ trợ kéo chuột / vuốt cảm ứng ngang (Touch / Drag Swipe) trên dải thẻ game
+      let dragStartX = null;
+      let dragStartY = null;
+      detailStageEl.addEventListener('pointerdown', (e) => {
+        if (!isDetailViewOpen) return;
+        if (!e.target.closest('.hub-other-games-section, #hub-left-peek-slot')) return;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+      });
+
+      detailStageEl.addEventListener('pointerup', (e) => {
+        if (dragStartX === null || dragStartY === null) return;
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        dragStartX = null;
+        dragStartY = null;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+          stepDropdownGame(dx < 0 ? 1 : -1);
+        }
+      });
+    }
+
+    // Hỗ trợ phím mũi tên Trái / Phải để lướt qua các game mượt mà như Console
+    window.addEventListener('keydown', (e) => {
+      if (!document.body.classList.contains('in-hub')) return;
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      if (document.querySelector('.modal-overlay.active')) return;
+
+      if (e.key === 'ArrowRight') {
+        if (isDetailViewOpen) {
+          e.preventDefault();
+          stepDropdownGame(1);
+        } else {
+          const filteredIds = getFilteredGameIds();
+          const curIdx = filteredIds.indexOf(selectedGameId);
+          if (curIdx !== -1 && curIdx + 1 < filteredIds.length) {
+            e.preventDefault();
+            try { soundManager.playCutePop(); } catch (_) {}
+            renderSelectedGame(filteredIds[curIdx + 1], false);
+          }
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (isDetailViewOpen) {
+          e.preventDefault();
+          stepDropdownGame(-1);
+        } else {
+          const filteredIds = getFilteredGameIds();
+          const curIdx = filteredIds.indexOf(selectedGameId);
+          if (curIdx > 0) {
+            e.preventDefault();
+            try { soundManager.playCutePop(); } catch (_) {}
+            renderSelectedGame(filteredIds[curIdx - 1], false);
+          }
+        }
+      }
+    });
 
     // Nút Card trên đỉnh tháp & Nút Pill Playing vào thẳng game
     document.getElementById('hub-tower-card')?.addEventListener('click', (e) => {
