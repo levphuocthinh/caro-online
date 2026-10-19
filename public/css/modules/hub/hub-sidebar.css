@@ -242,57 +242,6 @@ body.sidebar-open {
   border-radius: 4px;
 }
 
-/* Banner hiển thị Game đang chọn */
-.sidebar-game-banner {
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #e60012, #b3000e);
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  box-shadow: 0 6px 20px rgba(230, 0, 18, 0.3);
-  position: relative;
-  overflow: hidden;
-  transition: background 0.35s ease, box-shadow 0.35s ease;
-}
-
-.sidebar-game-banner::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 90px;
-  height: 90px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.sidebar-game-badge {
-  align-self: flex-start;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.45);
-  font-size: 9.5px;
-  font-weight: 900;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.sidebar-game-name {
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: -0.3px;
-  line-height: 1.2;
-}
-
-.sidebar-game-sub {
-  font-size: 11px;
-  font-weight: 700;
-  opacity: 0.9;
-  letter-spacing: 0.5px;
-}
-
 /* Tiêu đề từng nhóm chức năng */
 .sidebar-section-title {
   font-size: 12px;

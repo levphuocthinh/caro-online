@@ -260,20 +260,6 @@ export class HubController {
         playPill.style.display = 'none';
       }
     }
-
-    // Cập nhật thông tin game tương ứng vào Sidebar Drawer
-    const sbBanner = document.getElementById('sidebar-game-banner');
-    if (sbBanner && info.towerColor) {
-      sbBanner.style.background = `linear-gradient(135deg, ${info.towerColor}, ${info.towerDark || info.towerColor})`;
-    }
-    const sbBadge = document.getElementById('sidebar-game-badge');
-    if (sbBadge) {
-      sbBadge.textContent = info.playable ? (i18n.getText('tag_play_now') || 'PLAY NOW') : (i18n.getText('coming_badge') || 'SẮP RA MẮT');
-    }
-    const sbName = document.getElementById('sidebar-game-name');
-    if (sbName) sbName.textContent = info.coverTitle;
-    const sbSub = document.getElementById('sidebar-game-sub');
-    if (sbSub) sbSub.textContent = info.stripText;
   }
 
   static renderOtherGamesRow(filteredIds, activeIdx, slideDir) {
