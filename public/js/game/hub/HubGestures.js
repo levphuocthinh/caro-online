@@ -24,20 +24,6 @@ export class HubGestures {
   static bindHomeCarouselGestures() {
     const carousel = document.getElementById('hub-home-carousel');
     const stage = document.getElementById('hub-home-stage');
-    const prevBtn = document.getElementById('btn-home-carousel-prev');
-    const nextBtn = document.getElementById('btn-home-carousel-next');
-
-    // 1. Nút mũi tên Prev / Next trên Web Desktop
-    prevBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.controller.stepHomeGame(-1);
-    });
-
-    nextBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.controller.stepHomeGame(1);
-    });
-
     if (!carousel) return;
 
     let isDown = false;

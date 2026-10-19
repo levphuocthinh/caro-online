@@ -118,26 +118,13 @@ export class HubController {
     } else {
       HubViewRenderer.renderHomeView(this, catalog, filteredIds, prevOpenState);
     }
-
-    this.updateHomeNavArrows();
-
+ 
     const sbViewText = document.getElementById('sidebar-view-btn-text');
     if (sbViewText) {
       sbViewText.textContent = this.isDetailViewOpen
         ? (i18n.getText('sidebar_home_view') || 'Xem Toàn Cảnh (Home View)')
         : (i18n.getText('sidebar_detail_view') || 'Xem Chi Tiết (Detail View)');
     }
-  }
-
-  static updateHomeNavArrows() {
-    const prevBtn = document.getElementById('btn-home-carousel-prev');
-    const nextBtn = document.getElementById('btn-home-carousel-next');
-    if (!prevBtn || !nextBtn) return;
-
-    const filteredIds = this.getFilteredGameIds();
-    const curIdx = filteredIds.indexOf(this.selectedGameId);
-    prevBtn.disabled = curIdx <= 0;
-    nextBtn.disabled = curIdx >= filteredIds.length - 1 || curIdx === -1;
   }
 
   static stepHomeGame(direction) {

@@ -352,10 +352,6 @@ export class HubViewRenderer {
         activeHomeCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       } catch (_) {}
     }
-
-    if (typeof controller.updateHomeNavArrows === 'function') {
-      controller.updateHomeNavArrows();
-    }
   }
 
   /**
