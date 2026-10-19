@@ -329,20 +329,9 @@ export class HubViewRenderer {
           return;
         }
 
-        // Bấm chọn thẻ khác -> Chọn và chuyển mục trong Home View mà không bị nhảy trang
-        if (gId !== controller.selectedGameId) {
-          try { soundManager.playCutePop(); } catch (_) {}
-          controller.renderSelectedGame(gId, false);
-        } else {
-          // Bấm vào thẻ đang chọn: nếu chơi được thì vào game, nếu chưa thì mở chi tiết
-          const item = catalog[gId];
-          if (item?.playable) {
-            controller.triggerEnterSelectedGame();
-          } else {
-            try { soundManager.playCuteWhoosh(); } catch (_) {}
-            controller.renderSelectedGame(gId, true);
-          }
-        }
+        // Bấm vào thẻ game -> Mở ngay Dropdown (Detail View) cho tựa game đó
+        try { soundManager.playCuteWhoosh(); } catch (_) {}
+        controller.renderSelectedGame(gId, true);
       });
     });
 
