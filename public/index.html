@@ -376,8 +376,16 @@
       <!-- Hiển thị khi người dùng bấm Close thu gọn drawer -->
       <div class="hub-home-stage" id="hub-home-stage" style="display: none;">
         <!-- Dải Game Toàn Cảnh (Thẻ 240px x 240px, siêu to, rực rỡ) -->
-        <div class="hub-home-carousel" id="hub-home-carousel">
-          <!-- Render động toàn bộ 8 game thẻ to -->
+        <div class="hub-home-carousel-wrapper" id="hub-home-carousel-wrapper">
+          <button class="hub-carousel-arrow hub-carousel-prev" id="btn-home-carousel-prev" type="button" aria-label="Game trước" title="Game trước">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="hub-home-carousel" id="hub-home-carousel">
+            <!-- Render động toàn bộ 8 game thẻ to -->
+          </div>
+          <button class="hub-carousel-arrow hub-carousel-next" id="btn-home-carousel-next" type="button" aria-label="Game tiếp theo" title="Game tiếp theo">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
         </div>
 
         <!-- DOCK NÚT SQUIRCLE ĐIỀU KHIỂN (THAY THẾ ICON TRÒN CŨ BẰNG ICON SQUIRCLE RỰC RỠ NHƯ MẪU 1) -->

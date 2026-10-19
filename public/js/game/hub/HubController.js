@@ -25,6 +25,7 @@ export class HubController {
     this.currentFilterType = 'all';
     this.isDetailViewOpen = true;
     this.lastDropdownStepTime = 0;
+    this.isDragInProgress = false;
 
     // 1. Khởi tạo theme sáng / tối
     HubThemeManager.init();
@@ -118,11 +119,53 @@ export class HubController {
       HubViewRenderer.renderHomeView(this, catalog, filteredIds, prevOpenState);
     }
 
+    this.updateHomeNavArrows();
+
     const sbViewText = document.getElementById('sidebar-view-btn-text');
     if (sbViewText) {
       sbViewText.textContent = this.isDetailViewOpen
         ? (i18n.getText('sidebar_home_view') || 'Xem Toàn Cảnh (Home View)')
         : (i18n.getText('sidebar_detail_view') || 'Xem Chi Tiết (Detail View)');
+    }
+  }
+
+  static updateHomeNavArrows() {
+    const prevBtn = document.getElementById('btn-home-carousel-prev');
+    const nextBtn = document.getElementById('btn-home-carousel-next');
+    if (!prevBtn || !nextBtn) return;
+
+    const filteredIds = this.getFilteredGameIds();
+    const curIdx = filteredIds.indexOf(this.selectedGameId);
+    prevBtn.disabled = curIdx <= 0;
+    nextBtn.disabled = curIdx >= filteredIds.length - 1 || curIdx === -1;
+  }
+
+  static stepHomeGame(direction) {
+    const now = Date.now();
+    if (now - this.lastDropdownStepTime < 160) return;
+
+    const filteredIds = this.getFilteredGameIds();
+    if (filteredIds.length <= 1) return;
+
+    const curIdx = filteredIds.indexOf(this.selectedGameId);
+    if (curIdx === -1) return;
+
+    let nextIdx = curIdx + direction;
+    if (nextIdx < 0) nextIdx = 0;
+    if (nextIdx >= filteredIds.length) nextIdx = filteredIds.length - 1;
+
+    if (nextIdx === curIdx) return;
+
+    this.lastDropdownStepTime = now;
+    try { soundManager.playCutePop(); } catch (_) {}
+    this.renderSelectedGame(filteredIds[nextIdx], false);
+  }
+
+  static stepGame(direction) {
+    if (this.isDetailViewOpen) {
+      this.stepDropdownGame(direction);
+    } else {
+      this.stepHomeGame(direction);
     }
   }
 

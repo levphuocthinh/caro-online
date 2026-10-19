@@ -202,6 +202,7 @@ export class HubViewRenderer {
 
     otherRow.querySelectorAll('.hub-game-tile').forEach(tile => {
       tile.addEventListener('click', () => {
+        if (controller.isDragInProgress) return;
         const gId = tile.dataset.gameId;
         if (!gId) return;
         try { soundManager.playCutePop(); } catch (_) {}
@@ -316,16 +317,32 @@ export class HubViewRenderer {
 
     homeCarousel.querySelectorAll('.hub-home-card').forEach(card => {
       card.addEventListener('click', (e) => {
+        if (controller.isDragInProgress) return;
         const gId = card.dataset.gameId;
         if (!gId) return;
+
+        // Bấm vào nút Playing Pill -> Bắt đầu chơi ngay
         if (e.target.closest('.hub-playing-pill, #btn-home-pill')) {
           e.stopPropagation();
           controller.selectedGameId = gId;
           controller.triggerEnterSelectedGame();
           return;
         }
-        try { soundManager.playCuteWhoosh(); } catch (_) {}
-        controller.renderSelectedGame(gId, true);
+
+        // Bấm chọn thẻ khác -> Chọn và chuyển mục trong Home View mà không bị nhảy trang
+        if (gId !== controller.selectedGameId) {
+          try { soundManager.playCutePop(); } catch (_) {}
+          controller.renderSelectedGame(gId, false);
+        } else {
+          // Bấm vào thẻ đang chọn: nếu chơi được thì vào game, nếu chưa thì mở chi tiết
+          const item = catalog[gId];
+          if (item?.playable) {
+            controller.triggerEnterSelectedGame();
+          } else {
+            try { soundManager.playCuteWhoosh(); } catch (_) {}
+            controller.renderSelectedGame(gId, true);
+          }
+        }
       });
     });
 
@@ -334,6 +351,10 @@ export class HubViewRenderer {
       try {
         activeHomeCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       } catch (_) {}
+    }
+
+    if (typeof controller.updateHomeNavArrows === 'function') {
+      controller.updateHomeNavArrows();
     }
   }
 

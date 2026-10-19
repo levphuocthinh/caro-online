@@ -12,17 +12,33 @@
   align-items: center !important;
   gap: 18px !important;
   width: 100% !important;
-  overflow: hidden !important;
+  overflow-x: auto !important;
   padding: 2px 4px 14px 4px !important;
   margin: 0 !important;
   scroll-behavior: smooth !important;
   box-sizing: border-box !important;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y pinch-zoom;
+  scrollbar-width: none !important;
 }
 
 .hub-other-games-row::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
+}
+
+.hub-other-games-row.is-dragging {
+  cursor: grabbing !important;
+  scroll-behavior: auto !important;
+}
+
+.hub-other-games-row.is-dragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  pointer-events: none !important;
 }
 
 /* Hiệu ứng đẩy mượt sang trái / phải khi chọn hoặc lướt ngang qua các game ở Dropdown Center */
@@ -117,6 +133,61 @@
   box-sizing: border-box;
 }
 
+.hub-home-carousel-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hub-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  border: 2px solid rgba(255, 255, 255, 0.98);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08);
+  color: #2d3436;
+  font-size: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.hub-carousel-arrow:hover:not(:disabled) {
+  background: #ffffff;
+  color: #00b4d8;
+  transform: translateY(-50%) scale(1.12);
+  box-shadow: 0 8px 26px rgba(0, 229, 255, 0.45);
+}
+
+.hub-carousel-arrow:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.hub-carousel-arrow:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.hub-carousel-prev {
+  left: 12px;
+}
+
+.hub-carousel-next {
+  right: 12px;
+}
+
 .hub-home-carousel {
   display: flex !important;
   flex-direction: row !important;
@@ -126,16 +197,32 @@
   gap: 24px !important;
   width: 100% !important;
   overflow-x: auto !important;
-  padding: 24px 14px 32px 14px !important;
+  padding: 24px 24px 32px 24px !important;
   margin: 0 !important;
   scroll-behavior: smooth !important;
   box-sizing: border-box !important;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y pinch-zoom;
+  scrollbar-width: none !important;
 }
 
 .hub-home-carousel::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
+}
+
+.hub-home-carousel.is-dragging {
+  cursor: grabbing !important;
+  scroll-behavior: auto !important;
+}
+
+.hub-home-carousel.is-dragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  pointer-events: none !important;
 }
 
 /* Thẻ game ở Home View - Phóng to 240px x 240px */

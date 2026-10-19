@@ -289,6 +289,10 @@
     padding: 8px 0 20px 0 !important;
   }
 
+  .hub-carousel-arrow {
+    display: none !important;
+  }
+
   .hub-home-carousel {
     gap: 14px !important;
     padding: 12px 14px 20px 14px !important;
@@ -668,6 +672,23 @@ body.in-hub.theme-dark .news-card-caption,
 html[data-theme="dark"] body.in-hub .news-card-caption {
   background: rgba(18, 20, 28, 0.85);
   color: #dfe4ea;
+}
+
+/* Nút điều hướng Carousel trong Dark Mode */
+body.in-hub.theme-dark .hub-carousel-arrow,
+html[data-theme="dark"] body.in-hub .hub-carousel-arrow {
+  background: rgba(28, 31, 42, 0.88);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #f1f2f6;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+
+body.in-hub.theme-dark .hub-carousel-arrow:hover:not(:disabled),
+html[data-theme="dark"] body.in-hub .hub-carousel-arrow:hover:not(:disabled) {
+  background: #232733;
+  color: #00e5ff;
+  border-color: #00e5ff;
+  box-shadow: 0 6px 24px rgba(0, 229, 255, 0.5);
 }
 
 /* Modals & Toasts trong Dark Mode */
