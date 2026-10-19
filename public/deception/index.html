@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Deception: Murder in Viet Nam • Board Game Online</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <!-- Fonts: Cinzel for Noir Titles, Nunito for crisp reading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Dedicated Deception Stylesheet -->
+  <link rel="stylesheet" href="css/deception.css">
+</head>
+<body class="deception-app">
+  <!-- Background Ambient Glow & Rain -->
+  <div class="noir-backdrop">
+    <div class="noir-glow-red"></div>
+    <div class="noir-glow-cyan"></div>
+    <div class="noir-rain-canvas" id="rain-canvas"></div>
+  </div>
+
+  <div class="deception-container">
+    <!-- TOP HEADER -->
+    <header class="noir-header">
+      <div class="header-left">
+        <a href="/" class="btn-hub-return" title="Quay lại Cổng Game Hub">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Cổng Game</span>
+        </a>
+        <div class="noir-brand">
+          <span class="noir-brand-badge">HONG KONG NOIR</span>
+          <h1 class="noir-brand-title">DECEPTION</h1>
+          <span class="noir-brand-sub">MURDER IN VIET NAM</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="case-file-tag">
+          <i class="fa-solid fa-folder-open"></i>
+          <span>HỒ SƠ: <b id="lbl-case-id">#VN-1997</b></span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button type="button" class="btn-hdr-action" id="btn-toggle-lang" title="Đổi ngôn ngữ / Switch Language">
+          <i class="fa-solid fa-globe"></i>
+          <span id="lbl-lang">VI</span>
+        </button>
+        <button type="button" class="btn-hdr-action" id="btn-toggle-sound" title="Bật/Tắt âm thanh">
+          <i class="fa-solid fa-volume-high" id="icon-sound"></i>
+        </button>
+        <button type="button" class="btn-hdr-action" id="btn-open-rules" title="Xem Sách Luật & 9 Vai Trò">
+          <i class="fa-solid fa-book-skull"></i>
+          <span>Luật Chơi</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER (Only 1 primary view is active at a time - Zero Clutter!) -->
+    <main class="noir-main">
+
+      <!-- VIEW 1: LOBBY / TABLE SETUP (Sảnh Chờ & Cấu Hình Bàn 4-9 Người) -->
+      <section class="noir-view active" id="view-lobby">
+        <div class="lobby-card">
+          <div class="lobby-card-header">
+            <div>
+              <span class="view-eyebrow"><i class="fa-solid fa-users"></i> PHÒNG ĐIỀU TRA VỤ ÁN</span>
+              <h2 class="view-title">Thiết Lập Bàn Phá Án (4 – 9 Người Chơi)</h2>
+            </div>
+            <div class="room-share-badge">
+              <span>MÃ BÀN: <b id="lbl-room-code">#HK-88</b></span>
+              <button type="button" class="btn-copy-code" id="btn-copy-code">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Central Detective Table Layout Preview -->
+          <div class="lobby-table-wrapper">
+            <div class="detective-round-table">
+              <div class="table-felt">
+                <div class="table-emblem">
+                  <i class="fa-solid fa-fingerprint"></i>
+                  <span>HONG KONG POLICE</span>
+                </div>
+              </div>
+              <div class="table-seats-ring" id="lobby-seats-ring">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Compact Configuration Bar -->
+          <div class="lobby-controls-bar">
+            <div class="cfg-group">
+              <label for="cfg-player-name">Tên thám tử của bạn:</label>
+              <input type="text" id="cfg-player-name" class="noir-ctrl-input" value="Thám tử Trưởng" maxlength="18">
+            </div>
+
+            <div class="cfg-group">
+              <label for="cfg-player-count">Số người chơi:</label>
+              <select id="cfg-player-count" class="noir-ctrl-select">
+                <option value="4">4 Người (1 Pháp y, 1 Hung thủ, 2 Điều tra)</option>
+                <option value="5">5 Người (Có thêm Thám tử Cố vấn)</option>
+                <option value="6" selected>6 Người (Chuẩn: Có Đồng phạm & Nhân chứng ★)</option>
+                <option value="7">7 Người (+ Kỹ thuật viên Lab ★)</option>
+                <option value="8">8 Người (+ Nội gián đánh cắp huy hiệu ★)</option>
+                <option value="9">9 Người (Bàn đại tiệc phá án tối đa)</option>
+              </select>
+            </div>
+
+            <div class="cfg-group">
+              <label for="cfg-preferred-role">Vai trò bạn muốn cầm:</label>
+              <select id="cfg-preferred-role" class="noir-ctrl-select">
+                <option value="RANDOM">🎲 Ngẫu Nhiên (Trải nghiệm chuẩn)</option>
+                <option value="FORENSIC_SCIENTIST">🔬 Chuyên gia Pháp y</option>
+                <option value="MURDERER">🔪 Kẻ Sát Nhân</option>
+                <option value="INVESTIGATOR">🕵️ Điều tra viên</option>
+                <option value="WITNESS">👁️ Nhân chứng</option>
+                <option value="ACCOMPLICE">🎭 Đồng phạm</option>
+                <option value="LAB_TECHNICIAN">🧪 Kỹ thuật viên Phòng Lab</option>
+                <option value="INSIDE_MAN">🕶️ Nội gián</option>
+                <option value="PROTECTIVE_DETAIL">🛡️ Đặc vụ Bảo vệ</option>
+                <option value="CONSULTING_DETECTIVE">🎩 Thám tử Cố vấn</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="lobby-cta-row">
+            <button type="button" class="btn-noir-hero" id="btn-start-investigation">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>BẮT ĐẦU VỤ ÁN MỚI</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: ROLE REVEAL (Lật Thẻ Vai Trò Bí Mật) -->
+      <section class="noir-view" id="view-role">
+        <div class="role-reveal-stage">
+          <div class="role-card-3d" id="role-card-flip">
+            <div class="role-card-inner">
+              <div class="role-card-front" id="role-card-front">
+                <div class="card-crest"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="card-confidential">TOP SECRET • CASE FILE</div>
+                <div class="role-icon-box" id="role-display-icon">🕵️</div>
+                <h2 class="role-display-title" id="role-display-title">Điều Tra Viên</h2>
+                <span class="role-faction-pill" id="role-display-faction">PHE ĐIỀU TRA</span>
+                <p class="role-display-desc" id="role-display-desc">Mô tả vai trò</p>
+              </div>
+            </div>
+          </div>
+          <div class="role-actions">
+            <button type="button" class="btn-noir-hero" id="btn-role-ack">
+              <span>ĐÃ HIỂU NHIỆM VỤ — BƯỚC VÀO BAN ĐÊM</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: NIGHT CRIME SELECTION (Ban Đêm Gây Án) -->
+      <section class="noir-view" id="view-night">
+        <div class="night-stage">
+          <div class="night-banner">
+            <span class="night-moon-icon"><i class="fa-solid fa-moon"></i></span>
+            <h2 id="night-headline">Màn Đêm Buông Xuống...</h2>
+            <p id="night-sub">Kẻ Sát Nhân đang bí mật hành động trong bóng tối của phố cổ.</p>
+          </div>
+
+          <!-- Murderer Pick Hand (Only active when human is Murderer) -->
+          <div class="night-picker-container" id="night-murderer-picker" style="display: none;">
+            <div class="night-pick-instruction">
+              <span>Hãy chọn <b>1 Thẻ Phương Thức (Xanh)</b> và <b>1 Thẻ Manh Mối (Đỏ)</b> của bạn:</span>
+            </div>
+            <div class="night-cards-split">
+              <div class="night-col">
+                <h4 class="col-lbl col-blue"><i class="fa-solid fa-skull"></i> Phương Thức Gây Án (Xanh)</h4>
+                <div class="night-cards-grid" id="night-means-grid"></div>
+              </div>
+              <div class="night-col">
+                <h4 class="col-lbl col-red"><i class="fa-solid fa-fingerprint"></i> Manh Mối Vật Chứng (Đỏ)</h4>
+                <div class="night-cards-grid" id="night-clues-grid"></div>
+              </div>
+            </div>
+            <div class="night-confirm-row">
+              <button type="button" class="btn-noir-hero btn-crimson" id="btn-night-confirm-crime">
+                <i class="fa-solid fa-skull-crossbones"></i>
+                <span>XÁC NHẬN GÂY ÁN & RỜI HIỆN TRƯỜNG</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Non-Murderer Night Waiting or Intel View -->
+          <div class="night-intel-box" id="night-intel-box" style="display: none;">
+            <div class="intel-content" id="night-intel-content"></div>
+            <button type="button" class="btn-noir-hero" id="btn-night-proceed">
+              <span>BÌNH MINH LÊN — VÀO HIỆN TRƯỜNG VÒNG 1</span>
+              <i class="fa-solid fa-sun"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: MAIN INVESTIGATION TABLE (Bàn Phá Án Vòng 1, 2, 3) -->
+      <section class="noir-view" id="view-investigation">
+        <!-- Status Ribbon: Round, Phase, Time, Badges, Notes -->
+        <div class="investigation-ribbon">
+          <div class="ribbon-col">
+            <span class="ribbon-pill pill-gold" id="ribbon-round">VÒNG 1 / 3</span>
+            <span class="ribbon-pill pill-blue" id="ribbon-phase">PHÁP Y ĐẶT ĐẠN</span>
+          </div>
+
+          <!-- 30s Speaker Countdown Bar -->
+          <div class="speaker-hud" id="speaker-hud">
+            <span class="speaker-avatar" id="hud-speaker-avatar">🕵️</span>
+            <div class="speaker-info">
+              <span class="speaker-name" id="hud-speaker-name">Đang trình bày...</span>
+              <div class="speaker-time-bar">
+                <div class="speaker-time-fill" id="hud-time-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+            <span class="speaker-sec-badge" id="hud-speaker-sec">30s</span>
+          </div>
+
+          <div class="ribbon-col">
+            <div class="badge-counter-badge" id="ribbon-badges">
+              <i class="fa-solid fa-shield"></i>
+              <span>Huy Hiệu: <b id="lbl-badges-count">5/5</b></span>
+            </div>
+            <button type="button" class="btn-noir-small" id="btn-toggle-dossier" title="Xem Hồ Sơ Vụ Án">
+              <i class="fa-solid fa-scroll"></i>
+              <span>Nhật Ký</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section Navigation Switch for Mobile & Desktop (Pháp Y 6 Thẻ vs Bàn Nghi Phạm) -->
+        <div class="investigation-tab-switch">
+          <button type="button" class="inv-tab-btn active" data-tab="forensic">
+            <i class="fa-solid fa-bullseye"></i>
+            <span>BẢNG HIỆN TRƯỜNG PHÁP Y (6 THẺ)</span>
+          </button>
+          <button type="button" class="inv-tab-btn" data-tab="suspects">
+            <i class="fa-solid fa-users-viewfinder"></i>
+            <span>BÀN NGHI PHẠM & DANH MỤC VẬT CHỨNG</span>
+          </button>
+        </div>
+
+        <!-- Investigation Workspace -->
+        <div class="investigation-workspace active-tab-forensic" id="investigation-workspace">
+          <!-- 6 SCENE TILES PANEL (1 Tím + 1 Xanh lá + 4 Nâu) -->
+          <div class="forensic-tiles-stage" id="tab-pane-forensic">
+            <div class="stage-subhead">
+              <div>
+                <h3><i class="fa-solid fa-clipboard-check"></i> Bảng Chỉ Dẫn Hiện Trường Của Chuyên Gia Pháp Y</h3>
+                <p>Quan sát 6 viên đạn gỗ 🎯 đặt trên các thẻ để suy luận ra hung khí và manh mối của Kẻ Sát Nhân.</p>
+              </div>
+              <div id="forensic-actions-slot"></div>
+            </div>
+
+            <!-- The 6 Active Scene Tiles -->
+            <div class="scene-tiles-grid" id="active-scene-tiles-grid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- SUSPECTS & EVIDENCE BOARD -->
+          <div class="suspects-table-stage" id="tab-pane-suspects">
+            <div class="stage-subhead">
+              <div>
+                <h3><i class="fa-solid fa-users-viewfinder"></i> Bàn Nghi Phạm & Danh Mục Vật Chứng</h3>
+                <p>Mỗi nghi phạm giữ các thẻ Phương thức (Xanh) và Manh mối (Đỏ). Bấm vào thẻ để Ghim nghi vấn 📌 hoặc dùng Huy hiệu để Phá Án!</p>
+              </div>
+            </div>
+
+            <div class="suspects-grid" id="active-suspects-grid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM ACTION DOCK -->
+        <div class="floating-action-dock">
+          <div class="dock-actions-left">
+            <button type="button" class="btn-dock-btn" id="btn-dock-next-speaker">
+              <i class="fa-solid fa-forward-step"></i>
+              <span>Lượt Kế Tiếp</span>
+            </button>
+            <button type="button" class="btn-dock-btn" id="btn-dock-advance-round">
+              <i class="fa-solid fa-circle-arrow-right"></i>
+              <span>Sang Vòng Mới</span>
+            </button>
+          </div>
+
+          <div class="dock-actions-center">
+            <button type="button" class="btn-dock-accuse" id="btn-dock-accuse">
+              <i class="fa-solid fa-gavel"></i>
+              <span>🚨 ĐẬP BÀN PHÁ ÁN!</span>
+            </button>
+          </div>
+
+          <div class="dock-actions-right">
+            <button type="button" class="btn-dock-btn" id="btn-dock-consulting" style="display: none;">
+              <i class="fa-solid fa-id-badge"></i>
+              <span>Lật Thẻ Cố Vấn</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: WITNESS REVERSAL (Kẻ Sát Nhân Phản Công) -->
+      <section class="noir-view" id="view-witness-reversal">
+        <div class="reversal-stage">
+          <div class="reversal-card">
+            <span class="view-eyebrow text-crimson">🔫 LẬT KÈO CUỐI TRẬN</span>
+            <h2 class="view-title">Kẻ Sát Nhân Rút Súng Tìm Bắn [Nhân Chứng]</h2>
+            <p class="reversal-desc">
+              Cảnh sát đã tìm ra cặp vật chứng! Nhưng nếu bàn chơi có Nhân chứng, Kẻ Sát Nhân được quyền bắn 1 phát súng định mệnh:
+              Nếu bắn trúng Nhân chứng, phe Tội phạm sẽ cướp lấy chiến thắng!
+            </p>
+
+            <div class="reversal-targets-grid" id="reversal-targets-grid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: GAME OVER (Hồ Sơ Chân Tướng Vụ Án) -->
+      <section class="noir-view" id="view-game-over">
+        <div class="game-over-stage">
+          <div class="dossier-card" id="game-over-dossier">
+            <div class="dossier-stamp" id="dossier-stamp">CASE CLOSED</div>
+            <h2 class="dossier-headline" id="dossier-headline">Phe Cảnh Sát Chiến Thắng!</h2>
+            <p class="dossier-sub" id="dossier-sub">Vụ án mạng đã được phơi bày ra ánh sáng công lý.</p>
+
+            <div class="dossier-evidence-box">
+              <div class="evidence-item">
+                <span class="ev-lbl">KẺ SÁT NHÂN</span>
+                <div class="ev-val" id="dossier-murderer">🕵️ Thám tử A</div>
+              </div>
+              <div class="evidence-item">
+                <span class="ev-lbl">HUNG KHÍ (PHƯƠNG THỨC)</span>
+                <div class="ev-val val-blue" id="dossier-means">🧪 Thuốc độc</div>
+              </div>
+              <div class="evidence-item">
+                <span class="ev-lbl">VẬT CHỨNG (MANH MỐI)</span>
+                <div class="ev-val val-red" id="dossier-clue">🩸 Vết máu</div>
+              </div>
+            </div>
+
+            <!-- Full Roles Roster -->
+            <div class="dossier-roster-title">Danh Tính Toàn Bộ Người Chơi Trong Vụ Án:</div>
+            <div class="dossier-roster" id="dossier-roster">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <div class="dossier-cta-row">
+              <button type="button" class="btn-noir-hero" id="btn-rematch-case">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>MỞ VỤ ÁN MỚI</span>
+              </button>
+              <a href="/" class="btn-noir-hero btn-secondary">
+                <i class="fa-solid fa-house"></i>
+                <span>VỀ CỔNG GAME</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       MODALS & OVERLAYS
+       ========================================================================= -->
+
+  <!-- MODAL 1: ĐẬP BÀN PHÁ ÁN (ACCUSATION INTERRUPT MODAL) -->
+  <div class="noir-modal-overlay" id="modal-accuse">
+    <div class="noir-modal-card">
+      <div class="noir-modal-header">
+        <div>
+          <span class="view-eyebrow text-crimson">🚨 OFFICIAL ACCUSATION</span>
+          <h3 class="modal-heading">Chỉ Định Hung Thủ & Cặp Vật Chứng</h3>
+        </div>
+        <button type="button" class="btn-modal-close" data-close="modal-accuse"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body-scroll">
+        <p class="accuse-warning">
+          ⚠️ Bạn chỉ có <b>1 Huy Hiệu Duy Nhất</b> trong suốt ván chơi. Nếu đoán sai dù chỉ 1 thẻ, bạn sẽ mất vĩnh viễn quyền phá án!
+        </p>
+
+        <!-- Step 1: Pick Suspect -->
+        <div class="accuse-step">
+          <label>1. Chọn Nghi phạm bạn nghi ngờ:</label>
+          <div class="accuse-suspects-picker" id="accuse-suspects-picker"></div>
+        </div>
+
+        <!-- Step 2 & 3: Pick Means and Clue -->
+        <div class="accuse-cards-picker-row">
+          <div class="accuse-card-col">
+            <label class="col-lbl col-blue">2. Chọn 1 Phương thức (Xanh):</label>
+            <div class="accuse-options-list" id="accuse-means-picker"></div>
+          </div>
+          <div class="accuse-card-col">
+            <label class="col-lbl col-red">3. Chọn 1 Manh mối (Đỏ):</label>
+            <div class="accuse-options-list" id="accuse-clues-picker"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="noir-modal-footer">
+        <button type="button" class="btn-modal-cancel" data-close="modal-accuse">Để Suy Nghĩ Thêm</button>
+        <button type="button" class="btn-noir-hero btn-crimson" id="btn-confirm-accuse">
+          <i class="fa-solid fa-gavel"></i>
+          <span>NỘP HUY HIỆU & PHÁ ÁN!</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: SÁCH LUẬT & 9 VAI TRÒ CHÍNH THỨC -->
+  <div class="noir-modal-overlay" id="modal-rules">
+    <div class="noir-modal-card modal-wide">
+      <div class="noir-modal-header">
+        <div>
+          <span class="view-eyebrow">OFFICIAL RULEBOOK</span>
+          <h3 class="modal-heading">Cẩm Nang Luật Chơi & 9 Vai Trò</h3>
+        </div>
+        <button type="button" class="btn-modal-close" data-close="modal-rules"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body-scroll">
+        <div class="rules-summary-grid">
+          <div class="rule-box">
+            <h4>1. Ban Đêm Gây Án</h4>
+            <p>Hung thủ bí mật chọn 1 Hung Khí (Xanh) + 1 Manh Mối (Đỏ). Pháp y & Đồng phạm biết đáp án; Nhân chứng thấy 2 nghi phạm.</p>
+          </div>
+          <div class="rule-box">
+            <h4>2. Ba Vòng Giám Định</h4>
+            <p>Pháp y KHÔNG được nói, chỉ đặt 6 viên đạn gỗ lên 6 Thẻ Hiện Trường. Sang Vòng 2 & 3 thay dần từng thẻ để thu hẹp manh mối.</p>
+          </div>
+          <div class="rule-box">
+            <h4>3. Phá Án & Lật Kèo</h4>
+            <p>Mỗi người có 1 Huy hiệu để phá án. Nếu hung thủ bị bắt nhưng bàn có Nhân chứng, hung thủ được bắn 1 phát cuối để lật kèo thắng!</p>
+          </div>
+        </div>
+
+        <h4 class="rules-section-title"><i class="fa-solid fa-masks-theater"></i> Danh Sách 9 Vai Trò Chính Thức:</h4>
+        <div class="rules-roles-grid" id="rules-roles-grid"></div>
+      </div>
+
+      <div class="noir-modal-footer">
+        <button type="button" class="btn-noir-hero" data-close="modal-rules">
+          <i class="fa-solid fa-check"></i>
+          <span>ĐÃ NẮM RÕ LUẬT</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: NHẬT KÝ VỤ ÁN & TIMELINE (CASE DOSSIER) -->
+  <div class="noir-modal-overlay" id="modal-dossier">
+    <div class="noir-modal-card">
+      <div class="noir-modal-header">
+        <div>
+          <span class="view-eyebrow">CASE TIMELINE</span>
+          <h3 class="modal-heading">Nhật Ký & Biên Bản Điều Tra</h3>
+        </div>
+        <button type="button" class="btn-modal-close" data-close="modal-dossier"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body-scroll">
+        <div class="dossier-log-list" id="dossier-log-list"></div>
+      </div>
+      <div class="noir-modal-footer">
+        <button type="button" class="btn-modal-cancel" data-close="modal-dossier">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUTSCENE CANVAS OVERLAY (0% GPU Idle) -->
+  <div class="noir-cutscene-overlay" id="cutscene-overlay">
+    <div class="cutscene-box">
+      <div class="cutscene-top">
+        <span class="cutscene-tag" id="cutscene-tag">HONG KONG NOIR</span>
+        <button type="button" class="btn-cutscene-skip" id="btn-cutscene-skip">
+          <span>Bỏ qua</span> <i class="fa-solid fa-forward"></i>
+        </button>
+      </div>
+      <div class="cutscene-canvas-wrap">
+        <canvas id="cutscene-canvas" width="320" height="180"></canvas>
+      </div>
+      <div class="cutscene-bottom">
+        <h3 id="cutscene-title">Án Mạng Đêm Khuya</h3>
+        <p id="cutscene-sub">Đang tải...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Entry Point -->
+  <script type="module" src="js/DeceptionApp.js"></script>
+</body>
+</html>

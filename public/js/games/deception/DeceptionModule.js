@@ -29,37 +29,12 @@ export class DeceptionModule extends BaseGameModule {
   }
 
   /**
-   * Mở trang bàn điều tra Deception
+   * Mở trang bàn điều tra Deception độc lập
    */
   openLobby(pushState = true) {
-    if (!this.isInitialized) {
-      this.init();
+    if (typeof window !== 'undefined') {
+      window.location.href = '/deception/';
     }
-
-    CaroModal.closeAll();
-
-    // 1. Chuyển đổi màn hình sang trang game Deception
-    document.querySelectorAll('.screen').forEach(scr => scr.classList.remove('active'));
-    const deceptionScreen = document.getElementById('screen-deception');
-    if (deceptionScreen) {
-      deceptionScreen.classList.add('active');
-    }
-
-    // 2. Chuyển đổi body class sang không gian riêng của Deception
-    if (document.body) {
-      document.body.classList.remove('in-hub', 'in-game');
-      document.body.classList.add('in-deception');
-    }
-
-    // 3. Cập nhật URL Hash
-    if (pushState && typeof window !== 'undefined' && window.history) {
-      window.history.pushState({ screen: 'screen-deception' }, this.name, '#deception');
-    }
-
-    // 4. Render toàn bộ giao diện bàn điều tra
-    DeceptionUIBinder.renderAll();
-
-    try { soundManager.playCuteWhoosh(); } catch (_) {}
   }
 
   /**
