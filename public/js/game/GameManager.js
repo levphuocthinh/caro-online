@@ -1,25 +1,34 @@
 /**
- * Lớp điều phối tổng (GameManager) kết hợp các phân hệ:
- * LocalGame, AiGame, OnlineGame và UIBinder
+ * Lớp điều phối tổng (GameManager) kết hợp:
+ * Nền tảng Cổng Game Tổng (Console Web Hub), GameRegistry và các Module trò chơi con.
  */
-import { GameState } from './GameState.js';
-import { LocalGame } from './LocalGame.js';
-import { AiGame } from './AiGame.js';
-import { OnlineGame } from './OnlineGame.js';
+import { GameRegistry } from '../games/GameRegistry.js';
+import { CaroModule } from '../games/caro/CaroModule.js';
+import { ChessModule } from '../games/chess/ChessModule.js';
 import { UIBinder } from './UIBinder.js';
 import { CaroModal } from '../modules/modal.js';
 import { caroChat } from '../modules/chat.js';
 import { caroOnline } from '../modules/online.js';
-import { caroBoard } from '../modules/board.js';
 import { i18n } from '../modules/i18n.js';
 
 export class GameManager {
   constructor() {
-    this.state = new GameState();
-    this.localGame = new LocalGame(this.state);
-    this.aiGame = new AiGame(this.state);
-    this.onlineGame = new OnlineGame(this.state);
+    // 1. Hệ thống Registry quản lý đa game (Multi-Game Architecture)
+    this.registry = new GameRegistry(this);
+
+    // 2. Đăng ký các module trò chơi vào nền tảng
+    this.caro = new CaroModule(this);
+    this.chess = new ChessModule(this);
+
+    this.registry.register(this.caro);
+    this.registry.register(this.chess);
   }
+
+  // Thuộc tính tương thích ngược cho game cờ Caro
+  get state() { return this.caro.state; }
+  get localGame() { return this.caro.localGame; }
+  get aiGame() { return this.caro.aiGame; }
+  get onlineGame() { return this.caro.onlineGame; }
 
   init() {
     i18n.init();
@@ -107,90 +116,36 @@ export class GameManager {
     if (this.state.gameMode === 'online') {
       caroOnline.disconnect();
     }
+    this.registry.resetActive();
     this.localGame.switchToScreen('screen-hub', pushState);
   }
 
   openCaroLobby(pushState = true) {
-    CaroModal.closeAll();
-    this.localGame.switchToScreen('screen-lobby', pushState);
+    this.caro.openLobby(pushState);
   }
 
   handleSurrender() {
-    if (this.state.isGameOver) return;
-    if (confirm(i18n.getText('confirm_surrender'))) {
-      if (this.state.gameMode === 'online') {
-        caroOnline.surrender();
-      } else if (this.state.gameMode === 'ai') {
-        this.aiGame.endGame(this.state.mySymbol === 'X' ? 'O' : 'X', [], 'Surrender');
-      } else {
-        const winner = this.state.currentTurn === 'X' ? 'O' : 'X';
-        this.localGame.endGame(winner, [], `Player ${this.state.currentTurn} Surrendered`);
-      }
-    }
+    this.caro.handleSurrender();
   }
 
   handleOfferDraw() {
-    if (this.state.isGameOver) return;
-    if (this.state.gameMode === 'online') {
-      caroOnline.offerDraw();
-      CaroModal.showToast(i18n.getText('confirm_draw'));
-    } else if (this.state.gameMode === 'ai') {
-      this.aiGame.endGame('DRAW', [], '');
-    } else {
-      if (confirm(i18n.getText('confirm_draw'))) {
-        this.localGame.endGame('DRAW', [], '');
-      }
-    }
+    this.caro.handleOfferDraw();
   }
 
   handleRematch() {
-    if (this.state.gameMode === 'online') {
-      caroOnline.requestRematch();
-      CaroModal.showToast('Đã gửi yêu cầu ván mới. Đang chờ đối thủ đồng ý...');
-    } else if (this.state.gameMode === 'ai') {
-      const nextSymbol = this.state.mySymbol === 'X' ? 'O' : 'X';
-      this.aiGame.start(this.aiGame.aiEngine.difficulty, nextSymbol, caroBoard.size);
-    } else {
-      this.localGame.start();
-    }
+    this.caro.handleRematch();
   }
 
   confirmLeaveGame() {
-    const screenLobby = document.getElementById('screen-lobby');
-    if (screenLobby && screenLobby.classList.contains('active')) {
-      this.openHub();
-      return;
-    }
-    if (this.state.gameMode && !this.state.isGameOver) {
-      if (!confirm(i18n.getText('confirm_leave'))) {
-        return;
-      }
-    }
-    this.backToLobby();
+    this.caro.confirmLeaveGame();
   }
 
   confirmLeaveToHub() {
-    const screenLobby = document.getElementById('screen-lobby');
-    if (screenLobby && screenLobby.classList.contains('active')) {
-      this.openHub();
-      return;
-    }
-    if (this.state.gameMode && !this.state.isGameOver) {
-      if (!confirm(i18n.getText('confirm_leave'))) {
-        return;
-      }
-    }
-    this.openHub();
+    this.caro.confirmLeaveGame();
   }
 
   backToLobby(pushState = true) {
-    if (this.state.gameMode === 'online') {
-      this.onlineGame.backToLobby(pushState);
-    } else if (this.state.gameMode === 'ai') {
-      this.aiGame.backToLobby(pushState);
-    } else {
-      this.localGame.backToLobby(pushState);
-    }
+    this.caro.backToLobby(pushState);
   }
 
   setupHistoryRouting() {
@@ -250,7 +205,7 @@ export class GameManager {
             return;
           }
         }
-        // Dọn dẹp trận đấu và chuyển màn hình (không pushState thêm)
+        // Dọn dẹp trận đấu và chuyển màn hình
         this.backToLobby(false);
         if (targetScreen === 'screen-hub') {
           this.openHub(false);

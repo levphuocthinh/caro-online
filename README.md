@@ -88,17 +88,32 @@ caro/
 │   │   └── style.css                       # File stylesheet gốc nạp tất cả module CSS
 │   │
 │   ├── js/
+│   │   ├── games/                          # KIẾN TRÚC ĐA GAME (MULTI-GAME PLUG-AND-PLAY)
+│   │   │   ├── BaseGameModule.js           # Lớp trừu tượng (Interface) cho mọi game
+│   │   │   ├── GameRegistry.js             # Bộ đăng ký & điều phối game tập trung
+│   │   │   ├── README.md                   # Hướng dẫn nhanh cách thêm game mới trong 3 bước
+│   │   │   ├── templates/                  # Bản mẫu NewGameTemplate chuẩn để copy & paste
+│   │   │   ├── caro/                       # Module game Caro (Gói trọn vẹn riêng biệt)
+│   │   │   │   ├── CaroModule.js           # Điều phối toàn bộ vòng đời game Caro
+│   │   │   │   ├── CaroState.js            # Trạng thái ván cờ Caro
+│   │   │   │   ├── CaroBaseGame.js         # Lớp cơ sở UI bàn cờ
+│   │   │   │   ├── CaroLocalGame.js        # Chế độ Pass & Play 2 người 1 máy
+│   │   │   │   ├── CaroAiGame.js           # Chế độ đấu với Bot AI
+│   │   │   │   ├── CaroOnlineGame.js       # Chế độ Online qua Socket.io
+│   │   │   │   └── CaroUIBinder.js         # Gắn kết DOM các nút và modal của Caro
+│   │   │   └── chess/                      # Module mẫu Cờ Vua (Chess) minh họa
+│   │   │
 │   │   ├── game/
 │   │   │   ├── hub/                        # LOGIC CỔNG GAME CONSOLE ĐÃ MODULIZE
 │   │   │   │   ├── gamesCatalog.js         # Model danh mục 8 tựa game (màu sắc, mô tả, tin tức)
 │   │   │   │   └── HubController.js        # Controller quản lý thao tác, lướt ngang, tháp dropdown
-│   │   │   ├── GameManager.js              # Quản lý chuyển đổi qua lại giữa Hub, Lobby và Bàn cờ
-│   │   │   ├── BaseGame.js                 # Lớp cha điều phối đồng hồ, âm thanh, đặt quân cờ
-│   │   │   ├── OnlineGame.js               # Quản lý ván đấu Online qua Socket.io
-│   │   │   ├── AiGame.js                   # Quản lý ván đấu với Bot AI
-│   │   │   ├── LocalGame.js                # Quản lý ván đấu 2 người trên 1 máy
-│   │   │   ├── GameState.js                # Quản lý trạng thái ván cờ
-│   │   │   └── UIBinder.js                 # Gắn kết sự kiện DOM, modal, nút điều khiển game (~270 dòng)
+│   │   │   ├── GameManager.js              # Quản lý chuyển đổi qua lại giữa Hub, Lobby và Registry
+│   │   │   ├── BaseGame.js                 # Re-export tương thích ngược
+│   │   │   ├── OnlineGame.js               # Re-export tương thích ngược
+│   │   │   ├── AiGame.js                   # Re-export tương thích ngược
+│   │   │   ├── LocalGame.js                # Re-export tương thích ngược
+│   │   │   ├── GameState.js                # Re-export tương thích ngược
+│   │   │   └── UIBinder.js                 # Điều phối giao diện nền tảng Shell & Console Hub
 │   │   │
 │   │   ├── locales/                        # TỪ ĐIỂN ĐA NGÔN NGỮ TÁCH RỜI TỪNG FILE
 │   │   │   ├── metadata.js                 # Cờ SVG và tên hiển thị từng quốc gia

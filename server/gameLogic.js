@@ -98,6 +98,7 @@ function isBoardFull(board, boardSize) {
 function sanitizeRoomState(room) {
   return {
     id: room.id,
+    gameType: room.gameType || 'caro',
     boardSize: room.boardSize,
     rule: room.rule,
     turnTime: room.turnTime,

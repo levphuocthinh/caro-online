@@ -56,7 +56,12 @@ export class HubController {
 
   static triggerEnterSelectedGame() {
     try { soundManager.playMoveSound(); } catch (_) {}
-    const info = this.getCatalog()[this.selectedGameId];
+    const gameId = this.selectedGameId;
+    if (this.manager && this.manager.registry) {
+      const launched = this.manager.registry.launch(gameId);
+      if (launched) return;
+    }
+    const info = this.getCatalog()[gameId];
     if (!info) return;
     if (info.playable) {
       this.manager.openCaroLobby();

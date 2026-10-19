@@ -1,36 +1,32 @@
 /**
- * Lớp chuyên trách gắn các sự kiện nút bấm, modal, form input
+ * Lớp chuyên trách gắn các sự kiện nút bấm, modal, form input trên toàn hệ thống (UIBinder)
+ * Điều phối sự kiện giao diện Cổng Game Hub và ủy thác sự kiện từng game cho Module tương ứng.
  */
 import { CaroModal } from '../modules/modal.js';
 import { soundManager } from '../modules/audio.js';
-import { caroOnline } from '../modules/online.js';
 import { i18n } from '../modules/i18n.js';
 import { HubController } from './hub/HubController.js';
+import { CaroUIBinder } from '../games/caro/CaroUIBinder.js';
 
 export class UIBinder {
+  /**
+   * Cập nhật trạng thái hiển thị của các nút khi là Khán giả
+   * Tương thích ngược với các file gọi UIBinder.updateSpectatorUI
+   */
   static updateSpectatorUI(isSpectator) {
-    const displayVal = isSpectator ? 'none' : '';
-    const ctrlSurrender = document.getElementById('btn-surrender');
-    const ctrlDraw = document.getElementById('btn-offer-draw');
-    const mSurrender = document.getElementById('btn-mobile-surrender');
-    const mDraw = document.getElementById('btn-mobile-draw');
-    const rematchBtn = document.getElementById('btn-game-over-rematch');
-    const specBadge = document.getElementById('spectator-badge');
-
-    if (ctrlSurrender) ctrlSurrender.style.display = displayVal;
-    if (ctrlDraw) ctrlDraw.style.display = displayVal;
-    if (mSurrender) mSurrender.style.display = displayVal;
-    if (mDraw) mDraw.style.display = displayVal;
-    if (rematchBtn) rematchBtn.style.display = displayVal;
-    if (specBadge) specBadge.style.display = isSpectator ? 'inline-flex' : 'none';
+    CaroUIBinder.updateSpectatorUI(isSpectator);
   }
 
+  /**
+   * Gắn kết toàn bộ sự kiện của nền tảng Shell, Console Hub và các game con
+   * @param {Object} manager Thể hiện của GameManager
+   */
   static bind(manager) {
     const btnSoundToggle = document.getElementById('btn-sound-toggle');
     const btnHelpModal = document.getElementById('btn-help-modal');
     const btnHome = document.getElementById('btn-home');
 
-    // Nút âm thanh
+    // 1. Nút bật / tắt âm thanh toàn hệ thống
     if (btnSoundToggle) {
       btnSoundToggle.addEventListener('click', () => {
         const isMuted = soundManager.toggleMute();
@@ -39,7 +35,7 @@ export class UIBinder {
       });
     }
 
-    // Bộ chọn ngoại ngữ tùy biến có cờ SVG
+    // 2. Bộ chọn ngoại ngữ tùy biến có cờ SVG
     const langSelector = document.getElementById('custom-lang-selector');
     const langTrigger = document.getElementById('lang-trigger');
     if (langSelector && langTrigger) {
@@ -79,7 +75,7 @@ export class UIBinder {
       });
     }
 
-    // Âm thanh dễ thương khi bấm các nút tương tác trên toàn hệ thống
+    // 3. Âm thanh dễ thương khi bấm các nút tương tác trên toàn hệ thống
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('button, .lang-option, .hub-bubble-btn, .hub-dock-btn, .hub-game-tile, .hub-home-card, .hub-filter-tab, .hub-menu-item, .card-mode, .btn-icon');
       if (!btn) return;
@@ -90,7 +86,7 @@ export class UIBinder {
       }
     });
 
-    // Sự kiện khi bấm vào các game đang phát triển ở trang Caro
+    // 4. Sự kiện khi bấm vào các game đang phát triển ở trang Caro
     document.querySelectorAll('.coming-card').forEach(card => {
       card.addEventListener('click', () => {
         const jumpId = card.dataset.jumpHub;
@@ -115,7 +111,7 @@ export class UIBinder {
       btnHelpModal.addEventListener('click', () => CaroModal.open('modal-help'));
     }
 
-    // Nút quay lại Cổng Game từ trang riêng của Caro (Logo + Nút Cổng Game)
+    // 5. Nút quay lại Cổng Game từ các game con
     const backToHubHandler = (e) => {
       if (e) e.preventDefault();
       try { soundManager.playMoveSound(); } catch (_) {}
@@ -139,7 +135,7 @@ export class UIBinder {
       }
     });
 
-    // Đồng hồ thời gian thực trên thanh Header của Cổng Game
+    // 6. Đồng hồ thời gian thực trên thanh Header của Cổng Game
     const clockEl = document.getElementById('hub-live-clock');
     if (clockEl) {
       const updateClock = () => {
@@ -152,115 +148,11 @@ export class UIBinder {
       setInterval(updateClock, 15000);
     }
 
-    // =========================================================================
-    // ĐIỀU KHIỂN CỔNG GAME TỔNG HỢP (CONSOLE WEB HUB)
-    // =========================================================================
+    // 7. Khởi tạo Cổng Game Tổng (Console Web Hub)
     this.bindHubConsole(manager);
 
-    // Các nút chọn chế độ ở Sảnh chờ Caro
-    document.getElementById('btn-open-create-room')?.addEventListener('click', () => CaroModal.open('modal-create-room'));
-    document.getElementById('btn-open-join-room')?.addEventListener('click', () => CaroModal.open('modal-join-room'));
-    document.getElementById('btn-open-ai-setup')?.addEventListener('click', () => CaroModal.open('modal-ai-setup'));
-    document.getElementById('btn-start-local')?.addEventListener('click', () => manager.localGame.start());
-
-
-    // Nút xác nhận chơi với AI
-    document.getElementById('btn-confirm-ai-start')?.addEventListener('click', () => {
-      const difficulty = document.getElementById('ai-difficulty')?.value || 'hard';
-      const playerSymbol = document.getElementById('ai-player-symbol')?.value || 'X';
-      const size = Number(document.getElementById('ai-board-size')?.value || 15);
-      CaroModal.close('modal-ai-setup');
-      manager.aiGame.start(difficulty, playerSymbol, size);
-    });
-
-    // Nút xác nhận Tạo phòng Online
-    document.getElementById('btn-confirm-create-room')?.addEventListener('click', () => {
-      const playerName = document.getElementById('create-player-name')?.value.trim() || 'Người chơi 1';
-      const size = Number(document.getElementById('create-board-size')?.value || 15);
-      const selectedRule = document.getElementById('create-rule')?.value || 'standard';
-      const timeLimit = Number(document.getElementById('create-turn-time')?.value || 30);
-
-      CaroModal.close('modal-create-room');
-      caroOnline.createRoom({ playerName, boardSize: size, rule: selectedRule, turnTime: timeLimit });
-    });
-
-    // Nút xác nhận Vào phòng Online
-    const joinNameInput = document.getElementById('join-player-name');
-    const joinCodeInput = document.getElementById('join-room-code');
-
-    const confirmJoin = () => {
-      if (document.activeElement) document.activeElement.blur();
-      const playerName = joinNameInput?.value.trim() || 'Người chơi 2';
-      const code = joinCodeInput?.value.trim().toUpperCase() || '';
-
-      if (!code) {
-        CaroModal.showToast('Vui lòng nhập mã phòng!');
-        return;
-      }
-
-      CaroModal.close('modal-join-room');
-      caroOnline.joinRoom({ roomId: code, playerName });
-    };
-
-    document.getElementById('btn-confirm-join-room')?.addEventListener('click', confirmJoin);
-    [joinNameInput, joinCodeInput].forEach(inp => {
-      inp?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') confirmJoin();
-      });
-    });
-
-    // Nút Sao chép Link mời bạn
-    const copyLink = () => {
-      if (!caroOnline.roomId) {
-        CaroModal.showToast('Chỉ có thể chia sẻ khi chơi Online!');
-        return;
-      }
-      const shareUrl = `${window.location.origin}/?room=${caroOnline.roomId}`;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          CaroModal.showToast('Đã copy link mời bạn! Hãy gửi qua Zalo/Messenger.');
-        }).catch(() => prompt('Sao chép link này:', shareUrl));
-      } else {
-        prompt('Sao chép link này:', shareUrl);
-      }
-    };
-    document.getElementById('btn-share-room')?.addEventListener('click', copyLink);
-    document.getElementById('btn-mobile-share')?.addEventListener('click', copyLink);
-
-    const isSpectator = () => manager?.state?.gameMode === 'online' && manager?.state?.mySymbol === 'SPECTATOR';
-
-    // Nút Đầu hàng
-    const surrender = () => {
-      if (isSpectator()) return;
-      manager.handleSurrender();
-    };
-    document.getElementById('btn-surrender')?.addEventListener('click', surrender);
-    document.getElementById('btn-mobile-surrender')?.addEventListener('click', surrender);
-
-    // Nút Cầu hòa
-    const offerDraw = () => {
-      if (isSpectator()) return;
-      manager.handleOfferDraw();
-    };
-    document.getElementById('btn-offer-draw')?.addEventListener('click', offerDraw);
-    document.getElementById('btn-mobile-draw')?.addEventListener('click', offerDraw);
-
-    // Nút Rời trận
-    const leaveGame = () => manager.confirmLeaveGame();
-    document.getElementById('btn-leave-game')?.addEventListener('click', leaveGame);
-    document.getElementById('btn-mobile-leave')?.addEventListener('click', leaveGame);
-
-    // Nút Modal Game Over
-    document.getElementById('btn-game-over-lobby')?.addEventListener('click', () => {
-      CaroModal.close('modal-game-over');
-      manager.backToLobby();
-    });
-
-    document.getElementById('btn-game-over-rematch')?.addEventListener('click', () => {
-      if (isSpectator()) return;
-      CaroModal.close('modal-game-over');
-      manager.handleRematch();
-    });
+    // 8. Khởi tạo sự kiện của riêng trò chơi cờ Caro
+    CaroUIBinder.bind(manager);
   }
 
   static bindHubConsole(manager) {

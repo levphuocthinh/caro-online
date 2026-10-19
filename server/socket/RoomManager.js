@@ -12,7 +12,7 @@ class RoomManager {
   /**
    * Tạo một phòng đấu Caro mới
    */
-  createRoom(socket, { playerName, boardSize = 15, rule = 'standard', turnTime = 30 } = {}, io = null) {
+  createRoom(socket, { playerName, boardSize = 15, rule = 'standard', turnTime = 30, gameType = 'caro' } = {}, io = null) {
     const serverIo = io || socket.server;
     // Rời và dọn dẹp phòng cũ nếu socket đang ở phòng khác
     if (socket.currentRoomId) {
@@ -28,6 +28,7 @@ class RoomManager {
     const room = {
       id: roomId,
       hostId: socket.id,
+      gameType: gameType || 'caro',
       boardSize: size,
       rule: rule,
       turnTime: Number(turnTime) || 30,
