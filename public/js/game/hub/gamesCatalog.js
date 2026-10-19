@@ -5,7 +5,7 @@
 
 export const allGameIds = [
   'caro',
-  'splendor',
+  'deception',
   'catan',
   'carcassonne',
   'avalon',
@@ -38,6 +38,29 @@ export function getGamesCatalog(i18n) {
         { art: 'news-art-online', icon: 'fa-users', text: i18n.getText('news_cap_1'), action: 'online' },
         { art: 'news-art-ai', icon: 'fa-robot', text: i18n.getText('news_cap_2'), action: 'ai' },
         { art: 'news-art-local', icon: 'fa-people-arrows', text: i18n.getText('news_cap_3'), action: 'local' }
+      ]
+    },
+    deception: {
+      title: 'Deception: Murder in Viet Nam',
+      coverTitle: 'Deception',
+      category: 'boardgame',
+      stripText: 'ẨN VAI TRÒ • 4-12P',
+      studio: 'Lycngames • Social Deduction',
+      artClass: 'art-deception',
+      iconHtml: '<i class="fa-solid fa-magnifying-glass" id="hub-tower-icon"></i>',
+      towerColor: '#8b0000',
+      towerDark: '#2d0a0a',
+      playable: true,
+      badge: i18n.getText('tag_now_playing') || 'PLAY NOW',
+      pillAva: '🔍',
+      pillLabel: i18n.getText('pill_playing') || 'Playing',
+      ctaText: i18n.getText('hub_caro_cta') || 'VÀO ĐIỀU TRA',
+      medals: ['24', '15', '5'],
+      social: '+14 thám tử đang tham gia điều tra vụ án.',
+      news: [
+        { art: 'art-deception', icon: 'fa-magnifying-glass', text: 'Vụ án bí ẩn tại phố cổ: Khám phá manh mối và hung khí của hung thủ!' },
+        { art: 'art-avalon', icon: 'fa-user-secret', text: 'Giám định viên pháp y: Dẫn đường cho công lý bằng 6 thẻ hiện trường.' },
+        { art: 'art-chess', icon: 'fa-shield-halved', text: 'Cẩn thận với Đồng phạm: Kẻ đánh lạc hướng nguy hiểm nhất bàn chơi.' }
       ]
     },
     splendor: {

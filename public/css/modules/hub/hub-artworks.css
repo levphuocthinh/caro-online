@@ -105,6 +105,13 @@
   letter-spacing: 0.8px;
 }
 
+.art-deception {
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(231, 76, 60, 0.45) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(142, 68, 173, 0.5) 0%, transparent 55%),
+    linear-gradient(145deg, #1c1018 0%, #4a0e17 40%, #7b1113 75%, #a81c1c 100%) !important;
+}
+
 .art-splendor {
   background: 
     radial-gradient(circle at 50% 20%, rgba(255, 234, 167, 0.4) 0%, transparent 50%),

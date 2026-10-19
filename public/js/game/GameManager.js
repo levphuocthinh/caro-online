@@ -5,6 +5,7 @@
 import { GameRegistry } from '../games/GameRegistry.js';
 import { CaroModule } from '../games/caro/CaroModule.js';
 import { ChessModule } from '../games/chess/ChessModule.js';
+import { DeceptionModule } from '../games/deception/index.js';
 import { UIBinder } from './UIBinder.js';
 import { CaroModal } from '../modules/modal.js';
 import { caroChat } from '../modules/chat.js';
@@ -19,9 +20,11 @@ export class GameManager {
     // 2. Đăng ký các module trò chơi vào nền tảng
     this.caro = new CaroModule(this);
     this.chess = new ChessModule(this);
+    this.deception = new DeceptionModule(this);
 
     this.registry.register(this.caro);
     this.registry.register(this.chess);
+    this.registry.register(this.deception);
   }
 
   // Thuộc tính tương thích ngược cho game cờ Caro
@@ -161,6 +164,11 @@ export class GameManager {
       if (window.history && typeof window.history.replaceState === 'function') {
         window.history.replaceState({ screen: 'screen-lobby' }, document.title, window.location.pathname + window.location.search + '#caro');
       }
+    } else if (initialHash === '#deception') {
+      this.deception.openLobby(false);
+      if (window.history && typeof window.history.replaceState === 'function') {
+        window.history.replaceState({ screen: 'screen-deception' }, document.title, window.location.pathname + window.location.search + '#deception');
+      }
     } else {
       this.openHub(false);
       if (window.history && typeof window.history.replaceState === 'function') {
@@ -180,6 +188,8 @@ export class GameManager {
         targetScreen = state.screen;
       } else if (hash === '#caro' || hash === '#lobby') {
         targetScreen = 'screen-lobby';
+      } else if (hash === '#deception') {
+        targetScreen = 'screen-deception';
       } else if (hash === '#game' || hash === '#play') {
         targetScreen = 'screen-game';
       } else {

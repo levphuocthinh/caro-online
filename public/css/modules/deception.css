@@ -1,0 +1,349 @@
+/* ===================================================
+   DECEPTION: MURDER IN VIET NAM STYLESHEET
+   Màn hình điều tra vụ án, bảng giám định hiện trường & nghi phạm
+   =================================================== */
+
+#screen-deception.screen {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  padding: 16px 24px 48px 24px;
+  background: radial-gradient(circle at 50% 20%, #20141a 0%, #120e14 60%, #0a080c 100%);
+  color: #f1f2f6;
+  box-sizing: border-box;
+}
+
+#screen-deception.screen.active {
+  display: block;
+}
+
+.deception-page-wrapper {
+  max-width: 1380px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header trang Deception */
+.deception-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 12px 18px;
+  background: rgba(28, 22, 30, 0.85);
+  border: 1.5px solid rgba(255, 71, 87, 0.25);
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.deception-brand-col {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.deception-badge-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #e74c3c, #8e44ad);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 14px rgba(231, 76, 60, 0.45);
+}
+
+.deception-title {
+  font-size: clamp(20px, 3.5vw, 26px);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.4px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deception-tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #ff4757;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.deception-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-deception-action {
+  padding: 8px 18px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.22s ease;
+}
+
+.btn-deception-action:hover {
+  background: #ffffff;
+  color: #1e1e24;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
+}
+
+.btn-deception-primary {
+  background: linear-gradient(135deg, #ff4757, #c0392b);
+  border-color: #ff6b81;
+  box-shadow: 0 4px 14px rgba(255, 71, 87, 0.4);
+}
+
+.btn-deception-primary:hover {
+  background: linear-gradient(135deg, #ff6b81, #e74c3c);
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.6);
+}
+
+/* Khu vực Bảng Hiện Trường (Scene Tiles) */
+.deception-section-heading {
+  font-size: 19px;
+  font-weight: 800;
+  color: #dfe4ea;
+  margin: 12px 0 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deception-scene-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.deception-scene-card {
+  background: #18131d;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transition: all 0.22s ease;
+}
+
+.deception-scene-card.tile-fixed {
+  border-color: rgba(255, 71, 87, 0.5);
+  background: #201319;
+}
+
+.scene-tile-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scene-tile-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #ff6b81;
+  letter-spacing: 0.6px;
+}
+
+.scene-tile-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.scene-tile-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scene-opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #ced6e0;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+}
+
+.scene-opt-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.scene-opt-btn.is-marked {
+  background: rgba(255, 71, 87, 0.25);
+  border-color: #ff4757;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
+}
+
+.opt-bullet {
+  font-size: 14px;
+}
+
+/* Khu vực Bàn Nghi Phạm (Suspects Grid) */
+.deception-suspects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.suspect-item-card {
+  background: #19141f;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.suspect-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.suspect-ava {
+  font-size: 26px;
+}
+
+.suspect-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.suspect-assets {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.asset-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.asset-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #a4b0be;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.asset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.chip-means {
+  background: rgba(231, 76, 60, 0.18);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  color: #ff6b81;
+}
+
+.chip-clue {
+  background: rgba(52, 152, 219, 0.18);
+  border: 1px solid rgba(52, 152, 219, 0.4);
+  color: #70a1ff;
+}
+
+.btn-accuse-suspect {
+  margin-top: 4px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #dfe4ea;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-accuse-suspect:hover {
+  background: #ff4757;
+  color: #ffffff;
+  border-color: #ff4757;
+  box-shadow: 0 4px 14px rgba(255, 71, 87, 0.4);
+}
+
+/* Tối ưu hóa trên Mobile */
+@media (max-width: 768px) {
+  #screen-deception.screen {
+    padding: 12px 14px 36px 14px;
+  }
+
+  .deception-top-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .deception-top-actions {
+    justify-content: space-between;
+  }
+
+  .deception-scene-tiles {
+    grid-template-columns: 1fr;
+  }
+
+  .deception-suspects-grid {
+    grid-template-columns: 1fr;
+  }
+}

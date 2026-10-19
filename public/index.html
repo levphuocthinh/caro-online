@@ -586,6 +586,61 @@
     </div>
   </main>
 
+  <!-- =========================================================================
+       MÀN HÌNH GAME: DECEPTION: MURDER IN VIET NAM (VỤ ÁN MẠNG BÍ ẨN)
+       ========================================================================= -->
+  <main class="screen" id="screen-deception">
+    <div class="deception-page-wrapper">
+      <!-- Thanh điều hướng trên cùng -->
+      <header class="deception-top-bar">
+        <div class="deception-brand-col">
+          <div class="deception-badge-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <div>
+            <h1 class="deception-title">Deception: Murder in Viet Nam <span class="deception-tag">BOARD GAME</span></h1>
+            <span class="deception-sub" style="font-size: 13px; color: #a4b0be;">Trò chơi ẩn vai trò, suy luận và phá án bí ẩn</span>
+          </div>
+        </div>
+        <div class="deception-top-actions">
+          <button class="btn-deception-action" id="btn-deception-rules" type="button">
+            <i class="fa-solid fa-book-open"></i> Luật chơi
+          </button>
+          <button class="btn-deception-action btn-deception-primary" id="btn-deception-new-case" type="button">
+            <i class="fa-solid fa-rotate-right"></i> Vụ án mới
+          </button>
+          <button class="btn-deception-action" id="btn-deception-back-hub" type="button">
+            <i class="fa-solid fa-arrow-left"></i> Về Cổng Game
+          </button>
+        </div>
+      </header>
+
+      <!-- Section: Bảng Hiện Trường Giám Định Pháp Y -->
+      <section class="deception-section">
+        <h3 class="deception-section-heading">
+          <i class="fa-solid fa-clipboard-list" style="color: #ff4757;"></i> Bảng Hiện Trường Giám Định Pháp Y (Scene Tiles)
+        </h3>
+        <p style="font-size: 13.5px; color: #a4b0be; margin: 0 0 12px 0;">
+          Giám định viên pháp y đặt dấu ấn 🎯 vào các manh mối để chỉ dẫn các điều tra viên.
+        </p>
+        <div class="deception-scene-tiles" id="deception-scene-tiles">
+          <!-- Render động qua DeceptionUIBinder -->
+        </div>
+      </section>
+
+      <!-- Section: Bàn Nghi Phạm & Hung Khí / Manh Mối -->
+      <section class="deception-section">
+        <h3 class="deception-section-heading">
+          <i class="fa-solid fa-users-viewfinder" style="color: #70a1ff;"></i> Bàn Nghi Phạm & Danh Mục Vật Chứng
+        </h3>
+        <p style="font-size: 13.5px; color: #a4b0be; margin: 0 0 12px 0;">
+          Mỗi người chơi giữ 2 Hung Khí (đỏ) và 2 Manh Mối (xanh). Hãy thảo luận để tìm ra tổ hợp chính xác của Hung Thủ!
+        </p>
+        <div class="deception-suspects-grid" id="deception-suspects-grid">
+          <!-- Render động qua DeceptionUIBinder -->
+        </div>
+      </section>
+    </div>
+  </main>
+
   <!-- MODAL: TẠO PHÒNG MỚI -->
   <div class="modal-overlay" id="modal-create-room">
     <div class="modal-content">
