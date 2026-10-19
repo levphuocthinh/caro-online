@@ -1,35 +1,17 @@
-# 🔍 Deception: Murder in Viet Nam (Vụ Án Mạng Bí Ẩn)
+# Deception: Murder in Hong Kong / Viet Nam
 
-Trò chơi ẩn vai trò, suy luận và phá án xã hội (Social Deduction Board Game) dựa trên nguyên bản Deception, được bản địa hóa bối cảnh, hung khí, địa điểm và manh mối tại Việt Nam.
+Module trò chơi suy luận xã hội & phá án **Deception** vận hành độc lập 100% theo kiến trúc Multi-Game.
 
----
+## Cấu Trúc Thư Mục (`public/js/games/deception/`)
 
-## 📁 Cấu Trúc Thư Mục
-
-```
-public/js/games/deception/
-├── index.js                  # Entry point xuất khẩu module
-├── DeceptionModule.js        # Lớp điều khiển chính kế thừa BaseGameModule
-├── DeceptionState.js         # Quản lý vai trò, danh mục hung khí/manh mối, thẻ hiện trường
-├── DeceptionUIBinder.js      # Gắn kết sự kiện DOM, thẻ hiện trường và bàn nghi phạm
-└── README.md                 # Tài liệu này
-```
-
----
-
-## 👥 Vai Trò Trong Game
-
-1. **Giám Định Viên Pháp Y (Forensic Scientist)**: Biết toàn bộ chân tướng, điều phối ván chơi thông qua các dấu ấn trên Thẻ Hiện Trường.
-2. **Hung Thủ (Murderer)**: Bí mật chọn 1 Hung Khí và 1 Manh Mối, ngụy trang và đánh lạc hướng.
-3. **Điều Tra Viên (Investigators)**: Thảo luận, loại trừ và cùng nhau phá án.
-4. **Đồng Phạm (Accomplice - Mở rộng)**: Giúp hung thủ che giấu tội ác.
-5. **Nhân Chứng (Witness - Mở rộng)**: Nhận biết phe tội phạm nhưng phải cẩn thận kẻo bị ám sát.
-
----
-
-## 🧩 Cách Tích Hợp Vào Cổng Game Hub
-
-Game đã được đăng ký tự động vào `GameRegistry` và `GameManager`:
-* URL Hash: `#deception`
-* Màn hình riêng: `<main class="screen" id="screen-deception">`
-* Nút chuyển trang: Bấm vào thẻ **Deception** trên Cổng Game Hub -> Bấm **Playing / Vào Game** để mở trang làm việc riêng của game!
+- [`index.js`](./index.js): Điểm vào chính (Entry Point) xuất các class và bộ dữ liệu chuẩn.
+- [`DeceptionModule.js`](./DeceptionModule.js): Kế thừa `BaseGameModule`, điều phối vòng đời màn hình `#screen-deception`, chuyển cảnh Cutscene và kết nối với Cổng Game Hub.
+- [`DeceptionState.js`](./DeceptionState.js): Máy trạng thái (`State Machine`) đầy đủ **13 Pha (`GAME_PHASES`)** cho **4 – 9 người chơi**, hệ thống AI Pháp y & Nghi phạm thông minh, xét nghiệm Phòng Lab, Nội gián tước Huy hiệu, Thám tử Cố vấn và Lật kèo bắn Nhân chứng cuối trận.
+- [`DeceptionCutscene.js`](./DeceptionCutscene.js): Hệ thống Cutscene Pixel Art / Noir Silhouette trên Canvas 2D siêu nhẹ (chạy ở 12 FPS chỉ khi chuyển pha, **0% GPU/CPU khi nghỉ**).
+- [`DeceptionUIBinder.js`](./DeceptionUIBinder.js): Bộ điều phối giao diện bàn phá án Hong Kong Noir (tối ưu hóa 2 cột trên Desktop và thanh chuyển Tab nhanh trên Mobile).
+- [`data/deceptionData.js`](./data/deceptionData.js): Cơ sở dữ liệu song ngữ Anh – Việt đầy đủ:
+  - **9 Vai trò (`ROLE_DEFINITIONS`)**: Chuyên gia Pháp y, Kẻ Sát Nhân, Điều tra viên, Đồng phạm, Nhân chứng, Kỹ thuật viên Phòng Lab, Nội gián, Đặc vụ Bảo vệ, Thám tử Cố vấn.
+  - **26 Thẻ Hiện Trường (`SCENE_TILES`)**: 1 Thẻ Tím (*Nguyên nhân Tử vong*), 4 Thẻ Xanh lá (*Địa điểm Gây án*), 21 Thẻ Nâu (*Chi tiết Hiện trường*) = **156 lựa chọn song ngữ**.
+  - **7 Thẻ Sự Kiện (`EVENT_TILES`)**: *Sudden Twist, Forensic Breakthrough, Evidence Tampering, Witness Protection, Internal Investigation, Clean Sweep, The Perfect Crime*.
+  - **90 Thẻ Phương Thức (`MEANS_CARDS` - Thẻ Xanh)**: `M001` – `M090`.
+  - **200 Thẻ Manh Mối (`CLUE_CARDS` - Thẻ Đỏ)**: `C001` – `C200`.

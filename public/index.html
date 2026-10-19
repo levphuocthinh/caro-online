@@ -587,28 +587,35 @@
   </main>
 
   <!-- =========================================================================
-       MÀN HÌNH GAME: DECEPTION: MURDER IN VIET NAM (VỤ ÁN MẠNG BÍ ẨN)
+       MÀN HÌNH GAME: DECEPTION: MURDER IN HONG KONG / VIET NAM (4-9 NGƯỜI CHƠI)
        ========================================================================= -->
   <main class="screen" id="screen-deception">
     <div class="deception-page-wrapper">
-      <!-- Thanh điều hướng trên cùng -->
+      <!-- Thanh điều hướng Noir trên cùng -->
       <header class="deception-top-bar">
         <div class="deception-brand-col">
-          <div class="deception-badge-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <div class="deception-badge-icon" title="Deception: Murder in Hong Kong / Viet Nam"></div>
           <div>
-            <h1 class="deception-title">Deception: Murder in Viet Nam <span class="deception-tag" data-i18n="tag_boardgame">BOARD GAME</span></h1>
-            <span class="deception-sub" style="font-size: 13px; color: #a4b0be;" data-i18n="deception_subtitle">Trò chơi ẩn vai trò, suy luận và phá án bí ẩn</span>
+            <div class="deception-title-row">
+              <h1 class="deception-title">Deception: Murder in Viet Nam</h1>
+              <span class="deception-tag" data-i18n="tag_boardgame">BOARD GAME</span>
+              <span class="deception-case-chip" id="deception-case-chip">#HK-1024</span>
+            </div>
+            <div class="deception-meta-sub">
+              <span id="deception-phase-badge" class="deception-phase-badge">LOBBY • 4-9 PLAYERS</span>
+              <span class="deception-sub" data-i18n="deception_subtitle">Trò chơi ẩn vai trò, suy luận và phá án bí ẩn</span>
+            </div>
           </div>
         </div>
         <div class="deception-top-actions">
-          <button class="btn-deception-action" id="btn-deception-rules" type="button">
-            <i class="fa-solid fa-book-open"></i> <span data-i18n="deception_btn_rules">Luật chơi</span>
-          </button>
           <button class="btn-deception-action" id="btn-deception-friends" type="button">
-            <i class="fa-solid fa-users"></i> <span data-i18n="deception_btn_friends">Bạn bè</span>
+            <i class="fa-solid fa-sliders"></i> <span data-i18n="deception_btn_friends">Bàn Chơi (4-9)</span>
+          </button>
+          <button class="btn-deception-action" id="btn-deception-rules" type="button">
+            <i class="fa-solid fa-book-skull"></i> <span data-i18n="deception_btn_rules">Luật & 9 Vai Trò</span>
           </button>
           <button class="btn-deception-action btn-deception-primary" id="btn-deception-new-case" type="button">
-            <i class="fa-solid fa-rotate-right"></i> <span data-i18n="deception_btn_new_case">Vụ án mới</span>
+            <i class="fa-solid fa-Folder-open"></i> <span data-i18n="deception_btn_new_case">Phá Án Ngay</span>
           </button>
           <button class="btn-deception-action" id="btn-deception-back-hub" type="button">
             <i class="fa-solid fa-arrow-left"></i> <span data-i18n="deception_btn_back_hub">Về Cổng Game</span>
@@ -616,31 +623,113 @@
         </div>
       </header>
 
-      <!-- Section: Bảng Hiện Trường Giám Định Pháp Y -->
-      <section class="deception-section">
-        <h3 class="deception-section-heading">
-          <i class="fa-solid fa-clipboard-list" style="color: #ff4757;"></i> <span data-i18n="deception_scene_tiles_heading">Bảng Hiện Trường Giám Định Pháp Y (Scene Tiles)</span>
-        </h3>
-        <p style="font-size: 13.5px; color: #a4b0be; margin: 0 0 12px 0;" data-i18n="deception_scene_tiles_desc">
-          Giám định viên pháp y đặt dấu ấn 🎯 vào các manh mối để chỉ dẫn các điều tra viên.
-        </p>
-        <div class="deception-scene-tiles" id="deception-scene-tiles">
-          <!-- Render động qua DeceptionUIBinder -->
-        </div>
+      <!-- Bảng Điều Khiển Pha Trạng Thái (Command Banner: Lobby Config / Đêm Gây Án / Pháp Y / Trình Bày 30s / Phá Án / Kết Quả) -->
+      <section class="deception-command-banner" id="deception-command-banner">
+        <!-- Render động theo GamePhase qua DeceptionUIBinder -->
       </section>
 
-      <!-- Section: Bàn Nghi Phạm & Hung Khí / Manh Mối -->
-      <section class="deception-section">
-        <h3 class="deception-section-heading">
-          <i class="fa-solid fa-users-viewfinder" style="color: #70a1ff;"></i> <span data-i18n="deception_suspects_heading">Bàn Nghi Phạm & Danh Mục Vật Chứng</span>
-        </h3>
-        <p style="font-size: 13.5px; color: #a4b0be; margin: 0 0 12px 0;" data-i18n="deception_suspects_desc">
-          Mỗi người chơi giữ 2 Hung Khí (đỏ) và 2 Manh Mối (xanh). Hãy thảo luận để tìm ra tổ hợp chính xác của Hung Thủ!
-        </p>
-        <div class="deception-suspects-grid" id="deception-suspects-grid">
-          <!-- Render động qua DeceptionUIBinder -->
+      <!-- Thanh Chuyển Tab Nhanh tối ưu riêng cho Mobile -->
+      <nav class="deception-mobile-tabs" id="deception-mobile-tabs" aria-label="Deception Mobile Sections">
+        <button class="deception-mob-tab active" type="button" data-deception-tab="all">
+          <i class="fa-solid fa-layer-group"></i> <span>Tổng quan</span>
+        </button>
+        <button class="deception-mob-tab" type="button" data-deception-tab="forensic">
+          <i class="fa-solid fa-bullseye"></i> <span>Pháp y (6 Thẻ)</span>
+        </button>
+        <button class="deception-mob-tab" type="button" data-deception-tab="suspects">
+          <i class="fa-solid fa-users-viewfinder"></i> <span>Nghi phạm</span>
+        </button>
+        <button class="deception-mob-tab" type="button" data-deception-tab="log">
+          <i class="fa-solid fa-scroll"></i> <span>Hồ sơ</span>
+        </button>
+      </nav>
+
+      <!-- Không gian Bàn Điều Tra Chính (2 cột trên Desktop, Tab/Stack mượt trên Mobile) -->
+      <div class="deception-workspace" id="deception-workspace" data-active-tab="all">
+        <!-- Cột Trái: Bảng Hiện Trường Giám Định Pháp Y (26 Scene Tiles & 7 Event Tiles) -->
+        <aside class="deception-forensic-panel" id="deception-forensic-panel">
+          <div class="deception-panel-header">
+            <div>
+              <h3 class="deception-section-heading">
+                <i class="fa-solid fa-clipboard-list" style="color: #ff4757;"></i>
+                <span data-i18n="deception_scene_tiles_heading">Bảng Hiện Trường Giám Định Pháp Y (Scene Tiles)</span>
+              </h3>
+              <p class="deception-section-desc" data-i18n="deception_scene_tiles_desc">
+                Giám định viên pháp y đặt dấu ấn 🎯 vào các manh mối để chỉ dẫn các điều tra viên.
+              </p>
+            </div>
+            <div class="deception-forensic-meta" id="deception-forensic-meta"></div>
+          </div>
+
+          <!-- Thông báo Thẻ Sự Kiện (Event Tile) nếu có -->
+          <div id="deception-event-banner" class="deception-event-banner" style="display: none;"></div>
+
+          <!-- Lưới 6 Thẻ Hiện Trường (1 Tím, 1 Xanh lá, 4 Nâu) -->
+          <div class="deception-scene-tiles" id="deception-scene-tiles"></div>
+        </aside>
+
+        <!-- Cột Phải: Bàn Nghi Phạm (4-9 Ghế, 90 Thẻ Xanh Phương Thức & 200 Thẻ Đỏ Manh Mối) + Hồ sơ Vụ án -->
+        <div class="deception-table-panel" id="deception-table-panel">
+          <section class="deception-suspects-section" id="deception-suspects-section">
+            <div class="deception-panel-header">
+              <div>
+                <h3 class="deception-section-heading">
+                  <i class="fa-solid fa-users-viewfinder" style="color: #70a1ff;"></i>
+                  <span data-i18n="deception_suspects_heading">Bàn Nghi Phạm & Danh Mục Vật Chứng</span>
+                </h3>
+                <p class="deception-section-desc" data-i18n="deception_suspects_desc">
+                  Mỗi nghi phạm có các lá Phương thức (Xanh) và Manh mối (Đỏ) mở ngửa. Bấm vào thẻ để ghim nghi vấn 📌 hoặc dùng Huy hiệu để Phá Án!
+                </p>
+              </div>
+              <div class="deception-badges-summary" id="deception-badges-summary"></div>
+            </div>
+
+            <div class="deception-suspects-grid" id="deception-suspects-grid"></div>
+          </section>
+
+          <!-- Nhật ký Hồ sơ Phá án -->
+          <section class="deception-log-section" id="deception-log-section">
+            <div class="deception-log-header">
+              <h4><i class="fa-solid fa-file-shield"></i> <span id="deception-log-title">Biên Bản Điều Tra & Suy Luận</span></h4>
+              <span class="deception-db-badge">90 Means • 200 Clues • 26 Scene Tiles</span>
+            </div>
+            <div class="deception-case-log" id="deception-case-log"></div>
+          </section>
         </div>
-      </section>
+      </div>
+    </div>
+
+    <!-- OVERLAY 1: PIXEL ART / NOIR SILHOUETTE CUTSCENE PLAYER (0% GPU KHI NGHỈ) -->
+    <div class="deception-overlay" id="deception-cutscene-overlay">
+      <div class="deception-cutscene-box">
+        <div class="deception-cutscene-top">
+          <span class="deception-cutscene-badge" id="deception-cutscene-badge">HONG KONG NOIR</span>
+          <button class="deception-cutscene-skip" id="btn-deception-skip-cutscene" type="button">
+            <span>Bỏ qua</span> <i class="fa-solid fa-forward-step"></i>
+          </button>
+        </div>
+        <div class="deception-canvas-wrap">
+          <canvas id="deception-cutscene-canvas" width="320" height="180"></canvas>
+        </div>
+        <div class="deception-cutscene-caption">
+          <h3 id="deception-cutscene-title">Đêm Gây Án</h3>
+          <p id="deception-cutscene-sub">Kẻ Sát Nhân đang hành động trong bóng tối...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- OVERLAY 2: BẢNG ĐẬP BÀN PHÁ ÁN (ACCUSATION INTERRUPT) -->
+    <div class="deception-overlay" id="deception-accuse-overlay">
+      <div class="deception-drawer-card" id="deception-accuse-card">
+        <!-- Render động qua DeceptionUIBinder -->
+      </div>
+    </div>
+
+    <!-- OVERLAY 3: CẨM NANG 9 VAI TRÒ & LUẬT CHƠI CHÍNH THỨC -->
+    <div class="deception-overlay" id="deception-rules-overlay">
+      <div class="deception-drawer-card deception-rules-card" id="deception-rules-card">
+        <!-- Render động qua DeceptionUIBinder -->
+      </div>
     </div>
   </main>
 
@@ -827,46 +916,6 @@
       <div class="modal-btn-row" style="margin-top: 20px;">
         <button class="btn-primary" data-close="modal-help">
           <i class="fa-solid fa-check"></i> <span data-i18n="btn_understood">Đã Hiểu Rõ Nè</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: TẠO PHÒNG PHÁ ÁN DECEPTION CÙNG BẠN BÈ -->
-  <div class="modal-overlay" id="modal-deception-room">
-    <div class="modal-content" style="border: 1.5px solid rgba(255, 71, 87, 0.4); box-shadow: 0 12px 36px rgba(255, 71, 87, 0.25);">
-      <div class="modal-header">
-        <h3 class="modal-title">
-          <i class="fa-solid fa-magnifying-glass modal-icon" style="color: #ff4757;"></i>
-          <span data-i18n="modal_deception_title">Tạo Bàn Phá Án Cùng Bạn Bè</span>
-        </h3>
-        <button class="modal-close" data-close="modal-deception-room"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-i18n="lbl_detective_name">Tên thám tử của bạn:</label>
-        <input type="text" id="deception-player-name" class="form-input" placeholder="VD: Thám tử Mori" data-i18n-placeholder="placeholder_detective_name" value="Thám tử 1">
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-i18n="lbl_player_count">Số lượng người chơi:</label>
-        <select id="deception-player-count" class="form-select">
-          <option value="4" selected>4 Người (1 Giám định, 1 Hung thủ, 2 Điều tra)</option>
-          <option value="5">5 Người (Có thêm Nhân chứng hoặc Đồng phạm)</option>
-          <option value="6">6 Người (Chuẩn nhóm bạn - Kịch tính)</option>
-          <option value="8">8 Người (Bàn đại tiệc phá án)</option>
-          <option value="12">12 Người (Đông vui cực độ)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-i18n="lbl_expansion_roles">Vai trò mở rộng:</label>
-        <select id="deception-expansion-roles" class="form-select">
-          <option value="standard" selected>Cơ bản (Giám định pháp y, Hung thủ & Điều tra viên)</option>
-          <option value="expanded">Mở rộng (Bổ sung Đồng phạm & Nhân chứng)</option>
-        </select>
-      </div>
-      <div class="modal-btn-row">
-        <button class="btn-secondary" data-close="modal-deception-room" data-i18n="btn_cancel">Hủy</button>
-        <button class="btn-primary" id="btn-confirm-create-deception" style="background: linear-gradient(135deg, #ff4757, #c0392b); border-color: #ff4757;">
-          <i class="fa-solid fa-door-open"></i> <span data-i18n="btn_create_deception_room">Vào Bàn Phá Án</span>
         </button>
       </div>
     </div>

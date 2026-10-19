@@ -1,16 +1,20 @@
-/* ===================================================
-   DECEPTION: MURDER IN VIET NAM STYLESHEET
-   Màn hình điều tra vụ án, bảng giám định hiện trường & nghi phạm
-   =================================================== */
+/* ==========================================================================
+   DECEPTION: MURDER IN HONG KONG / VIET NAM - HONG KONG NOIR STYLESHEET
+   Thiết kế chuẩn Detective Noir tối ưu hóa 100% cho cả Web (Desktop/Tablet) & Mobile
+   ========================================================================== */
 
 #screen-deception.screen {
   display: none;
   width: 100%;
   min-height: 100vh;
-  padding: 16px 24px 48px 24px;
-  background: radial-gradient(circle at 50% 20%, #20141a 0%, #120e14 60%, #0a080c 100%);
+  padding: 16px 22px 48px 22px;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(192, 57, 43, 0.16) 0%, transparent 45%),
+    radial-gradient(circle at 82% 18%, rgba(41, 128, 185, 0.14) 0%, transparent 48%),
+    linear-gradient(180deg, #130f18 0%, #0d0a12 55%, #08060b 100%);
   color: #f1f2f6;
   box-sizing: border-box;
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 #screen-deception.screen.active {
@@ -18,26 +22,29 @@
 }
 
 .deception-page-wrapper {
-  max-width: 1380px;
+  max-width: 1480px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
 }
 
-/* Header trang Deception */
+/* ==========================================================================
+   1. THANH ĐIỀU HƯỚNG TRÊN CÙNG (TOP NOIR HEADER)
+   ========================================================================== */
+
 .deception-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 14px;
   padding: 12px 18px;
-  background: rgba(28, 22, 30, 0.85);
-  border: 1.5px solid rgba(255, 71, 87, 0.25);
+  background: rgba(22, 17, 27, 0.92);
+  border: 1.5px solid rgba(255, 71, 87, 0.28);
   border-radius: 18px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.48);
 }
 
 .deception-brand-col {
@@ -47,136 +54,765 @@
 }
 
 .deception-badge-icon {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   border-radius: 14px;
   background: url('/images/deception-cover.jpg') center/cover no-repeat;
-  border: 1.5px solid rgba(255, 71, 87, 0.4);
-  display: inline-flex;
+  border: 1.5px solid rgba(255, 71, 87, 0.55);
+  box-shadow: 0 4px 16px rgba(231, 76, 60, 0.4);
+  flex-shrink: 0;
+}
+
+.deception-title-row {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 14px rgba(231, 76, 60, 0.45);
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .deception-title {
-  font-size: clamp(20px, 3.5vw, 26px);
-  font-weight: 800;
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-weight: 900;
   color: #ffffff;
   letter-spacing: -0.4px;
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .deception-tag {
-  font-size: 11px;
+  font-size: 10.5px;
   padding: 3px 8px;
   border-radius: 6px;
-  background: #ff4757;
+  background: linear-gradient(135deg, #ff4757, #c0392b);
   color: #ffffff;
   font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+.deception-case-chip {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(241, 196, 15, 0.16);
+  border: 1px solid rgba(241, 196, 15, 0.45);
+  color: #fbc531;
+  font-weight: 800;
+  font-family: monospace;
+}
+
+.deception-meta-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.deception-phase-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(112, 161, 255, 0.18);
+  border: 1px solid rgba(112, 161, 255, 0.4);
+  color: #70a1ff;
   letter-spacing: 0.5px;
+}
+
+.deception-sub {
+  font-size: 12.5px;
+  color: #a4b0be;
 }
 
 .deception-top-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .btn-deception-action {
-  padding: 8px 18px;
+  padding: 9px 16px;
   border-radius: 12px;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 13.5px;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f1f2f6;
+  font-weight: 800;
+  font-size: 13px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.22s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-deception-action:hover {
-  background: #ffffff;
-  color: #1e1e24;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
 }
 
 .btn-deception-primary {
   background: linear-gradient(135deg, #ff4757, #c0392b);
   border-color: #ff6b81;
-  box-shadow: 0 4px 14px rgba(255, 71, 87, 0.4);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(255, 71, 87, 0.38);
 }
 
 .btn-deception-primary:hover {
   background: linear-gradient(135deg, #ff6b81, #e74c3c);
-  color: #ffffff;
-  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.6);
+  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.55);
 }
 
-/* Khu vực Bảng Hiện Trường (Scene Tiles) */
-.deception-section-heading {
-  font-size: 19px;
+/* ==========================================================================
+   2. BẢNG ĐIỀU KHIỂN PHA TRẠNG THÁI (COMMAND BANNER & LOBBY SETUP)
+   ========================================================================== */
+
+.deception-command-banner {
+  width: 100%;
+}
+
+.noir-lobby-panel,
+.noir-phase-box {
+  background: linear-gradient(145deg, rgba(28, 22, 36, 0.95), rgba(18, 14, 24, 0.95));
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.42);
+}
+
+.noir-phase-box.theme-criminal {
+  border-color: rgba(255, 71, 87, 0.55);
+  background: linear-gradient(145deg, rgba(44, 16, 24, 0.94), rgba(20, 11, 16, 0.96));
+}
+
+.noir-phase-box.theme-police {
+  border-color: rgba(112, 161, 255, 0.48);
+  background: linear-gradient(145deg, rgba(18, 28, 46, 0.94), rgba(14, 18, 28, 0.96));
+}
+
+.noir-phase-box.theme-presentation {
+  border-color: rgba(241, 196, 15, 0.5);
+  background: linear-gradient(145deg, rgba(35, 28, 18, 0.94), rgba(19, 16, 22, 0.96));
+}
+
+.noir-phase-box.theme-police-win {
+  border: 2px solid #2ed573;
+  background: linear-gradient(145deg, rgba(16, 44, 32, 0.95), rgba(12, 22, 20, 0.96));
+}
+
+.noir-phase-box.theme-criminal-win {
+  border: 2px solid #ff4757;
+  background: linear-gradient(145deg, rgba(52, 14, 22, 0.95), rgba(22, 10, 14, 0.96));
+}
+
+.noir-lobby-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.noir-kicker {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: #fbc531;
+  margin-bottom: 4px;
+}
+
+.noir-lobby-title {
+  margin: 0;
+  font-size: clamp(17px, 2vw, 21px);
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.noir-room-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 13px;
+}
+
+.btn-noir-mini {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-noir-mini:hover,
+.btn-noir-mini.active {
+  background: #ff4757;
+  border-color: #ff6b81;
+}
+
+.noir-lobby-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.noir-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.noir-field label {
+  font-size: 12px;
   font-weight: 800;
+  color: #ced6e0;
+}
+
+.noir-input,
+.noir-select {
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  background: rgba(10, 8, 14, 0.85);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  outline: none;
+}
+
+.noir-input:focus,
+.noir-select:focus {
+  border-color: #70a1ff;
+}
+
+.noir-lobby-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  margin-bottom: 14px;
+}
+
+.noir-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
   color: #dfe4ea;
-  margin: 12px 0 6px 0;
+  cursor: pointer;
+}
+
+.noir-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: #ff4757;
+}
+
+.noir-lobby-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.noir-stat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.noir-stat-pill {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #dfe4ea;
+}
+
+.noir-stat-pill.pill-blue {
+  background: rgba(30, 144, 255, 0.15);
+  border-color: rgba(30, 144, 255, 0.4);
+  color: #70a1ff;
+}
+
+.noir-stat-pill.pill-red {
+  background: rgba(255, 71, 87, 0.15);
+  border-color: rgba(255, 71, 87, 0.4);
+  color: #ff6b81;
+}
+
+.noir-stat-pill.pill-gold {
+  background: rgba(241, 196, 15, 0.15);
+  border-color: rgba(241, 196, 15, 0.4);
+  color: #fbc531;
+}
+
+.btn-noir-cta {
+  padding: 11px 22px;
+  border-radius: 12px;
+  border: 1.5px solid #5352ed;
+  background: linear-gradient(135deg, #3742fa, #5352ed);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 6px 18px rgba(55, 66, 250, 0.38);
+  transition: all 0.2s ease;
+}
+
+.btn-noir-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(55, 66, 250, 0.55);
+}
+
+.btn-noir-cta.btn-crimson {
+  background: linear-gradient(135deg, #ff4757, #c0392b);
+  border-color: #ff6b81;
+  box-shadow: 0 6px 18px rgba(255, 71, 87, 0.42);
+}
+
+.btn-noir-cta.btn-crimson:hover {
+  box-shadow: 0 8px 24px rgba(255, 71, 87, 0.65);
+}
+
+.btn-noir-secondary {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.18s ease;
+}
+
+.btn-noir-secondary:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Các khối hiển thị trong Pha Đêm & Pha Trình bày */
+.noir-phase-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.noir-role-showcase {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 480px;
+}
+
+.noir-role-icon-lg {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  flex-shrink: 0;
+}
+
+.noir-role-info h3,
+.noir-phase-text h3,
+.noir-phase-text h2 {
+  margin: 4px 0 6px 0;
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.noir-role-info p,
+.noir-highlight-p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #dfe4ea;
+}
+
+.noir-team-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+}
+
+.noir-team-tag.tag-crim {
+  background: rgba(255, 71, 87, 0.25);
+  color: #ff6b81;
+  border: 1px solid rgba(255, 71, 87, 0.5);
+}
+
+.noir-team-tag.tag-pol {
+  background: rgba(30, 144, 255, 0.25);
+  color: #70a1ff;
+  border: 1px solid rgba(30, 144, 255, 0.5);
+}
+
+.noir-crime-pair-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pair-chip {
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pair-chip.chip-blue {
+  background: rgba(30, 144, 255, 0.18);
+  border: 1px solid rgba(30, 144, 255, 0.45);
+  color: #70a1ff;
+}
+
+.pair-chip.chip-red {
+  background: rgba(255, 71, 87, 0.18);
+  border: 1px solid rgba(255, 71, 87, 0.45);
+  color: #ff6b81;
+}
+
+.pair-chip.chip-gold {
+  background: rgba(241, 196, 15, 0.18);
+  border: 1px solid rgba(241, 196, 15, 0.45);
+  color: #fbc531;
+}
+
+.noir-phase-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Đồng hồ 30 giây Trình bày */
+.noir-speaker-spotlight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1 1 420px;
+}
+
+.speaker-ava-ring {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(241, 196, 15, 0.16);
+  border: 2px solid #fbc531;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(241, 196, 15, 0.35);
+}
+
+.speaker-meta {
+  flex: 1;
+}
+
+.speaker-timer-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 8px;
+  background: #ff4757;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.noir-timer-track {
+  width: 100%;
+  max-width: 380px;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.noir-timer-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2ed573, #fbc531, #ff4757);
+  transition: width 0.35s linear;
+}
+
+.noir-inside-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn-noir-target {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 71, 87, 0.55);
+  background: rgba(255, 71, 87, 0.16);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-noir-target:hover {
+  background: #ff4757;
+  transform: scale(1.03);
+}
+
+/* ==========================================================================
+   3. BỐ CỤC WORKSPACE CHÍNH (2 CỘT DESKTOP & TAB MOBILE)
+   ========================================================================== */
+
+.deception-mobile-tabs {
+  display: none;
+  gap: 6px;
+  background: rgba(20, 16, 26, 0.92);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.deception-mob-tab {
+  flex: 1;
+  padding: 8px 6px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #a4b0be;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.deception-mob-tab.active {
+  background: linear-gradient(135deg, #ff4757, #c0392b);
+  color: #ffffff;
+}
+
+.deception-workspace {
+  display: grid;
+  grid-template-columns: 460px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.deception-forensic-panel,
+.deception-suspects-section,
+.deception-log-section {
+  background: rgba(20, 16, 26, 0.82);
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.deception-table-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.deception-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.deception-section-heading {
+  font-size: 17px;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0 0 4px 0;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
+.deception-section-desc {
+  font-size: 12.5px;
+  color: #a4b0be;
+  margin: 0;
+}
+
+.deception-forensic-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.forensic-officer-chip,
+.forensic-deck-chip,
+.badges-counter-pill {
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #dfe4ea;
+}
+
+/* ==========================================================================
+   4. BẢNG HIỆN TRƯỜNG GIÁM ĐỊNH PHÁP Y (26 SCENE TILES: TÍM, XANH LÁ, NÂU)
+   ========================================================================== */
+
+.deception-event-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(30, 144, 255, 0.16);
+  border: 1.5px solid rgba(30, 144, 255, 0.45);
+  margin-bottom: 12px;
+}
+
+.deception-event-banner .event-icon {
+  font-size: 24px;
+}
+
+.deception-event-banner strong {
+  display: block;
+  font-size: 13px;
+  color: #70a1ff;
+}
+
+.deception-event-banner p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #dfe4ea;
+}
+
 .deception-scene-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .deception-scene-card {
-  background: #18131d;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 14px;
+  background: #17121c;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-  transition: all 0.22s ease;
+  gap: 8px;
+  transition: all 0.2s ease;
 }
 
-.deception-scene-card.tile-fixed {
-  border-color: rgba(255, 71, 87, 0.5);
-  background: #201319;
+.deception-scene-card.tile-purple {
+  border-color: rgba(155, 89, 182, 0.65);
+  background: linear-gradient(180deg, rgba(58, 28, 74, 0.55) 0%, #17121c 100%);
 }
 
-.scene-tile-header {
+.deception-scene-card.tile-green {
+  border-color: rgba(46, 213, 115, 0.55);
+  background: linear-gradient(180deg, rgba(22, 64, 44, 0.5) 0%, #17121c 100%);
+}
+
+.deception-scene-card.tile-brown {
+  border-color: rgba(225, 177, 44, 0.38);
+  background: linear-gradient(180deg, rgba(56, 40, 26, 0.45) 0%, #17121c 100%);
+}
+
+.scene-tile-top-row {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
 }
 
 .scene-tile-badge {
-  font-size: 10px;
-  font-weight: 800;
-  color: #ff6b81;
+  font-size: 9.5px;
+  font-weight: 900;
   letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #fbc531;
+}
+
+.tile-purple .scene-tile-badge { color: #d6a2e8; }
+.tile-green .scene-tile-badge { color: #7bed9f; }
+
+.btn-replace-tile {
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(241, 196, 15, 0.5);
+  background: rgba(241, 196, 15, 0.16);
+  color: #fbc531;
+  font-size: 10.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-replace-tile:hover {
+  background: #fbc531;
+  color: #1e272e;
 }
 
 .scene-tile-title {
   margin: 0;
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 900;
   color: #ffffff;
+}
+
+.scene-tile-sub {
+  font-size: 11px;
+  color: #a4b0be;
 }
 
 .scene-tile-options {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .scene-opt-btn {
@@ -186,65 +822,179 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  padding: 7px 10px;
-  color: #ced6e0;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 6px 9px;
+  color: #dfe4ea;
   cursor: pointer;
   text-align: left;
-  transition: all 0.18s ease;
+  transition: all 0.15s ease;
 }
 
 .scene-opt-btn:hover {
   background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
 }
 
 .scene-opt-btn.is-marked {
-  background: rgba(255, 71, 87, 0.25);
+  background: rgba(255, 71, 87, 0.26);
   border-color: #ff4757;
   color: #ffffff;
-  font-weight: 800;
-  box-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
+  box-shadow: 0 0 12px rgba(255, 71, 87, 0.35);
 }
 
 .opt-bullet {
   font-size: 14px;
+  flex-shrink: 0;
 }
 
-/* Khu vực Bàn Nghi Phạm (Suspects Grid) */
+.opt-text-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+}
+
+.opt-text {
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+.opt-text-en {
+  font-size: 10.5px;
+  color: #a4b0be;
+}
+
+/* ==========================================================================
+   5. BÀN NGHI PHẠM & THẺ BÀI VẬT CHỨNG (SUSPECTS GRID)
+   ========================================================================== */
+
 .deception-suspects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 14px;
 }
 
 .suspect-item-card {
-  background: #19141f;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: #17131e;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.suspect-item-card.is-self-seat {
+  border-color: rgba(112, 161, 255, 0.45);
+  box-shadow: 0 0 18px rgba(112, 161, 255, 0.12);
+}
+
+.suspect-item-card.is-speaking-seat {
+  border-color: #fbc531;
+  box-shadow: 0 0 22px rgba(241, 196, 15, 0.28);
 }
 
 .suspect-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  padding-bottom: 8px;
+  padding-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.suspect-id-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .suspect-ava {
-  font-size: 26px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23px;
+}
+
+.suspect-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .suspect-name {
-  font-size: 15px;
+  font-size: 14.5px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.you-pill {
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: #3742fa;
+  color: #ffffff;
+}
+
+.suspect-sub-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 3px;
+}
+
+.suspect-role-pill {
+  font-size: 10.5px;
   font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+.suspect-role-pill.role-crim {
+  background: rgba(255, 71, 87, 0.22);
+  color: #ff6b81;
+  border: 1px solid rgba(255, 71, 87, 0.45);
+}
+
+.suspect-role-pill.role-pol {
+  background: rgba(46, 213, 115, 0.18);
+  color: #7bed9f;
+  border: 1px solid rgba(46, 213, 115, 0.4);
+}
+
+.badge-status-chip {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #a4b0be;
+}
+
+.badge-status-chip.has-badge {
+  color: #fbc531;
+}
+
+.btn-accuse-suspect {
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 71, 87, 0.45);
+  background: rgba(255, 71, 87, 0.14);
+  color: #ff6b81;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+}
+
+.btn-accuse-suspect:hover {
+  background: #ff4757;
   color: #ffffff;
 }
 
@@ -261,92 +1011,536 @@
 }
 
 .asset-label {
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 10.5px;
+  font-weight: 900;
   color: #a4b0be;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .asset-chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
 }
 
 .chip {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  padding: 7px 9px;
+  border-radius: 9px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: all 0.16s ease;
 }
 
 .chip-means {
-  background: rgba(231, 76, 60, 0.18);
-  border: 1px solid rgba(231, 76, 60, 0.4);
-  color: #ff6b81;
+  background: rgba(30, 144, 255, 0.12);
+  border: 1px solid rgba(30, 144, 255, 0.35);
+  color: #dfe4ea;
+}
+
+.chip-means:hover {
+  background: rgba(30, 144, 255, 0.24);
+  border-color: #70a1ff;
 }
 
 .chip-clue {
-  background: rgba(52, 152, 219, 0.18);
-  border: 1px solid rgba(52, 152, 219, 0.4);
-  color: #70a1ff;
+  background: rgba(255, 71, 87, 0.12);
+  border: 1px solid rgba(255, 71, 87, 0.35);
+  color: #dfe4ea;
 }
 
-.btn-accuse-suspect {
-  margin-top: 4px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.06);
-  color: #dfe4ea;
+.chip-clue:hover {
+  background: rgba(255, 71, 87, 0.24);
+  border-color: #ff6b81;
+}
+
+.chip.chip-selected-crime,
+.chip.chip-true-solution {
+  border: 2px solid #fbc531;
+  box-shadow: 0 0 14px rgba(241, 196, 15, 0.45);
+  background: rgba(241, 196, 15, 0.2);
+}
+
+.chip.chip-pinned {
+  border-style: dashed;
+  border-color: #fbc531;
+}
+
+.chip-top-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12.5px;
   font-weight: 800;
+  color: #ffffff;
+}
+
+.chip-sub-line {
+  font-size: 10px;
+  color: #a4b0be;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   6. BIÊN BẢN HỒ SƠ ĐIỀU TRA (CASE LOG)
+   ========================================================================== */
+
+.deception-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.deception-log-header h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deception-db-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #70a1ff;
+  background: rgba(112, 161, 255, 0.12);
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
+.deception-case-log {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 4px;
+}
+
+.noir-log-item {
+  padding: 8px 12px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 3px solid #70a1ff;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.noir-log-item.log-crime,
+.noir-log-item.log-error {
+  border-left-color: #ff4757;
+  background: rgba(255, 71, 87, 0.08);
+}
+
+.noir-log-item.log-forensic,
+.noir-log-item.log-event {
+  border-left-color: #fbc531;
+  background: rgba(241, 196, 15, 0.08);
+}
+
+.noir-log-item.log-success {
+  border-left-color: #2ed573;
+  background: rgba(46, 213, 115, 0.1);
+}
+
+.log-time {
+  font-family: monospace;
+  font-weight: 800;
+  color: #a4b0be;
+  margin-right: 6px;
+}
+
+/* ==========================================================================
+   7. OVERLAYS: PIXEL CUTSCENE, ACCUSATION DRAWER & RULES ENCYCLOPEDIA
+   ========================================================================== */
+
+.deception-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  background: rgba(5, 4, 8, 0.84);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.deception-overlay.active {
+  display: flex;
+}
+
+.deception-cutscene-box {
+  width: 100%;
+  max-width: 580px;
+  background: #120e18;
+  border: 2px solid rgba(255, 71, 87, 0.55);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  text-align: center;
+}
+
+.deception-cutscene-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.deception-cutscene-badge {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff6b81;
+}
+
+.deception-cutscene-skip {
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.deception-canvas-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #07050a;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#deception-cutscene-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.deception-cutscene-caption h3 {
+  margin: 12px 0 4px 0;
+  font-size: 19px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.deception-cutscene-caption p {
+  margin: 0;
+  font-size: 13.5px;
+  color: #ced6e0;
+}
+
+/* Accusation & Rules Drawers */
+.deception-drawer-card {
+  width: 100%;
+  max-width: 780px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #16111d;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+}
+
+.noir-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.noir-drawer-header h3 {
+  margin: 2px 0 0 0;
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.btn-noir-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.noir-drawer-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #dfe4ea;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 71, 87, 0.12);
+  border: 1px solid rgba(255, 71, 87, 0.35);
+  margin-bottom: 14px;
+}
+
+.accuse-step-block label,
+.accuse-col label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #fbc531;
+  margin-bottom: 8px;
+}
+
+.accuse-suspect-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.accuse-suspect-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 13px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s ease;
+  gap: 6px;
 }
 
-.btn-accuse-suspect:hover {
+.accuse-suspect-btn.active {
+  border-color: #fbc531;
+  background: rgba(241, 196, 15, 0.22);
+}
+
+.accuse-cards-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.accuse-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accuse-card-opt {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.accuse-card-opt small {
+  color: #a4b0be;
+  font-size: 11px;
+}
+
+.accuse-card-opt.opt-blue.selected {
+  border-color: #1e90ff;
+  background: rgba(30, 144, 255, 0.25);
+}
+
+.accuse-card-opt.opt-red.selected {
+  border-color: #ff4757;
+  background: rgba(255, 71, 87, 0.25);
+}
+
+.noir-drawer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Rules & 9 Roles Grid */
+.rules-flow-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.flow-step-card {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.flow-step-card .step-num {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
   background: #ff4757;
   color: #ffffff;
-  border-color: #ff4757;
-  box-shadow: 0 4px 14px rgba(255, 71, 87, 0.4);
+  font-size: 12px;
+  font-weight: 900;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
 }
 
-/* Tối ưu hóa trên Mobile */
+.flow-step-card h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+
+.flow-step-card p {
+  margin: 0;
+  font-size: 12px;
+  color: #ced6e0;
+  line-height: 1.45;
+}
+
+.rules-sub-heading {
+  margin: 14px 0 8px 0;
+  font-size: 15px;
+  color: #fbc531;
+}
+
+.rules-roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.rules-role-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rules-role-item.item-crim {
+  border-color: rgba(255, 71, 87, 0.4);
+}
+
+.rules-role-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.role-f-tag {
+  margin-left: auto;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.rules-role-item p {
+  margin: 0;
+  font-size: 11.5px;
+  color: #ced6e0;
+  line-height: 1.4;
+}
+
+.rules-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rules-event-chip {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(30, 144, 255, 0.1);
+  border: 1px solid rgba(30, 144, 255, 0.3);
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   8. RESPONSIVE TABLET & MOBILE OPTIMIZATION
+   ========================================================================== */
+
+@media (max-width: 1140px) {
+  .deception-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .deception-scene-tiles {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   #screen-deception.screen {
-    padding: 12px 14px 36px 14px;
+    padding: 10px 12px 36px 12px;
   }
 
   .deception-top-bar {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    padding: 12px;
   }
 
   .deception-top-actions {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
-    justify-content: stretch;
   }
 
   .deception-top-actions .btn-deception-action {
-    flex: 1 1 calc(50% - 6px);
     justify-content: center;
     padding: 8px 10px;
-    font-size: 12.5px;
+    font-size: 12px;
+  }
+
+  .deception-mobile-tabs {
+    display: flex;
+    position: sticky;
+    top: 6px;
+    z-index: 90;
+  }
+
+  /* Lọc hiển thị theo Tab trên Mobile để người dùng lướt gọn gàng */
+  .deception-workspace[data-active-tab="forensic"] .deception-table-panel {
+    display: none;
+  }
+
+  .deception-workspace[data-active-tab="suspects"] .deception-forensic-panel,
+  .deception-workspace[data-active-tab="suspects"] .deception-log-section {
+    display: none;
+  }
+
+  .deception-workspace[data-active-tab="log"] .deception-forensic-panel,
+  .deception-workspace[data-active-tab="log"] .deception-suspects-section {
+    display: none;
   }
 
   .deception-scene-tiles {
@@ -354,6 +1548,10 @@
   }
 
   .deception-suspects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .accuse-cards-columns {
     grid-template-columns: 1fr;
   }
 }

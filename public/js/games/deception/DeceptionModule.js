@@ -1,13 +1,13 @@
 /**
- * DeceptionModule: Module trò chơi chính "Deception: Murder in Viet Nam"
- * Kế thừa BaseGameModule, vận hành độc lập theo kiến trúc Multi-Game.
+ * DeceptionModule: Module trò chơi chính "Deception: Murder in Hong Kong / Viet Nam"
+ * Kế thừa BaseGameModule, vận hành độc lập 100% theo kiến trúc Multi-Game.
  */
 import { BaseGameModule } from '../BaseGameModule.js';
 import { DeceptionState } from './DeceptionState.js';
 import { DeceptionUIBinder } from './DeceptionUIBinder.js';
+import { deceptionCutscene } from './DeceptionCutscene.js';
 import { CaroModal } from '../../modules/modal.js';
 import { soundManager } from '../../modules/audio.js';
-
 import { i18n } from '../../modules/i18n.js';
 
 export class DeceptionModule extends BaseGameModule {
@@ -29,7 +29,7 @@ export class DeceptionModule extends BaseGameModule {
   }
 
   /**
-   * Mở trang / sảnh trò chơi Deception
+   * Mở trang bàn điều tra Deception
    */
   openLobby(pushState = true) {
     if (!this.isInitialized) {
@@ -56,26 +56,59 @@ export class DeceptionModule extends BaseGameModule {
       window.history.pushState({ screen: 'screen-deception' }, this.name, '#deception');
     }
 
-    // 4. Render lại các thẻ hiện trường & danh sách nghi phạm
-    DeceptionUIBinder.renderSceneTiles();
-    DeceptionUIBinder.renderSuspectCards();
+    // 4. Render toàn bộ giao diện bàn điều tra
+    DeceptionUIBinder.renderAll();
 
     try { soundManager.playCuteWhoosh(); } catch (_) {}
   }
 
   /**
-   * Tạo vụ án mới
+   * Bắt đầu một Vụ Án Mới (Chia 9 vai trò, 90 lá Phương thức, 200 lá Manh mối, 26 Thẻ Hiện trường)
    */
   startNewCase() {
-    this.state.reset();
-    DeceptionUIBinder.renderSceneTiles();
-    CaroModal.showToast(i18n.getText('deception_toast_new_case', { caseId: this.state.caseId }));
+    DeceptionUIBinder.stopSpeakerTimer();
+    this.state.startNewGame();
+    DeceptionUIBinder.renderAll();
+
+    const human = this.state.getHumanPlayer();
+    const isVi = (i18n.currentLang || 'vi') === 'vi';
+    const roleName = isVi
+      ? DeceptionUIBinder.getRoleDef(human.role).name_vi
+      : DeceptionUIBinder.getRoleDef(human.role).name_en;
+
+    deceptionCutscene.play({
+      type: 'ROLE_REVEAL',
+      team: human.team,
+      badgeText: `CASE #${this.state.caseId}`,
+      title: isVi ? `Vai trò của bạn: ${roleName}` : `Your Secret Role: ${roleName}`,
+      subtitle: isVi
+        ? DeceptionUIBinder.getRoleDef(human.role).desc_vi
+        : DeceptionUIBinder.getRoleDef(human.role).desc_en,
+      durationMs: 2200
+    });
+
+    CaroModal.showToast(
+      i18n.getText('deception_toast_new_case', { caseId: this.state.caseId })
+    );
   }
 
   /**
-   * Rời trang game và quay trở về Cổng Game Tổng (Hub)
+   * Quay về trạng thái cấu hình Sảnh Bàn Chơi (4-9 người)
+   */
+  openTableSetup() {
+    DeceptionUIBinder.stopSpeakerTimer();
+    deceptionCutscene.stop();
+    this.state.initPreviewTable();
+    DeceptionUIBinder.renderAll();
+  }
+
+  /**
+   * Rời trang game Deception và quay trở về Cổng Game Tổng (Hub)
    */
   leaveToHub() {
+    DeceptionUIBinder.stopSpeakerTimer();
+    deceptionCutscene.stop();
+
     if (document.body) {
       document.body.classList.remove('in-deception');
       document.body.classList.add('in-hub');

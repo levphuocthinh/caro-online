@@ -67,7 +67,6 @@ export class HubSidebarController {
           if (currentItem?.playable) {
             if (this.controller.selectedGameId === 'deception') {
               this.manager.registry.launch('deception');
-              CaroModal.open('modal-deception-room');
             } else {
               this.manager.openCaroLobby();
               CaroModal.open('modal-create-room');
@@ -78,7 +77,7 @@ export class HubSidebarController {
         } else if (action === 'guide') {
           soundManager.playCuteChime();
           if (this.controller.selectedGameId === 'deception') {
-            CaroModal.showToast(i18n.getText('deception_toast_rules'));
+            this.manager.registry.launch('deception');
           } else {
             CaroModal.open('modal-help');
           }
