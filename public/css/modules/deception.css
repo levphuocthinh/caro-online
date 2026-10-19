@@ -336,7 +336,17 @@
   }
 
   .deception-top-actions {
-    justify-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: stretch;
+  }
+
+  .deception-top-actions .btn-deception-action {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 12.5px;
   }
 
   .deception-scene-tiles {

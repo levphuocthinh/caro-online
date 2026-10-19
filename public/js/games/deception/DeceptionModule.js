@@ -32,6 +32,10 @@ export class DeceptionModule extends BaseGameModule {
    * Mở trang / sảnh trò chơi Deception
    */
   openLobby(pushState = true) {
+    if (!this.isInitialized) {
+      this.init();
+    }
+
     CaroModal.closeAll();
 
     // 1. Chuyển đổi màn hình sang trang game Deception
@@ -41,12 +45,18 @@ export class DeceptionModule extends BaseGameModule {
       deceptionScreen.classList.add('active');
     }
 
-    // 2. Cập nhật URL Hash
+    // 2. Chuyển đổi body class sang không gian riêng của Deception
+    if (document.body) {
+      document.body.classList.remove('in-hub', 'in-game');
+      document.body.classList.add('in-deception');
+    }
+
+    // 3. Cập nhật URL Hash
     if (pushState && typeof window !== 'undefined' && window.history) {
       window.history.pushState({ screen: 'screen-deception' }, this.name, '#deception');
     }
 
-    // 3. Render lại các thẻ hiện trường
+    // 4. Render lại các thẻ hiện trường & danh sách nghi phạm
     DeceptionUIBinder.renderSceneTiles();
     DeceptionUIBinder.renderSuspectCards();
 
@@ -66,6 +76,11 @@ export class DeceptionModule extends BaseGameModule {
    * Rời trang game và quay trở về Cổng Game Tổng (Hub)
    */
   leaveToHub() {
+    if (document.body) {
+      document.body.classList.remove('in-deception');
+      document.body.classList.add('in-hub');
+    }
+
     if (this.platform && typeof this.platform.openHub === 'function') {
       this.platform.openHub();
     } else {

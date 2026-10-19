@@ -131,6 +131,15 @@ export class I18nManager {
 
     setOptionText('ai-player-symbol', 'X', dict.opt_side_x);
     setOptionText('ai-player-symbol', 'O', dict.opt_side_o);
+
+    setOptionText('deception-player-count', '4', dict.opt_deception_4p);
+    setOptionText('deception-player-count', '5', dict.opt_deception_5p);
+    setOptionText('deception-player-count', '6', dict.opt_deception_6p);
+    setOptionText('deception-player-count', '8', dict.opt_deception_8p);
+    setOptionText('deception-player-count', '12', dict.opt_deception_12p);
+
+    setOptionText('deception-expansion-roles', 'standard', dict.opt_deception_roles_std);
+    setOptionText('deception-expansion-roles', 'expanded', dict.opt_deception_roles_exp);
   }
 
   getText(key, params = {}) {

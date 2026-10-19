@@ -65,14 +65,23 @@ export class HubSidebarController {
 
         if (action === 'friends') {
           if (currentItem?.playable) {
-            this.manager.openCaroLobby();
-            CaroModal.open('modal-create-room');
+            if (this.controller.selectedGameId === 'deception') {
+              this.manager.registry.launch('deception');
+              CaroModal.open('modal-deception-room');
+            } else {
+              this.manager.openCaroLobby();
+              CaroModal.open('modal-create-room');
+            }
           } else {
             this.controller.showComingToast();
           }
         } else if (action === 'guide') {
           soundManager.playCuteChime();
-          CaroModal.open('modal-help');
+          if (this.controller.selectedGameId === 'deception') {
+            CaroModal.showToast(i18n.getText('deception_toast_rules'));
+          } else {
+            CaroModal.open('modal-help');
+          }
         } else if (action === 'sound') {
           document.getElementById('btn-sound-toggle')?.click();
         } else if (action === 'achievements') {

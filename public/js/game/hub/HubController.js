@@ -82,7 +82,13 @@ export class HubController {
     const info = this.getCatalog()[gameId];
     if (!info) return;
     if (info.playable) {
-      this.manager.openCaroLobby();
+      if (gameId === 'caro') {
+        this.manager.openCaroLobby();
+      } else if (gameId === 'deception') {
+        if (this.manager.deception) {
+          this.manager.deception.openLobby();
+        }
+      }
     } else {
       this.showComingToast();
     }

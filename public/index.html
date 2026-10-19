@@ -604,6 +604,9 @@
           <button class="btn-deception-action" id="btn-deception-rules" type="button">
             <i class="fa-solid fa-book-open"></i> <span data-i18n="deception_btn_rules">Luật chơi</span>
           </button>
+          <button class="btn-deception-action" id="btn-deception-friends" type="button">
+            <i class="fa-solid fa-users"></i> <span data-i18n="deception_btn_friends">Bạn bè</span>
+          </button>
           <button class="btn-deception-action btn-deception-primary" id="btn-deception-new-case" type="button">
             <i class="fa-solid fa-rotate-right"></i> <span data-i18n="deception_btn_new_case">Vụ án mới</span>
           </button>
@@ -824,6 +827,46 @@
       <div class="modal-btn-row" style="margin-top: 20px;">
         <button class="btn-primary" data-close="modal-help">
           <i class="fa-solid fa-check"></i> <span data-i18n="btn_understood">Đã Hiểu Rõ Nè</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TẠO PHÒNG PHÁ ÁN DECEPTION CÙNG BẠN BÈ -->
+  <div class="modal-overlay" id="modal-deception-room">
+    <div class="modal-content" style="border: 1.5px solid rgba(255, 71, 87, 0.4); box-shadow: 0 12px 36px rgba(255, 71, 87, 0.25);">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa-solid fa-magnifying-glass modal-icon" style="color: #ff4757;"></i>
+          <span data-i18n="modal_deception_title">Tạo Bàn Phá Án Cùng Bạn Bè</span>
+        </h3>
+        <button class="modal-close" data-close="modal-deception-room"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_detective_name">Tên thám tử của bạn:</label>
+        <input type="text" id="deception-player-name" class="form-input" placeholder="VD: Thám tử Mori" data-i18n-placeholder="placeholder_detective_name" value="Thám tử 1">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_player_count">Số lượng người chơi:</label>
+        <select id="deception-player-count" class="form-select">
+          <option value="4" selected>4 Người (1 Giám định, 1 Hung thủ, 2 Điều tra)</option>
+          <option value="5">5 Người (Có thêm Nhân chứng hoặc Đồng phạm)</option>
+          <option value="6">6 Người (Chuẩn nhóm bạn - Kịch tính)</option>
+          <option value="8">8 Người (Bàn đại tiệc phá án)</option>
+          <option value="12">12 Người (Đông vui cực độ)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_expansion_roles">Vai trò mở rộng:</label>
+        <select id="deception-expansion-roles" class="form-select">
+          <option value="standard" selected>Cơ bản (Giám định pháp y, Hung thủ & Điều tra viên)</option>
+          <option value="expanded">Mở rộng (Bổ sung Đồng phạm & Nhân chứng)</option>
+        </select>
+      </div>
+      <div class="modal-btn-row">
+        <button class="btn-secondary" data-close="modal-deception-room" data-i18n="btn_cancel">Hủy</button>
+        <button class="btn-primary" id="btn-confirm-create-deception" style="background: linear-gradient(135deg, #ff4757, #c0392b); border-color: #ff4757;">
+          <i class="fa-solid fa-door-open"></i> <span data-i18n="btn_create_deception_room">Vào Bàn Phá Án</span>
         </button>
       </div>
     </div>

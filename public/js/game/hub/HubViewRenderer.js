@@ -156,6 +156,8 @@ export class HubViewRenderer {
         playPill.style.display = 'inline-flex';
         const pillAva = playPill.querySelector('.hub-pill-avatar');
         if (pillAva) pillAva.textContent = info.pillAva || '🐱';
+        const pillText = playPill.querySelector('.hub-pill-text');
+        if (pillText) pillText.textContent = info.pillLabel || i18n.getText('pill_playing') || 'Playing';
       } else {
         playPill.style.display = 'none';
       }
@@ -246,6 +248,10 @@ export class HubViewRenderer {
           try { soundManager.playCutePop(); } catch (_) {}
           if (!info.playable) {
             controller.showComingToast();
+            return;
+          }
+          if (controller.selectedGameId === 'deception') {
+            controller.triggerEnterSelectedGame();
             return;
           }
           const act = card.dataset.newsAction;
@@ -367,14 +373,23 @@ export class HubViewRenderer {
           controller.triggerEnterSelectedGame();
         } else if (action === 'friends') {
           if (currentItem?.playable) {
-            manager.openCaroLobby();
-            CaroModal.open('modal-create-room');
+            if (controller.selectedGameId === 'deception') {
+              manager.registry.launch('deception');
+              CaroModal.open('modal-deception-room');
+            } else {
+              manager.openCaroLobby();
+              CaroModal.open('modal-create-room');
+            }
           } else {
             controller.showComingToast();
           }
         } else if (action === 'guide') {
           soundManager.playCuteChime();
-          CaroModal.open('modal-help');
+          if (controller.selectedGameId === 'deception') {
+            CaroModal.showToast(i18n.getText('deception_toast_rules'));
+          } else {
+            CaroModal.open('modal-help');
+          }
         } else if (action === 'sound') {
           document.getElementById('btn-sound-toggle')?.click();
         } else if (action === 'achievements') {

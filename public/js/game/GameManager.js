@@ -120,6 +120,10 @@ export class GameManager {
       caroOnline.disconnect();
     }
     this.registry.resetActive();
+    if (document.body) {
+      document.body.classList.remove('in-deception', 'in-game');
+      document.body.classList.add('in-hub');
+    }
     this.localGame.switchToScreen('screen-hub', pushState);
   }
 
@@ -223,11 +227,13 @@ export class GameManager {
         return;
       }
 
-      // Điều hướng giữa Sảnh Caro và Cổng Game Hub
+      // Điều hướng giữa Sảnh Caro, Deception và Cổng Game Hub
       if (targetScreen === 'screen-hub') {
         this.openHub(false);
       } else if (targetScreen === 'screen-lobby') {
         this.openCaroLobby(false);
+      } else if (targetScreen === 'screen-deception') {
+        this.deception.openLobby(false);
       } else if (targetScreen === 'screen-game') {
         if (this.state.gameMode) {
           this.localGame.switchToScreen('screen-game', false);

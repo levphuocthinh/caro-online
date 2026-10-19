@@ -354,5 +354,21 @@ export const ja = {
   "reaction_plead": "お願い",
   "reaction_sparkle": "キラキラ",
   "reaction_party": "お祝い",
-  "reaction_cake": "ケーキ"
+  "reaction_cake": "ケーキ",
+  "modal_deception_title": "友達と事件調査ルームを作成",
+  "lbl_detective_name": "あなたの探偵名:",
+  "placeholder_detective_name": "例：毛利探偵",
+  "lbl_player_count": "プレイヤー人数:",
+  "lbl_expansion_roles": "拡張役職:",
+  "opt_deception_4p": "4人（法医学者1名、殺人犯1名、捜査官2名）",
+  "opt_deception_5p": "5人（目撃者または共犯者を追加）",
+  "opt_deception_6p": "6人（標準グループ・スリリング）",
+  "opt_deception_8p": "8人（大規模調査パーティー）",
+  "opt_deception_12p": "12人（究極の大人数パーティー）",
+  "opt_deception_roles_std": "基本（法医学者、殺人犯、捜査官）",
+  "opt_deception_roles_exp": "拡張（共犯者と目撃者を追加）",
+  "btn_create_deception_room": "事件調査ルームに入る",
+  "deception_btn_friends": "フレンド",
+  "deception_toast_room_created": "🔍 {name}探偵が調査ルーム（{caseId}）を作成しました！友達に事件コードを共有して調査を開始しましょう！",
+  "deception_toast_friends": "🔍 4〜12人の友達と一緒にDeceptionの事件調査ルームを開きましょう！"
 };

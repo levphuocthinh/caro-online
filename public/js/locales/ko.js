@@ -354,5 +354,21 @@ export const ko = {
   "reaction_plead": "부탁해",
   "reaction_sparkle": "반짝반짝",
   "reaction_party": "축하",
-  "reaction_cake": "케이크"
+  "reaction_cake": "케이크",
+  "modal_deception_title": "친구와 함께 사건 수사 방 만들기",
+  "lbl_detective_name": "당신의 탐정 이름:",
+  "placeholder_detective_name": "예: 모리 탐정",
+  "lbl_player_count": "플레이어 인원수:",
+  "lbl_expansion_roles": "확장 역할:",
+  "opt_deception_4p": "4명 (법의학자 1명, 살인자 1명, 수사관 2명)",
+  "opt_deception_5p": "5명 (목격자 또는 공범 추가)",
+  "opt_deception_6p": "6명 (표준 파티 - 스릴 만점)",
+  "opt_deception_8p": "8명 (대규모 추리 파티)",
+  "opt_deception_12p": "12명 (최대 인원 파티)",
+  "opt_deception_roles_std": "기본 (법의학자, 살인자, 수사관)",
+  "opt_deception_roles_exp": "확장 (공범 및 목격자 추가)",
+  "btn_create_deception_room": "수사 방 입장하기",
+  "deception_btn_friends": "친구",
+  "deception_toast_room_created": "🔍 {name} 탐정이 수사 방({caseId})을 개설했습니다! 친구들에게 사건 코드를 공유하여 수사를 시작하세요!",
+  "deception_toast_friends": "🔍 4~12명의 친구와 함께 사건을 수사하는 디셉션 방을 열어보세요!"
 };

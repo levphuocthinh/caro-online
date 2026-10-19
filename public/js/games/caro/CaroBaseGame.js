@@ -48,6 +48,7 @@ export class CaroBaseGame {
       if (document.body) {
         document.body.classList.toggle('in-game', isGame);
         document.body.classList.toggle('in-hub', isHub);
+        document.body.classList.remove('in-deception');
       }
     }
 

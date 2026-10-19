@@ -354,5 +354,21 @@ export const zh = {
   "reaction_plead": "拜托",
   "reaction_sparkle": "闪烁",
   "reaction_party": "庆祝",
-  "reaction_cake": "蛋糕"
+  "reaction_cake": "蛋糕",
+  "modal_deception_title": "与好友创建破案房间",
+  "lbl_detective_name": "您的侦探昵称:",
+  "placeholder_detective_name": "例如：毛利侦探",
+  "lbl_player_count": "玩家人数:",
+  "lbl_expansion_roles": "扩展身份:",
+  "opt_deception_4p": "4人（法医1名、凶手1名、调查员2名）",
+  "opt_deception_5p": "5人（增加目击者或帮凶）",
+  "opt_deception_6p": "6人（标准开黑・精彩绝伦）",
+  "opt_deception_8p": "8人（大型推理盛宴）",
+  "opt_deception_12p": "12人（终极超大派对）",
+  "opt_deception_roles_std": "基础（法医、凶手与调查员）",
+  "opt_deception_roles_exp": "扩展（增加帮凶与目击者）",
+  "btn_create_deception_room": "进入破案房间",
+  "deception_btn_friends": "好友",
+  "deception_toast_room_created": "🔍 侦探 {name} 已创建破案房间（{caseId}）！快将案件编号分享给好友共同调查吧！",
+  "deception_toast_friends": "🔍 开启 Deception 破案房间，与4-12位好友一起调查案件！"
 };

@@ -354,5 +354,21 @@ export const vi = {
   "reaction_plead": "Cầu xin",
   "reaction_sparkle": "Lấp lánh",
   "reaction_party": "Ăn mừng",
-  "reaction_cake": "Bánh ngọt"
+  "reaction_cake": "Bánh ngọt",
+  "modal_deception_title": "Tạo Bàn Phá Án Cùng Bạn Bè",
+  "lbl_detective_name": "Tên thám tử của bạn:",
+  "placeholder_detective_name": "VD: Thám tử Mori",
+  "lbl_player_count": "Số lượng người chơi:",
+  "lbl_expansion_roles": "Vai trò mở rộng:",
+  "opt_deception_4p": "4 Người (1 Giám định, 1 Hung thủ, 2 Điều tra)",
+  "opt_deception_5p": "5 Người (Có thêm Nhân chứng hoặc Đồng phạm)",
+  "opt_deception_6p": "6 Người (Chuẩn nhóm bạn - Kịch tính)",
+  "opt_deception_8p": "8 Người (Bàn đại tiệc phá án)",
+  "opt_deception_12p": "12 Người (Đông vui cực độ)",
+  "opt_deception_roles_std": "Cơ bản (Giám định pháp y, Hung thủ & Điều tra viên)",
+  "opt_deception_roles_exp": "Mở rộng (Bổ sung Đồng phạm & Nhân chứng)",
+  "btn_create_deception_room": "Vào Bàn Phá Án",
+  "deception_btn_friends": "Bạn bè",
+  "deception_toast_room_created": "🔍 Thám tử {name} đã mở bàn phá án ({caseId})! Hãy chia sẻ mã vụ án cho bạn bè cùng điều tra!",
+  "deception_toast_friends": "🔍 Mở bàn phá án Deception để điều tra vụ án cùng nhóm bạn bè từ 4-12 người!"
 };

@@ -30,7 +30,24 @@ export class DeceptionUIBinder {
       CaroModal.showToast(i18n.getText('deception_toast_rules'));
     });
 
-    // 4. Lắng nghe thay đổi ngôn ngữ hệ thống
+    // 4. Nút Bạn bè (Mở cửa sổ tạo phòng điều tra Deception)
+    document.getElementById('btn-deception-friends')?.addEventListener('click', () => {
+      try { soundManager.playCutePop(); } catch (_) {}
+      CaroModal.open('modal-deception-room');
+    });
+
+    // 5. Nút Xác nhận tạo phòng điều tra Deception trong Modal
+    document.getElementById('btn-confirm-create-deception')?.addEventListener('click', () => {
+      try { soundManager.playCutePop(); } catch (_) {}
+      CaroModal.close('modal-deception-room');
+      module.openLobby();
+      module.startNewCase();
+      const nameInput = document.getElementById('deception-player-name');
+      const detName = (nameInput && nameInput.value && nameInput.value.trim()) || 'Thám tử';
+      CaroModal.showToast(i18n.getText('deception_toast_room_created', { name: detName, caseId: module.state.caseId }));
+    });
+
+    // 6. Lắng nghe thay đổi ngôn ngữ hệ thống
     if (typeof window !== 'undefined') {
       window.addEventListener('caro:languageChanged', () => {
         const deceptionScreen = document.getElementById('screen-deception');
@@ -41,7 +58,7 @@ export class DeceptionUIBinder {
       });
     }
 
-    // 5. Render các thẻ dữ liệu ban đầu
+    // 7. Render các thẻ dữ liệu ban đầu
     this.renderSceneTiles();
     this.renderSuspectCards();
   }

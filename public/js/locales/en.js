@@ -354,5 +354,21 @@ export const en = {
   "reaction_plead": "Pleading",
   "reaction_sparkle": "Sparkles",
   "reaction_party": "Celebration",
-  "reaction_cake": "Cake"
+  "reaction_cake": "Cake",
+  "modal_deception_title": "Create Investigation Room with Friends",
+  "lbl_detective_name": "Your Detective Name:",
+  "placeholder_detective_name": "e.g. Detective Mori",
+  "lbl_player_count": "Player Count:",
+  "lbl_expansion_roles": "Expansion Roles:",
+  "opt_deception_4p": "4 Players (1 Forensic, 1 Murderer, 2 Investigators)",
+  "opt_deception_5p": "5 Players (Add Witness or Accomplice)",
+  "opt_deception_6p": "6 Players (Standard Group - Thrilling)",
+  "opt_deception_8p": "8 Players (Grand Investigation Party)",
+  "opt_deception_12p": "12 Players (Ultimate Party Size)",
+  "opt_deception_roles_std": "Standard (Forensic Scientist, Murderer & Investigators)",
+  "opt_deception_roles_exp": "Expanded (Adds Accomplice & Witness)",
+  "btn_create_deception_room": "Enter Investigation Room",
+  "deception_btn_friends": "Friends",
+  "deception_toast_room_created": "🔍 Detective {name} created room ({caseId})! Share case code with friends to investigate!",
+  "deception_toast_friends": "🔍 Open a Deception investigation room to play with 4-12 friends!"
 };
