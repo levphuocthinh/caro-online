@@ -4,6 +4,7 @@
  */
 import { CaroModal } from '../../modules/modal.js';
 import { caroOnline } from '../../modules/online.js';
+import { i18n } from '../../modules/i18n.js';
 
 export class CaroUIBinder {
   /**
@@ -67,7 +68,7 @@ export class CaroUIBinder {
       const code = joinCodeInput?.value.trim().toUpperCase() || '';
 
       if (!code) {
-        CaroModal.showToast('Vui lòng nhập mã phòng!');
+        CaroModal.showToast(i18n.getText('toast_enter_room_code'));
         return;
       }
 
@@ -85,13 +86,13 @@ export class CaroUIBinder {
     // 5. Nút Sao chép Link mời bạn
     const copyLink = () => {
       if (!caroOnline.roomId) {
-        CaroModal.showToast('Chỉ có thể chia sẻ khi chơi Online!');
+        CaroModal.showToast(i18n.getText('toast_online_only_share'));
         return;
       }
       const shareUrl = `${window.location.origin}/?room=${caroOnline.roomId}`;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(shareUrl).then(() => {
-          CaroModal.showToast('Đã copy link mời bạn! Hãy gửi qua Zalo/Messenger.');
+          CaroModal.showToast(i18n.getText('toast_link_copied'));
         }).catch(() => prompt('Sao chép link này:', shareUrl));
       } else {
         prompt('Sao chép link này:', shareUrl);

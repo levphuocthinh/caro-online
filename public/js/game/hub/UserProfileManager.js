@@ -133,7 +133,7 @@ export class UserProfileManager {
       const newName = (inputName?.value || '').trim();
 
       if (!newName) {
-        CaroModal.showToast('Vui lòng nhập tên của bạn!');
+        CaroModal.showToast(i18n.getText('toast_enter_name'));
         return;
       }
 

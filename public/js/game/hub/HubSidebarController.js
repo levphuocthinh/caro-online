@@ -10,6 +10,7 @@
 
 import { CaroModal } from '../../modules/modal.js';
 import { soundManager } from '../../modules/audio.js';
+import { i18n } from '../../modules/i18n.js';
 
 export class HubSidebarController {
   static init(controller, manager) {
@@ -76,13 +77,13 @@ export class HubSidebarController {
           document.getElementById('btn-sound-toggle')?.click();
         } else if (action === 'achievements') {
           soundManager.playCuteChime();
-          CaroModal.showToast(`🏆 Hệ thống Thành tựu của ${currentItem?.coverTitle || 'Game'} đã ghi nhận tiến độ của bạn!`);
+          CaroModal.showToast(i18n.getText('toast_achievements', { game: currentItem?.coverTitle || 'Game' }));
         } else if (action === 'news') {
           document.querySelector('.hub-news-section')?.scrollIntoView({ behavior: 'smooth' });
         } else if (action === 'recent-posts') {
-          CaroModal.showToast(`📰 ${currentItem?.coverTitle || 'Game'}: Cập nhật bài viết mới nhất đã sẵn sàng!`);
+          CaroModal.showToast(i18n.getText('toast_recent_posts', { game: currentItem?.coverTitle || 'Game' }));
         } else if (action === 'addons') {
-          CaroModal.showToast(`🎁 DLC & Gói mở rộng (Add-Ons) sẽ có mặt trong phiên bản sắp tới!`);
+          CaroModal.showToast(i18n.getText('toast_addons'));
         }
       });
     });

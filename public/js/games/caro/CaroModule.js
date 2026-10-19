@@ -102,7 +102,7 @@ export class CaroModule extends BaseGameModule {
   handleRematch() {
     if (this.state.gameMode === 'online') {
       caroOnline.requestRematch();
-      CaroModal.showToast('Đã gửi yêu cầu ván mới. Đang chờ đối thủ đồng ý...');
+      CaroModal.showToast(i18n.getText('toast_rematch_requested'));
     } else if (this.state.gameMode === 'ai') {
       const nextSymbol = this.state.mySymbol === 'X' ? 'O' : 'X';
       this.aiGame.start(this.aiGame.aiEngine.difficulty, nextSymbol, caroBoard.size);

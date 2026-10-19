@@ -1,8 +1,10 @@
 /**
  * DeceptionUIBinder: Điều khiển giao diện và tương tác DOM của game Deception
+ * Hỗ trợ đa ngôn ngữ đồng bộ 100% qua i18n
  */
 import { CaroModal } from '../../modules/modal.js';
 import { soundManager } from '../../modules/audio.js';
+import { i18n } from '../../modules/i18n.js';
 import { VIETNAM_CRIME_DATABASE } from './DeceptionState.js';
 
 export class DeceptionUIBinder {
@@ -25,29 +27,56 @@ export class DeceptionUIBinder {
     // 3. Nút Xem luật chơi
     document.getElementById('btn-deception-rules')?.addEventListener('click', () => {
       try { soundManager.playCuteChime(); } catch (_) {}
-      CaroModal.showToast('🔍 Luật chơi Deception: Giám định viên đặt dấu ấn trên Bảng Hiện Trường để chỉ dẫn. Các Điều tra viên thảo luận tìm ra đúng 1 Hung Khí & 1 Manh Mối của Hung Thủ!');
+      CaroModal.showToast(i18n.getText('deception_toast_rules'));
     });
 
-    // 4. Render các thẻ dữ liệu ban đầu
+    // 4. Lắng nghe thay đổi ngôn ngữ hệ thống
+    if (typeof window !== 'undefined') {
+      window.addEventListener('caro:languageChanged', () => {
+        const deceptionScreen = document.getElementById('screen-deception');
+        if (deceptionScreen && deceptionScreen.classList.contains('active')) {
+          this.renderSceneTiles();
+          this.renderSuspectCards();
+        }
+      });
+    }
+
+    // 5. Render các thẻ dữ liệu ban đầu
     this.renderSceneTiles();
     this.renderSuspectCards();
   }
 
+  static getTileTitle(tile) {
+    if (tile.id === 'location') return i18n.getText('deception_scene_location');
+    if (tile.id === 'cause_of_death') return i18n.getText('deception_scene_cause');
+    if (tile.id === 'crime_scene_state') return i18n.getText('deception_scene_state');
+    if (tile.id === 'victim_state') return i18n.getText('deception_scene_victim');
+    return tile.title;
+  }
+
+  static getTileOptionText(tile, optIdx) {
+    if (tile.id === 'location') return i18n.getText(`deception_loc_${optIdx + 1}`);
+    if (tile.id === 'cause_of_death') return i18n.getText(`deception_cause_${optIdx + 1}`);
+    if (tile.id === 'crime_scene_state') return i18n.getText(`deception_state_${optIdx + 1}`);
+    if (tile.id === 'victim_state') return i18n.getText(`deception_victim_${optIdx + 1}`);
+    return tile.options[optIdx] || '';
+  }
+
   static renderSceneTiles() {
     const container = document.getElementById('deception-scene-tiles');
-    if (!container) return;
+    if (!container || !this.state) return;
 
     container.innerHTML = this.state.sceneTiles.map((tile, tIdx) => `
       <div class="deception-scene-card ${tile.isFixed ? 'tile-fixed' : ''}" data-tile-index="${tIdx}">
         <div class="scene-tile-header">
-          <span class="scene-tile-badge">${tile.isFixed ? '★ CỐ ĐỊNH' : 'ĐỊA ĐIỂM / TÌNH TIẾT'}</span>
-          <h4 class="scene-tile-title">${tile.title}</h4>
+          <span class="scene-tile-badge">${tile.isFixed ? i18n.getText('deception_tile_fixed') : i18n.getText('deception_tile_event')}</span>
+          <h4 class="scene-tile-title">${this.getTileTitle(tile)}</h4>
         </div>
         <div class="scene-tile-options">
           ${tile.options.map((opt, optIdx) => `
             <button class="scene-opt-btn ${tile.selected === optIdx ? 'is-marked' : ''}" type="button" data-tile-idx="${tIdx}" data-opt-idx="${optIdx}">
               <span class="opt-bullet">${tile.selected === optIdx ? '🎯' : '•'}</span>
-              <span class="opt-text">${opt}</span>
+              <span class="opt-text">${this.getTileOptionText(tile, optIdx)}</span>
             </button>
           `).join('')}
         </div>
@@ -70,12 +99,12 @@ export class DeceptionUIBinder {
     const container = document.getElementById('deception-suspects-grid');
     if (!container) return;
 
-    // Giả lập 4 nghi phạm mẫu quanh bàn phá án
+    // Giả lập 4 nghi phạm mẫu quanh bàn phá án được quốc tế hóa
     const suspects = [
-      { id: 'p1', name: 'Nghi phạm A (Bác sĩ)', ava: '👨‍⚕️', means: VIETNAM_CRIME_DATABASE.means.slice(0, 2), clues: VIETNAM_CRIME_DATABASE.clues.slice(0, 2) },
-      { id: 'p2', name: 'Nghi phạm B (Tài xế)', ava: '🧑‍✈️', means: VIETNAM_CRIME_DATABASE.means.slice(2, 4), clues: VIETNAM_CRIME_DATABASE.clues.slice(2, 4) },
-      { id: 'p3', name: 'Nghi phạm C (Chủ quán)', ava: '👨‍🍳', means: VIETNAM_CRIME_DATABASE.means.slice(4, 6), clues: VIETNAM_CRIME_DATABASE.clues.slice(4, 6) },
-      { id: 'p4', name: 'Nghi phạm D (Nhân viên)', ava: '👩‍💼', means: VIETNAM_CRIME_DATABASE.means.slice(6, 8), clues: VIETNAM_CRIME_DATABASE.clues.slice(6, 8) }
+      { id: 'p1', name: i18n.getText('deception_suspect_1'), ava: '👨‍⚕️', means: VIETNAM_CRIME_DATABASE.means.slice(0, 2), clues: VIETNAM_CRIME_DATABASE.clues.slice(0, 2) },
+      { id: 'p2', name: i18n.getText('deception_suspect_2'), ava: '🧑‍✈️', means: VIETNAM_CRIME_DATABASE.means.slice(2, 4), clues: VIETNAM_CRIME_DATABASE.clues.slice(2, 4) },
+      { id: 'p3', name: i18n.getText('deception_suspect_3'), ava: '👨‍🍳', means: VIETNAM_CRIME_DATABASE.means.slice(4, 6), clues: VIETNAM_CRIME_DATABASE.clues.slice(4, 6) },
+      { id: 'p4', name: i18n.getText('deception_suspect_4'), ava: '👩‍💼', means: VIETNAM_CRIME_DATABASE.means.slice(6, 8), clues: VIETNAM_CRIME_DATABASE.clues.slice(6, 8) }
     ];
 
     container.innerHTML = suspects.map(s => `
@@ -86,20 +115,20 @@ export class DeceptionUIBinder {
         </div>
         <div class="suspect-assets">
           <div class="asset-group means-group">
-            <span class="asset-label"><i class="fa-solid fa-skull"></i> Hung khí</span>
+            <span class="asset-label"><i class="fa-solid fa-skull"></i> ${i18n.getText('deception_means_label')}</span>
             <div class="asset-chips">
               ${s.means.map(m => `<span class="chip chip-means" title="${m.type}">${m.icon} ${m.name}</span>`).join('')}
             </div>
           </div>
           <div class="asset-group clues-group">
-            <span class="asset-label"><i class="fa-solid fa-fingerprint"></i> Manh mối</span>
+            <span class="asset-label"><i class="fa-solid fa-fingerprint"></i> ${i18n.getText('deception_clues_label')}</span>
             <div class="asset-chips">
               ${s.clues.map(c => `<span class="chip chip-clue" title="${c.type}">${c.icon} ${c.name}</span>`).join('')}
             </div>
           </div>
         </div>
         <button class="btn-accuse-suspect" type="button" data-suspect="${s.id}">
-          <i class="fa-solid fa-gavel"></i> Buộc Tội Phá Án
+          <i class="fa-solid fa-gavel"></i> ${i18n.getText('deception_btn_accuse')}
         </button>
       </div>
     `).join('');
@@ -107,7 +136,7 @@ export class DeceptionUIBinder {
     container.querySelectorAll('.btn-accuse-suspect').forEach(btn => {
       btn.addEventListener('click', () => {
         try { soundManager.playCuteChime(); } catch (_) {}
-        CaroModal.showToast('🚨 Bạn đã đưa ra lời buộc tội! Giám định viên lắc đầu: Chưa trùng khớp hoàn toàn hung khí và manh mối.');
+        CaroModal.showToast(i18n.getText('deception_toast_accuse'));
       });
     });
   }

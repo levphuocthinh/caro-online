@@ -110,7 +110,7 @@ export class GameManager {
         joinNameInput.value = 'Kỳ thủ ' + Math.floor(Math.random() * 899 + 100);
       }
       CaroModal.open('modal-join-room');
-      CaroModal.showToast(`Đã nhận link phòng ${roomFromUrl.toUpperCase()}! Bấm "Vào Phòng Ngay" để chơi.`);
+      CaroModal.showToast(i18n.getText('toast_received_room_link', { roomId: roomFromUrl.toUpperCase() }));
     }
   }
 

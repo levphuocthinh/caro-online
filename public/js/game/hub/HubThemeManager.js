@@ -5,6 +5,7 @@
 
 import { CaroModal } from '../../modules/modal.js';
 import { soundManager } from '../../modules/audio.js';
+import { i18n } from '../../modules/i18n.js';
 
 export class HubThemeManager {
   static STORAGE_KEY = 'lycn_theme';
@@ -48,7 +49,7 @@ export class HubThemeManager {
     const current = document.documentElement.getAttribute('data-theme') || 'light';
     const nextTheme = current === 'dark' ? 'light' : 'dark';
     this.applyTheme(nextTheme);
-    CaroModal.showToast(nextTheme === 'dark' ? '🌙 Đã chuyển sang Giao diện Tối' : '☀️ Đã chuyển sang Giao diện Sáng');
+    CaroModal.showToast(nextTheme === 'dark' ? i18n.getText('toast_theme_dark') : i18n.getText('toast_theme_light'));
     return nextTheme;
   }
 

@@ -31,7 +31,7 @@ export class UIBinder {
       btnSoundToggle.addEventListener('click', () => {
         const isMuted = soundManager.toggleMute();
         btnSoundToggle.innerHTML = isMuted ? '<i class="fa-solid fa-volume-xmark"></i>' : '<i class="fa-solid fa-volume-high"></i>';
-        CaroModal.showToast(isMuted ? 'Đã tắt âm thanh' : 'Đã bật âm thanh');
+        CaroModal.showToast(isMuted ? i18n.getText('toast_sound_muted') : i18n.getText('toast_sound_unmuted'));
       });
     }
 

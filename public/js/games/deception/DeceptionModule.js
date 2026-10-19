@@ -8,6 +8,8 @@ import { DeceptionUIBinder } from './DeceptionUIBinder.js';
 import { CaroModal } from '../../modules/modal.js';
 import { soundManager } from '../../modules/audio.js';
 
+import { i18n } from '../../modules/i18n.js';
+
 export class DeceptionModule extends BaseGameModule {
   constructor(platform = null) {
     super({
@@ -57,7 +59,7 @@ export class DeceptionModule extends BaseGameModule {
   startNewCase() {
     this.state.reset();
     DeceptionUIBinder.renderSceneTiles();
-    CaroModal.showToast(`📁 Đã tạo hồ sơ vụ án mới (${this.state.caseId}). Giám định viên đã sẵn sàng ghi nhận hiện trường!`);
+    CaroModal.showToast(i18n.getText('deception_toast_new_case', { caseId: this.state.caseId }));
   }
 
   /**

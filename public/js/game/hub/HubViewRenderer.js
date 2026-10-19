@@ -379,13 +379,13 @@ export class HubViewRenderer {
           document.getElementById('btn-sound-toggle')?.click();
         } else if (action === 'achievements') {
           soundManager.playCuteChime();
-          CaroModal.showToast(`🏆 Hệ thống Thành tựu của ${currentItem?.coverTitle || 'Game'} đã ghi nhận tiến độ của bạn!`);
+          CaroModal.showToast(i18n.getText('toast_achievements', { game: currentItem?.coverTitle || 'Game' }));
         } else if (action === 'news') {
           document.querySelector('.hub-news-section')?.scrollIntoView({ behavior: 'smooth' });
         } else if (action === 'recent-posts') {
-          CaroModal.showToast(`📰 ${currentItem?.coverTitle || 'Game'}: Cập nhật bài viết mới nhất đã sẵn sàng!`);
+          CaroModal.showToast(i18n.getText('toast_recent_posts', { game: currentItem?.coverTitle || 'Game' }));
         } else if (action === 'addons') {
-          CaroModal.showToast(`🎁 DLC & Gói mở rộng (Add-Ons) sẽ có mặt trong phiên bản sắp tới!`);
+          CaroModal.showToast(i18n.getText('toast_addons'));
         }
       });
     });
@@ -405,7 +405,7 @@ export class HubViewRenderer {
           controller.applyFilter(action);
         } else if (action === 'trophy') {
           try { soundManager.playCuteChime(); } catch (_) {}
-          CaroModal.showToast('🏆 Bạn đã mở khóa 18 Huy chương Đồng, 12 Bạc và 3 Vàng trên Cổng Game!');
+          CaroModal.showToast(i18n.getText('toast_trophy'));
         } else if (action === 'guide') {
           try { soundManager.playCuteChime(); } catch (_) {}
           CaroModal.open('modal-help');
@@ -438,7 +438,7 @@ export class HubViewRenderer {
           CaroModal.open('modal-help');
         } else if (bType === 'trophy') {
           try { soundManager.playCuteChime(); } catch (_) {}
-          CaroModal.showToast('🏆 Bạn đã mở khóa 18 Huy chương Đồng, 12 Bạc và 3 Vàng trên Cổng Game!');
+          CaroModal.showToast(i18n.getText('toast_trophy'));
         }
       });
     });

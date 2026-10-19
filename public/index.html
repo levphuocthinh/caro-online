@@ -64,7 +64,7 @@
           <span class="logo-icon logo-icon-caro"><i class="fa-solid fa-paw"></i></span>
           <div class="logo-titles">
             <span class="logo-title logo-title-caro">Caro Online</span>
-            <span class="logo-subtitle logo-subtitle-caro">Bé Miu &amp; Bé Thỏ</span>
+            <span class="logo-subtitle logo-subtitle-caro" data-i18n="logo_subtitle_caro">Bé Miu &amp; Bé Thỏ</span>
           </div>
         </div>
       </div>
@@ -145,7 +145,7 @@
   <aside class="hub-sidebar-drawer" id="hub-sidebar-drawer" aria-label="Menu trò chơi">
     <div class="hub-sidebar-header">
       <div class="sidebar-user-profile" id="sidebar-user-profile">
-        <div class="sidebar-user-avatar-wrap" id="btn-edit-avatar-trigger" title="Nhấn để đổi Avatar & Tên">
+        <div class="sidebar-user-avatar-wrap" id="btn-edit-avatar-trigger" title="Nhấn để đổi Avatar & Tên" data-i18n-title="tip_change_profile">
           <div class="sidebar-user-avatar" id="sidebar-user-avatar">🐱</div>
           <span class="user-status-dot" title="Online"></span>
         </div>
@@ -518,7 +518,7 @@
         </div>
         <div class="board-status-banner" id="game-status-banner">
           <span id="banner-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
-          <span id="banner-text">Lượt của Bé Mèo (X) đi trước nè</span>
+          <span id="banner-text" data-i18n="banner_initial">Lượt của Bé Mèo (X) đi trước nè</span>
         </div>
 
         <div class="board-container" id="board-container">
@@ -556,7 +556,7 @@
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-comments" style="color: #ff3366;"></i>
             <span data-i18n="chat_title">Tám Chuyện & Tương Tác</span>
-            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);" id="room-code-tag">Phòng: ----</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);" id="room-code-tag"><span data-i18n="room_code_prefix">Phòng</span>: ----</span>
             <span class="spectator-counter" id="spectator-counter" style="display: none;" title="Số khán giả đang theo dõi">
               <i class="fa-solid fa-eye"></i> <span id="spectator-count-val">0</span>
             </span>
@@ -567,16 +567,16 @@
           <div class="chat-bubble system" data-i18n="chat_welcome">Chào mừng bạn vào ván cờ! Hãy gửi lời chào dễ thương tới đối thủ nhé!</div>
         </div>
         <div class="reaction-bar">
-          <button class="btn-reaction" data-emoji="💖" title="Yêu thích">💖</button>
-          <button class="btn-reaction" data-emoji="🌸" title="Bông hoa">🌸</button>
-          <button class="btn-reaction" data-emoji="🐾" title="Dấu chân">🐾</button>
-          <button class="btn-reaction" data-emoji="🐱" title="Bé mèo">🐱</button>
-          <button class="btn-reaction" data-emoji="🐰" title="Bé thỏ">🐰</button>
-          <button class="btn-reaction" data-emoji="🍓" title="Dâu tây">🍓</button>
-          <button class="btn-reaction" data-emoji="🥺" title="Cầu xin">🥺</button>
-          <button class="btn-reaction" data-emoji="✨" title="Lấp lánh">✨</button>
-          <button class="btn-reaction" data-emoji="🎉" title="Ăn mừng">🎉</button>
-          <button class="btn-reaction" data-emoji="🍰" title="Bánh ngọt">🍰</button>
+          <button class="btn-reaction" data-emoji="💖" title="Yêu thích" data-i18n-title="reaction_love">💖</button>
+          <button class="btn-reaction" data-emoji="🌸" title="Bông hoa" data-i18n-title="reaction_flower">🌸</button>
+          <button class="btn-reaction" data-emoji="🐾" title="Dấu chân" data-i18n-title="reaction_paw">🐾</button>
+          <button class="btn-reaction" data-emoji="🐱" title="Bé mèo" data-i18n-title="reaction_cat">🐱</button>
+          <button class="btn-reaction" data-emoji="🐰" title="Bé thỏ" data-i18n-title="reaction_rabbit">🐰</button>
+          <button class="btn-reaction" data-emoji="🍓" title="Dâu tây" data-i18n-title="reaction_strawberry">🍓</button>
+          <button class="btn-reaction" data-emoji="🥺" title="Cầu xin" data-i18n-title="reaction_plead">🥺</button>
+          <button class="btn-reaction" data-emoji="✨" title="Lấp lánh" data-i18n-title="reaction_sparkle">✨</button>
+          <button class="btn-reaction" data-emoji="🎉" title="Ăn mừng" data-i18n-title="reaction_party">🎉</button>
+          <button class="btn-reaction" data-emoji="🍰" title="Bánh ngọt" data-i18n-title="reaction_cake">🍰</button>
         </div>
         <div class="chat-input-area">
           <input type="text" id="chat-input" class="chat-input" placeholder="Nhắn gì đó cute đi..." data-i18n-placeholder="chat_placeholder" maxlength="150" autocomplete="off">
@@ -596,19 +596,19 @@
         <div class="deception-brand-col">
           <div class="deception-badge-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
           <div>
-            <h1 class="deception-title">Deception: Murder in Viet Nam <span class="deception-tag">BOARD GAME</span></h1>
-            <span class="deception-sub" style="font-size: 13px; color: #a4b0be;">Trò chơi ẩn vai trò, suy luận và phá án bí ẩn</span>
+            <h1 class="deception-title">Deception: Murder in Viet Nam <span class="deception-tag" data-i18n="tag_boardgame">BOARD GAME</span></h1>
+            <span class="deception-sub" style="font-size: 13px; color: #a4b0be;" data-i18n="deception_subtitle">Trò chơi ẩn vai trò, suy luận và phá án bí ẩn</span>
           </div>
         </div>
         <div class="deception-top-actions">
           <button class="btn-deception-action" id="btn-deception-rules" type="button">
-            <i class="fa-solid fa-book-open"></i> Luật chơi
+            <i class="fa-solid fa-book-open"></i> <span data-i18n="deception_btn_rules">Luật chơi</span>
           </button>
           <button class="btn-deception-action btn-deception-primary" id="btn-deception-new-case" type="button">
-            <i class="fa-solid fa-rotate-right"></i> Vụ án mới
+            <i class="fa-solid fa-rotate-right"></i> <span data-i18n="deception_btn_new_case">Vụ án mới</span>
           </button>
           <button class="btn-deception-action" id="btn-deception-back-hub" type="button">
-            <i class="fa-solid fa-arrow-left"></i> Về Cổng Game
+            <i class="fa-solid fa-arrow-left"></i> <span data-i18n="deception_btn_back_hub">Về Cổng Game</span>
           </button>
         </div>
       </header>
@@ -616,9 +616,9 @@
       <!-- Section: Bảng Hiện Trường Giám Định Pháp Y -->
       <section class="deception-section">
         <h3 class="deception-section-heading">
-          <i class="fa-solid fa-clipboard-list" style="color: #ff4757;"></i> Bảng Hiện Trường Giám Định Pháp Y (Scene Tiles)
+          <i class="fa-solid fa-clipboard-list" style="color: #ff4757;"></i> <span data-i18n="deception_scene_tiles_heading">Bảng Hiện Trường Giám Định Pháp Y (Scene Tiles)</span>
         </h3>
-        <p style="font-size: 13.5px; color: #a4b0be; margin: 0 0 12px 0;">
+        <p style="font-size: 13.5px; color: #a4b0be; margin: 0 0 12px 0;" data-i18n="deception_scene_tiles_desc">
           Giám định viên pháp y đặt dấu ấn 🎯 vào các manh mối để chỉ dẫn các điều tra viên.
         </p>
         <div class="deception-scene-tiles" id="deception-scene-tiles">
@@ -629,9 +629,9 @@
       <!-- Section: Bàn Nghi Phạm & Hung Khí / Manh Mối -->
       <section class="deception-section">
         <h3 class="deception-section-heading">
-          <i class="fa-solid fa-users-viewfinder" style="color: #70a1ff;"></i> Bàn Nghi Phạm & Danh Mục Vật Chứng
+          <i class="fa-solid fa-users-viewfinder" style="color: #70a1ff;"></i> <span data-i18n="deception_suspects_heading">Bàn Nghi Phạm & Danh Mục Vật Chứng</span>
         </h3>
-        <p style="font-size: 13.5px; color: #a4b0be; margin: 0 0 12px 0;">
+        <p style="font-size: 13.5px; color: #a4b0be; margin: 0 0 12px 0;" data-i18n="deception_suspects_desc">
           Mỗi người chơi giữ 2 Hung Khí (đỏ) và 2 Manh Mối (xanh). Hãy thảo luận để tìm ra tổ hợp chính xác của Hung Thủ!
         </p>
         <div class="deception-suspects-grid" id="deception-suspects-grid">
