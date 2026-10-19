@@ -188,12 +188,21 @@
   z-index: 10 !important;
 }
 
-/* Nút Playing chỉ hiện khi hover chuột vào thẻ game */
-.hub-home-card:hover .hub-playing-pill {
+/* Nút Playing chỉ hiện khi hover chuột vào thẻ game PLAYABLE */
+.hub-home-card.is-playable:hover .hub-playing-pill {
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
   transform: translateX(-50%) translateY(0) scale(1) !important;
+}
+
+.hub-home-card.is-playable:hover .tile-bottom-strip {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.hub-home-card.is-unplayable .hub-playing-pill {
+  display: none !important;
 }
 
 /* ===================================================
@@ -350,12 +359,23 @@
 
 /* Hỗ trợ thiết bị cảm ứng điện thoại / tablet không có hover chuột */
 @media (hover: none) {
-  .hub-home-card.selected .hub-playing-pill,
-  .hub-tower-card .hub-playing-pill {
+  .hub-home-card.is-playable.selected .hub-playing-pill,
+  .hub-tower-card.is-playable .hub-playing-pill {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
     transform: translateX(-50%) translateY(0) scale(1) !important;
+  }
+
+  .hub-home-card.is-playable.selected .tile-bottom-strip,
+  .hub-tower-card.is-playable .tile-bottom-strip {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  .hub-home-card.is-unplayable .hub-playing-pill,
+  .hub-tower-card.is-unplayable .hub-playing-pill {
+    display: none !important;
   }
 }
 

@@ -51,10 +51,10 @@
 
   .hub-tower-card {
     width: 100% !important;
-    height: auto !important;
+    height: min(88vw, 280px) !important;
+    min-height: min(88vw, 280px) !important;
+    max-height: min(88vw, 280px) !important;
     aspect-ratio: 1 / 1 !important;
-    min-height: unset !important;
-    max-height: unset !important;
     border-radius: 17px 17px 0 0 !important;
   }
 
@@ -128,21 +128,34 @@
 
   .hub-tower-card {
     width: 100% !important;
-    height: auto !important;
+    height: min(84vw, 250px) !important;
+    min-height: min(84vw, 250px) !important;
+    max-height: min(84vw, 250px) !important;
     aspect-ratio: 1 / 1 !important;
-    min-height: unset !important;
-    max-height: unset !important;
   }
 
-  /* Nút Playing Pill trên màn hình cảm ứng luôn hiện rõ ở chân thẻ để chạm vào chơi ngay */
-  .hub-tower-card .hub-playing-pill,
-  .hub-home-card.selected .hub-playing-pill {
+  /* Nút Playing Pill trên màn hình cảm ứng: Chỉ hiển thị trên thẻ PLAYABLE (như Caro) */
+  .hub-tower-card.is-playable .hub-playing-pill,
+  .hub-home-card.is-playable.selected .hub-playing-pill {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
     transform: translateX(-50%) translateY(0) scale(1) !important;
     bottom: 10px !important;
     padding: 5px 16px 5px 6px !important;
+  }
+
+  /* Ẩn dải strip dưới đáy trên thẻ playable khi pill đang hiển thị để tránh đè chữ */
+  .hub-tower-card.is-playable .tile-bottom-strip,
+  .hub-home-card.is-playable.selected .tile-bottom-strip {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Thẻ unplayable (Sắp ra mắt) tuyệt đối không hiện nút Playing để không che tên game */
+  .hub-tower-card.is-unplayable .hub-playing-pill,
+  .hub-home-card.is-unplayable .hub-playing-pill {
+    display: none !important;
   }
 
   /* Nút Close bar dính liền dưới Card */

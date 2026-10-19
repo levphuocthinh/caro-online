@@ -205,6 +205,9 @@ export class HubController {
     towerCard.dataset.gameId = this.selectedGameId;
     towerCard.classList.toggle('has-cover-image', !!info.hasCoverImage);
     towerCard.dataset.hasCover = info.hasCoverImage ? 'true' : 'false';
+    towerCard.classList.toggle('is-playable', !!info.playable);
+    towerCard.classList.toggle('is-unplayable', !info.playable);
+    towerCard.dataset.playable = info.playable ? 'true' : 'false';
 
     const towerLogo = document.getElementById('hub-tower-logo');
     if (towerLogo) {
@@ -235,11 +238,19 @@ export class HubController {
     const towerStrip = document.getElementById('hub-tower-strip');
     if (towerStrip) towerStrip.textContent = info.stripText;
 
-    const pillAva = document.getElementById('hub-pill-ava');
-    if (pillAva) pillAva.textContent = info.pillAva || '🐱';
+    const playPill = document.getElementById('btn-hub-play-pill');
+    if (playPill) {
+      if (info.playable) {
+        playPill.style.display = 'inline-flex';
+        const pillAva = document.getElementById('hub-pill-ava');
+        if (pillAva) pillAva.textContent = info.pillAva || '🐱';
 
-    const pillLabel = document.getElementById('hub-pill-label');
-    if (pillLabel) pillLabel.textContent = info.playable ? i18n.getText('pill_playing') : i18n.getText('coming_badge');
+        const pillLabel = document.getElementById('hub-pill-label');
+        if (pillLabel) pillLabel.textContent = i18n.getText('pill_playing') || 'Playing';
+      } else {
+        playPill.style.display = 'none';
+      }
+    }
   }
 
   static renderOtherGamesRow(filteredIds, activeIdx, slideDir) {
@@ -365,7 +376,7 @@ export class HubController {
       const item = catalog[gId];
       const isSel = gId === this.selectedGameId;
       return `
-        <div class="hub-home-card ${item.artClass} ${isSel ? 'selected' : ''} ${item.hasCoverImage ? 'has-cover-image' : ''}" data-game-id="${gId}" data-has-cover="${item.hasCoverImage ? 'true' : 'false'}" title="${item.coverTitle}">
+        <div class="hub-home-card ${item.artClass} ${isSel ? 'selected' : ''} ${item.hasCoverImage ? 'has-cover-image' : ''} ${item.playable ? 'is-playable' : 'is-unplayable'}" data-game-id="${gId}" data-has-cover="${item.hasCoverImage ? 'true' : 'false'}" data-playable="${item.playable ? 'true' : 'false'}" title="${item.coverTitle}">
           <div class="tile-art-bg ${item.artClass}"></div>
           <span class="tile-top-tag ${item.playable ? 'tag-ready' : ''}">${item.badge}</span>
           ${!item.hasCoverImage ? `
@@ -375,10 +386,12 @@ export class HubController {
             </div>
           ` : ''}
           <div class="tile-bottom-strip">${item.stripText}</div>
-          <button class="hub-playing-pill" type="button" title="${item.playable ? 'Bắt đầu chơi game' : 'Sắp ra mắt'}" data-game-id="${gId}">
-            <span class="hub-pill-avatar">${item.pillAva || '🐱'}</span>
-            <span class="hub-pill-text">${item.playable ? (i18n.getText('pill_playing') || 'Playing') : (i18n.getText('coming_badge') || 'Sắp ra mắt')}</span>
-          </button>
+          ${item.playable ? `
+            <button class="hub-playing-pill" type="button" title="${i18n.getText('tip_start_game') || 'Bắt đầu chơi game'}" data-game-id="${gId}">
+              <span class="hub-pill-avatar">${item.pillAva || '🐱'}</span>
+              <span class="hub-pill-text">${i18n.getText('pill_playing') || 'Playing'}</span>
+            </button>
+          ` : ''}
         </div>
       `;
     }).join('');

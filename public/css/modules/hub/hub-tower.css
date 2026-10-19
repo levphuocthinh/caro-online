@@ -131,12 +131,23 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 40%, transparent 65%);
 }
 
-/* Nút Playing chỉ hiện khi hover chuột vào thẻ game */
-.hub-tower-card:hover .hub-playing-pill {
+/* Nút Playing chỉ hiện khi hover chuột vào thẻ game PLAYABLE */
+.hub-tower-card.is-playable:hover .hub-playing-pill {
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
   transform: translateX(-50%) translateY(0) scale(1) !important;
+}
+
+/* Khi hover vào thẻ playable có nút playing, làm mờ dải strip dưới đáy để không bị đè chữ */
+.hub-tower-card.is-playable:hover .tile-bottom-strip {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Thẻ unplayable (Sắp ra mắt) tuyệt đối không hiện nút Playing để không che tên game */
+.hub-tower-card.is-unplayable .hub-playing-pill {
+  display: none !important;
 }
 
 /* Ẩn logo và tên ở giữa cho bất kỳ game nào có hình ảnh bìa */
