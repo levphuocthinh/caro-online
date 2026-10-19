@@ -1,0 +1,641 @@
+.hub-other-games-section {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.hub-other-games-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 18px !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  padding: 2px 4px 14px 4px !important;
+  margin: 0 !important;
+  scroll-behavior: smooth !important;
+  box-sizing: border-box !important;
+}
+
+.hub-other-games-row::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Hiệu ứng đẩy mượt sang trái / phải khi chọn hoặc lướt ngang qua các game ở Dropdown Center */
+.anim-push-left {
+  animation: hubPushLeft 0.34s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.anim-push-right {
+  animation: hubPushRight 0.34s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes hubPushLeft {
+  0% {
+    transform: translateX(68px);
+    opacity: 0.72;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes hubPushRight {
+  0% {
+    transform: translateX(-68px);
+    opacity: 0.72;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Thẻ các game khác trong Detail View - Phóng to 220px x 220px */
+.hub-other-games-row .hub-game-tile {
+  flex: 0 0 220px !important;
+  width: 220px !important;
+  height: 220px !important;
+  min-width: 220px !important;
+  min-height: 220px !important;
+  max-width: 220px !important;
+  max-height: 220px !important;
+  flex-shrink: 0 !important;
+  border-radius: 18px !important;
+  background: #232733 !important;
+  border: 3.5px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  transition: all 0.26s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  user-select: none !important;
+  opacity: 0.94 !important;
+  filter: brightness(0.98) !important;
+  box-sizing: border-box !important;
+}
+
+.hub-other-games-row .hub-game-tile:hover {
+  opacity: 1 !important;
+  filter: brightness(1.05) !important;
+  transform: translateY(-6px) scale(1.03) !important;
+  border-color: #00e5ff !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25), 0 0 20px rgba(0, 229, 255, 0.5) !important;
+}
+
+/* CỘT CHI TIẾT GAME BÊN PHẢI */
+.hub-dropdown-details-col {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  padding-top: 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* ===================================================
+   2. KHUNG TRANG CHỦ / TOÀN CẢNH (HOME VIEW - MẪU 1: media_1792258800495_24267be0.png)
+   THẺ PHÓNG TO 240px, DOCK 6 NÚT TRÒN ĐẶC TRƯNG CỦA NINTENDO
+   =================================================== */
+.hub-home-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 36px;
+  padding: 16px 0 36px 0;
+  box-sizing: border-box;
+}
+
+.hub-home-carousel {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 24px !important;
+  width: 100% !important;
+  overflow-x: auto !important;
+  padding: 24px 14px 32px 14px !important;
+  margin: 0 !important;
+  scroll-behavior: smooth !important;
+  box-sizing: border-box !important;
+}
+
+.hub-home-carousel::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Thẻ game ở Home View - Phóng to 240px x 240px */
+.hub-home-card {
+  flex: 0 0 240px !important;
+  width: 240px !important;
+  height: 240px !important;
+  min-width: 240px !important;
+  min-height: 240px !important;
+  max-width: 240px !important;
+  max-height: 240px !important;
+  flex-shrink: 0 !important;
+  border-radius: 20px !important;
+  background: #232733 !important;
+  border: 4px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+}
+
+.hub-home-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 35%, transparent 60%);
+  border-radius: inherit;
+}
+
+.hub-home-card:hover {
+  transform: translateY(-8px) scale(1.04) !important;
+  border-color: #00e5ff !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25), 0 0 24px rgba(0, 229, 255, 0.6) !important;
+}
+
+.hub-home-card.selected {
+  transform: translateY(-10px) scale(1.06) !important;
+  border: 4px solid #ffffff !important;
+  outline: 3.5px solid #00e5ff !important;
+  outline-offset: -1px !important;
+  box-shadow: 0 0 0 4px #00e5ff, 0 0 34px rgba(0, 229, 255, 0.85), 0 22px 46px rgba(0, 0, 0, 0.35) !important;
+  z-index: 10 !important;
+}
+
+.hub-home-card.selected .hub-playing-pill {
+  display: inline-flex !important;
+}
+
+/* ===================================================
+   DOCK NÚT SQUIRCLE ĐIỀU KHIỂN Ở ĐÁY (HOME VIEW - MẪU 1)
+   THAY THẾ ICON TRÒN CŨ BẰNG ICON SQUIRCLE RỰC RỠ NHƯ MẪU 1
+   CÙNG HIỆU ỨNG ANIMATION BAY XUỐNG / LÊN MƯỢT MÀ
+   =================================================== */
+.hub-console-dock {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  width: 100% !important;
+  margin-top: 14px !important;
+  padding: 10px 0 28px 0 !important;
+  box-sizing: border-box;
+}
+
+.hub-console-dock.anim-dock-in {
+  animation: dockDropInFromTop 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.hub-console-dock.anim-dock-out {
+  animation: dockSlideUpOut 0.35s ease forwards;
+}
+
+.hub-console-dock .hub-dock-btn {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+  border-radius: 16px !important;
+  font-size: 22px !important;
+  cursor: pointer !important;
+}
+
+.hub-console-dock .hub-dock-btn::before {
+  border-top-left-radius: 14px !important;
+  border-top-right-radius: 14px !important;
+}
+
+/* Các Animation Bay Xuống (Descend) & Bay Lên (Ascend) giữa Header và Dock */
+.hub-header-bubbles {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
+}
+
+.hub-header-bubbles.in-home-mode {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transform: translateY(20px) scale(0.9) !important;
+}
+
+.hub-header-bubbles.anim-descend {
+  animation: flyDownFromHeader 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.hub-header-bubbles.anim-ascend {
+  animation: flyUpToHeader 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes flyDownFromHeader {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    visibility: visible;
+  }
+  50% {
+    transform: translateY(90px) scale(0.92);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(180px) scale(0.85);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes flyUpToHeader {
+  0% {
+    transform: translateY(90px) scale(0.85);
+    opacity: 0;
+    visibility: visible;
+  }
+  60% {
+    transform: translateY(-6px) scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes dockDropInFromTop {
+  0% {
+    transform: translateY(-80px) scale(0.82);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(12px) scale(1.05);
+    opacity: 0.95;
+  }
+  85% {
+    transform: translateY(-4px) scale(0.98);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dockSlideUpOut {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-60px) scale(0.85);
+    opacity: 0;
+  }
+}
+
+/* Nút Pill "Playing / Vào Game" ở chân thẻ đang chọn (giống thẻ Mario trên Switch) */
+.hub-playing-pill {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: none;
+  align-items: center;
+  background: rgba(18, 18, 24, 0.92);
+  border: 2px solid #ffffff;
+  border-radius: 28px;
+  padding: 4px 16px 4px 5px;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+}
+
+.hub-playing-pill:hover {
+  transform: translateX(-50%) scale(1.08);
+  background: #00b8d4;
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.75);
+}
+
+.hub-pill-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+  border: 1.5px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.hub-pill-text {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+
+
+    radial-gradient(circle at 50% 20%, rgba(255, 234, 167, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(243, 104, 224, 0.5) 0%, transparent 55%),
+    linear-gradient(145deg, #341f97 0%, #5f27cd 45%, #9b59b6 80%, #f368e0 100%) !important;
+}
+.art-catan {
+  background: 
+    radial-gradient(circle at 50% 15%, rgba(255, 242, 0, 0.45) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(38, 222, 129, 0.35) 0%, transparent 50%),
+    linear-gradient(145deg, #d35400 0%, #e67e22 40%, #f39c12 75%, #f1c40f 100%) !important;
+}
+.art-carcassonne {
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(46, 134, 222, 0.4) 0%, transparent 55%),
+    linear-gradient(145deg, #0b7a5e 0%, #10ac84 45%, #1dd1a1 75%, #2e86de 100%) !important;
+}
+.art-avalon {
+  background: 
+    radial-gradient(circle at 50% 25%, rgba(225, 112, 85, 0.45) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(108, 92, 231, 0.45) 0%, transparent 50%),
+    linear-gradient(145deg, #1e272e 0%, #2c3e50 40%, #8e44ad 75%, #c0392b 100%) !important;
+}
+.art-chess {
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.35) 0%, transparent 50%),
+    radial-gradient(circle at 80% 85%, rgba(116, 185, 255, 0.4) 0%, transparent 55%),
+    linear-gradient(145deg, #0c2461 0%, #1e3799 45%, #4a69bd 80%, #60a3bc 100%) !important;
+}
+.art-xiangqi {
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(254, 202, 87, 0.45) 0%, transparent 50%),
+    radial-gradient(circle at 85% 80%, rgba(235, 77, 75, 0.4) 0%, transparent 50%),
+    linear-gradient(145deg, #6a0d24 0%, #b71540 45%, #e55039 80%, #fa983a 100%) !important;
+}
+.art-ludo {
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(255, 234, 167, 0.5) 0%, transparent 45%),
+    radial-gradient(circle at 20% 80%, rgba(9, 132, 227, 0.4) 0%, transparent 50%),
+    linear-gradient(145deg, #006221 0%, #009432 40%, #00b894 75%, #0984e3 100%) !important;
+}
+
+/* 2. Khu vực Tiêu Đề Lớn & Thông số của Game Đang Chọn */
+.hub-selected-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 2px;
+}
+
+.hub-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.hub-big-title {
+  font-size: clamp(28px, 3.8vw, 42px);
+  font-weight: 900;
+  color: #3d4449;
+  letter-spacing: -0.8px;
+  line-height: 1.1;
+}
+
+.hub-cta-enter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: none;
+  background: linear-gradient(135deg, #e60012, #ff3838);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(230, 0, 18, 0.35);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hub-cta-enter:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 10px 28px rgba(230, 0, 18, 0.5);
+}
+
+.hub-cta-enter.is-coming {
+  background: linear-gradient(135deg, #636e72, #2d3436);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.hub-studio-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #3d4449;
+}
+
+.studio-pill-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e60012;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+
+/* Hàng Huy chương & Bạn bè sở hữu game giống ảnh mẫu */
+.hub-stats-friends-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 4px;
+}
+
+.hub-medals {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14.5px;
+  font-weight: 800;
+}
+
+.medal-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.medal-bronze { color: #cd7f32; }
+.medal-silver { color: #95a5a6; }
+.medal-gold { color: #f1c40f; }
+.medal-trophy { color: #bdc3c7; }
+
+.hub-friends-playing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-stack {
+  display: flex;
+  align-items: center;
+}
+
+.stack-ava {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  margin-left: -6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.stack-ava:first-child {
+  margin-left: 0;
+}
+
+.friends-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #57606f;
+}
+
+/* 3. Khu vực News 16:9 & Recent Posts (Khớp 100% Ảnh Nintendo Switch Mẫu 2) */
+.hub-news-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.hub-news-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hub-news-heading {
+  font-size: 24px;
+  font-weight: 800;
+  color: #2d3436;
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+
+.hub-news-feed-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  color: #636e72;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.hub-news-feed-btn:hover {
+  border-color: #00e5ff;
+  color: #0984e3;
+  transform: scale(1.08);
+}
+
+.hub-news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.hub-news-card {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  min-height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1e2029;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hub-news-card:hover {
+  transform: translateY(-5px) scale(1.025);
+  border-color: #00e5ff;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.55), 0 12px 28px rgba(0, 0, 0, 0.25);
+}
+
+.news-card-visual {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.45s ease;
+}
+
+.hub-news-card:hover .news-card-visual {
+  transform: scale(1.08);
+}
+
+.news-card-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.2) 35%, rgba(0, 0, 0, 0.9) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.news-card-caption {
+  position: relative;
+  z-index: 3;
+  padding: 10px 14px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+

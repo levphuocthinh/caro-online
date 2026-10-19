@@ -1,0 +1,284 @@
+/* ===================================================
+   HUB.CSS: Giao diện Cổng Game Tổng Hợp (Console Web UI)
+   Lấy cảm hứng từ Console Dashboard hiện đại, tối ưu cho Web
+   =================================================== */
+
+/* Khi ở màn hình Cổng Game (Console Hub), đổi sang nền sáng Console tinh tế */
+body.in-hub {
+  background-color: #ebebef;
+  background-image: 
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.9) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(216, 226, 239, 0.8) 0%, transparent 50%),
+    linear-gradient(180deg, #f3f5f8 0%, #e6eaf0 100%);
+  color: #2d3436;
+}
+
+/* Header biến đổi theo phong cách Console Web khi ở trang Hub */
+body.in-hub .app-header {
+  background: rgba(244, 246, 249, 0.92);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.04);
+  padding: 10px 28px;
+}
+
+body.in-hub .logo-title {
+  background: linear-gradient(135deg, #e60012, #ff4757);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body.in-hub .logo-subtitle {
+  color: #636e72;
+}
+
+body.in-hub .lang-trigger {
+  background: #ffffff;
+  border: 1.5px solid #dfe6e9;
+  color: #2d3436;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+body.in-hub .lang-trigger:hover {
+  border-color: #00b8d4;
+  box-shadow: 0 4px 12px rgba(0, 184, 212, 0.2);
+}
+
+body.in-hub .btn-icon {
+  background: #ffffff;
+  border: 1.5px solid #dfe6e9;
+  color: #2d3436;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+body.in-hub .btn-icon i {
+  color: #2d3436;
+}
+
+body.in-hub .btn-icon:hover {
+  border-color: #e60012;
+  background: #fff5f5;
+  box-shadow: 0 6px 14px rgba(230, 0, 18, 0.18);
+}
+
+body.in-hub .btn-icon:hover i {
+  color: #e60012;
+}
+
+/* Điều khiển hiển thị Logo Hub vs Logo gốc Caro (Khớp 100% Ảnh Gốc của bạn) */
+body.in-hub .logo-content-hub {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
+body.in-hub .logo-content-caro {
+  display: none !important;
+}
+
+body:not(.in-hub) .logo-content-hub {
+  display: none !important;
+}
+body:not(.in-hub) .logo-content-caro {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Ẩn hoàn toàn nút Cổng Game, Theme toggle và Đồng hồ khi ở trong trang game Caro */
+.btn-back-hub,
+#btn-back-to-hub,
+body:not(.in-hub) #btn-theme-toggle,
+body:not(.in-hub) .hub-clock-box {
+  display: none !important;
+}
+
+/* Thanh Icon Nintendo Squircles Siêu Dễ Thương & Rực Rỡ Sắc Màu ở giữa Header */
+.hub-header-bubbles {
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+
+body.in-hub .hub-header-bubbles {
+  display: flex;
+}
+
+.hub-bubble-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px; /* Chuẩn squircle Nintendo bo góc tròn nhiều, siêu dễ thương */
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #ffffff !important;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-sizing: border-box;
+  padding: 0;
+}
+
+/* Ánh sáng phản chiếu kính 3D console ở nửa trên */
+.hub-bubble-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 46%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border-top-left-radius: 11px;
+  border-top-right-radius: 11px;
+  pointer-events: none;
+}
+
+/* 5 sắc màu Nintendo rực rỡ đặc trưng */
+.hub-bubble-btn.bubble-news {
+  background: linear-gradient(145deg, #ff2e43, #e60012);
+  box-shadow: 0 4px 14px rgba(230, 0, 18, 0.4);
+}
+
+.hub-bubble-btn.bubble-classic {
+  background: linear-gradient(145deg, #00d26a, #00a843);
+  box-shadow: 0 4px 14px rgba(0, 184, 77, 0.4);
+}
+
+.hub-bubble-btn.bubble-modern {
+  background: linear-gradient(145deg, #9b59b6, #6c5ce7);
+  box-shadow: 0 4px 14px rgba(108, 92, 231, 0.4);
+}
+
+.hub-bubble-btn.bubble-trophy {
+  background: linear-gradient(145deg, #ffa801, #f39c12);
+  box-shadow: 0 4px 14px rgba(243, 156, 18, 0.4);
+}
+
+.hub-bubble-btn.bubble-guide {
+  background: linear-gradient(145deg, #00d2ff, #0984e3);
+  box-shadow: 0 4px 14px rgba(9, 132, 227, 0.4);
+}
+
+.hub-bubble-btn.bubble-theme {
+  background: linear-gradient(145deg, #00cec9, #0984e3);
+  box-shadow: 0 4px 14px rgba(0, 206, 201, 0.45);
+}
+
+.hub-bubble-btn.bubble-sound {
+  background: linear-gradient(145deg, #2ed573, #10ac84);
+  box-shadow: 0 4px 14px rgba(46, 213, 115, 0.45);
+}
+
+.hub-bubble-btn i {
+  color: #ffffff !important;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
+  position: relative;
+  z-index: 2;
+}
+
+.hub-bubble-btn:hover {
+  transform: translateY(-3px) scale(1.12);
+  border-color: #ffffff;
+  outline: 3px solid #00e5ff;
+  outline-offset: 2px;
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.85);
+}
+
+.hub-bubble-btn.active {
+  transform: translateY(-2px) scale(1.1);
+  border-color: #ffffff;
+  outline: 3.5px solid #00e5ff;
+  outline-offset: 2.5px;
+  box-shadow: 
+    0 0 0 3px #00e5ff,
+    0 0 22px rgba(0, 229, 255, 0.95);
+}
+
+.hub-clock-box {
+  display: inline-flex;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: #2d3436;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* Studio Pill Badge */
+.hub-studio-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #0984e3, #00cec9);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+
+
+/* ===================================================
+   CẤU TRÚC MÀN HÌNH CONSOLE HUB (#screen-hub)
+   =================================================== */
+#screen-hub.screen {
+  max-width: 1560px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 32px 36px 32px;
+  box-sizing: border-box;
+}
+
+.hub-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100vh - 76px);
+  box-sizing: border-box;
+}
+
+/* Thanh Sub-Navigation (★ Featured | Recent | Cờ Truyền Thống | Board Game) */
+.hub-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 6px 4px 18px 4px;
+  user-select: none;
+  overflow-x: auto;
+}
+
+.hub-filter-tab {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  font-weight: 800;
+  color: #7f8c8d;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.hub-filter-tab:hover {
+  color: #2d3436;
+}
+
+.hub-filter-tab.active {
+  color: #1e272e;
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 900;
+}
+
+.hub-filter-tab.active i {
+  color: #e60012;
+}
+

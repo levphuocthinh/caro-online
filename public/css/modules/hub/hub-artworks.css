@@ -1,0 +1,122 @@
+.tile-art-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Ruy-băng trạng thái góc trên hoặc đáy giống DEMO / NINTENDO GAMECUBE */
+.tile-top-tag {
+  position: relative;
+  z-index: 2;
+  align-self: flex-end;
+  margin: 7px 7px 0 0;
+  font-size: 9.5px;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.tile-top-tag.tag-ready {
+  background: #00c853;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 200, 83, 0.5);
+}
+
+.tile-center-logo {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 8px;
+  margin: auto 0;
+}
+
+.tile-center-logo i {
+  font-size: 36px;
+  color: #ffffff;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+  margin-bottom: 5px;
+  transition: transform 0.25s ease;
+}
+
+.hub-game-tile:hover .tile-center-logo i {
+  transform: scale(1.14) rotate(-4deg);
+}
+
+.tile-game-name {
+  font-size: 14.5px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  line-height: 1.15;
+}
+
+.tile-bottom-strip {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 5px 6px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(4px);
+}
+
+/* Phối màu Artwork đặc trưng cho từng Game Tile */
+.art-caro {
+  background: url('/images/caro-3d-cover.jpg') center/cover no-repeat !important;
+}
+
+/* Ẩn icon và tiêu đề chữ phẳng trên bìa Caro để hình 3D chú chó Shiba Gomoku hiển thị trọn vẹn */
+.hub-game-tile[data-game-id="caro"] .tile-center-logo {
+  display: none !important;
+}
+
+.hub-cover-artwork.art-caro ~ .hub-cover-logo-box {
+  display: none !important;
+}
+
+.hub-game-tile[data-game-id="caro"] .tile-bottom-strip {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  font-weight: 900;
+  letter-spacing: 0.8px;
+}
+
+.art-splendor {
+  background: 
+
+/* Scenic Artworks cho 3 thẻ News Caro Online */
+.news-art-online {
+  background: 
+    radial-gradient(circle at 75% 25%, #00e5ff 0%, transparent 45%),
+    radial-gradient(circle at 25% 75%, #ff4757 0%, transparent 45%),
+    linear-gradient(135deg, #1e3799 0%, #0984e3 50%, #6c5ce7 100%);
+}
+
+.news-art-ai {
+  background: 
+    radial-gradient(circle at 70% 30%, #55efc4 0%, transparent 45%),
+    radial-gradient(circle at 20% 70%, #ffeaa7 0%, transparent 45%),
+    linear-gradient(135deg, #006266 0%, #009432 50%, #1289a7 100%);
+}
+
+.news-art-local {
+  background: 
+    radial-gradient(circle at 80% 30%, #ff4757 0%, transparent 45%),
+    radial-gradient(circle at 20% 70%, #00d2ff 0%, transparent 45%),
+    linear-gradient(135deg, #b71540 0%, #e60012 50%, #0652dd 100%);
+}
+
+/* Header Recent Posts (Khớp 100% Ảnh Mẫu 2) */

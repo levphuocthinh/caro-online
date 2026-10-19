@@ -1,0 +1,400 @@
+@media (max-width: 900px) {
+  .hub-detail-stage {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 20px !important;
+  }
+  .hub-left-peek-slot {
+    display: none !important;
+  }
+  .hub-left-tower {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    border-radius: 18px !important;
+  }
+  .hub-tower-card {
+    height: 240px !important;
+  }
+}
+
+
+.hub-recent-posts-section {
+  margin-top: 10px;
+  padding-top: 4px;
+}
+
+.hub-recent-posts-heading {
+  font-size: 22px;
+  font-weight: 800;
+  color: #8395a7;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+/* ===================================================
+   RESPONSIVE CHO IPAD / TABLET & ĐIỆN THOẠI
+   =================================================== */
+@media (max-width: 1024px) {
+  #screen-hub.screen {
+    padding: 12px 16px;
+  }
+
+  .hub-dropdown-stage {
+    grid-template-columns: 210px 1fr;
+    gap: 20px;
+  }
+
+  .hub-news-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  body.in-hub .app-header {
+    padding: 8px 12px;
+  }
+
+  .hub-header-bubbles {
+    display: none !important;
+  }
+
+  .hub-dropdown-stage {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .hub-game-tile {
+    flex: 0 0 126px !important;
+    width: 126px !important;
+    height: 126px !important;
+    min-width: 126px !important;
+    min-height: 126px !important;
+    max-width: 126px !important;
+    max-height: 126px !important;
+  }
+
+  .hub-game-tile.selected {
+    flex: 0 0 154px !important;
+    width: 154px !important;
+    height: 154px !important;
+    min-width: 154px !important;
+    min-height: 154px !important;
+    max-width: 154px !important;
+    max-height: 154px !important;
+  }
+
+  .hub-dropdown-menu-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .hub-news-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===================================================
+   CHẾ ĐỘ SÁNG / TỐI TOÀN DIỆN (CONSOLE DARK MODE)
+   Tối ưu hóa toàn bộ các thành phần của Cổng Game Web
+   =================================================== */
+
+/* Nền trang Hub khi ở Dark Theme */
+body.in-hub.theme-dark,
+html[data-theme="dark"] body.in-hub {
+  background-color: #0f1015;
+  background-image: 
+    radial-gradient(circle at 18% 12%, rgba(40, 48, 68, 0.42) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(20, 24, 36, 0.75) 0%, transparent 55%),
+    linear-gradient(180deg, #13151c 0%, #0c0d12 100%);
+  color: #f1f2f6;
+}
+
+/* Header trong Dark Mode */
+body.in-hub.theme-dark .app-header,
+html[data-theme="dark"] body.in-hub .app-header {
+  background: rgba(18, 20, 26, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.55);
+}
+
+body.in-hub.theme-dark .logo-subtitle,
+html[data-theme="dark"] body.in-hub .logo-subtitle {
+  color: #a4b0be;
+}
+
+/* Nút Icon & Nút Theme / Sound / Help trên Header trong Dark Mode */
+body.in-hub.theme-dark .btn-icon,
+html[data-theme="dark"] body.in-hub .btn-icon {
+  background: #1e212b;
+  border: 1.5px solid #2d3240;
+  color: #f1f2f6;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.in-hub.theme-dark .btn-icon i,
+html[data-theme="dark"] body.in-hub .btn-icon i {
+  color: #f1f2f6;
+}
+
+body.in-hub.theme-dark .btn-icon:hover,
+html[data-theme="dark"] body.in-hub .btn-icon:hover {
+  border-color: #ff4757;
+  background: #282c39;
+  box-shadow: 0 6px 16px rgba(255, 71, 87, 0.25);
+}
+
+body.in-hub.theme-dark .btn-icon:hover i,
+html[data-theme="dark"] body.in-hub .btn-icon:hover i {
+  color: #ff4757;
+}
+
+/* Đồng hồ Live trong Dark Mode */
+body.in-hub.theme-dark .hub-clock-box,
+html[data-theme="dark"] body.in-hub .hub-clock-box {
+  background: #1e212b;
+  border: 1.5px solid #2d3240;
+  color: #f1f2f6;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Bộ chọn ngoại ngữ trong Dark Mode */
+body.in-hub.theme-dark .lang-trigger,
+html[data-theme="dark"] body.in-hub .lang-trigger {
+  background: #1e212b;
+  border: 1.5px solid #2d3240;
+  color: #f1f2f6;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.in-hub.theme-dark .lang-trigger:hover,
+html[data-theme="dark"] body.in-hub .lang-trigger:hover {
+  border-color: #00e5ff;
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.25);
+}
+
+body.in-hub.theme-dark .lang-dropdown-menu,
+html[data-theme="dark"] body.in-hub .lang-dropdown-menu {
+  background: #1e212b;
+  border: 1.5px solid #2d3240;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+body.in-hub.theme-dark .lang-option,
+html[data-theme="dark"] body.in-hub .lang-option {
+  color: #dfe4ea;
+}
+
+body.in-hub.theme-dark .lang-option:hover,
+html[data-theme="dark"] body.in-hub .lang-option:hover {
+  background: #282c39;
+  color: #ffffff;
+}
+
+body.in-hub.theme-dark .lang-option.active,
+html[data-theme="dark"] body.in-hub .lang-option.active {
+  background: rgba(230, 0, 18, 0.18);
+  color: #ff4757;
+}
+
+/* Các Icon Squircles Nintendo rực rỡ trong Dark Mode */
+body.in-hub.theme-dark .hub-bubble-btn,
+html[data-theme="dark"] body.in-hub .hub-bubble-btn {
+  /* Giữ trọn sắc màu rực rỡ chuẩn Nintendo trong cả Dark Mode */
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+body.in-hub.theme-dark .hub-bubble-btn:hover,
+html[data-theme="dark"] body.in-hub .hub-bubble-btn:hover {
+  border-color: #ffffff;
+  outline: 3px solid #00e5ff;
+  outline-offset: 2px;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.9);
+}
+
+body.in-hub.theme-dark .hub-bubble-btn.active,
+html[data-theme="dark"] body.in-hub .hub-bubble-btn.active {
+  border-color: #ffffff;
+  outline: 3.5px solid #00e5ff;
+  outline-offset: 2.5px;
+  box-shadow: 
+    0 0 0 3px #00e5ff,
+    0 0 24px rgba(0, 229, 255, 1);
+}
+
+/* Thanh Sub-Nav lọc danh mục trong Dark Mode */
+body.in-hub.theme-dark .hub-filter-tab,
+html[data-theme="dark"] body.in-hub .hub-filter-tab {
+  color: #8395a7;
+}
+
+body.in-hub.theme-dark .hub-filter-tab:hover,
+html[data-theme="dark"] body.in-hub .hub-filter-tab:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body.in-hub.theme-dark .hub-filter-tab.active,
+html[data-theme="dark"] body.in-hub .hub-filter-tab.active {
+  background: #1e212b;
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+body.in-hub.theme-dark .hub-filter-tab.active i,
+html[data-theme="dark"] body.in-hub .hub-filter-tab.active i {
+  color: #ff4757;
+}
+
+/* Dải Game Tiles trong Dark Mode */
+body.in-hub.theme-dark .hub-tiles-row::-webkit-scrollbar-thumb,
+html[data-theme="dark"] body.in-hub .hub-tiles-row::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.in-hub.theme-dark .hub-game-tile,
+html[data-theme="dark"] body.in-hub .hub-game-tile {
+  background: #181a22;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+body.in-hub.theme-dark .hub-game-tile:hover,
+html[data-theme="dark"] body.in-hub .hub-game-tile:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.65);
+}
+
+body.in-hub.theme-dark .hub-game-tile.selected,
+html[data-theme="dark"] body.in-hub .hub-game-tile.selected {
+  border: 4px solid #ffffff;
+  outline: 4px solid #00e5ff;
+  box-shadow: 
+    0 0 0 4px #00e5ff,
+    0 0 32px rgba(0, 229, 255, 0.8),
+    0 24px 50px rgba(0, 0, 0, 0.75);
+}
+
+body.in-hub.theme-dark .tile-game-name,
+html[data-theme="dark"] body.in-hub .tile-game-name {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+}
+
+body.in-hub.theme-dark .tile-bottom-strip,
+html[data-theme="dark"] body.in-hub .tile-bottom-strip {
+  background: rgba(12, 14, 18, 0.88);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Cột Menu dọc trong Dark Mode */
+body.in-hub.theme-dark .hub-dropdown-menu-col,
+html[data-theme="dark"] body.in-hub .hub-dropdown-menu-col {
+  background: #181a22;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.7);
+}
+
+body.in-hub.theme-dark .hub-menu-close-bar,
+html[data-theme="dark"] body.in-hub .hub-menu-close-bar {
+  background: #181b24 !important;
+  color: var(--tower-theme, #ff4757) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.in-hub.theme-dark .hub-menu-close-bar:hover,
+html[data-theme="dark"] body.in-hub .hub-menu-close-bar:hover {
+  background: #252b38 !important;
+  filter: brightness(1.15);
+}
+
+body.in-hub.theme-dark .hub-tower-menu,
+html[data-theme="dark"] body.in-hub .hub-tower-menu {
+  background: transparent !important;
+}
+
+/* Cột Phải Details trong Dark Mode */
+body.in-hub.theme-dark .hub-big-title,
+html[data-theme="dark"] body.in-hub .hub-big-title {
+  color: #ffffff;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.7);
+}
+
+body.in-hub.theme-dark #hub-selected-studio,
+html[data-theme="dark"] body.in-hub #hub-selected-studio {
+  color: #a4b0be;
+}
+
+body.in-hub.theme-dark .hub-medals,
+html[data-theme="dark"] body.in-hub .hub-medals {
+  background: #181a22;
+  border: 1.5px solid #2d3240;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  padding: 6px 16px;
+  border-radius: 20px;
+}
+
+body.in-hub.theme-dark .hub-friends-playing,
+html[data-theme="dark"] body.in-hub .hub-friends-playing {
+  background: #181a22;
+  border: 1.5px solid #2d3240;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  padding: 6px 16px;
+  border-radius: 20px;
+}
+
+body.in-hub.theme-dark .friends-text,
+html[data-theme="dark"] body.in-hub .friends-text {
+  color: #ced6e0;
+}
+
+body.in-hub.theme-dark .stack-ava,
+html[data-theme="dark"] body.in-hub .stack-ava {
+  border: 2px solid #181a22;
+}
+
+body.in-hub.theme-dark .hub-news-heading,
+html[data-theme="dark"] body.in-hub .hub-news-heading {
+  color: #f1f2f6;
+}
+
+body.in-hub.theme-dark .hub-news-card,
+html[data-theme="dark"] body.in-hub .hub-news-card {
+  background: #181a22;
+  border: 2px solid #2b303d;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+body.in-hub.theme-dark .hub-news-card:hover,
+html[data-theme="dark"] body.in-hub .hub-news-card:hover {
+  border-color: #00e5ff;
+  box-shadow: 0 14px 30px rgba(0, 229, 255, 0.3);
+}
+
+body.in-hub.theme-dark .news-card-caption,
+html[data-theme="dark"] body.in-hub .news-card-caption {
+  background: rgba(18, 20, 28, 0.85);
+  color: #dfe4ea;
+}
+
+/* Modals & Toasts trong Dark Mode */
+html[data-theme="dark"] .modal-overlay .modal-card {
+  background: #181a22;
+  border: 1.5px solid #2d3240;
+  color: #dfe4ea;
+}
+
+html[data-theme="dark"] .modal-overlay .modal-card h2,
+html[data-theme="dark"] .modal-overlay .modal-card h3 {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .toast {
+  background: rgba(22, 25, 34, 0.96);
+  border: 1.5px solid #3d4455;
+  color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+}
