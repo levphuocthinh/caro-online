@@ -233,5 +233,11 @@ export const zh = {
   "sidebar_cat_title": "游戏分类",
   "sidebar_home_view": "全景视图 (Home View)",
   "sidebar_detail_view": "详情视图 (Detail View)",
-  "menu_title": "菜单"
+  "menu_title": "菜单",
+  "tip_edit_profile": "修改昵称与头像",
+  "status_online": "在线",
+  "modal_profile_title": "玩家个人资料",
+  "lbl_choose_avatar": "选择可爱头像:",
+  "btn_save_profile": "保存资料",
+  "profile_updated_toast": "玩家资料更新成功！"
 };

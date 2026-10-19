@@ -233,5 +233,11 @@ export const ko = {
   "sidebar_cat_title": "게임 카테고리",
   "sidebar_home_view": "전체 보기 (Home View)",
   "sidebar_detail_view": "상세 보기 (Detail View)",
-  "menu_title": "메뉴"
+  "menu_title": "메뉴",
+  "tip_edit_profile": "이름 및 아바타 수정",
+  "status_online": "온라인",
+  "modal_profile_title": "플레이어 프로필",
+  "lbl_choose_avatar": "귀여운 아바타 선택:",
+  "btn_save_profile": "프로필 저장",
+  "profile_updated_toast": "플레이어 프로필이 업데이트되었습니다!"
 };

@@ -233,5 +233,11 @@ export const en = {
   "sidebar_cat_title": "Game Categories",
   "sidebar_home_view": "Full View (Home Mode)",
   "sidebar_detail_view": "Detail View (Game Mode)",
-  "menu_title": "Menu"
+  "menu_title": "Menu",
+  "tip_edit_profile": "Edit name & avatar",
+  "status_online": "Online",
+  "modal_profile_title": "Player Profile",
+  "lbl_choose_avatar": "Choose your cute avatar:",
+  "btn_save_profile": "Save Profile",
+  "profile_updated_toast": "Player profile updated successfully!"
 };

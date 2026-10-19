@@ -9,6 +9,7 @@ import { CaroModal } from '../../modules/modal.js';
 import { soundManager } from '../../modules/audio.js';
 import { i18n } from '../../modules/i18n.js';
 import { allGameIds, getGamesCatalog } from './gamesCatalog.js';
+import { UserProfileManager } from './UserProfileManager.js';
 
 export class HubController {
   static init(manager) {
@@ -19,6 +20,7 @@ export class HubController {
     this.lastDropdownStepTime = 0;
 
     this.initTheme();
+    UserProfileManager.init();
     this.bindEvents(manager);
     this.renderSelectedGame('caro', true);
 

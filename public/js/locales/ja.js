@@ -233,5 +233,11 @@ export const ja = {
   "sidebar_cat_title": "ゲームカテゴリ",
   "sidebar_home_view": "全体表示 (Home View)",
   "sidebar_detail_view": "詳細表示 (Detail View)",
-  "menu_title": "メニュー"
+  "menu_title": "メニュー",
+  "tip_edit_profile": "名前とアバターを編集",
+  "status_online": "オンライン",
+  "modal_profile_title": "プレイヤープロフィール",
+  "lbl_choose_avatar": "かわいいアバターを選択:",
+  "btn_save_profile": "保存する",
+  "profile_updated_toast": "プロフィールを更新しました！"
 };

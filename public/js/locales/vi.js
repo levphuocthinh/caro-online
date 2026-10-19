@@ -233,5 +233,11 @@ export const vi = {
   "sidebar_cat_title": "Danh mục Game",
   "sidebar_home_view": "Xem Toàn Cảnh (Home View)",
   "sidebar_detail_view": "Xem Chi Tiết (Detail View)",
-  "menu_title": "Menu"
+  "menu_title": "Menu",
+  "tip_edit_profile": "Chỉnh sửa tên & avatar",
+  "status_online": "Online",
+  "modal_profile_title": "Hồ Sơ Người Chơi",
+  "lbl_choose_avatar": "Chọn hình đại diện dễ thương:",
+  "btn_save_profile": "Lưu Hồ Sơ",
+  "profile_updated_toast": "Đã cập nhật hồ sơ người chơi thành công!"
 };

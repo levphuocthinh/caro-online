@@ -144,11 +144,23 @@
   <div class="hub-sidebar-backdrop" id="hub-sidebar-backdrop"></div>
   <aside class="hub-sidebar-drawer" id="hub-sidebar-drawer" aria-label="Menu trò chơi">
     <div class="hub-sidebar-header">
-      <div class="sidebar-brand">
-        <span class="sidebar-brand-icon"><i class="fa-solid fa-gamepad"></i></span>
-        <div class="sidebar-brand-text">
-          <span class="sidebar-title">Lycngames</span>
-          <span class="sidebar-subtitle">Game Console Menu</span>
+      <div class="sidebar-user-profile" id="sidebar-user-profile">
+        <div class="sidebar-user-avatar-wrap" id="btn-edit-avatar-trigger" title="Nhấn để đổi Avatar & Tên">
+          <div class="sidebar-user-avatar" id="sidebar-user-avatar">🐱</div>
+          <span class="user-status-dot" title="Online"></span>
+        </div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name-row">
+            <span class="sidebar-user-name" id="sidebar-user-name">Bé Miu Miu</span>
+            <button class="btn-edit-user" id="btn-edit-user-profile" type="button" title="Chỉnh sửa tên & avatar" data-i18n-title="tip_edit_profile">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
+          <div class="sidebar-user-sub-row">
+            <span class="user-level-badge" id="sidebar-user-level">Lv. 1</span>
+            <span class="user-gamer-tag" id="sidebar-user-tag">#8892</span>
+            <span class="user-online-badge"><span class="badge-dot-live"></span> <span data-i18n="status_online">Online</span></span>
+          </div>
         </div>
       </div>
       <button class="btn-sidebar-close" id="btn-sidebar-close" type="button" title="Đóng Menu" data-i18n-title="tip_close_menu">
@@ -699,6 +711,44 @@
         </button>
         <button class="btn-primary" id="btn-game-over-rematch">
           <i class="fa-solid fa-rotate-right"></i> <span data-i18n="btn_rematch">Chơi Lại Ván Mới</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CHỈNH SỬA HỒ SƠ NGƯỜI CHƠI (TẠM THỜI & SẴN SÀNG CHO BACKEND) -->
+  <div class="modal-overlay" id="modal-edit-profile">
+    <div class="modal-content modal-profile-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-user-pen modal-icon"></i> <span data-i18n="modal_profile_title">Hồ Sơ Người Chơi</span></h3>
+        <button class="modal-close" data-close="modal-edit-profile"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_choose_avatar">Chọn hình đại diện dễ thương:</label>
+        <div class="avatar-picker-grid" id="avatar-picker-grid">
+          <button class="avatar-pick-btn active" data-avatar="🐱" type="button">🐱</button>
+          <button class="avatar-pick-btn" data-avatar="🐰" type="button">🐰</button>
+          <button class="avatar-pick-btn" data-avatar="🦊" type="button">🦊</button>
+          <button class="avatar-pick-btn" data-avatar="🐼" type="button">🐼</button>
+          <button class="avatar-pick-btn" data-avatar="🦁" type="button">🦁</button>
+          <button class="avatar-pick-btn" data-avatar="🐯" type="button">🐯</button>
+          <button class="avatar-pick-btn" data-avatar="🐻" type="button">🐻</button>
+          <button class="avatar-pick-btn" data-avatar="🐨" type="button">🐨</button>
+          <button class="avatar-pick-btn" data-avatar="🐶" type="button">🐶</button>
+          <button class="avatar-pick-btn" data-avatar="🦄" type="button">🦄</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="lbl_player_name">Tên dễ thương của bạn:</label>
+        <input type="text" id="input-edit-player-name" class="form-input" maxlength="20" placeholder="VD: Bé Miu Miu" data-i18n-placeholder="placeholder_name">
+      </div>
+
+      <div class="modal-btn-row">
+        <button class="btn-secondary" data-close="modal-edit-profile" data-i18n="btn_cancel">Hủy</button>
+        <button class="btn-primary" id="btn-save-profile">
+          <i class="fa-solid fa-check"></i> <span data-i18n="btn_save_profile">Lưu Hồ Sơ</span>
         </button>
       </div>
     </div>
