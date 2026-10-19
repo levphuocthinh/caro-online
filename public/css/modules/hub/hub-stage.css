@@ -188,8 +188,12 @@
   z-index: 10 !important;
 }
 
-.hub-home-card.selected .hub-playing-pill {
-  display: inline-flex !important;
+/* Nút Playing chỉ hiện khi hover chuột vào thẻ game */
+.hub-home-card:hover .hub-playing-pill {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateX(-50%) translateY(0) scale(1) !important;
 }
 
 /* ===================================================
@@ -315,30 +319,44 @@
   }
 }
 
-/* Nút Pill "Playing / Vào Game" ở chân thẻ đang chọn (giống thẻ Mario trên Switch) */
+/* Nút Pill "Playing / Vào Game" ở chân thẻ (chỉ xuất hiện mượt mà khi hover chuột) */
 .hub-playing-pill {
   position: absolute;
-  bottom: 10px;
+  bottom: 12px;
   left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  display: none;
+  transform: translateX(-50%) translateY(8px) scale(0.92);
+  z-index: 10;
+  display: inline-flex;
   align-items: center;
-  background: rgba(18, 18, 24, 0.92);
+  background: rgba(18, 18, 24, 0.94);
   border: 2px solid #ffffff;
   border-radius: 28px;
   padding: 4px 16px 4px 5px;
   gap: 8px;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.22s ease, background 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap;
 }
 
 .hub-playing-pill:hover {
-  transform: translateX(-50%) scale(1.08);
-  background: #00b8d4;
-  box-shadow: 0 0 18px rgba(0, 229, 255, 0.75);
+  transform: translateX(-50%) translateY(-2px) scale(1.08) !important;
+  background: #00b8d4 !important;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.85) !important;
+}
+
+/* Hỗ trợ thiết bị cảm ứng điện thoại / tablet không có hover chuột */
+@media (hover: none) {
+  .hub-home-card.selected .hub-playing-pill,
+  .hub-tower-card .hub-playing-pill {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateX(-50%) translateY(0) scale(1) !important;
+  }
 }
 
 .hub-pill-avatar {

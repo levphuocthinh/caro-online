@@ -23,6 +23,7 @@ export function getGamesCatalog(i18n) {
       stripText: 'CỜ CHIẾN THUẬT',
       studio: i18n.getText('hub_caro_studio'),
       artClass: 'art-caro',
+      hasCoverImage: true,
       iconHtml: '<i class="fa-solid fa-paw" id="hub-tower-icon"></i>',
       towerColor: '#e60012',
       towerDark: '#b3000e',

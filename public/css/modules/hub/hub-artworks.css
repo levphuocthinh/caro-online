@@ -38,6 +38,17 @@
   margin: auto 0;
 }
 
+/* Khi game có hình ảnh bìa (như Caro hoặc các game cập nhật ảnh sau này),
+   ẩn toàn bộ icon và tên ở giữa để không che mất artwork */
+.has-cover-image .tile-center-logo,
+[data-has-cover="true"] .tile-center-logo,
+.hub-tower-card.has-cover-image .tile-center-logo,
+.hub-home-card.has-cover-image .tile-center-logo,
+.hub-game-tile.has-cover-image .tile-center-logo,
+[data-game-id="caro"] .tile-center-logo {
+  display: none !important;
+}
+
 .tile-center-logo i {
   font-size: 36px;
   color: #ffffff;

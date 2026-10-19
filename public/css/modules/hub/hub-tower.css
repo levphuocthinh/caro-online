@@ -131,10 +131,17 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 40%, transparent 65%);
 }
 
-.hub-tower-card .hub-playing-pill {
-  display: inline-flex !important;
+/* Nút Playing chỉ hiện khi hover chuột vào thẻ game */
+.hub-tower-card:hover .hub-playing-pill {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateX(-50%) translateY(0) scale(1) !important;
 }
 
+/* Ẩn logo và tên ở giữa cho bất kỳ game nào có hình ảnh bìa */
+.hub-tower-card.has-cover-image .tile-center-logo,
+.hub-tower-card[data-has-cover="true"] .tile-center-logo,
 .hub-tower-card[data-game-id="caro"] .tile-center-logo {
   display: none !important;
 }

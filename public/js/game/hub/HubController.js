@@ -158,13 +158,15 @@ export class HubController {
       const prevItem = this.getCatalog()[prevGameId];
       leftPeekSlot.classList.add('has-peek');
       leftPeekSlot.innerHTML = prevItem ? `
-        <div class="hub-game-tile ${prevItem.artClass} ${prevItem.playable ? 'playable' : ''}" data-game-id="${prevGameId}" title="${prevItem.coverTitle}">
+        <div class="hub-game-tile ${prevItem.artClass} ${prevItem.playable ? 'playable' : ''} ${prevItem.hasCoverImage ? 'has-cover-image' : ''}" data-game-id="${prevGameId}" data-has-cover="${prevItem.hasCoverImage ? 'true' : 'false'}" title="${prevItem.coverTitle}">
           <div class="tile-art-bg ${prevItem.artClass}"></div>
           <span class="tile-top-tag ${prevItem.playable ? 'tag-ready' : ''}">${prevItem.badge}</span>
-          <div class="tile-center-logo">
-            <span>${prevItem.iconHtml}</span>
-            <span class="tile-game-name">${prevItem.coverTitle}</span>
-          </div>
+          ${!prevItem.hasCoverImage ? `
+            <div class="tile-center-logo">
+              <span>${prevItem.iconHtml}</span>
+              <span class="tile-game-name">${prevItem.coverTitle}</span>
+            </div>
+          ` : ''}
           <div class="tile-bottom-strip">${prevItem.stripText}</div>
         </div>
       ` : '';
@@ -201,6 +203,14 @@ export class HubController {
     if (!towerCard) return;
 
     towerCard.dataset.gameId = this.selectedGameId;
+    towerCard.classList.toggle('has-cover-image', !!info.hasCoverImage);
+    towerCard.dataset.hasCover = info.hasCoverImage ? 'true' : 'false';
+
+    const towerLogo = document.getElementById('hub-tower-logo');
+    if (towerLogo) {
+      towerLogo.style.display = info.hasCoverImage ? 'none' : 'flex';
+    }
+
     if (slideDir) {
       towerCard.classList.remove('anim-push-left', 'anim-push-right');
       void towerCard.offsetWidth;
@@ -253,13 +263,15 @@ export class HubController {
     otherRow.innerHTML = rightIds.map(gId => {
       const item = catalog[gId];
       return `
-        <div class="hub-game-tile ${item.artClass} ${item.playable ? 'playable' : ''}" data-game-id="${gId}" title="${item.coverTitle}">
+        <div class="hub-game-tile ${item.artClass} ${item.playable ? 'playable' : ''} ${item.hasCoverImage ? 'has-cover-image' : ''}" data-game-id="${gId}" data-has-cover="${item.hasCoverImage ? 'true' : 'false'}" title="${item.coverTitle}">
           <div class="tile-art-bg ${item.artClass}"></div>
           <span class="tile-top-tag ${item.playable ? 'tag-ready' : ''}">${item.badge}</span>
-          <div class="tile-center-logo">
-            <span>${item.iconHtml}</span>
-            <span class="tile-game-name">${item.coverTitle}</span>
-          </div>
+          ${!item.hasCoverImage ? `
+            <div class="tile-center-logo">
+              <span>${item.iconHtml}</span>
+              <span class="tile-game-name">${item.coverTitle}</span>
+            </div>
+          ` : ''}
           <div class="tile-bottom-strip">${item.stripText}</div>
         </div>
       `;
@@ -353,20 +365,20 @@ export class HubController {
       const item = catalog[gId];
       const isSel = gId === this.selectedGameId;
       return `
-        <div class="hub-home-card ${item.artClass} ${isSel ? 'selected' : ''}" data-game-id="${gId}" title="${item.coverTitle}">
+        <div class="hub-home-card ${item.artClass} ${isSel ? 'selected' : ''} ${item.hasCoverImage ? 'has-cover-image' : ''}" data-game-id="${gId}" data-has-cover="${item.hasCoverImage ? 'true' : 'false'}" title="${item.coverTitle}">
           <div class="tile-art-bg ${item.artClass}"></div>
           <span class="tile-top-tag ${item.playable ? 'tag-ready' : ''}">${item.badge}</span>
-          <div class="tile-center-logo">
-            <span>${item.iconHtml}</span>
-            <span class="tile-game-name">${item.coverTitle}</span>
-          </div>
-          <div class="tile-bottom-strip">${item.stripText}</div>
-          ${isSel ? `
-            <button class="hub-playing-pill" id="btn-home-pill" type="button" title="Bắt đầu chơi game">
-              <span class="hub-pill-avatar">${item.pillAva || '🐱'}</span>
-              <span class="hub-pill-text">${item.playable ? i18n.getText('pill_playing') : i18n.getText('coming_badge')}</span>
-            </button>
+          ${!item.hasCoverImage ? `
+            <div class="tile-center-logo">
+              <span>${item.iconHtml}</span>
+              <span class="tile-game-name">${item.coverTitle}</span>
+            </div>
           ` : ''}
+          <div class="tile-bottom-strip">${item.stripText}</div>
+          <button class="hub-playing-pill" type="button" title="${item.playable ? 'Bắt đầu chơi game' : 'Sắp ra mắt'}" data-game-id="${gId}">
+            <span class="hub-pill-avatar">${item.pillAva || '🐱'}</span>
+            <span class="hub-pill-text">${item.playable ? (i18n.getText('pill_playing') || 'Playing') : (i18n.getText('coming_badge') || 'Sắp ra mắt')}</span>
+          </button>
         </div>
       `;
     }).join('');
@@ -375,7 +387,7 @@ export class HubController {
       card.addEventListener('click', (e) => {
         const gId = card.dataset.gameId;
         if (!gId) return;
-        if (e.target.closest('#btn-home-pill')) {
+        if (e.target.closest('.hub-playing-pill, #btn-home-pill')) {
           e.stopPropagation();
           this.selectedGameId = gId;
           this.triggerEnterSelectedGame();
