@@ -111,16 +111,15 @@ caro/
 │   │   │   └── chess/                      # Chess template module sample
 │   │   │
 │   │   ├── game/
-│   │   │   ├── hub/                        # CONSOLE WEB HUB CONTROLLERS
+│   │   │   ├── hub/                        # MODULAR CONSOLE WEB HUB COMPONENTS
 │   │   │   │   ├── gamesCatalog.js         # Catalog model of 8 featured games (colors, metadata)
-│   │   │   │   ├── HubController.js        # Manages view modes, gestures, animations, sidebar
+│   │   │   │   ├── HubController.js        # Slim coordinator (~190 lines) linking hub sub-modules
+│   │   │   │   ├── HubViewRenderer.js      # Detail & panoramic home view DOM renderer
+│   │   │   │   ├── HubSidebarController.js # Mobile slide-out sidebar drawer & feature routing
+│   │   │   │   ├── HubGestures.js          # Wheel, touch swipe, drag & keyboard navigation
+│   │   │   │   ├── HubThemeManager.js      # Light/Dark mode state and persistence
 │   │   │   │   └── UserProfileManager.js   # Local player profile, avatar picker & backend hooks
 │   │   │   ├── GameManager.js              # Coordinates transitions between Hub, Lobby and Registry
-│   │   │   ├── BaseGame.js                 # Backward-compatibility alias
-│   │   │   ├── OnlineGame.js               # Backward-compatibility alias
-│   │   │   ├── AiGame.js                   # Backward-compatibility alias
-│   │   │   ├── LocalGame.js                # Backward-compatibility alias
-│   │   │   ├── GameState.js                # Backward-compatibility alias
 │   │   │   └── UIBinder.js                 # Hub shell and application UI binder
 │   │   │
 │   │   ├── locales/                        # ISOLATED LOCALE DICTIONARIES
