@@ -334,37 +334,38 @@ body.sidebar-open {
   color: #e60012;
 }
 
-/* Nút badge Menu inline cạnh tiêu đề game */
+/* ===================================================
+   TRÊN WEB (DESKTOP): HOÀN TOÀN KHÔNG DÙNG SIDEBAR & KHÔNG CÓ NÚT MENU
+   Chỉ khi chuyển sang hiển thị Mobile (<= 768px) mới kích hoạt Sidebar
+   =================================================== */
+@media (min-width: 769px) {
+  .btn-hub-sidebar-toggle,
+  .hub-sidebar-badge-btn,
+  .hub-sidebar-backdrop,
+  .hub-sidebar-drawer {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
+/* Nút badge Menu inline cạnh tiêu đề: Ẩn hoàn toàn để giữ tiêu đề gọn đẹp 100% như thiết kế */
 .hub-sidebar-badge-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1.5px solid rgba(0, 0, 0, 0.12);
-  background: #ffffff;
-  color: #2d3436;
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-  white-space: nowrap;
+  display: none !important;
 }
 
-.hub-sidebar-badge-btn:hover {
-  border-color: #00e5ff;
-  color: #0984e3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(0, 229, 255, 0.25);
-}
-
-/* Nút Toggle Sidebar trên Header */
+/* Nút Toggle Sidebar trên Header (Mặc định ẩn, chỉ hiện trên Mobile khi ở Hub) */
 .btn-hub-sidebar-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: none !important;
   cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  body.in-hub .btn-hub-sidebar-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 /* ===================================================

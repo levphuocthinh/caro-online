@@ -524,6 +524,8 @@ export class HubController {
     const backdrop = document.getElementById('hub-sidebar-backdrop');
 
     const openDrawer = () => {
+      // Chỉ hỗ trợ mở Sidebar trên giao diện Mobile (<= 768px), trên Web Desktop không dùng Sidebar
+      if (typeof window !== 'undefined' && window.innerWidth > 768) return;
       try { soundManager.playCuteWhoosh(); } catch (_) {}
       drawer?.classList.add('open');
       backdrop?.classList.add('open');
@@ -538,9 +540,16 @@ export class HubController {
     };
 
     document.getElementById('btn-hub-sidebar-toggle')?.addEventListener('click', openDrawer);
-    document.getElementById('btn-hub-open-menu-inline')?.addEventListener('click', openDrawer);
     document.getElementById('btn-sidebar-close')?.addEventListener('click', closeDrawer);
     backdrop?.addEventListener('click', closeDrawer);
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && drawer?.classList.contains('open')) {
+          closeDrawer();
+        }
+      });
+    }
 
     // Xử lý các mục điều hướng trong Sidebar Nav (7 tính năng từ Tower Menu)
     document.querySelectorAll('.sidebar-nav-item').forEach(item => {
