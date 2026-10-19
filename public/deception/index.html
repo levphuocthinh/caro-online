@@ -202,6 +202,15 @@
               <i class="fa-solid fa-sun"></i>
             </button>
           </div>
+
+          <!-- Allies Night Box (For Lab Tech and Inside Man) -->
+          <div class="night-allies-box" id="night-allies-box" style="display: none;">
+            <div class="intel-content" id="night-allies-content"></div>
+            <button type="button" class="btn-noir-hero" id="btn-allies-proceed">
+              <span>BÌNH MINH VÒNG 2 — BẮT ĐẦU VÒNG ĐIỀU TRA MỚI</span>
+              <i class="fa-solid fa-sun"></i>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -218,7 +227,11 @@
           <div class="speaker-hud" id="speaker-hud">
             <span class="speaker-avatar" id="hud-speaker-avatar">🕵️</span>
             <div class="speaker-info">
-              <span class="speaker-name" id="hud-speaker-name">Đang trình bày...</span>
+              <div class="speaker-name-row">
+                <span class="speaker-name" id="hud-speaker-name">Đang trình bày...</span>
+                <span class="speaker-status-tag" id="hud-speaker-status"></span>
+              </div>
+              <div class="speaker-speech-quote" id="hud-speaker-quote" style="display: none;"></div>
               <div class="speaker-time-bar">
                 <div class="speaker-time-fill" id="hud-time-fill" style="width: 100%;"></div>
               </div>

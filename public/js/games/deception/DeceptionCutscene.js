@@ -36,11 +36,12 @@ export class DeceptionCutscene {
   play(config = {}) {
     this.stop();
 
-    const overlay = document.getElementById('deception-cutscene-overlay');
-    const canvas = document.getElementById('deception-cutscene-canvas');
-    const titleEl = document.getElementById('deception-cutscene-title');
-    const subEl = document.getElementById('deception-cutscene-sub');
-    const badgeEl = document.getElementById('deception-cutscene-badge');
+    const overlay = document.getElementById('deception-cutscene-overlay') || document.getElementById('cutscene-overlay');
+    const canvas = document.getElementById('deception-cutscene-canvas') || document.getElementById('cutscene-canvas');
+    const titleEl = document.getElementById('deception-cutscene-title') || document.getElementById('cutscene-title');
+    const subEl = document.getElementById('deception-cutscene-sub') || document.getElementById('cutscene-sub');
+    const badgeEl = document.getElementById('deception-cutscene-badge') || document.getElementById('cutscene-tag');
+    const skipBtn = document.getElementById('btn-cutscene-skip');
 
     if (!overlay || !canvas) {
       if (typeof config.onComplete === 'function') config.onComplete();
@@ -53,7 +54,11 @@ export class DeceptionCutscene {
     if (subEl) subEl.textContent = config.subtitle || '';
     if (badgeEl) {
       badgeEl.textContent = config.badgeText || 'HONG KONG NOIR ARCHIVE';
-      badgeEl.className = `deception-cutscene-badge ${config.team === 'CRIMINAL' ? 'badge-criminal' : 'badge-police'}`;
+      badgeEl.className = `cutscene-tag ${config.team === 'CRIMINAL' ? 'badge-criminal' : 'badge-police'}`;
+    }
+
+    if (skipBtn) {
+      skipBtn.onclick = () => this.finish();
     }
 
     overlay.classList.add('active');
@@ -87,7 +92,7 @@ export class DeceptionCutscene {
 
   finish() {
     this.stop();
-    const overlay = document.getElementById('deception-cutscene-overlay');
+    const overlay = document.getElementById('deception-cutscene-overlay') || document.getElementById('cutscene-overlay');
     if (overlay) {
       overlay.classList.remove('active');
     }

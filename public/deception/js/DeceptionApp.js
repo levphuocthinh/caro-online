@@ -1,7 +1,7 @@
 /**
  * DeceptionApp: Controller cho trang chuyên biệt độc lập "Deception: Murder in Viet Nam"
  * Hoàn toàn tách biệt khỏi Caro, giao diện Noir phân theo từng phân đoạn (Stage-Based),
- * tuyệt đối không nhồi nhét, trực quan và tối ưu cho cả Desktop lẫn Mobile.
+ * tuyệt đối không nhồi nhét, trực quan, song ngữ rõ ràng và tối ưu cho cả Desktop lẫn Mobile.
  */
 
 import {
@@ -11,13 +11,13 @@ import {
   CLUE_CARDS
 } from '/js/games/deception/data/deceptionData.js';
 import { DeceptionState, GAME_PHASES } from '/js/games/deception/DeceptionState.js';
+import { deceptionCutscene } from '/js/games/deception/DeceptionCutscene.js';
 
 class DeceptionAppController {
   constructor() {
     this.state = new DeceptionState();
     this.isVi = true;
     this.speakerTimerId = null;
-    this.cutsceneTimerId = null;
     this.soundEnabled = true;
 
     // Audio Context cho âm thanh kịch tính Noir
@@ -63,6 +63,22 @@ class DeceptionAppController {
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
         osc.start(t);
         osc.stop(t + 0.25);
+      } else if (type === 'bullet_drop') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(240, t);
+        osc.frequency.exponentialRampToValueAtTime(70, t + 0.15);
+        gain.gain.setValueAtTime(0.35, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        osc.start(t);
+        osc.stop(t + 0.15);
+      } else if (type === 'badge_loss') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(420, t);
+        osc.frequency.linearRampToValueAtTime(140, t + 0.28);
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+        osc.start(t);
+        osc.stop(t + 0.28);
       } else if (type === 'chime') {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(587.33, t); // D5
@@ -71,14 +87,21 @@ class DeceptionAppController {
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
         osc.start(t);
         osc.stop(t + 0.4);
+      } else if (type === 'tick') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(850, t);
+        gain.gain.setValueAtTime(0.06, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+        osc.start(t);
+        osc.stop(t + 0.04);
       } else if (type === 'revolver') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(300, t);
-        osc.frequency.exponentialRampToValueAtTime(30, t + 0.35);
+        osc.frequency.setValueAtTime(320, t);
+        osc.frequency.exponentialRampToValueAtTime(25, t + 0.38);
         gain.gain.setValueAtTime(0.5, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
         osc.start(t);
-        osc.stop(t + 0.35);
+        osc.stop(t + 0.38);
       }
     } catch (_) {}
   }
@@ -141,7 +164,12 @@ class DeceptionAppController {
     // Đóng modals qua nút có data-close
     document.querySelectorAll('[data-close]').forEach(btn => {
       btn.addEventListener('click', () => {
-        this.closeModal(btn.dataset.close);
+        const modalId = btn.dataset.close;
+        this.closeModal(modalId);
+        // Nếu hủy modal phá án mà đang trong vòng tranh luận, tiếp tục đồng hồ
+        if (modalId === 'modal-accuse' && this.state.phase.includes('PRESENTATION')) {
+          this.startSpeakerTimer();
+        }
       });
     });
 
@@ -183,11 +211,6 @@ class DeceptionAppController {
       this.enterNightCrimePhase();
     });
 
-    // Nút Bỏ qua Cutscene
-    document.getElementById('btn-cutscene-skip')?.addEventListener('click', () => {
-      this.finishCutscene();
-    });
-
     // Chuyển đổi tab Pháp Y 6 Thẻ vs Bàn Nghi Phạm
     document.querySelectorAll('.inv-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -207,10 +230,11 @@ class DeceptionAppController {
     // Dock Actions
     document.getElementById('btn-dock-next-speaker')?.addEventListener('click', () => {
       this.playAudio('click');
+      this.stopSpeakerTimer();
       if (!this.state.nextSpeaker()) {
         this.advanceInvestigationRound();
       } else {
-        this.renderInvestigationHud();
+        this.startSpeakerTimer();
       }
     });
 
@@ -219,6 +243,7 @@ class DeceptionAppController {
     });
 
     document.getElementById('btn-dock-accuse')?.addEventListener('click', () => {
+      this.stopSpeakerTimer();
       this.openAccusationDialog();
     });
 
@@ -261,6 +286,7 @@ class DeceptionAppController {
   }
 
   startInvestigationGame() {
+    this.stopSpeakerTimer();
     this.playAudio('chime');
     this.state.startNewGame();
     this.updateHeaderInfo();
@@ -281,7 +307,7 @@ class DeceptionAppController {
     const desc = document.getElementById('role-display-desc');
 
     if (ico) ico.textContent = roleDef.icon;
-    if (title) title.textContent = this.isVi ? roleDef.name_vi : roleDef.name_en;
+    if (title) title.textContent = `${roleDef.name_vi} (${roleDef.name_en})`;
     if (faction) {
       const isCrim = human.team === 'CRIMINAL';
       faction.className = `role-faction-pill ${isCrim ? 'pill-crim' : 'pill-pol'}`;
@@ -306,8 +332,11 @@ class DeceptionAppController {
     const isMurderer = human.role === 'MURDERER';
     const murdererPicker = document.getElementById('night-murderer-picker');
     const intelBox = document.getElementById('night-intel-box');
+    const alliesBox = document.getElementById('night-allies-box');
     const headline = document.getElementById('night-headline');
     const sub = document.getElementById('night-sub');
+
+    if (alliesBox) alliesBox.style.display = 'none';
 
     if (isMurderer) {
       if (headline) headline.textContent = this.isVi ? 'Bạn Là Kẻ Sát Nhân' : 'You Are The Murderer';
@@ -342,8 +371,13 @@ class DeceptionAppController {
     if (meansGrid) {
       meansGrid.innerHTML = murderer.meansCards.map(m => `
         <button type="button" class="evidence-chip chip-blue ${this.state.pendingSelection.meansCardId === m.id ? 'is-selected' : ''}" data-pick-means="${m.id}">
-          <span>${m.icon || '🧪'} ${this.isVi ? m.vi : m.en}</span>
-          <small>${m.category}</small>
+          <div class="evidence-chip-left">
+            <span class="evidence-chip-icon">${m.icon || '🧪'}</span>
+            <div class="evidence-chip-text">
+              <span class="evidence-chip-vi">${m.vi}</span>
+              <span class="evidence-chip-en">${m.en}</span>
+            </div>
+          </div>
         </button>
       `).join('');
 
@@ -359,8 +393,13 @@ class DeceptionAppController {
     if (cluesGrid) {
       cluesGrid.innerHTML = murderer.clueCards.map(c => `
         <button type="button" class="evidence-chip chip-red ${this.state.pendingSelection.clueCardId === c.id ? 'is-selected' : ''}" data-pick-clue="${c.id}">
-          <span>${c.icon || '🔎'} ${this.isVi ? c.vi : c.en}</span>
-          <small>${c.category}</small>
+          <div class="evidence-chip-left">
+            <span class="evidence-chip-icon">${c.icon || '🔎'}</span>
+            <div class="evidence-chip-text">
+              <span class="evidence-chip-vi">${c.vi}</span>
+              <span class="evidence-chip-en">${c.en}</span>
+            </div>
+          </div>
         </button>
       `).join('');
 
@@ -374,18 +413,28 @@ class DeceptionAppController {
     }
 
     const confirmBtn = document.getElementById('btn-night-confirm-crime');
-    confirmBtn?.onclick = () => {
-      const mId = this.state.pendingSelection.meansCardId;
-      const cId = this.state.pendingSelection.clueCardId;
-      if (!mId || !cId) {
-        alert(this.isVi ? 'Vui lòng chọn đủ 1 thẻ Xanh và 1 thẻ Đỏ!' : 'Please pick 1 Blue Means and 1 Red Clue!');
-        return;
-      }
-      this.state.commitMurdererSelection(mId, cId);
-      this.playCutscene('NIGHT_CRIME', () => {
-        this.startInvestigationRound1();
-      });
-    };
+    if (confirmBtn) {
+      confirmBtn.onclick = () => {
+        const mId = this.state.pendingSelection.meansCardId;
+        const cId = this.state.pendingSelection.clueCardId;
+        if (!mId || !cId) {
+          alert(this.isVi ? 'Vui lòng chọn đủ 1 thẻ Xanh và 1 thẻ Đỏ!' : 'Please pick 1 Blue Means and 1 Red Clue!');
+          return;
+        }
+        this.state.commitMurdererSelection(mId, cId);
+
+        const mCard = this.state.findCardById(mId)?.card;
+        const cat = mCard ? mCard.category : 'Severe Injury';
+
+        this.playCutscene('NIGHT_CRIME', {
+          category: cat,
+          title: this.isVi ? 'Đêm Gây Án Đẫm Máu' : 'Night of Crime',
+          subtitle: this.isVi ? `Hung khí: ${mCard?.vi || '—'}` : `Means: ${mCard?.en || '—'}`
+        }, () => {
+          this.startInvestigationRound1();
+        });
+      };
+    }
   }
 
   renderNightIntelContent() {
@@ -399,37 +448,61 @@ class DeceptionAppController {
 
     if (human.role === 'ACCOMPLICE' || human.role === 'FORENSIC_SCIENTIST') {
       intelContent.innerHTML = `
-        <div style="font-size: 15px; margin-bottom: 10px;">
+        <div style="font-size: 15px; margin-bottom: 12px;">
           <b>🕵️ Hung thủ:</b> ${murderer ? murderer.displayName : '—'}
         </div>
-        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
-          <span class="evidence-chip chip-blue">🔪 ${solMeans ? solMeans.vi : '—'}</span>
-          <span class="evidence-chip chip-red">🩸 ${solClue ? solClue.vi : '—'}</span>
+        <div style="display: flex; justify-content: center; gap: 12px; margin-top: 10px; flex-wrap: wrap;">
+          <span class="evidence-chip chip-blue" style="cursor: default;">
+            <div class="evidence-chip-left">
+              <span class="evidence-chip-icon">🔪</span>
+              <div class="evidence-chip-text">
+                <span class="evidence-chip-vi">${solMeans ? solMeans.vi : '—'}</span>
+                <span class="evidence-chip-en">${solMeans ? solMeans.en : '—'}</span>
+              </div>
+            </div>
+          </span>
+          <span class="evidence-chip chip-red" style="cursor: default;">
+            <div class="evidence-chip-left">
+              <span class="evidence-chip-icon">🩸</span>
+              <div class="evidence-chip-text">
+                <span class="evidence-chip-vi">${solClue ? solClue.vi : '—'}</span>
+                <span class="evidence-chip-en">${solClue ? solClue.en : '—'}</span>
+              </div>
+            </div>
+          </span>
         </div>
       `;
     } else if (human.role === 'WITNESS') {
       const suspects = this.state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
       intelContent.innerHTML = `
-        <p style="font-size: 14px; line-height: 1.5;">
+        <p style="font-size: 14.5px; line-height: 1.6;">
           👁️ <b>Bạn là Nhân chứng:</b> Bạn đã thấy 2 nghi phạm rời hiện trường:
-          <br><b>${suspects.map(s => s.displayName).join(' & ')}</b>
-          <br><em>(Nhưng không biết ai là hung thủ trực tiếp, ai là đồng phạm!)</em>
+          <br><b style="color: var(--crimson); font-size: 16px;">${suspects.map(s => s.displayName).join(' & ')}</b>
+          <br><em style="color: var(--text-secondary);">(Nhưng không biết ai là hung thủ trực tiếp, ai là đồng phạm!)</em>
         </p>
       `;
     } else {
       intelContent.innerHTML = `
-        <p style="font-size: 14px; line-height: 1.5;">
+        <p style="font-size: 14.5px; line-height: 1.6;">
           Tất cả điều tra viên đang chờ bình minh. Hiện trường vụ án đang được phong tỏa...
         </p>
       `;
     }
 
     const btn = document.getElementById('btn-night-proceed');
-    btn?.onclick = () => {
-      this.playCutscene('NIGHT_CRIME', () => {
-        this.startInvestigationRound1();
-      });
-    };
+    if (btn) {
+      btn.onclick = () => {
+        const mCard = this.state.findCardById(this.state.solution.meansCardId)?.card;
+        const cat = mCard ? mCard.category : 'Severe Injury';
+        this.playCutscene('NIGHT_CRIME', {
+          category: cat,
+          title: this.isVi ? 'Hiện Trường Vụ Án' : 'Crime Scene',
+          subtitle: this.isVi ? 'Pháp y bắt đầu khám nghiệm' : 'Forensics inspecting the scene'
+        }, () => {
+          this.startInvestigationRound1();
+        });
+      };
+    }
   }
 
   /* =========================================================================
@@ -438,8 +511,19 @@ class DeceptionAppController {
 
   startInvestigationRound1() {
     this.state.startRound1Evidence();
+    const human = this.state.getHumanPlayer();
+
     this.renderInvestigationTable();
     this.showView('view-investigation');
+
+    if (human.role === 'FORENSIC_SCIENTIST') {
+      // Pháp y người chơi tự tay đặt 6 viên đạn gỗ
+      this.playAudio('chime');
+    } else {
+      // Pháp y là Bot tự động đặt đạn xong -> Bắt đầu Vòng tranh luận 1
+      this.state.startPresentationPhase();
+      this.startSpeakerTimer();
+    }
   }
 
   renderInvestigationTable() {
@@ -459,28 +543,8 @@ class DeceptionAppController {
     const badgesLeft = activeHolders.filter(p => p.hasBadge).length;
     if (lblBadges) lblBadges.textContent = `${badgesLeft}/${activeHolders.length}`;
 
-    // HUD Speaker
-    const currentSpeaker = this.state.getCurrentSpeaker();
-    const speakerAvatar = document.getElementById('hud-speaker-avatar');
-    const speakerName = document.getElementById('hud-speaker-name');
-    const speakerSec = document.getElementById('hud-speaker-sec');
-    const timeFill = document.getElementById('hud-time-fill');
-
-    if (currentSpeaker && this.state.phase.includes('PRESENTATION')) {
-      if (lblPhase) lblPhase.textContent = this.isVi ? 'TRÌNH BÀY 30S' : '30S PRESENTATION';
-      if (speakerAvatar) speakerAvatar.textContent = currentSpeaker.avatar;
-      if (speakerName) speakerName.textContent = currentSpeaker.displayName;
-      if (speakerSec) speakerSec.textContent = `${this.state.speakerTimeLeft}s`;
-      if (timeFill) {
-        const pct = Math.max(0, Math.min(100, Math.round((this.state.speakerTimeLeft / 30) * 100)));
-        timeFill.style.width = `${pct}%`;
-      }
-    } else {
-      if (lblPhase) lblPhase.textContent = this.isVi ? 'PHÁP Y ĐẶT ĐẠN' : 'FORENSIC MARKERS';
-      if (speakerName) speakerName.textContent = this.isVi ? 'Quan sát hiện trường...' : 'Observe crime scene...';
-      if (speakerSec) speakerSec.textContent = '—';
-      if (timeFill) timeFill.style.width = '100%';
-    }
+    // Update Speaker HUD
+    this.updateSpeakerHud();
 
     // Consulting Detective button
     const human = this.state.getHumanPlayer();
@@ -499,6 +563,91 @@ class DeceptionAppController {
     }
   }
 
+  startSpeakerTimer() {
+    this.stopSpeakerTimer();
+    this.state.speakerTimeLeft = this.state.config.presentationSeconds || 30;
+    this.updateSpeakerHud();
+
+    this.speakerTimerId = window.setInterval(() => {
+      if (this.state.speakerTimeLeft > 0) {
+        this.state.speakerTimeLeft--;
+        this.updateSpeakerHud();
+
+        if (this.state.speakerTimeLeft <= 5 && this.state.speakerTimeLeft > 0) {
+          this.playAudio('tick');
+        }
+      } else {
+        // Hết 30 giây của người hiện tại -> Chuyển sang người tiếp theo
+        this.stopSpeakerTimer();
+        this.playAudio('chime');
+        if (!this.state.nextSpeaker()) {
+          this.advanceInvestigationRound();
+        } else {
+          this.startSpeakerTimer();
+        }
+      }
+    }, 1000);
+  }
+
+  stopSpeakerTimer() {
+    if (this.speakerTimerId) {
+      clearInterval(this.speakerTimerId);
+      this.speakerTimerId = null;
+    }
+  }
+
+  updateSpeakerHud() {
+    const currentSpeaker = this.state.getCurrentSpeaker();
+    const human = this.state.getHumanPlayer();
+    const speakerAvatar = document.getElementById('hud-speaker-avatar');
+    const speakerName = document.getElementById('hud-speaker-name');
+    const speakerStatus = document.getElementById('hud-speaker-status');
+    const speakerQuote = document.getElementById('hud-speaker-quote');
+    const speakerSec = document.getElementById('hud-speaker-sec');
+    const timeFill = document.getElementById('hud-time-fill');
+    const lblPhase = document.getElementById('ribbon-phase');
+
+    if (currentSpeaker && this.state.phase.includes('PRESENTATION')) {
+      const isSelf = currentSpeaker.id === human.id;
+      if (lblPhase) lblPhase.textContent = this.isVi ? 'TRANH LUẬN 30S' : '30S DISCUSSION';
+      if (speakerAvatar) speakerAvatar.textContent = currentSpeaker.avatar;
+      if (speakerName) speakerName.textContent = currentSpeaker.displayName;
+      if (speakerStatus) {
+        speakerStatus.textContent = isSelf ? (this.isVi ? 'LƯỢT CỦA BẠN' : 'YOUR TURN') : (this.isVi ? 'ĐANG NÓI' : 'SPEAKING');
+        speakerStatus.className = `speaker-status-tag ${isSelf ? 'tag-you' : ''}`;
+      }
+      if (speakerSec) speakerSec.textContent = `${this.state.speakerTimeLeft}s`;
+      if (timeFill) {
+        const pct = Math.max(0, Math.min(100, Math.round((this.state.speakerTimeLeft / 30) * 100)));
+        timeFill.style.width = `${pct}%`;
+      }
+
+      if (speakerQuote) {
+        if (isSelf) {
+          speakerQuote.style.display = 'block';
+          speakerQuote.textContent = this.isVi
+            ? '💬 Lượt của bạn! Bạn có thể trao đổi suy luận hoặc bấm "Lượt Kế Tiếp" khi nói xong.'
+            : '💬 Your turn! Share your deduction or click "Next Speaker" when done.';
+        } else {
+          const latestBotLog = this.state.caseLogs.find(l => l.type === 'speech');
+          if (latestBotLog) {
+            speakerQuote.style.display = 'block';
+            speakerQuote.textContent = this.isVi ? latestBotLog.textVi : latestBotLog.textEn;
+          } else {
+            speakerQuote.style.display = 'none';
+          }
+        }
+      }
+    } else {
+      if (lblPhase) lblPhase.textContent = this.isVi ? 'PHÁP Y ĐẶT ĐẠN' : 'FORENSIC MARKERS';
+      if (speakerName) speakerName.textContent = this.isVi ? 'Quan sát hiện trường...' : 'Observe crime scene...';
+      if (speakerStatus) speakerStatus.textContent = '';
+      if (speakerQuote) speakerQuote.style.display = 'none';
+      if (speakerSec) speakerSec.textContent = '—';
+      if (timeFill) timeFill.style.width = '100%';
+    }
+  }
+
   renderActiveSceneTiles() {
     const grid = document.getElementById('active-scene-tiles-grid');
     const actionsSlot = document.getElementById('forensic-actions-slot');
@@ -508,7 +657,29 @@ class DeceptionAppController {
     const isHumanForensic = human.role === 'FORENSIC_SCIENTIST';
 
     if (actionsSlot) {
-      if (isHumanForensic && (this.state.phase === GAME_PHASES.ROUND_2_EVIDENCE || this.state.phase === GAME_PHASES.ROUND_3_EVIDENCE)) {
+      if (isHumanForensic && this.state.phase === GAME_PHASES.ROUND_1_EVIDENCE) {
+        const allSet = this.state.areAllSceneTilesMarked();
+        actionsSlot.innerHTML = `
+          <button type="button" class="btn-noir-hero ${allSet ? '' : 'disabled'}" id="btn-forensic-confirm-r1" style="font-size: 13px; padding: 8px 16px;">
+            <i class="fa-solid fa-check-double"></i>
+            <span>${this.isVi ? 'XÁC NHẬN 6 VIÊN ĐẠN & BẮT ĐẦU TRANH LUẬN' : 'CONFIRM 6 BULLETS & START DISCUSSION'}</span>
+          </button>
+        `;
+        document.getElementById('btn-forensic-confirm-r1')?.addEventListener('click', () => {
+          if (!this.state.areAllSceneTilesMarked()) {
+            alert(this.isVi ? 'Vui lòng đặt đủ 6 viên đạn lên 6 Thẻ Hiện Trường!' : 'Please place all 6 bullets on the Scene Tiles!');
+            return;
+          }
+          this.playCutscene('BULLET_DROP', {
+            title: this.isVi ? 'Hoàn Tất Giám Định' : 'Forensic Clues Ready',
+            subtitle: this.isVi ? 'Đã bố trí 6 viên đạn gỗ' : 'All 6 bullets placed'
+          }, () => {
+            this.state.startPresentationPhase();
+            this.renderInvestigationTable();
+            this.startSpeakerTimer();
+          });
+        });
+      } else if (isHumanForensic && (this.state.phase === GAME_PHASES.ROUND_2_EVIDENCE || this.state.phase === GAME_PHASES.ROUND_3_EVIDENCE)) {
         actionsSlot.innerHTML = `
           <button type="button" class="btn-noir-small" id="btn-forensic-swap-brown">
             <i class="fa-solid fa-arrows-rotate"></i> ${this.isVi ? 'Đổi 1 Thẻ Nâu' : 'Swap 1 Brown Tile'}
@@ -516,7 +687,7 @@ class DeceptionAppController {
         `;
         document.getElementById('btn-forensic-swap-brown')?.addEventListener('click', () => {
           this.state.replaceBrownSceneTile(2);
-          this.playAudio('click');
+          this.playAudio('bullet_drop');
           this.renderActiveSceneTiles();
         });
       } else {
@@ -534,21 +705,26 @@ class DeceptionAppController {
         tile.color === 'GREEN' ? (this.isVi ? 'ĐỊA ĐIỂM GÂY ÁN' : 'LOCATION OF CRIME') :
         (this.isVi ? `HIỆN TRƯỜNG (VÒNG ${tile.roundPlaced || 1})` : `SCENE (ROUND ${tile.roundPlaced || 1})`);
 
-      const opts = this.isVi ? tile.options_vi : tile.options_en;
-
       return `
         <div class="scene-tile-card ${colorClass}">
           <div class="tile-header">
             <span class="tile-badge">${badgeName}</span>
           </div>
-          <h4 class="tile-title">${this.isVi ? tile.name_vi : tile.name_en}</h4>
+          <div class="tile-title">
+            <span class="tile-title-vi">${tile.name_vi}</span>
+            <span class="tile-title-en">${tile.name_en}</span>
+          </div>
           <div class="tile-options-list">
-            ${opts.map((optText, optIdx) => {
+            ${tile.options_vi.map((viText, optIdx) => {
+              const enText = tile.options_en ? tile.options_en[optIdx] : '';
               const isMarked = tile.selectedOptionIndex === optIdx;
               return `
                 <button type="button" class="tile-opt-btn ${isMarked ? 'is-marked' : ''}" data-tile-idx="${tIdx}" data-opt-idx="${optIdx}">
                   <span class="bullet-marker">${isMarked ? '🎯' : '•'}</span>
-                  <span>${optText}</span>
+                  <div class="tile-opt-texts">
+                    <span class="tile-opt-vi">${viText}</span>
+                    <span class="tile-opt-en">${enText}</span>
+                  </div>
                 </button>
               `;
             }).join('')}
@@ -560,10 +736,11 @@ class DeceptionAppController {
     // Click đặt đạn (nếu là Pháp y)
     grid.querySelectorAll('.tile-opt-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (!isHumanForensic && !this.state.phase.includes('EVIDENCE')) return;
         const tIdx = parseInt(btn.dataset.tileIdx, 10);
         const optIdx = parseInt(btn.dataset.optIdx, 10);
         this.state.placeBulletOnTile(tIdx, optIdx);
-        this.playAudio('gavel');
+        this.playAudio('bullet_drop');
         this.renderActiveSceneTiles();
       });
     });
@@ -606,8 +783,14 @@ class DeceptionAppController {
               <div class="evidence-chips-grid">
                 ${s.meansCards.map(m => `
                   <button type="button" class="evidence-chip chip-blue ${this.state.pinnedCardIds.has(m.id) ? 'is-pinned' : ''}" data-pin-card="${m.id}">
-                    <span>${m.icon || '🧪'} ${this.isVi ? m.vi : m.en}</span>
-                    ${this.state.pinnedCardIds.has(m.id) ? '<span>📌</span>' : ''}
+                    <div class="evidence-chip-left">
+                      <span class="evidence-chip-icon">${m.icon || '🧪'}</span>
+                      <div class="evidence-chip-text">
+                        <span class="evidence-chip-vi">${m.vi}</span>
+                        <span class="evidence-chip-en">${m.en}</span>
+                      </div>
+                    </div>
+                    ${this.state.pinnedCardIds.has(m.id) ? '<span class="evidence-chip-pin">📌</span>' : ''}
                   </button>
                 `).join('')}
               </div>
@@ -618,8 +801,14 @@ class DeceptionAppController {
               <div class="evidence-chips-grid">
                 ${s.clueCards.map(c => `
                   <button type="button" class="evidence-chip chip-red ${this.state.pinnedCardIds.has(c.id) ? 'is-pinned' : ''}" data-pin-card="${c.id}">
-                    <span>${c.icon || '🔎'} ${this.isVi ? c.vi : c.en}</span>
-                    ${this.state.pinnedCardIds.has(c.id) ? '<span>📌</span>' : ''}
+                    <div class="evidence-chip-left">
+                      <span class="evidence-chip-icon">${c.icon || '🔎'}</span>
+                      <div class="evidence-chip-text">
+                        <span class="evidence-chip-vi">${c.vi}</span>
+                        <span class="evidence-chip-en">${c.en}</span>
+                      </div>
+                    </div>
+                    ${this.state.pinnedCardIds.has(c.id) ? '<span class="evidence-chip-pin">📌</span>' : ''}
                   </button>
                 `).join('')}
               </div>
@@ -646,29 +835,158 @@ class DeceptionAppController {
     // Bấm phá án thẳng từ thẻ nghi phạm
     grid.querySelectorAll('[data-accuse-suspect]').forEach(btn => {
       btn.addEventListener('click', () => {
+        this.stopSpeakerTimer();
         this.openAccusationDialog(btn.dataset.accuseSuspect);
       });
     });
   }
 
   advanceInvestigationRound() {
+    this.stopSpeakerTimer();
     this.playAudio('click');
+
     if (this.state.round === 1) {
+      const hasAlliesNight = this.state.players.some(
+        p => p.role === 'LAB_TECHNICIAN' || p.role === 'INSIDE_MAN'
+      );
+      if (hasAlliesNight) {
+        this.enterAlliesNightPhase();
+        return;
+      }
       this.state.startRound2Evidence();
+      this.startInvestigationRoundAfterEvidence();
     } else if (this.state.round === 2) {
       this.state.startRound3Evidence();
+      this.startInvestigationRoundAfterEvidence();
     } else {
       // Hết 3 vòng mà chưa phá án thành công -> Hung thủ thắng!
       this.state.finishGame(
         'CRIMINAL',
         'TIME_EXPIRED',
         'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra thủ phạm. Kẻ Sát Nhân đã cao chạy xa bay!',
-        'All 3 investigation rounds finished without an arrest. The Murderer escaped!'
+        'All 3 investigation rounds finished without an arrest. The Murderer escaped into the night!'
       );
       this.showGameOverView();
-      return;
     }
+  }
+
+  startInvestigationRoundAfterEvidence() {
+    const human = this.state.getHumanPlayer();
     this.renderInvestigationTable();
+    this.showView('view-investigation');
+
+    if (human.role !== 'FORENSIC_SCIENTIST') {
+      this.state.startPresentationPhase();
+      this.startSpeakerTimer();
+    }
+  }
+
+  /* =========================================================================
+     STAGE: ALLIES NIGHT PHASE
+     ========================================================================= */
+
+  enterAlliesNightPhase() {
+    this.state.startAlliesNightPhase();
+    const human = this.state.getHumanPlayer();
+
+    const murdererPicker = document.getElementById('night-murderer-picker');
+    const intelBox = document.getElementById('night-intel-box');
+    const alliesBox = document.getElementById('night-allies-box');
+    const alliesContent = document.getElementById('night-allies-content');
+    const headline = document.getElementById('night-headline');
+    const sub = document.getElementById('night-sub');
+
+    if (murdererPicker) murdererPicker.style.display = 'none';
+    if (intelBox) intelBox.style.display = 'none';
+    if (alliesBox) alliesBox.style.display = 'flex';
+
+    if (headline) headline.textContent = this.isVi ? 'Đêm Mở Rộng: Đầu Mối Ngầm' : 'Allies Night: Undercover Operations';
+    if (sub) sub.textContent = this.isVi
+      ? 'Kỹ thuật viên phòng lab & Nội gián đang bí mật hành động.'
+      : 'The Lab Technician and Inside Man are operating under the cover of night.';
+
+    if (alliesContent) {
+      if (human.role === 'LAB_TECHNICIAN') {
+        const suspects = this.state.players.filter(p => p.role !== 'FORENSIC_SCIENTIST' && p.id !== human.id);
+        alliesContent.innerHTML = `
+          <div style="font-size: 15px; margin-bottom: 12px;">
+            🧪 <b>Bạn là Kỹ thuật viên Phòng Lab:</b> Chọn 1 lá bài trên bàn để kiểm tra trong phòng thí nghiệm:
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px; max-height: 240px; overflow-y: auto;">
+            ${suspects.map(s => `
+              <div style="background: rgba(255,255,255,0.04); padding: 8px; border-radius: 8px; text-align: left;">
+                <div style="font-weight: 800; font-size: 13px; margin-bottom: 6px;">${s.avatar} ${s.displayName}</div>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  ${[...s.meansCards, ...s.clueCards].map(c => `
+                    <button type="button" class="evidence-chip ${c.type === 'MEANS' ? 'chip-blue' : 'chip-red'}" data-lab-check="${c.id}">
+                      <span>${c.icon || '🔬'} ${this.isVi ? c.vi : c.en}</span>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          <div id="lab-check-result" style="margin-top: 14px; font-weight: 900; font-size: 14px;"></div>
+        `;
+
+        alliesContent.querySelectorAll('[data-lab-check]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const cardId = btn.dataset.labCheck;
+            const isMatch = this.state.performLabTechCheck(cardId);
+            this.playAudio('chime');
+            const resBox = document.getElementById('lab-check-result');
+            if (resBox) {
+              resBox.innerHTML = isMatch
+                ? `<span style="color: var(--green);">✅ MẪU DƯƠNG TÍNH! Lá bài này CHÍNH LÀ một phần của vụ án!</span>`
+                : `<span style="color: var(--crimson);">❌ MẪU ÂM TÍNH! Lá bài này KHÔNG liên quan đến vụ án.</span>`;
+            }
+          });
+        });
+      } else if (human.role === 'INSIDE_MAN') {
+        const targets = this.state.players.filter(p => p.hasBadge && p.id !== human.id && p.role !== 'FORENSIC_SCIENTIST');
+        alliesContent.innerHTML = `
+          <div style="font-size: 15px; margin-bottom: 12px;">
+            🕶️ <b>Bạn là Nội Gián:</b> Hãy chọn 1 Điều tra viên để bí mật đánh cắp Huy hiệu Phá án của họ:
+          </div>
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            ${targets.map(t => `
+              <button type="button" class="reversal-target-btn" data-steal-target="${t.id}">
+                ${t.avatar} ${t.displayName}
+              </button>
+            `).join('')}
+          </div>
+          <div id="inside-steal-result" style="margin-top: 14px; font-weight: 900; font-size: 14px;"></div>
+        `;
+
+        alliesContent.querySelectorAll('[data-steal-target]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const tId = btn.dataset.stealTarget;
+            this.state.performInsideManStrip(tId);
+            this.playAudio('badge_loss');
+            const resBox = document.getElementById('inside-steal-result');
+            if (resBox) {
+              resBox.innerHTML = `<span style="color: var(--gold);">🕶️ Đã đánh cắp thành công Huy hiệu của ${this.state.getPlayerById(tId)?.displayName}!</span>`;
+            }
+          });
+        });
+      } else {
+        alliesContent.innerHTML = `
+          <p style="font-size: 14.5px; line-height: 1.6;">
+            Thành phố trong đêm... Kỹ thuật viên Phòng Lab và các đầu mối ngầm đang bí mật hành động.
+          </p>
+        `;
+      }
+    }
+
+    const proceedBtn = document.getElementById('btn-allies-proceed');
+    if (proceedBtn) {
+      proceedBtn.onclick = () => {
+        this.state.startRound2Evidence();
+        this.startInvestigationRoundAfterEvidence();
+      };
+    }
+
+    this.showView('view-night');
   }
 
   /* =========================================================================
@@ -724,7 +1042,9 @@ class DeceptionAppController {
     if (meansPicker) {
       meansPicker.innerHTML = activeTarget.meansCards.map(m => `
         <button type="button" class="accuse-card-btn ${this.state.pendingSelection.accuseMeansId === m.id ? 'active-blue' : ''}" data-sel-means="${m.id}">
-          <span>${m.icon || '🧪'} ${this.isVi ? m.vi : m.en}</span>
+          <span>${m.icon || '🧪'}</span>
+          <span style="font-weight: 800;">${m.vi}</span>
+          <small style="opacity: 0.75; margin-left: 4px;">(${m.en})</small>
         </button>
       `).join('');
 
@@ -740,7 +1060,9 @@ class DeceptionAppController {
     if (cluesPicker) {
       cluesPicker.innerHTML = activeTarget.clueCards.map(c => `
         <button type="button" class="accuse-card-btn ${this.state.pendingSelection.accuseClueId === c.id ? 'active-red' : ''}" data-sel-clue="${c.id}">
-          <span>${c.icon || '🔎'} ${this.isVi ? c.vi : c.en}</span>
+          <span>${c.icon || '🔎'}</span>
+          <span style="font-weight: 800;">${c.vi}</span>
+          <small style="opacity: 0.75; margin-left: 4px;">(${c.en})</small>
         </button>
       `).join('');
 
@@ -772,7 +1094,13 @@ class DeceptionAppController {
 
     if (!res.valid) return;
 
-    this.playCutscene('ACCUSATION', () => {
+    this.playCutscene('ACCUSATION', {
+      isSuccess: res.isCorrect,
+      title: this.isVi ? 'Đập Bàn Phá Án' : 'Official Accusation',
+      subtitle: res.isCorrect
+        ? (this.isVi ? 'Cáo buộc chính xác!' : 'Accusation confirmed!')
+        : (this.isVi ? 'Bác bỏ! Đoán sai!' : 'Dismissed! Accusation false!')
+    }, () => {
       if (res.isCorrect) {
         this.playAudio('chime');
         if (this.state.phase === GAME_PHASES.WITNESS_REVERSAL) {
@@ -781,12 +1109,13 @@ class DeceptionAppController {
           this.showGameOverView();
         }
       } else {
-        this.playAudio('gavel');
+        this.playAudio('badge_loss');
         alert(this.isVi ? 'BÁC BỎ! Lời cáo buộc không chính xác. Bạn đã mất Huy hiệu!' : 'DISMISSED! Accusation incorrect. Badge lost!');
         if (this.state.phase === GAME_PHASES.GAME_OVER) {
           this.showGameOverView();
         } else {
           this.renderInvestigationTable();
+          this.startSpeakerTimer();
         }
       }
     });
@@ -821,7 +1150,13 @@ class DeceptionAppController {
   executeWitnessReversalShot(targetId) {
     this.playAudio('revolver');
     const res = this.state.resolveWitnessShot(targetId);
-    this.playCutscene('WITNESS_REVERSAL', () => {
+    this.playCutscene('WITNESS_REVERSAL', {
+      isSuccess: res.hitWitness,
+      title: this.isVi ? 'Phát Súng Định Mệnh' : 'The Final Shot',
+      subtitle: res.hitWitness
+        ? (this.isVi ? 'Nhân chứng bị hạ sát!' : 'Witness assassinated!')
+        : (this.isVi ? 'Cảnh sát bảo vệ thành công!' : 'Police protected the witness!')
+    }, () => {
       this.showGameOverView();
     });
   }
@@ -831,6 +1166,7 @@ class DeceptionAppController {
      ========================================================================= */
 
   showGameOverView() {
+    this.stopSpeakerTimer();
     const isPoliceWin = this.state.winnerTeam === 'INVESTIGATION';
     const murderer = this.state.getMurdererPlayer();
     const solMeans = this.state.findCardById(this.state.solution.meansCardId)?.card;
@@ -852,8 +1188,8 @@ class DeceptionAppController {
     if (stamp) stamp.textContent = isPoliceWin ? 'SOLVED' : 'ESCAPED';
 
     if (dMur) dMur.textContent = murderer ? `${murderer.avatar} ${murderer.displayName}` : '—';
-    if (dMeans) dMeans.textContent = solMeans ? `🔪 ${this.isVi ? solMeans.vi : solMeans.en}` : '—';
-    if (dClue) dClue.textContent = solClue ? `🩸 ${this.isVi ? solClue.vi : solClue.en}` : '—';
+    if (dMeans) dMeans.textContent = solMeans ? `🔪 ${solMeans.vi} (${solMeans.en})` : '—';
+    if (dClue) dClue.textContent = solClue ? `🩸 ${solClue.vi} (${solClue.en})` : '—';
 
     if (roster) {
       roster.innerHTML = this.state.players.map(p => {
@@ -873,60 +1209,22 @@ class DeceptionAppController {
      CUTSCENES & DIALOGS
      ========================================================================= */
 
-  playCutscene(type, onComplete) {
-    const overlay = document.getElementById('cutscene-overlay');
-    const canvas = document.getElementById('cutscene-canvas');
-    const title = document.getElementById('cutscene-title');
-    const sub = document.getElementById('cutscene-sub');
-
-    if (!overlay || !canvas) {
-      if (onComplete) onComplete();
-      return;
+  playCutscene(type, options = {}, onComplete = null) {
+    if (typeof options === 'function') {
+      onComplete = options;
+      options = {};
     }
-
-    overlay.classList.add('active');
-    this.onCutsceneComplete = onComplete;
-
-    const ctx = canvas.getContext('2d');
-    canvas.width = 320;
-    canvas.height = 180;
-    ctx.imageSmoothingEnabled = false;
-
-    if (title) title.textContent = type;
-    if (sub) sub.textContent = 'Hong Kong Noir Action';
-
-    let frame = 0;
-    const totalFrames = 24;
-
-    this.cutsceneTimerId = window.setInterval(() => {
-      ctx.fillStyle = '#08050c';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = frame % 4 < 2 ? 'rgba(255, 71, 87, 0.25)' : 'rgba(30, 144, 255, 0.25)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(80 + frame * 6, 85, 12, 10);
-
-      frame++;
-      if (frame >= totalFrames) {
-        this.finishCutscene();
+    deceptionCutscene.play({
+      type,
+      ...options,
+      onComplete: () => {
+        if (typeof onComplete === 'function') onComplete();
       }
-    }, 100);
+    });
   }
 
   finishCutscene() {
-    if (this.cutsceneTimerId) {
-      clearInterval(this.cutsceneTimerId);
-      this.cutsceneTimerId = null;
-    }
-    const overlay = document.getElementById('cutscene-overlay');
-    if (overlay) overlay.classList.remove('active');
-    if (this.onCutsceneComplete) {
-      const cb = this.onCutsceneComplete;
-      this.onCutsceneComplete = null;
-      cb();
-    }
+    deceptionCutscene.finish();
   }
 
   renderDossierLogs() {

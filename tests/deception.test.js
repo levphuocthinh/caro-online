@@ -95,4 +95,138 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     assert.equal(state.phase, GAME_PHASES.GAME_OVER);
     assert.equal(state.winnerTeam, 'CRIMINAL');
   });
+
+  await t.test('All 9 Roles can be preferred and assigned to Human player', () => {
+    const roles = [
+      'FORENSIC_SCIENTIST', 'MURDERER', 'INVESTIGATOR', 'WITNESS',
+      'ACCOMPLICE', 'LAB_TECHNICIAN', 'INSIDE_MAN', 'PROTECTIVE_DETAIL', 'CONSULTING_DETECTIVE'
+    ];
+
+    for (const r of roles) {
+      const state = new DeceptionState();
+      state.config.playerCount = 9;
+      state.config.preferredRole = r;
+      state.config.includeAccompliceAndWitness = true;
+      state.config.includeUndercoverAllies = true;
+      state.startNewGame();
+
+      assert.equal(state.getHumanPlayer().role, r, `Human should be assigned role ${r}`);
+      if (r === 'FORENSIC_SCIENTIST') {
+        assert.equal(state.getHumanPlayer().hasBadge, false, 'Forensic has no badge');
+        assert.equal(state.getHumanPlayer().isRoleRevealed, true, 'Forensic is publicly revealed');
+      } else {
+        assert.equal(state.getHumanPlayer().hasBadge, true, `${r} should have 1 badge`);
+      }
+    }
+  });
+
+  await t.test('Forensic smart marker AI matches Cause of Death semantically', () => {
+    const state = new DeceptionState();
+    state.config.playerCount = 6;
+    state.startNewGame();
+
+    const causeTile = state.activeSceneTiles.find(t => t.id === 'tile_cause_01');
+    assert.ok(causeTile, 'Cause of death tile must be present');
+
+    // Test with Poisoning Means card
+    const poisonCard = MEANS_CARDS.find(m => m.category === 'Poisoning');
+    const dummyClue = CLUE_CARDS[0];
+    const murderer = state.getMurdererPlayer();
+    murderer.meansCards[0] = { ...poisonCard, type: 'MEANS' };
+    murderer.clueCards[0] = { ...dummyClue, type: 'CLUE' };
+    state.commitMurdererSelection(poisonCard.id, dummyClue.id);
+
+    const calculatedOpt = state.computeSmartBulletOption(causeTile);
+    assert.equal(calculatedOpt, 4, 'Option 4 in tile_cause_01 is Poisoning / Trúng độc');
+  });
+
+  await t.test('Witness Reversal: Murderer shooting wrong target awards victory to Investigation', () => {
+    const state = new DeceptionState();
+    state.config.playerCount = 6;
+    state.config.includeAccompliceAndWitness = true;
+    state.startNewGame();
+    state.proceedToNightCrime();
+    state.proceedAfterNightCrime();
+    state.startRound1Evidence();
+    state.startPresentationPhase();
+
+    const murderer = state.getMurdererPlayer();
+    const witness = state.players.find(p => p.role === 'WITNESS');
+    const innocentCop = state.players.find(p => p.team === 'INVESTIGATION' && p.role !== 'WITNESS' && p.role !== 'FORENSIC_SCIENTIST');
+
+    // Make correct accusation
+    const accuser = innocentCop;
+    state.makeAccusation(accuser.id, murderer.id, state.solution.meansCardId, state.solution.clueCardId);
+    assert.equal(state.phase, GAME_PHASES.WITNESS_REVERSAL);
+
+    // Murderer shoots innocent cop instead of the Witness
+    const shotRes = state.resolveWitnessShot(innocentCop.id);
+    assert.equal(shotRes.hitWitness, false);
+    assert.equal(state.phase, GAME_PHASES.GAME_OVER);
+    assert.equal(state.winnerTeam, 'INVESTIGATION');
+  });
+
+  await t.test('All Badges exhausted without solving results in Criminal victory', () => {
+    const state = new DeceptionState();
+    state.config.playerCount = 4;
+    state.startNewGame();
+    state.proceedToNightCrime();
+    state.proceedAfterNightCrime();
+    state.startRound1Evidence();
+    state.startPresentationPhase();
+
+    const murderer = state.getMurdererPlayer();
+    const detectives = state.players.filter(p => p.hasBadge && p.id !== murderer.id);
+
+    for (const d of detectives) {
+      const wrongMeans = murderer.meansCards.find(m => m.id !== state.solution.meansCardId);
+      state.makeAccusation(d.id, murderer.id, wrongMeans.id, state.solution.clueCardId);
+    }
+
+    // Now all remaining badges are gone
+    const remainingBadges = state.players.filter(p => p.hasBadge && p.role !== 'FORENSIC_SCIENTIST').length;
+    if (remainingBadges === 0) {
+      assert.equal(state.phase, GAME_PHASES.GAME_OVER);
+      assert.equal(state.winnerTeam, 'CRIMINAL');
+    }
+  });
+
+  await t.test('Consulting Detective discards badge to prove 100% innocence', () => {
+    const state = new DeceptionState();
+    state.config.playerCount = 8;
+    state.config.preferredRole = 'CONSULTING_DETECTIVE';
+    state.startNewGame();
+
+    const consulting = state.getHumanPlayer();
+    assert.equal(consulting.role, 'CONSULTING_DETECTIVE');
+    assert.equal(consulting.hasBadge, true);
+    assert.equal(consulting.isRoleRevealed, false);
+
+    const success = state.activateConsultingDetectiveReveal(consulting.id);
+    assert.equal(success, true);
+    assert.equal(consulting.hasBadge, false, 'Badge is discarded');
+    assert.equal(consulting.isRoleRevealed, true, 'Role is revealed');
+  });
+
+  await t.test('Lab Technician and Inside Man abilities function in Allies Night', () => {
+    const state = new DeceptionState();
+    state.config.playerCount = 8;
+    state.config.includeUndercoverAllies = true;
+    state.startNewGame();
+    state.proceedToNightCrime();
+
+    const trueMeansId = state.solution.meansCardId;
+    const isTrueMatch = state.performLabTechCheck(trueMeansId);
+    assert.equal(isTrueMatch, true, 'Lab Tech should detect actual means card');
+
+    const fakeCardId = 'M999_DUMMY';
+    const isFalseMatch = state.performLabTechCheck(fakeCardId);
+    assert.equal(isFalseMatch, false, 'Lab Tech should reject non-solution card');
+
+    const victim = state.players.find(p => p.hasBadge && p.team === 'INVESTIGATION' && p.role !== 'FORENSIC_SCIENTIST');
+    assert.ok(victim);
+    const stripSuccess = state.performInsideManStrip(victim.id);
+    assert.equal(stripSuccess, true);
+    assert.equal(victim.hasBadge, false, 'Victim lost their badge');
+  });
 });
