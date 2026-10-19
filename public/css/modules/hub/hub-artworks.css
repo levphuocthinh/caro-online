@@ -106,10 +106,23 @@
 }
 
 .art-deception {
-  background: 
-    radial-gradient(circle at 50% 20%, rgba(231, 76, 60, 0.45) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(142, 68, 173, 0.5) 0%, transparent 55%),
-    linear-gradient(145deg, #1c1018 0%, #4a0e17 40%, #7b1113 75%, #a81c1c 100%) !important;
+  background: url('/images/deception-cover.jpg') center/cover no-repeat !important;
+}
+
+/* Ẩn icon và tiêu đề chữ phẳng trên bìa Deception để hình ảnh bìa Detective hiển thị trọn vẹn */
+.hub-game-tile[data-game-id="deception"] .tile-center-logo,
+.hub-home-card[data-game-id="deception"] .tile-center-logo,
+.hub-tower-card[data-game-id="deception"] .tile-center-logo {
+  display: none !important;
+}
+
+.hub-game-tile[data-game-id="deception"] .tile-bottom-strip,
+.hub-home-card[data-game-id="deception"] .tile-bottom-strip,
+.hub-tower-card[data-game-id="deception"] .tile-bottom-strip {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  font-weight: 900;
+  letter-spacing: 0.8px;
 }
 
 .art-splendor {

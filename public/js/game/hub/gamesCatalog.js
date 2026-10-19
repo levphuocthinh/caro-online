@@ -47,6 +47,7 @@ export function getGamesCatalog(i18n) {
       stripText: 'ẨN VAI TRÒ • 4-12P',
       studio: 'Lycngames • Social Deduction',
       artClass: 'art-deception',
+      hasCoverImage: true,
       iconHtml: '<i class="fa-solid fa-magnifying-glass" id="hub-tower-icon"></i>',
       towerColor: '#8b0000',
       towerDark: '#2d0a0a',
