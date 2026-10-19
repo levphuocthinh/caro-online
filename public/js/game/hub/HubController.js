@@ -593,14 +593,26 @@ export class HubController {
 
       let dragStartX = null;
       let dragStartY = null;
+      let isTouchOnScrollableRow = false;
+
       detailStageEl.addEventListener('pointerdown', (e) => {
         if (!this.isDetailViewOpen) return;
-        if (!e.target.closest('.hub-other-games-section, #hub-left-peek-slot')) return;
+        const onTarget = e.target.closest('.hub-other-games-section, #hub-left-peek-slot, #hub-tower-card');
+        if (!onTarget) return;
+
+        // Nếu vuốt cảm ứng trên hàng game khác, để cuộn ngang tự nhiên mượt mà
+        isTouchOnScrollableRow = e.pointerType === 'touch' && !!e.target.closest('.hub-other-games-row');
+        if (isTouchOnScrollableRow) return;
+
         dragStartX = e.clientX;
         dragStartY = e.clientY;
       });
 
       detailStageEl.addEventListener('pointerup', (e) => {
+        if (isTouchOnScrollableRow) {
+          isTouchOnScrollableRow = false;
+          return;
+        }
         if (dragStartX === null || dragStartY === null) return;
         const dx = e.clientX - dragStartX;
         const dy = e.clientY - dragStartY;

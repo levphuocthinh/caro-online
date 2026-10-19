@@ -107,6 +107,52 @@
 
 .art-splendor {
   background: 
+    radial-gradient(circle at 50% 20%, rgba(255, 234, 167, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(243, 104, 224, 0.5) 0%, transparent 55%),
+    linear-gradient(145deg, #341f97 0%, #5f27cd 45%, #9b59b6 80%, #f368e0 100%) !important;
+}
+
+.art-catan {
+  background: 
+    radial-gradient(circle at 50% 15%, rgba(255, 242, 0, 0.45) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(38, 222, 129, 0.35) 0%, transparent 50%),
+    linear-gradient(145deg, #d35400 0%, #e67e22 40%, #f39c12 75%, #f1c40f 100%) !important;
+}
+
+.art-carcassonne {
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(46, 134, 222, 0.4) 0%, transparent 55%),
+    linear-gradient(145deg, #0b7a5e 0%, #10ac84 45%, #1dd1a1 75%, #2e86de 100%) !important;
+}
+
+.art-avalon {
+  background: 
+    radial-gradient(circle at 50% 25%, rgba(225, 112, 85, 0.45) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(108, 92, 231, 0.45) 0%, transparent 50%),
+    linear-gradient(145deg, #1e272e 0%, #2c3e50 40%, #8e44ad 75%, #c0392b 100%) !important;
+}
+
+.art-chess {
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.35) 0%, transparent 50%),
+    radial-gradient(circle at 80% 85%, rgba(116, 185, 255, 0.4) 0%, transparent 55%),
+    linear-gradient(145deg, #0c2461 0%, #1e3799 45%, #4a69bd 80%, #60a3bc 100%) !important;
+}
+
+.art-xiangqi {
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(254, 202, 87, 0.45) 0%, transparent 50%),
+    radial-gradient(circle at 85% 80%, rgba(235, 77, 75, 0.4) 0%, transparent 50%),
+    linear-gradient(145deg, #6a0d24 0%, #b71540 45%, #e55039 80%, #fa983a 100%) !important;
+}
+
+.art-ludo {
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(255, 234, 167, 0.5) 0%, transparent 45%),
+    radial-gradient(circle at 20% 80%, rgba(9, 132, 227, 0.4) 0%, transparent 50%),
+    linear-gradient(145deg, #006221 0%, #009432 40%, #00b894 75%, #0984e3 100%) !important;
+}
 
 /* Scenic Artworks cho 3 thẻ News Caro Online */
 .news-art-online {

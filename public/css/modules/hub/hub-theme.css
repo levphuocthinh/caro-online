@@ -1,24 +1,8 @@
-@media (max-width: 900px) {
-  .hub-detail-stage {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 20px !important;
-  }
-  .hub-left-peek-slot {
-    display: none !important;
-  }
-  .hub-left-tower {
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-    margin-right: 0 !important;
-    border-radius: 18px !important;
-  }
-  .hub-tower-card {
-    height: 240px !important;
-  }
-}
-
+/* ===================================================
+   RESPONSIVE CHO MÁY TÍNH BẢNG (TABLET) & ĐIỆN THOẠI (SMARTPHONE)
+   Tối ưu hóa toàn diện: Cân đối thẻ game, Menu chip lướt ngang,
+   Header gọn gàng và dải game khác vuốt mượt mà trên màn hình nhỏ
+   =================================================== */
 
 .hub-recent-posts-section {
   margin-top: 10px;
@@ -33,17 +17,10 @@
   margin: 0;
 }
 
-/* ===================================================
-   RESPONSIVE CHO IPAD / TABLET & ĐIỆN THOẠI
-   =================================================== */
+/* Tablet (1024px trở xuống) */
 @media (max-width: 1024px) {
   #screen-hub.screen {
-    padding: 12px 16px;
-  }
-
-  .hub-dropdown-stage {
-    grid-template-columns: 210px 1fr;
-    gap: 20px;
+    padding: 12px 18px;
   }
 
   .hub-news-grid {
@@ -51,7 +28,48 @@
   }
 }
 
-@media (max-width: 767px) {
+/* Tablet Portrait & Điện thoại (900px trở xuống) */
+@media (max-width: 900px) {
+  .hub-detail-stage {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 18px !important;
+  }
+
+  .hub-left-peek-slot {
+    display: none !important;
+  }
+
+  .hub-left-tower {
+    width: min(88vw, 280px) !important;
+    min-width: min(88vw, 280px) !important;
+    max-width: min(88vw, 280px) !important;
+    margin-right: 0 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 0 0 3px #00e5ff, 0 10px 30px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  .hub-tower-card {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    border-radius: 17px 17px 0 0 !important;
+  }
+
+  .hub-right-stage {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+  }
+}
+
+/* ===================================================
+   TỐI ƯU HÓA ĐẶC BIỆT CHO ĐIỆN THOẠI (MOBILE SMARTPHONES <= 768px)
+   =================================================== */
+@media (max-width: 768px) {
   body.in-hub .app-header {
     padding: 8px 12px;
   }
@@ -60,39 +78,326 @@
     display: none !important;
   }
 
-  .hub-dropdown-stage {
-    grid-template-columns: 1fr;
-    gap: 16px;
+  #screen-hub.screen {
+    padding: 8px 12px 24px 12px !important;
   }
 
-  .hub-game-tile {
-    flex: 0 0 126px !important;
-    width: 126px !important;
-    height: 126px !important;
-    min-width: 126px !important;
-    min-height: 126px !important;
-    max-width: 126px !important;
-    max-height: 126px !important;
+  .hub-wrapper {
+    min-height: calc(100vh - 60px);
   }
 
-  .hub-game-tile.selected {
-    flex: 0 0 154px !important;
-    width: 154px !important;
-    height: 154px !important;
-    min-width: 154px !important;
-    min-height: 154px !important;
-    max-width: 154px !important;
-    max-height: 154px !important;
-  }
-
-  .hub-dropdown-menu-col {
+  /* 1. Thanh lọc danh mục vuốt ngang dạng Chip bo tròn như App Store */
+  .hub-filter-bar {
+    gap: 8px !important;
+    padding: 4px 0 12px 0 !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    flex-wrap: nowrap !important;
     width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
+  }
+
+  .hub-filter-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .hub-filter-tab {
+    padding: 6px 14px !important;
+    font-size: 13px !important;
+    border-radius: 20px !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+  }
+
+  .hub-filter-tab.active {
+    background: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    color: #1e272e !important;
+  }
+
+  /* 2. Tháp Hero Card trên Điện thoại: Căn giữa, vuông vắn chuẩn 1:1 */
+  .hub-left-tower {
+    width: min(84vw, 260px) !important;
+    min-width: min(84vw, 260px) !important;
+    max-width: min(84vw, 260px) !important;
+    margin: 0 auto !important;
+    border-radius: 18px !important;
+  }
+
+  .hub-tower-card {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    min-height: unset !important;
+    max-height: unset !important;
+  }
+
+  /* Nút Playing Pill trên màn hình cảm ứng luôn hiện rõ ở chân thẻ để chạm vào chơi ngay */
+  .hub-tower-card .hub-playing-pill,
+  .hub-home-card.selected .hub-playing-pill {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateX(-50%) translateY(0) scale(1) !important;
+    bottom: 10px !important;
+    padding: 5px 16px 5px 6px !important;
+  }
+
+  /* Nút Close bar dính liền dưới Card */
+  .hub-menu-close-bar {
+    padding: 8px 14px !important;
+    font-size: 13.5px !important;
+    min-height: 38px !important;
+  }
+
+  /* Menu Tháp: Biến cột dọc 300px thành dải Chip lướt ngang mượt mà chỉ 38px cao */
+  .hub-tower-menu {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 6px !important;
+    padding: 6px 8px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .hub-tower-menu::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .hub-menu-item {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+    border-radius: 16px !important;
+    white-space: nowrap !important;
+    min-height: 30px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  /* 3. Thứ tự hiển thị trên Điện thoại: Thông tin Game -> Dải Game khác -> Tin tức */
+  .hub-right-stage {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .hub-dropdown-details-col {
+    order: 1 !important;
+    width: 100% !important;
+    gap: 12px !important;
+    padding-top: 0 !important;
+  }
+
+  .hub-other-games-section {
+    order: 2 !important;
+    width: 100% !important;
+    margin-top: 4px !important;
+    padding: 0 !important;
+  }
+
+  /* Tiêu đề & Thông tin Game đang chọn */
+  .hub-selected-info {
+    gap: 6px !important;
+    padding: 0 !important;
+  }
+
+  .hub-big-title {
+    font-size: clamp(22px, 5.8vw, 28px) !important;
+    letter-spacing: -0.4px !important;
+  }
+
+  .hub-studio-row {
+    font-size: 13.5px !important;
+  }
+
+  .hub-stats-friends-row {
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .hub-medals {
+    font-size: 13px !important;
+    gap: 8px !important;
+    padding: 4px 12px !important;
+  }
+
+  .hub-friends-playing {
+    font-size: 12.5px !important;
+  }
+
+  .friends-text {
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+  }
+
+  /* 4. Dải ô vuông các game khác: 130px x 130px, hiển thị 2.5 game cùng lúc, cuộn chạm cực nhạy */
+  .hub-other-games-row {
+    gap: 12px !important;
+    padding: 4px 2px 12px 2px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    scroll-snap-type: x mandatory !important;
+  }
+
+  .hub-other-games-row .hub-game-tile {
+    flex: 0 0 130px !important;
+    width: 130px !important;
+    height: 130px !important;
+    min-width: 130px !important;
+    min-height: 130px !important;
+    max-width: 130px !important;
+    max-height: 130px !important;
+    border-radius: 14px !important;
+    border-width: 2.5px !important;
+    scroll-snap-align: start !important;
+  }
+
+  .hub-other-games-row .hub-game-tile .tile-game-name {
+    font-size: 12px !important;
+  }
+
+  .hub-other-games-row .hub-game-tile .tile-center-logo i {
+    font-size: 26px !important;
+  }
+
+  .hub-other-games-row .hub-game-tile .tile-bottom-strip {
+    font-size: 8.5px !important;
+    padding: 3px 4px !important;
+  }
+
+  /* 5. Tin tức News trên điện thoại */
+  .hub-news-section {
+    margin-top: 4px !important;
+    gap: 10px !important;
+  }
+
+  .hub-news-heading {
+    font-size: 20px !important;
   }
 
   .hub-news-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .hub-news-card {
+    min-height: 115px !important;
+    border-radius: 12px !important;
+  }
+
+  .news-card-caption {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+  }
+
+  /* 6. Chế độ Toàn Cảnh (Home Stage khi bấm Close) trên Điện thoại */
+  .hub-home-stage {
+    gap: 18px !important;
+    padding: 8px 0 20px 0 !important;
+  }
+
+  .hub-home-carousel {
+    gap: 14px !important;
+    padding: 12px 14px 20px 14px !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .hub-home-card {
+    flex: 0 0 min(72vw, 210px) !important;
+    width: min(72vw, 210px) !important;
+    height: min(72vw, 210px) !important;
+    min-width: min(72vw, 210px) !important;
+    min-height: min(72vw, 210px) !important;
+    max-width: min(72vw, 210px) !important;
+    max-height: min(72vw, 210px) !important;
+    scroll-snap-align: center !important;
+    border-radius: 18px !important;
+  }
+
+  .hub-home-card.selected {
+    transform: translateY(-4px) scale(1.03) !important;
+  }
+}
+
+/* ===================================================
+   TỐI ƯU HÓA MÀN HÌNH NHỎ & HEADER (<= 640px)
+   =================================================== */
+@media (max-width: 640px) {
+  body.in-hub .app-header {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  /* Ẩn đồng hồ live trên mobile vì thanh trạng thái hệ thống của điện thoại luôn có đồng hồ */
+  .hub-clock-box {
+    display: none !important;
+  }
+
+  /* Thu gọn bộ chọn ngôn ngữ: Chỉ hiển thị cờ SVG và mũi tên, ẩn chữ để tiết kiệm 70px */
+  .selected-lang-name {
+    display: none !important;
+  }
+
+  .lang-trigger {
+    padding: 4px 8px !important;
+    gap: 4px !important;
+    border-radius: 14px !important;
+  }
+
+  .header-actions {
+    gap: 5px !important;
+  }
+
+  .btn-icon {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    font-size: 14px !important;
+  }
+
+  .logo-title {
+    font-size: 16px !important;
+  }
+
+  .logo-subtitle {
+    font-size: 10px !important;
+  }
+
+  /* Dock 7 nút Squircle ở đáy (Home View) thu gọn vừa khít mọi màn hình điện thoại */
+  .hub-console-dock {
+    gap: 8px !important;
+    padding: 6px 8px 16px 8px !important;
+    margin-top: 6px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .hub-console-dock::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .hub-console-dock .hub-dock-btn {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    border-radius: 13px !important;
+    font-size: 18px !important;
+    flex-shrink: 0 !important;
   }
 }
 
