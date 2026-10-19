@@ -225,5 +225,13 @@ export const vi = {
   "hub_ludo_social": "Phòng chơi 4 màu sôi động, tung xúc xắc xuất quân và đá ngựa đầy kịch tính!",
   "news_ludo_1": "Tung xúc xắc 3D vui nhộn, ra lục xuất quân và được thưởng thêm lượt!",
   "news_ludo_2": "Hiệu ứng đá ngựa đối phương về chuồng cực kỳ hài hước cùng biểu cảm chat!",
-  "news_ludo_3": "Hỗ trợ đấu 4 người cùng lúc qua mạng hoặc chuyền tay trên 1 máy!"
+  "news_ludo_3": "Hỗ trợ đấu 4 người cùng lúc qua mạng hoặc chuyền tay trên 1 máy!",
+  "tip_sidebar_menu": "Mở Menu Sidebar",
+  "tip_close_menu": "Đóng Menu",
+  "sidebar_menu_title": "Tính năng Game",
+  "sidebar_view_title": "Chế độ xem Cổng Game",
+  "sidebar_cat_title": "Danh mục Game",
+  "sidebar_home_view": "Xem Toàn Cảnh (Home View)",
+  "sidebar_detail_view": "Xem Chi Tiết (Detail View)",
+  "menu_title": "Menu"
 };

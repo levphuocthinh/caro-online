@@ -225,5 +225,13 @@ export const en = {
   "hub_ludo_social": "Vibrant 4-color arena: roll dice to deploy pawns and capture rivals!",
   "news_ludo_1": "Exciting 3D dice rolls: roll six to launch pawns and earn bonus turns!",
   "news_ludo_2": "Hilarious pawn knockout animations paired with expressive chat emojis!",
-  "news_ludo_3": "Supports 4 players simultaneously online or pass-and-play on 1 screen!"
+  "news_ludo_3": "Supports 4 players simultaneously online or pass-and-play on 1 screen!",
+  "tip_sidebar_menu": "Open Sidebar Menu",
+  "tip_close_menu": "Close Menu",
+  "sidebar_menu_title": "Game Features",
+  "sidebar_view_title": "Hub View Mode",
+  "sidebar_cat_title": "Game Categories",
+  "sidebar_home_view": "Full View (Home Mode)",
+  "sidebar_detail_view": "Detail View (Game Mode)",
+  "menu_title": "Menu"
 };

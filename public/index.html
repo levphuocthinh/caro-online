@@ -39,7 +39,12 @@
 
   <!-- Thanh điều hướng trên cùng -->
   <header class="app-header">
-    <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+      <!-- Nút mở Menu Sidebar Drawer (Tiện lợi đặc biệt trên Điện thoại) -->
+      <button class="btn-icon btn-hub-sidebar-toggle" id="btn-hub-sidebar-toggle" type="button" title="Mở Menu Sidebar" data-i18n-title="tip_sidebar_menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
       <button class="btn-back-hub" id="btn-back-to-hub" type="button" style="display: none;" title="Quay về Cổng Game Tổng Hợp" data-i18n-title="tip_back_hub">
         <i class="fa-solid fa-table-cells-large"></i> <span data-i18n="hub_back_btn">Cổng Game</span>
       </button>
@@ -134,6 +139,100 @@
   </header>
 
   <!-- =========================================================================
+       SIDEBAR DRAWER: Menu trượt phong cách Console Web cho Điện thoại & Máy tính
+       ========================================================================= -->
+  <div class="hub-sidebar-backdrop" id="hub-sidebar-backdrop"></div>
+  <aside class="hub-sidebar-drawer" id="hub-sidebar-drawer" aria-label="Menu trò chơi">
+    <div class="hub-sidebar-header">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-icon"><i class="fa-solid fa-gamepad"></i></span>
+        <div class="sidebar-brand-text">
+          <span class="sidebar-title">Lycngames</span>
+          <span class="sidebar-subtitle">Game Console Menu</span>
+        </div>
+      </div>
+      <button class="btn-sidebar-close" id="btn-sidebar-close" type="button" title="Đóng Menu" data-i18n-title="tip_close_menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="hub-sidebar-content">
+      <!-- Game Info Banner -->
+      <div class="sidebar-game-banner" id="sidebar-game-banner">
+        <div class="sidebar-game-badge" id="sidebar-game-badge">PLAY NOW</div>
+        <div class="sidebar-game-name" id="sidebar-game-name">Caro Online</div>
+        <div class="sidebar-game-sub" id="sidebar-game-sub">CỜ CHIẾN THUẬT</div>
+      </div>
+
+      <!-- Section: Chức năng Game (7 nút từ Tower Menu) -->
+      <div class="sidebar-section-title" data-i18n="sidebar_menu_title">Tính năng Game</div>
+      <nav class="sidebar-nav-list" id="sidebar-nav-list">
+        <button class="sidebar-nav-item active" data-sidebar-action="achievements" type="button">
+          <span class="sidebar-item-icon"><i class="fa-solid fa-trophy"></i></span>
+          <span class="sidebar-item-text" data-i18n="menu_achievements">Achievements</span>
+          <span class="sidebar-item-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+        <button class="sidebar-nav-item" data-sidebar-action="friends" type="button">
+          <span class="sidebar-item-icon"><i class="fa-solid fa-user-group"></i></span>
+          <span class="sidebar-item-text" data-i18n="menu_friends">Friends</span>
+          <span class="sidebar-item-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+        <button class="sidebar-nav-item" data-sidebar-action="news" type="button">
+          <span class="sidebar-item-icon"><i class="fa-solid fa-newspaper"></i></span>
+          <span class="sidebar-item-text" data-i18n="menu_news">News</span>
+          <span class="sidebar-item-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+        <button class="sidebar-nav-item" data-sidebar-action="recent-posts" type="button">
+          <span class="sidebar-item-icon"><i class="fa-solid fa-comments"></i></span>
+          <span class="sidebar-item-text" data-i18n="menu_recent_posts">Recent Posts</span>
+          <span class="sidebar-item-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+        <button class="sidebar-nav-item" data-sidebar-action="addons" type="button">
+          <span class="sidebar-item-icon"><i class="fa-solid fa-puzzle-piece"></i></span>
+          <span class="sidebar-item-text" data-i18n="menu_addons">Add-Ons</span>
+          <span class="sidebar-item-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+        <button class="sidebar-nav-item" data-sidebar-action="sound" type="button">
+          <span class="sidebar-item-icon"><i class="fa-solid fa-music"></i></span>
+          <span class="sidebar-item-text" data-i18n="menu_soundtrack">Soundtrack</span>
+          <span class="sidebar-item-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+        <button class="sidebar-nav-item" data-sidebar-action="guide" type="button">
+          <span class="sidebar-item-icon"><i class="fa-solid fa-book-open"></i></span>
+          <span class="sidebar-item-text" data-i18n="menu_guide">Guide</span>
+          <span class="sidebar-item-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+      </nav>
+
+      <!-- Section: Chế độ hiển thị -->
+      <div class="sidebar-section-title" data-i18n="sidebar_view_title">Chế độ xem Cổng Game</div>
+      <div class="sidebar-view-toggle">
+        <button class="sidebar-view-btn" id="btn-sidebar-toggle-view" type="button">
+          <i class="fa-solid fa-table-cells-large"></i>
+          <span id="sidebar-view-btn-text" data-i18n="sidebar_home_view">Xem Toàn Cảnh (Home View)</span>
+        </button>
+      </div>
+
+      <!-- Section: Danh mục nhanh -->
+      <div class="sidebar-section-title" data-i18n="sidebar_cat_title">Danh mục Game</div>
+      <div class="sidebar-cat-chips">
+        <button class="sidebar-cat-chip active" data-sidebar-filter="all" type="button">
+          <i class="fa-solid fa-star"></i> <span data-i18n="tab_all_games">Tất cả Game</span>
+        </button>
+        <button class="sidebar-cat-chip" data-sidebar-filter="recent" type="button">
+          <i class="fa-solid fa-clock-rotate-left"></i> <span data-i18n="tab_recent_games">Chơi gần đây</span>
+        </button>
+        <button class="sidebar-cat-chip" data-sidebar-filter="classic" type="button">
+          <i class="fa-solid fa-chess"></i> <span data-i18n="tab_classic_chess">Cờ Truyền Thống</span>
+        </button>
+        <button class="sidebar-cat-chip" data-sidebar-filter="boardgame" type="button">
+          <i class="fa-solid fa-dice-d20"></i> <span data-i18n="tab_modern_boardgame">Board Game Hiện Đại</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- =========================================================================
        MÀN HÌNH 1: TRANG TỔNG HỢP GAME (CONSOLE WEB HUB - THEO MẪU THIẾT KẾ)
        ========================================================================= -->
   <main class="screen active" id="screen-hub">
@@ -221,6 +320,9 @@
             <div class="hub-selected-info">
               <div class="hub-title-row">
                 <h1 class="hub-big-title" id="hub-selected-title">Caro Online</h1>
+                <button class="hub-sidebar-badge-btn" id="btn-hub-open-menu-inline" type="button" title="Mở Menu Sidebar">
+                  <i class="fa-solid fa-bars-staggered"></i> <span data-i18n="menu_title">Menu</span>
+                </button>
               </div>
 
               <div class="hub-studio-row">

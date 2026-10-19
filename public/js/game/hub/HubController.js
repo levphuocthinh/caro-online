@@ -105,6 +105,13 @@ export class HubController {
     } else {
       this.renderHomeView(catalog, filteredIds, prevOpenState);
     }
+
+    const sbViewText = document.getElementById('sidebar-view-btn-text');
+    if (sbViewText) {
+      sbViewText.textContent = this.isDetailViewOpen 
+        ? (i18n.getText('sidebar_home_view') || 'Xem Toàn Cảnh (Home View)')
+        : (i18n.getText('sidebar_detail_view') || 'Xem Chi Tiết (Detail View)');
+    }
   }
 
   static renderDetailView(info, filteredIds, activeIdx, slideDir, prevOpenState) {
@@ -251,6 +258,20 @@ export class HubController {
         playPill.style.display = 'none';
       }
     }
+
+    // Cập nhật thông tin game tương ứng vào Sidebar Drawer
+    const sbBanner = document.getElementById('sidebar-game-banner');
+    if (sbBanner && info.towerColor) {
+      sbBanner.style.background = `linear-gradient(135deg, ${info.towerColor}, ${info.towerDark || info.towerColor})`;
+    }
+    const sbBadge = document.getElementById('sidebar-game-badge');
+    if (sbBadge) {
+      sbBadge.textContent = info.playable ? (i18n.getText('tag_play_now') || 'PLAY NOW') : (i18n.getText('coming_badge') || 'SẮP RA MẮT');
+    }
+    const sbName = document.getElementById('sidebar-game-name');
+    if (sbName) sbName.textContent = info.coverTitle;
+    const sbSub = document.getElementById('sidebar-game-sub');
+    if (sbSub) sbSub.textContent = info.stripText;
   }
 
   static renderOtherGamesRow(filteredIds, activeIdx, slideDir) {
@@ -491,8 +512,97 @@ export class HubController {
     // Thanh lọc danh mục Sub-nav & Bubble Header
     this.bindFilterTabs();
 
+    // Menu Sidebar Drawer cho Điện thoại & Máy tính
+    this.bindSidebar(manager);
+
     // Thao tác lướt ngang: Wheel, Trackpad, Drag Swipe, Arrow Keys
     this.bindHorizontalGestures();
+  }
+
+  static bindSidebar(manager) {
+    const drawer = document.getElementById('hub-sidebar-drawer');
+    const backdrop = document.getElementById('hub-sidebar-backdrop');
+
+    const openDrawer = () => {
+      try { soundManager.playCuteWhoosh(); } catch (_) {}
+      drawer?.classList.add('open');
+      backdrop?.classList.add('open');
+      document.body.classList.add('sidebar-open');
+    };
+
+    const closeDrawer = () => {
+      try { soundManager.playCutePop(); } catch (_) {}
+      drawer?.classList.remove('open');
+      backdrop?.classList.remove('open');
+      document.body.classList.remove('sidebar-open');
+    };
+
+    document.getElementById('btn-hub-sidebar-toggle')?.addEventListener('click', openDrawer);
+    document.getElementById('btn-hub-open-menu-inline')?.addEventListener('click', openDrawer);
+    document.getElementById('btn-sidebar-close')?.addEventListener('click', closeDrawer);
+    backdrop?.addEventListener('click', closeDrawer);
+
+    // Xử lý các mục điều hướng trong Sidebar Nav (7 tính năng từ Tower Menu)
+    document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const action = item.dataset.sidebarAction;
+        try { soundManager.playCutePop(); } catch (_) {}
+        document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        closeDrawer();
+
+        const catalog = this.getCatalog();
+        const currentItem = catalog[this.selectedGameId];
+
+        if (action === 'friends') {
+          if (currentItem?.playable) {
+            manager.openCaroLobby();
+            CaroModal.open('modal-create-room');
+          } else {
+            this.showComingToast();
+          }
+        } else if (action === 'guide') {
+          soundManager.playCuteChime();
+          CaroModal.open('modal-help');
+        } else if (action === 'sound') {
+          document.getElementById('btn-sound-toggle')?.click();
+        } else if (action === 'achievements') {
+          soundManager.playCuteChime();
+          CaroModal.showToast(`🏆 Hệ thống Thành tựu của ${currentItem?.coverTitle || 'Game'} đã ghi nhận tiến độ của bạn!`);
+        } else if (action === 'news') {
+          document.querySelector('.hub-news-section')?.scrollIntoView({ behavior: 'smooth' });
+        } else if (action === 'recent-posts') {
+          CaroModal.showToast(`📰 ${currentItem?.coverTitle || 'Game'}: Cập nhật bài viết mới nhất đã sẵn sàng!`);
+        } else if (action === 'addons') {
+          CaroModal.showToast(`🎁 DLC & Gói mở rộng (Add-Ons) sẽ có mặt trong phiên bản sắp tới!`);
+        }
+      });
+    });
+
+    // Nút toggle Home View / Detail View trong sidebar
+    document.getElementById('btn-sidebar-toggle-view')?.addEventListener('click', () => {
+      try { soundManager.playCuteWhoosh(); } catch (_) {}
+      closeDrawer();
+      this.renderSelectedGame(this.selectedGameId, !this.isDetailViewOpen);
+    });
+
+    // Các chip lọc danh mục trong sidebar
+    document.querySelectorAll('.sidebar-cat-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        closeDrawer();
+        const filter = chip.dataset.sidebarFilter || 'all';
+        this.applyFilter(filter);
+        document.querySelectorAll('.sidebar-cat-chip').forEach(c => {
+          c.classList.toggle('active', c.dataset.sidebarFilter === filter);
+        });
+      });
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawer?.classList.contains('open')) {
+        closeDrawer();
+      }
+    });
   }
 
   static bindTowerMenu(manager, closeDrawerHandler) {

@@ -158,39 +158,11 @@
     display: none !important;
   }
 
-  /* Nút Close bar dính liền dưới Card */
-  .hub-menu-close-bar {
-    padding: 8px 14px !important;
-    font-size: 13.5px !important;
-    min-height: 38px !important;
-  }
-
-  /* Menu Tháp: Biến cột dọc 300px thành dải Chip lướt ngang mượt mà chỉ 38px cao */
+  /* Ẩn hoàn toàn nút Close và các nút menu khỏi thẻ trên điện thoại,
+     chuyển toàn bộ chức năng vào Sidebar Drawer trượt mượt mà */
+  .hub-menu-close-bar,
   .hub-tower-menu {
-    flex-direction: row !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
-    gap: 6px !important;
-    padding: 6px 8px !important;
-    width: 100% !important;
-    justify-content: flex-start !important;
-    flex-wrap: nowrap !important;
-  }
-
-  .hub-tower-menu::-webkit-scrollbar {
     display: none !important;
-  }
-
-  .hub-menu-item {
-    flex: 0 0 auto !important;
-    width: auto !important;
-    padding: 5px 12px !important;
-    font-size: 12px !important;
-    border-radius: 16px !important;
-    white-space: nowrap !important;
-    min-height: 30px !important;
-    background: rgba(255, 255, 255, 0.12) !important;
   }
 
   /* 3. Thứ tự hiển thị trên Điện thoại: Thông tin Game -> Dải Game khác -> Tin tức */

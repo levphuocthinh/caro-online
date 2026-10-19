@@ -225,5 +225,13 @@ export const zh = {
   "hub_ludo_social": "四色活力棋盘，掷骰起飞与撞子回巢充满无限欢乐与反转！",
   "news_ludo_1": "逼真趣味3D骰子，掷出点数六起飞并获得额外掷骰奖励！",
   "news_ludo_2": "幽默爆笑的撞子击退特效搭配丰富的即时表情互动！",
-  "news_ludo_3": "支持最多4人跨网在线联机，或单台设备轮流操作畅玩！"
+  "news_ludo_3": "支持最多4人跨网在线联机，或单台设备轮流操作畅玩！",
+  "tip_sidebar_menu": "打开侧边栏菜单",
+  "tip_close_menu": "关闭菜单",
+  "sidebar_menu_title": "游戏功能",
+  "sidebar_view_title": "游戏大厅视图",
+  "sidebar_cat_title": "游戏分类",
+  "sidebar_home_view": "全景视图 (Home View)",
+  "sidebar_detail_view": "详情视图 (Detail View)",
+  "menu_title": "菜单"
 };

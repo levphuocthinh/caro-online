@@ -225,5 +225,13 @@ export const ja = {
   "hub_ludo_social": "鮮やかな4色アリーナ：サイコロを振って駒を出撃させ、ライバルをキック！",
   "news_ludo_1": "爽快な3Dダイスロール！6を出して駒を出撃＆連続手番ボーナス！",
   "news_ludo_2": "対戦相手の駒をスタートに戻すユーモラスな演出と感情豊かな絵文字！",
-  "news_ludo_3": "オンライン4人同時対戦または1台の端末でのパス＆プレイに対応！"
+  "news_ludo_3": "オンライン4人同時対戦または1台の端末でのパス＆プレイに対応！",
+  "tip_sidebar_menu": "サイドバーメニューを開く",
+  "tip_close_menu": "メニューを閉じる",
+  "sidebar_menu_title": "ゲーム機能",
+  "sidebar_view_title": "ハブ表示モード",
+  "sidebar_cat_title": "ゲームカテゴリ",
+  "sidebar_home_view": "全体表示 (Home View)",
+  "sidebar_detail_view": "詳細表示 (Detail View)",
+  "menu_title": "メニュー"
 };

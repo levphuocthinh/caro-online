@@ -225,5 +225,13 @@ export const ko = {
   "hub_ludo_social": "활기찬 4색 경기장: 주사위를 굴려 말을 출격시키고 상대 말을 잡아내는 긴장감!",
   "news_ludo_1": "경쾌한 3D 주사위 굴리기! 6이 나오면 말 출격 및 보너스 턴 획득!",
   "news_ludo_2": "상대 말을 시작 지점으로 되돌리는 유쾌한 넉아웃 연출과 귀여운 이모티콘!",
-  "news_ludo_3": "실시간 4인 온라인 멀티플레이 및 1대 기기에서 돌아가며 두기 지원!"
+  "news_ludo_3": "실시간 4인 온라인 멀티플레이 및 1대 기기에서 돌아가며 두기 지원!",
+  "tip_sidebar_menu": "사이드바 메뉴 열기",
+  "tip_close_menu": "메뉴 닫기",
+  "sidebar_menu_title": "게임 기능",
+  "sidebar_view_title": "허브 뷰 모드",
+  "sidebar_cat_title": "게임 카테고리",
+  "sidebar_home_view": "전체 보기 (Home View)",
+  "sidebar_detail_view": "상세 보기 (Detail View)",
+  "menu_title": "메뉴"
 };
