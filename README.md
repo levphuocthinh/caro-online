@@ -1,232 +1,241 @@
 # 🎮 Lycngames — Caro Online & Console Web Hub
 
-Dự án Web App trò chơi cờ Caro (Gomoku) trực tuyến thời gian thực kết hợp **Cổng Game Tổng Hợp phong cách máy chơi game Console (Nintendo Switch Dashboard)**. Dự án được phát triển theo kiến trúc **Module hóa tiêu chuẩn ES6 (Frontend)** và **Hướng đối tượng OOP phân tầng (Backend Node.js + Socket.io)**, đảm bảo code gọn gàng, chia nhỏ từng model/function rõ ràng, không bị phình to nguyên khối và tối ưu trải nghiệm mượt mà trên mọi thiết bị (Desktop, iPad, Tablet, Mobile).
+A real-time multiplayer Caro (Gomoku / Five-in-a-Row) web game combined with an interactive **Console Web Hub inspired by the Nintendo Switch dashboard**. Designed with a **modular ES6 frontend architecture** and an **object-oriented layered backend (Node.js + Socket.io)**, ensuring clean code separation, scalable multi-game plug-and-play capability, zero bloated monoliths, and an ultra-smooth responsive experience across all screen sizes (Desktop, iPad, Tablet, and Mobile).
 
 ---
 
-## 🌟 Điểm Nhấn & Tính Năng Nổi Bật
+## 🌟 Key Highlights & Features
 
-### 1. 🕹️ Cổng Game Console Hiện Đại (Console Web Hub)
-Lấy cảm hứng từ thiết kế Dashboard của máy chơi game Nintendo Switch, được tùy biến tối ưu cho nền tảng Web:
-- **Cơ chế hiển thị 2 tầng (Dual-Stage Layout)**:
-  - **Chế độ Chi tiết (Center Dropdown View)**: Khi chọn bất kỳ tựa game nào:
-    - **Khay Peek bên trái (`#hub-left-peek-slot`)**: Tự động đẩy game phía trước lùi sang trái lộ một nửa thẻ (giống phong cách thẻ Zelda đứng cạnh Mario trên Switch).
-    - **Tháp Dropdown trung tâm (`#hub-left-tower`)**: Phóng to thẻ 220px x 220px, nút `Playing / Chơi ngay`, thanh `Close` thu gọn và menu chức năng (Achievements, Friends, News, Add-Ons, Soundtrack, Guide).
-    - **Đồng bộ màu sắc tự động (Dynamic Color Theme)**: Toàn bộ viền và nền menu của Tháp tự động biến chuyển màu mượt mà theo tông màu chủ đạo của từng tựa game (Caro: Đỏ Mario `#e60012`, Catan: Cam lúa mạch `#d35400`, Carcassonne: Xanh ngọc `#10ac84`, Splendor: Tím đá quý `#6c5ce7`, Cờ Vua: Xanh dương hoàng gia `#1e3799`, v.v.).
-    - **Dải thẻ game bên phải (`#hub-other-games-row`)**: Xếp gọn các game tiếp theo, không bao giờ bị cắt lẹm dưới gầm tháp.
-  - **Chế độ Toàn cảnh (Home View)**: Khi bấm nút `Close`:
-    - Dải thẻ game toàn cảnh phóng to 240px x 240px cuộn mượt mà.
-    - **Thanh Dock Squircle ở đáy**: Cụm 7 nút điều khiển squircle bo góc tròn rực rỡ sắc màu kèm hiệu ứng kính 3D và animation bay xuống/bay lên mượt mà.
-- **Thao tác lướt ngang đa dạng (Horizontal Gestures)**:
-  - Lăn chuột (Mouse Wheel) hoặc vuốt ngang Trackpad trên dải game để nhảy từng nấc.
-  - Kéo chuột / vuốt chạm cảm ứng (Drag / Touch Swipe).
-  - Phím mũi tên Bàn phím (`←` / `→`) để chuyển đổi game nhanh như trên tay cầm console.
-- **Hệ thống âm thanh Web Audio API dễ thương (Cute Sound Engine)**:
-  - Tổng hợp âm thanh bằng code Web Audio thuần, không phụ thuộc file MP3 ngoài (`playCutePop`, `playCuteChime`, `playCuteWhoosh`, `playCuteTap`).
-- **Giao diện Console Sáng / Tối (Light / Dark Theme)**: Chuyển đổi giao diện Sáng / Tối tự động lưu vào LocalStorage và tối ưu màu nền mượt mà.
-
----
-
-### 2. 🎯 Ba Chế Độ Chơi Cờ Caro Đa Dạng
-- 🌐 **Chơi Online thời gian thực (Multiplayer)**:
-  - Tạo phòng riêng với mã phòng 6 ký tự ngẫu nhiên.
-  - Tùy chọn kích thước bàn cờ (`15x15`, `19x19`, `12x12`).
-  - Luật thi đấu: Luật tự do hoặc **Luật chặn 2 đầu (Block-2-Ends)**.
-  - Giới hạn thời gian suy nghĩ mỗi lượt (`30s`, `60s` hoặc không giới hạn).
-  - Hỗ trợ **Khán giả theo dõi trận đấu (Spectator)** với chế độ bảo vệ quyền hạn.
-  - Đàm phán cầu hòa (Draw Negotiation), Xin hàng (Surrender), Đổi bên khi chơi lại (Rematch).
-  - Khung chat trực tiếp và thanh thả cảm xúc nhanh với 10 emoji siêu dễ thương (`💖`, `🌸`, `🐾`, `🐱`, `🐰`, `🍓`, `🥺`, `✨`, `🎉`, `🍰`).
-- 🤖 **Đấu với Bé Bot AI**:
-  - 3 cấp độ trí tuệ nhân tạo: **Dễ (Easy)**, **Trung Bình (Medium)**, và **Cao Thủ (Hard)**.
-  - Thuật toán đánh giá mẫu hình cờ (Heuristic Pattern Evaluation) với vùng cắt tỉa khoảng cách Chebyshev-2 siêu nhanh.
-- 👥 **2 Người trên một máy (Pass & Play)**: Chơi đối kháng trực tiếp trên cùng một màn hình điện thoại, iPad hoặc máy tính không cần kết nối mạng.
+### 1. 🕹️ Console Web Hub (Nintendo Switch Dashboard Style)
+Inspired by the modern Nintendo Switch system dashboard, custom-tailored for the web:
+- **Dual-Stage Console Layout**:
+  - **Center Dropdown Detail View**: When selecting any title:
+    - **Left Peek Slot (`#hub-left-peek-slot`)**: Shifts the preceding game to the left, partially exposing its card edge (mimicking the iconic Switch carousel behavior).
+    - **Center Dropdown Tower (`#hub-left-tower`)**: Expands to a clean 220px x 220px game tile, complete with hover/tap play pills and feature menu actions (*Achievements, Friends, News, Add-Ons, Soundtrack, Guide*).
+    - **Dynamic Color Theme Matching**: Automatically adapts ambient gradient borders, shadows, and accent highlights to match each game's signature identity (Caro: Mario Red `#e60012`, Catan: Harvest Orange `#d35400`, Carcassonne: Medieval Jade `#10ac84`, Splendor: Renaissance Gem `#6c5ce7`, Chess: Royal Blue `#1e3799`, Ludo: Arena Green `#009432`, etc.).
+    - **Horizontal Stage Carousel (`#hub-other-games-row`)**: Neatly arranges upcoming game titles without clipping or vertical misalignment.
+  - **Full Panoramic Home View**:
+    - Expands all game cards to 240px x 240px with smooth inertia scrolling.
+    - **Floating Squircle Quick Dock**: Features 7 rounded action capsules with 3D glassmorphism backdrop blurs and subtle bounce animations.
+- **Mobile-First Slide-Out Sidebar Drawer**:
+  - Automatically isolates clutter on mobile devices (`<= 768px`) by transforming menu actions into a sleek console sidebar drawer.
+  - **Gamer Profile Header**: Features an interactive avatar with an online status indicator dot, nickname, gamer tag (e.g. `#8892`), level badge (`Lv. 1`), and click-to-edit avatar modal with 10 pet avatars (🐱, 🐰, 🦊, 🐼, 🦁, 🐯, 🐻, 🐨, 🐶, 🦄).
+  - **Backend-Ready Architecture**: Powered by `UserProfileManager.js`, keeping profile state locally in `localStorage` while providing seamless plug-and-play hooks for future backend authentication and user database synchronization.
+- **Versatile Horizontal Navigation**:
+  - Mouse wheel and trackpad swipe with stepped snap transitions.
+  - Touch swipe and mouse drag interactions.
+  - Keyboard arrow keys (`←` / `→`) for authentic gamepad-like navigation.
+- **Cute Web Audio Synthesizer**:
+  - Procedural sound effects generated on-the-fly using the native Web Audio API without relying on heavy external audio files (`playCutePop`, `playCuteChime`, `playCuteWhoosh`, `playCuteTap`).
+- **Dark & Light Mode Switcher**:
+  - Console-grade light and dark themes persisted in `localStorage`.
 
 ---
 
-### 3. 🌐 Đa Ngôn Ngữ Chuẩn Quốc Tế (i18n Parity)
-- Hỗ trợ 5 ngôn ngữ hoàn chỉnh kèm cờ SVG hình học chính xác:
-  - 🇻🇳 **Tiếng Việt** (`vi`)
+### 2. 🎯 Three Distinct Caro Gameplay Modes
+- 🌐 **Real-Time Online Multiplayer**:
+  - Create custom rooms with 6-character room codes or join via shareable invite links.
+  - Configurable board dimensions: `15x15` (Tournament standard), `19x19` (Spacious), and `12x12` (Quick Blitz).
+  - Configurable victory rules: **Free Style (Standard Gomoku)** or **Block-2-Ends Rule (Vietnamese Caro Championship Rule)**.
+  - Turn timers: `30s`, `60s`, or unlimited.
+  - Dedicated **Spectator Mode** with role permission isolation.
+  - Real-time in-game actions: Draw offer negotiation, Surrender forfeit, and Rematch with side swapping.
+  - Live chat and quick emoji reactions bar with 10 expressive animated emojis (`💖`, `🌸`, `🐾`, `🐱`, `🐰`, `🍓`, `🥺`, `✨`, `🎉`, `🍰`).
+- 🤖 **Smart Bot AI**:
+  - 3 intelligence tiers: **Easy**, **Medium**, and **Hard**.
+  - Fast pattern heuristic evaluation algorithm with Chebyshev-2 distance spatial pruning for sub-frame response times.
+- 👥 **Local Device Pass & Play**:
+  - Two-player face-to-face game on a single phone, tablet, or desktop screen without requiring internet access.
+
+---
+
+### 3. 🌐 Internationalization (i18n Parity)
+- Full 5-language native localization with accurate geometric SVG country flags:
+  - 🇻🇳 **Vietnamese** (`vi`)
   - 🇬🇧 **English** (`en`)
-  - 🇯🇵 **日本語** (`ja`)
-  - 🇰🇷 **한국어** (`ko`)
-  - 🇨🇳 **中文** (`zh`)
-- Đồng bộ 100% key từ điển giữa tất cả các ngôn ngữ, hỗ trợ truyền tham số nội suy động `{param}`.
+  - 🇯🇵 **Japanese** (`ja`)
+  - 🇰🇷 **Korean** (`ko`)
+  - 🇨🇳 **Simplified Chinese** (`zh`)
+- 100% dictionary key parity verified by automated testing, supporting dynamic string interpolation (`{param}`).
 
 ---
 
-## 📂 Kiến Trúc & Cấu Trúc Thư Mục Module Hóa
+## 📂 Modular Architecture & Directory Tree
 
-Mã nguồn được phân tách triệt để, loại bỏ các file nguyên khối 1000 dòng để dễ đọc, dễ mở rộng và bảo trì:
+The codebase enforces strict modular separation, eliminating legacy 1000-line monolithic files for readability, maintainability, and extensibility:
 
 ```
 caro/
 ├── 🖥️ server/                              # BACKEND NODE.JS + SOCKET.IO
 │   ├── socket/
-│   │   ├── SocketController.js             # Điều phối kết nối Socket với rào chắn lỗi try-catch
-│   │   ├── RoomManager.js                  # Quản lý vòng đời phòng, mã phòng, dọn dẹp bộ nhớ
-│   │   ├── MatchManager.js                 # Quản lý ván đấu, lượt đánh, cầu hòa, xin hàng, rematch
-│   │   └── ChatManager.js                  # Quản lý tin nhắn và rate-limit thả reaction
-│   ├── gameLogic.js                        # Thuật toán thẩm định thắng/thua và luật chặn 2 đầu
-│   ├── network.js                          # Tiện ích phát hiện địa chỉ IP mạng LAN nội bộ
-│   └── socketHandler.js                    # Adapter kết nối Socket.io
+│   │   ├── SocketController.js             # Coordinates Socket events with error boundary isolation
+│   │   ├── RoomManager.js                  # Manages room lifecycle, codes, and memory cleanup
+│   │   ├── MatchManager.js                 # Turn alternation, victory checks, draw, surrender, rematch
+│   │   └── ChatManager.js                  # In-room messaging and reaction rate limiting
+│   ├── gameLogic.js                        # Gomoku win evaluation and Block-2-Ends logic
+│   ├── network.js                          # LAN IP auto-detection utility
+│   └── socketHandler.js                    # Socket.io connection adapter
 │
 ├── 🌐 public/                              # FRONTEND WEB APPLICATION
 │   ├── css/
 │   │   ├── modules/
-│   │   │   ├── hub/                        # CSS CỔNG GAME CONSOLE ĐÃ MODULIZE
-│   │   │   │   ├── hub-header.css          # Header, icon squircles, logo, bộ chọn ngoại ngữ
-│   │   │   │   ├── hub-tower.css           # Khay peek trái, tháp game, thanh close, menu đỏ
-│   │   │   │   ├── hub-stage.css           # Dải thẻ game, chi tiết game, news, home stage, dock
-│   │   │   │   ├── hub-artworks.css        # Gradient nghệ thuật cho 8 tựa game & thẻ tin tức
-│   │   │   │   └── hub-theme.css           # Console dark theme và responsive mobile/tablet
-│   │   │   ├── hub.css                     # Master hub stylesheet tổng hợp các module hub/
-│   │   │   ├── base.css                    # Biến CSS, font chữ, bố cục khung nhìn chung
-│   │   │   ├── lobby.css                   # Sảnh chờ game Caro và 3 thẻ chế độ chơi
-│   │   │   ├── board.css                   # Bàn cờ Caro, quân X/O hoạt họa pop-in, thanh lượt
-│   │   │   ├── chat.css                    # Khung chat và thanh emoji cảm xúc
-│   │   │   └── modal.css                   # Cửa sổ popup, modal form và thông báo Toast
-│   │   └── style.css                       # File stylesheet gốc nạp tất cả module CSS
+│   │   │   ├── hub/                        # MODULAR CONSOLE WEB HUB STYLES
+│   │   │   │   ├── hub-header.css          # Top bar, squircle icons, branding, language selector
+│   │   │   │   ├── hub-tower.css           # Left peek slot, dropdown tower, close bar, menu list
+│   │   │   │   ├── hub-stage.css           # Carousel stage, game details, news grid, home dock
+│   │   │   │   ├── hub-artworks.css        # Thematic gradient artworks for all game tiles
+│   │   │   │   ├── hub-sidebar.css         # Mobile slide-out drawer, user profile, avatar picker
+│   │   │   │   └── hub-theme.css           # Dark theme and responsive tablet/mobile viewports
+│   │   │   ├── hub.css                     # Master stylesheet aggregating all hub/ modules
+│   │   │   ├── base.css                    # CSS variables, fonts, shared layout reset
+│   │   │   ├── lobby.css                   # Caro game lobby cards and configuration
+│   │   │   ├── board.css                   # Grid renderer, animated X/O stones, turn indicators
+│   │   │   ├── chat.css                    # Chatbox panel and emoji reaction bar
+│   │   │   └── modal.css                   # Accessible modals, dialogs, and toast notifications
+│   │   └── style.css                       # Root stylesheet bundle
 │   │
 │   ├── js/
-│   │   ├── games/                          # KIẾN TRÚC ĐA GAME (MULTI-GAME PLUG-AND-PLAY)
-│   │   │   ├── BaseGameModule.js           # Lớp trừu tượng (Interface) cho mọi game
-│   │   │   ├── GameRegistry.js             # Bộ đăng ký & điều phối game tập trung
-│   │   │   ├── README.md                   # Hướng dẫn nhanh cách thêm game mới trong 3 bước
-│   │   │   ├── templates/                  # Bản mẫu NewGameTemplate chuẩn để copy & paste
-│   │   │   ├── caro/                       # Module game Caro (Gói trọn vẹn riêng biệt)
-│   │   │   │   ├── CaroModule.js           # Điều phối toàn bộ vòng đời game Caro
-│   │   │   │   ├── CaroState.js            # Trạng thái ván cờ Caro
-│   │   │   │   ├── CaroBaseGame.js         # Lớp cơ sở UI bàn cờ
-│   │   │   │   ├── CaroLocalGame.js        # Chế độ Pass & Play 2 người 1 máy
-│   │   │   │   ├── CaroAiGame.js           # Chế độ đấu với Bot AI
-│   │   │   │   ├── CaroOnlineGame.js       # Chế độ Online qua Socket.io
-│   │   │   │   └── CaroUIBinder.js         # Gắn kết DOM các nút và modal của Caro
-│   │   │   └── chess/                      # Module mẫu Cờ Vua (Chess) minh họa
+│   │   ├── games/                          # MULTI-GAME PLUG-AND-PLAY ARCHITECTURE
+│   │   │   ├── BaseGameModule.js           # Abstract base class / interface for any game
+│   │   │   ├── GameRegistry.js             # Central game registry and coordinator
+│   │   │   ├── README.md                   # 3-step guide for developers to add new games
+│   │   │   ├── templates/                  # NewGameTemplate boilerplate for rapid extension
+│   │   │   ├── caro/                       # Caro Game Module (Fully self-contained package)
+│   │   │   │   ├── CaroModule.js           # Main coordinator for Caro game lifecycle
+│   │   │   │   ├── CaroState.js            # Immutable board state tracker
+│   │   │   │   ├── CaroBaseGame.js         # Base board UI controller
+│   │   │   │   ├── CaroLocalGame.js        # Pass & Play 2-player controller
+│   │   │   │   ├── CaroAiGame.js           # Bot AI game controller
+│   │   │   │   ├── CaroOnlineGame.js       # Real-time Socket.io multiplayer controller
+│   │   │   │   └── CaroUIBinder.js         # DOM button and modal event binder
+│   │   │   └── chess/                      # Chess template module sample
 │   │   │
 │   │   ├── game/
-│   │   │   ├── hub/                        # LOGIC CỔNG GAME CONSOLE ĐÃ MODULIZE
-│   │   │   │   ├── gamesCatalog.js         # Model danh mục 8 tựa game (màu sắc, mô tả, tin tức)
-│   │   │   │   └── HubController.js        # Controller quản lý thao tác, lướt ngang, tháp dropdown
-│   │   │   ├── GameManager.js              # Quản lý chuyển đổi qua lại giữa Hub, Lobby và Registry
-│   │   │   ├── BaseGame.js                 # Re-export tương thích ngược
-│   │   │   ├── OnlineGame.js               # Re-export tương thích ngược
-│   │   │   ├── AiGame.js                   # Re-export tương thích ngược
-│   │   │   ├── LocalGame.js                # Re-export tương thích ngược
-│   │   │   ├── GameState.js                # Re-export tương thích ngược
-│   │   │   └── UIBinder.js                 # Điều phối giao diện nền tảng Shell & Console Hub
+│   │   │   ├── hub/                        # CONSOLE WEB HUB CONTROLLERS
+│   │   │   │   ├── gamesCatalog.js         # Catalog model of 8 featured games (colors, metadata)
+│   │   │   │   ├── HubController.js        # Manages view modes, gestures, animations, sidebar
+│   │   │   │   └── UserProfileManager.js   # Local player profile, avatar picker & backend hooks
+│   │   │   ├── GameManager.js              # Coordinates transitions between Hub, Lobby and Registry
+│   │   │   ├── BaseGame.js                 # Backward-compatibility alias
+│   │   │   ├── OnlineGame.js               # Backward-compatibility alias
+│   │   │   ├── AiGame.js                   # Backward-compatibility alias
+│   │   │   ├── LocalGame.js                # Backward-compatibility alias
+│   │   │   ├── GameState.js                # Backward-compatibility alias
+│   │   │   └── UIBinder.js                 # Hub shell and application UI binder
 │   │   │
-│   │   ├── locales/                        # TỪ ĐIỂN ĐA NGÔN NGỮ TÁCH RỜI TỪNG FILE
-│   │   │   ├── metadata.js                 # Cờ SVG và tên hiển thị từng quốc gia
-│   │   │   ├── vi.js                       # Tiếng Việt
-│   │   │   ├── en.js                       # English
-│   │   │   ├── ja.js                       # 日本語
-│   │   │   ├── ko.js                       # 한국어
-│   │   │   └── zh.js                       # 中文
+│   │   ├── locales/                        # ISOLATED LOCALE DICTIONARIES
+│   │   │   ├── metadata.js                 # Country display names and SVG flags
+│   │   │   ├── vi.js                       # Vietnamese dictionary
+│   │   │   ├── en.js                       # English dictionary
+│   │   │   ├── ja.js                       # Japanese dictionary
+│   │   │   ├── ko.js                       # Korean dictionary
+│   │   │   └── zh.js                       # Chinese dictionary
 │   │   │
 │   │   ├── modules/
-│   │   │   ├── i18n.js                     # Engine đa ngôn ngữ tinh gọn (~130 dòng)
-│   │   │   ├── audio.js                    # Synthesizer âm thanh Web Audio API
-│   │   │   ├── board.js                    # Renderer bàn cờ bằng Event Delegation 1 listener duy nhất
-│   │   │   ├── ai.js                       # Thuật toán Heuristic của Bot AI
-│   │   │   ├── chat.js                     # Module chat và thả emoji
-│   │   │   ├── modal.js                    # Quản lý popup Modal và Toast
-│   │   │   ├── confetti.js                 # Hiệu ứng pháo hoa ăn mừng chiến thắng
-│   │   │   ├── timer.js                    # Đồng hồ đếm ngược từng lượt
-│   │   │   └── online.js                   # Socket.io Client wrapper
-│   │   └── main.js                         # Điểm khởi đầu khởi tạo GameManager
+│   │   │   ├── i18n.js                     # Lightweight internationalization engine (~130 lines)
+│   │   │   ├── audio.js                    # Web Audio API sound synthesizer
+│   │   │   ├── board.js                    # Event Delegation board grid renderer (1 listener)
+│   │   │   ├── ai.js                       # Bot AI heuristic evaluation engine
+│   │   │   ├── chat.js                     # In-room messaging and reaction emitter
+│   │   │   ├── modal.js                    # Accessible modal overlays and toast alerts
+│   │   │   ├── confetti.js                 # Canvas celebration particle engine
+│   │   │   ├── timer.js                    # Turn countdown timer
+│   │   │   └── online.js                   # Socket.io client wrapper
+│   │   └── main.js                         # Application entrypoint
 │   │
-│   └── index.html                          # Cấu trúc HTML chính tinh gọn, chuẩn ngữ nghĩa
+│   └── index.html                          # Clean, semantic, accessible HTML5 markup
 │
-├── 🧪 tests/                               # BỘ KIỂM THỬ TỰ ĐỘNG TOÀN DIỆN (86/86 PASS)
-│   ├── harness.js                          # Test harness tự viết nhẹ nhàng, chạy trực tiếp trên Node.js
-│   ├── runner.js                           # Test runner phân tầng tự động phát hiện suite
-│   ├── tier1_features/                     # Kiểm thử tính năng chính (Logic cờ, Socket, i18n, Audio, UI)
-│   ├── tier2_boundaries/                   # Kiểm thử góc biên, toạ độ âm, flood nước đi, rate-limit chat
-│   ├── tier3_combinations/                 # Kiểm thử phối hợp (Khán giả vào giữa trận, đổi bên khi hòa)
-│   └── tier4_scenarios/                    # Mô phỏng trận đấu giải đấu 15x15 Gomoku hoàn chỉnh
+├── 🧪 tests/                               # COMPREHENSIVE AUTOMATED TEST SUITE (86/86 PASS)
+│   ├── harness.js                          # Zero-dependency custom test harness running on Node.js
+│   ├── runner.js                           # Tiered test runner with auto-discovery
+│   ├── tier1_features/                     # Core features (Game rules, Sockets, i18n, Audio, UI)
+│   ├── tier2_boundaries/                   # Edge boundaries (Board corners, negative coords, spam defense)
+│   ├── tier3_combinations/                 # Cross-feature flows (Mid-game spectator join, rematch side swap)
+│   └── tier4_scenarios/                    # Real-world simulations (Full 15x15 championship Gomoku match)
 │
-├── server.js                               # Khởi động HTTP & WebSocket Server
-├── chay-game-online.bat                    # Script khởi chạy 1-chạm cho Windows
-├── render.yaml                             # Cấu hình tự động Deploy lên Render.com
-└── package.json                            # Cấu hình gói và dependencies
+├── server.js                               # HTTP & WebSocket server entrypoint
+├── chay-game-online.bat                    # One-click Windows startup script
+├── render.yaml                             # Cloud deployment configuration for Render.com
+└── package.json                            # Node.js project manifest & dependencies
 ```
 
 ---
 
-## 🚀 Hướng Dẫn Cài Đặt & Khởi Chạy
+## 🚀 Installation & Quick Start
 
-### 1. Yêu cầu hệ thống
-- Đã cài đặt [Node.js](https://nodejs.org/) (phiên bản 18.x hoặc 20.x trở lên).
-- Trình duyệt hiện đại hỗ trợ ES6 Modules (Chrome, Edge, Firefox, Safari).
-
----
-
-### 2. Khởi chạy 1-chạm trên Windows
-- Nhấp đúp chuột vào file **`chay-game-online.bat`**.
-- Hệ thống sẽ tự động khởi động server tại cổng `3000` và mở đường hầm Cloudflare Tunnel công khai.
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) installed (v18.x or v20.x+ recommended).
+- Modern web browser with ES6 Module support (Chrome, Edge, Firefox, Safari).
 
 ---
 
-### 3. Khởi chạy thủ công qua Terminal
-1. Cài đặt các thư viện:
+### 2. One-Click Launch on Windows
+Double-click the **`chay-game-online.bat`** file in the root folder.
+The script will automatically install dependencies if needed, start the local server on port `3000`, and provide a public Cloudflare Tunnel link.
+
+---
+
+### 3. Manual Startup via Terminal
+1. Install project dependencies:
    ```bash
    npm install
    ```
-2. Chạy máy chủ:
+2. Start the game server:
    ```bash
    npm start
-   # Hoặc:
+   # Or alternatively:
    node server.js
    ```
-3. Mở trình duyệt và truy cập:
-   - Trên máy của bạn: `http://localhost:3000`
-   - Trên các thiết bị khác trong cùng mạng Wi-Fi: `http://<IP-Máy-Của-Bạn>:3000`
+3. Open your browser:
+   - On your computer: `http://localhost:3000`
+   - On mobile/tablet connected to the same Wi-Fi: `http://<YOUR-LOCAL-IP>:3000`
 
 ---
 
-### 4. Mở mạng Internet để chơi cùng bạn bè từ xa (Cloudflare Tunnel)
-Mở cửa sổ Terminal mới và chạy:
+### 4. Play with Friends Anywhere (Cloudflare Tunnel)
+To invite friends across the internet without port forwarding or VPNs, open a new terminal window and run:
 ```bash
 npm run online
 ```
-Sao chép đường dẫn `https://xxxx.trycloudflare.com` hiển thị trên màn hình và gửi cho bạn bè để cùng chơi trực tuyến ngay trên điện thoại hoặc máy tính.
+Copy the generated public URL (e.g. `https://xxxx.trycloudflare.com`) and send it to your friends to play instantly on any smartphone, tablet, or PC!
 
 ---
 
-## 🧪 Chạy Bộ Kiểm Thử Tự Động (Automated Test Suite)
+## 🧪 Comprehensive Automated Testing
 
-Dự án sở hữu bộ test E2E và Unit Test toàn diện không phụ thuộc framework ngoài:
+The project includes an end-to-end and unit testing harness built from scratch without external testing dependencies:
+
 ```bash
 npm test
 ```
 
-### Các tùy chọn chạy riêng theo tầng:
-- `node tests/runner.js tier1` — Chạy các bài test kiểm tra tính năng cốt lõi.
-- `node tests/runner.js tier2` — Chạy các bài test góc biên & chống spam / flood payload.
-- `node tests/runner.js tier3` — Chạy các bài test tương tác đa client & spectator.
-- `node tests/runner.js tier4` — Mô phỏng toàn bộ ván đấu giải vô địch Gomoku 15x15.
+### Running Specific Test Tiers:
+- `node tests/runner.js tier1` — Tests core functionality (Rules, Socket events, i18n, Audio synthesis, UI modals).
+- `node tests/runner.js tier2` — Tests edge boundaries, negative coordinates, move flooding, and rate-limiting.
+- `node tests/runner.js tier3` — Tests multi-client combinations (Spectators joining mid-game, rematch symbol swaps).
+- `node tests/runner.js tier4` — Simulates real-world full 15x15 Gomoku matches with adversarial moves.
 
-Kết quả kiểm thử: **31 Test Suites | 86/86 Test Cases PASS (100%)**.
+Test Results: **31 Test Suites | 86/86 Test Cases PASS (100%)**.
 
 ---
 
-## ☁️ Triển Khai Lên Nền Tảng Đám Mây (Deploy to Cloud)
+## ☁️ Cloud Deployment
 
-Dự án đã có sẵn cấu hình `render.yaml` để đưa lên [Render.com](https://render.com):
-1. Đẩy code lên GitHub repository của bạn.
-2. Đăng nhập vào Render.com -> chọn **New +** -> **Web Service**.
-3. Chọn repo `caro-online`.
-4. Render sẽ tự động cấu hình:
+The repository includes a ready-to-use `render.yaml` blueprint for [Render.com](https://render.com):
+1. Push your repository to your GitHub account.
+2. Sign in to Render.com -> click **New +** -> select **Web Service**.
+3. Link your `caro-online` repository.
+4. Render will automatically detect the settings:
    - **Runtime**: `Node`
    - **Build Command**: `npm install`
    - **Start Command**: `npm start`
-5. Nhấn **Deploy** để có ngay trang web online 24/7 hoàn toàn miễn phí.
+5. Click **Create Web Service** to deploy your live online game 24/7 for free.
 
 ---
 
-## 👨‍💻 Tác Giả & Bản Quyền
+## 👨‍💻 Author & License
 
-- **Tác giả:** [Le Van Phuoc Thinh / Lycn](https://github.com/levphuocthinh)
+- **Author:** [Le Van Phuoc Thinh / Lycn](https://github.com/levphuocthinh)
 - **Email:** `lpvt267@gmail.com`
-- **Kho lưu trữ:** [github.com/levphuocthinh/caro-online](https://github.com/levphuocthinh/caro-online)
-- **Giấy phép:** MIT License
+- **Repository:** [github.com/levphuocthinh/caro-online](https://github.com/levphuocthinh/caro-online)
+- **License:** MIT License
