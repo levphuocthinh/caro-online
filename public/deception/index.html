@@ -104,7 +104,7 @@
             <button type="button" class="btn-lobby-mode-tab" id="tab-btn-online" data-mode="online">
               <i class="fa-solid fa-earth-americas"></i>
               <span>Phòng Chơi Online (Multiplayer)</span>
-              <span class="mode-pill-badge pill-online">🌐 WebSocket Live</span>
+              <span class="mode-pill-badge pill-online">🌐 Trực Tuyến</span>
             </button>
           </div>
 
@@ -240,7 +240,7 @@
 
             <!-- ONLINE PERKS / FEATURE TAGS -->
             <div class="online-perks-row">
-              <span class="online-perk"><i class="fa-solid fa-bolt"></i> WebSocket Thời Gian Thực</span>
+              <span class="online-perk"><i class="fa-solid fa-bolt"></i> Kết Nối Trực Tuyến Tức Thì</span>
               <span class="online-perk"><i class="fa-solid fa-comments"></i> Kênh Chat & Đàm Thoại Trực Tiếp</span>
               <span class="online-perk"><i class="fa-solid fa-robot"></i> Thêm Bot AI Lấp Đầy Ghế</span>
               <span class="online-perk"><i class="fa-solid fa-gavel"></i> Chủ Phòng Quyền Lực (Kick / Start)</span>
@@ -249,13 +249,13 @@
         </div>
       </section>
 
-      <!-- VIEW 1.5: ONLINE WAITING ROOM (Phòng Chờ Trực Tuyến & Nhắn Tin WebSocket) -->
+      <!-- VIEW 1.5: ONLINE WAITING ROOM (Phòng Chờ Trực Tuyến & Nhắn Tin) -->
       <section class="noir-view" id="view-online-room">
         <div class="online-room-card">
           <!-- Room Header Bar -->
           <div class="online-room-header">
             <div class="room-title-block">
-              <span class="view-eyebrow text-gold"><i class="fa-solid fa-wifi"></i> PHÒNG CHỜ TRỰC TUYẾN WEBSOCKET</span>
+              <span class="view-eyebrow text-gold"><i class="fa-solid fa-wifi"></i> PHÒNG CHỜ TRỰC TUYẾN</span>
               <h2 class="view-title">Bàn Hội Chẩn Trọng Án <span id="online-room-title-code" class="code-highlight">#DEC---</span></h2>
             </div>
             <div class="room-meta-actions">
@@ -316,9 +316,29 @@
               <!-- Seats Roster Container -->
               <div class="seats-roster-box">
                 <div class="seats-roster-header">
-                  <h4><i class="fa-solid fa-chair"></i> Bàn Hội Chẩn (4 – 9 Người Chơi)</h4>
+                  <h4><i class="fa-solid fa-chair"></i> Bàn Hội Chẩn Trực Tuyến (4 – 9 Người Chơi)</h4>
                   <span class="seats-requirement-hint" id="lbl-seats-hint">Cần tối thiểu 4 người chơi để bắt đầu</span>
                 </div>
+
+                <!-- Central Detective Table Layout for Online Waiting Room -->
+                <div class="lobby-table-wrapper online-table-wrapper">
+                  <div class="detective-round-table online-round-table">
+                    <div class="table-felt">
+                      <div class="table-emblem">
+                        <i class="fa-solid fa-fingerprint"></i>
+                        <span>BÀN HỘI CHẨN TRỰC TUYẾN</span>
+                      </div>
+                      <div class="online-table-felt-status">
+                        <span class="felt-code-tag">Phòng: <b id="online-felt-room-code">DEC---</b></span>
+                        <span class="felt-status-tag" id="online-felt-status-tag">Đang chờ thành viên...</span>
+                      </div>
+                    </div>
+                    <div class="table-seats-ring" id="online-table-seats-ring">
+                      <!-- Dynamically rendered seats around the table -->
+                    </div>
+                  </div>
+                </div>
+
                 <div class="seats-cards-grid" id="online-seats-grid">
                   <!-- Rendered dynamically with host/ready badges, empty slots and kick buttons -->
                 </div>
@@ -355,7 +375,7 @@
               </div>
             </div>
 
-            <!-- RIGHT COLUMN: LIVE REAL-TIME CHAT (WEBSOCKET) -->
+            <!-- RIGHT COLUMN: LIVE REAL-TIME CHAT -->
             <div class="online-col-chat">
               <div class="live-chat-panel">
                 <div class="chat-panel-header">
@@ -365,7 +385,7 @@
                   </div>
                   <div class="chat-live-pulse">
                     <span class="pulse-dot"></span>
-                    <span>WebSocket Live</span>
+                    <span>Trực Tuyến</span>
                   </div>
                 </div>
 
@@ -948,7 +968,7 @@
     <div class="chat-drawer-header">
       <div class="drawer-title">
         <i class="fa-solid fa-comments"></i>
-        <span>Đàm Thoại Trọng Án (WebSocket Live)</span>
+        <span>Đàm Thoại Trọng Án (Trực Tuyến)</span>
       </div>
       <button type="button" class="btn-drawer-close" id="btn-close-ingame-chat" title="Thu nhỏ khung chat">
         <i class="fa-solid fa-xmark"></i>

@@ -194,6 +194,33 @@ describe('Deception Online Multiplayer & WebSocket Suite', () => {
       await testServer.close();
     }
   });
+
+  test('DOM & UI: Online waiting room contains detective poker table and seat ring elements', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const html = fs.readFileSync(path.join(__dirname, '../public/deception/index.html'), 'utf8');
+
+    assert(html.includes('online-round-table'), 'Must include online-round-table class');
+    assert(html.includes('online-table-seats-ring'), 'Must include online-table-seats-ring container');
+    assert(html.includes('online-felt-room-code'), 'Must include online-felt-room-code element');
+    assert(html.includes('online-felt-status-tag'), 'Must include online-felt-status-tag element');
+    assert(html.includes('BÀN HỘI CHẨN TRỰC TUYẾN'), 'Must include central emblem title');
+  });
+
+  test('UI Terminology: All technical WebSocket jargon removed in favor of friendly player terms', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const html = fs.readFileSync(path.join(__dirname, '../public/deception/index.html'), 'utf8');
+    const js = fs.readFileSync(path.join(__dirname, '../public/deception/js/DeceptionApp.js'), 'utf8');
+
+    // index.html should have ZERO user-facing occurrences of 'websocket'
+    const lowerHtml = html.toLowerCase();
+    assertEqual(lowerHtml.includes('websocket'), false, 'index.html must have 0 occurrences of websocket');
+
+    // DeceptionApp.js should have 0 occurrences of 'WebSocket' in toast notifications
+    const toastMatches = js.match(/showToast\([^)]*websocket[^)]*\)/i);
+    assertEqual(toastMatches, null, 'showToast must not reference WebSocket');
+  });
 });
 
 if (require.main === module) {

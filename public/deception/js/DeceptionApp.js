@@ -288,7 +288,7 @@ class DeceptionAppController {
       const name = (document.getElementById('online-create-name')?.value || '').trim() || 'Thám tử Trưởng';
 
       if (!this.socket || !this.socket.connected) {
-        this.showToast('Đang kết nối lại máy chủ WebSocket... Vui lòng thử lại sau giây lát!');
+        this.showToast('Đang kết nối lại máy chủ trực tuyến... Vui lòng thử lại sau giây lát!');
         this.initSocket();
         if (this.socket) {
           this.socket.once('connect', () => {
@@ -318,7 +318,7 @@ class DeceptionAppController {
       }
 
       if (!this.socket || !this.socket.connected) {
-        this.showToast('Đang kết nối lại máy chủ WebSocket... Vui lòng thử lại sau giây lát!');
+        this.showToast('Đang kết nối lại máy chủ trực tuyến... Vui lòng thử lại sau giây lát!');
         this.initSocket();
         if (this.socket) {
           this.socket.once('connect', () => {
@@ -896,6 +896,9 @@ class DeceptionAppController {
       }
     }
 
+    // Render the detective poker-style oval table with player seats ring
+    this.renderOnlineSeatsTable();
+
     const grid = document.getElementById('online-seats-grid');
     if (grid) {
       const activeSeatsHtml = this.onlineRoom.players.map((p, idx) => {
@@ -975,6 +978,105 @@ class DeceptionAppController {
         this.renderChatMessageBubble(msg, chatStream);
       });
       chatStream.scrollTop = chatStream.scrollHeight;
+    }
+  }
+
+  renderOnlineSeatsTable() {
+    const ring = document.getElementById('online-table-seats-ring');
+    if (!ring || !this.onlineRoom) return;
+
+    const players = this.onlineRoom.players || [];
+    const isHost = this.onlineRoom.hostId === this.myPlayerId;
+    const totalPlayers = players.length;
+
+    // Minimum slots to show on the round table ellipse is 6, or up to 9
+    // This gives a full realistic table appearance like the solo mode table
+    const totalSlots = Math.max(6, Math.min(9, totalPlayers + (totalPlayers < 9 ? 1 : 0)));
+
+    let nodesHtml = '';
+
+    for (let i = 0; i < totalSlots; i++) {
+      const angle = (i / totalSlots) * 2 * Math.PI - Math.PI / 2;
+      const rx = 50 + 44 * Math.cos(angle);
+      const ry = 50 + 44 * Math.sin(angle);
+
+      if (i < totalPlayers) {
+        const p = players[i];
+        const isSelf = p.id === this.myPlayerId;
+        const isReady = Boolean(p.isReady);
+
+        nodesHtml += `
+          <div class="online-table-seat-node ${isSelf ? 'is-self' : ''} ${p.isHost ? 'is-host' : ''} ${p.isBot ? 'is-bot' : ''} ${isReady ? 'is-ready' : 'is-waiting'}"
+               style="left: ${rx.toFixed(2)}%; top: ${ry.toFixed(2)}%;"
+               title="${this.escapeHtml(p.displayName)}${isSelf ? ' (Bạn)' : ''} - Ghế #${i + 1}">
+            <div class="table-seat-avatar">${p.avatar || '👤'}</div>
+            ${p.isHost ? '<span class="seat-badge-crown" title="Chủ phòng">👑</span>' : ''}
+            ${p.isBot ? '<span class="seat-badge-bot" title="Bot AI">🤖</span>' : ''}
+            ${!p.isHost && !p.isBot ? (isReady ? '<span class="seat-badge-ready" title="Đã sẵn sàng">✓</span>' : '<span class="seat-badge-waiting" title="Chờ sẵn sàng">⏳</span>') : ''}
+            ${isHost && !isSelf ? `
+              <button type="button" class="table-seat-kick-btn" data-player-id="${p.id}" title="Mời ${this.escapeHtml(p.displayName)} ra khỏi phòng">
+                ✕
+              </button>
+            ` : ''}
+            <span class="online-table-seat-label">${this.escapeHtml(p.displayName)}${isSelf ? ' (Bạn)' : ''}</span>
+          </div>
+        `;
+      } else {
+        // Empty slot (host can click to add bot)
+        const slotIdx = i + 1;
+        nodesHtml += `
+          <div class="online-table-seat-node is-empty ${isHost ? 'slot-can-add' : ''}"
+               style="left: ${rx.toFixed(2)}%; top: ${ry.toFixed(2)}%;"
+               ${isHost ? `data-action="add-bot" title="Nhấp để thêm nhanh Bot AI vào ghế #${slotIdx}"` : `title="Ghế #${slotIdx} đang trống"`}>
+            <div class="table-seat-avatar">${isHost ? '<i class="fa-solid fa-plus"></i>' : '<i class="fa-solid fa-chair"></i>'}</div>
+            <span class="online-table-seat-label">${isHost ? '+ Bot AI' : `Ghế #${slotIdx}`}</span>
+          </div>
+        `;
+      }
+    }
+
+    ring.innerHTML = nodesHtml;
+
+    // Center table code & status pill
+    const feltCode = document.getElementById('online-felt-room-code');
+    if (feltCode) feltCode.textContent = `#${this.onlineRoom.roomCode}`;
+
+    const feltStatus = document.getElementById('online-felt-status-tag');
+    if (feltStatus) {
+      const unreadyHumans = players.filter(p => !p.isBot && !p.isReady && p.id !== this.onlineRoom.hostId);
+      if (totalPlayers < 4) {
+        feltStatus.className = 'felt-status-tag';
+        feltStatus.textContent = `Cần thêm ${4 - totalPlayers} người`;
+      } else if (unreadyHumans.length > 0) {
+        feltStatus.className = 'felt-status-tag';
+        feltStatus.textContent = `Chờ ${unreadyHumans.length} người sẵn sàng`;
+      } else {
+        feltStatus.className = 'felt-status-tag status-ready';
+        feltStatus.textContent = `✨ Bàn đã sẵn sàng!`;
+      }
+    }
+
+    // Attach click events on the table seats
+    ring.querySelectorAll('.table-seat-kick-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const targetPlayerId = btn.dataset.playerId;
+        if (targetPlayerId && this.socket) {
+          this.socket.emit('deception:kick_player', { targetPlayerId });
+          this.playAudio('click');
+        }
+      });
+    });
+
+    if (isHost) {
+      ring.querySelectorAll('.slot-can-add').forEach(slot => {
+        slot.addEventListener('click', () => {
+          if (this.socket) {
+            this.socket.emit('deception:add_bot');
+            this.playAudio('click');
+          }
+        });
+      });
     }
   }
 
