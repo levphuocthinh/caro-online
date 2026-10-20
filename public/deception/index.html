@@ -277,51 +277,45 @@
           </div>
         </div>
 
-        <!-- THÔNG BÁO DẪN TRÒ THÔNG MINH (GAME MASTER NARRATOR BAR) -->
-        <div class="game-master-narrator-bar" id="game-master-narrator-bar">
-          <div class="narrator-left">
-            <div class="narrator-officer-badge">
-              <i class="fa-solid fa-user-secret"></i>
+        <!-- THANH ĐIỀU HÀNH TRANH LUẬN TỰ DO & ĐỒNG HỒ VÒNG (FREE DISCUSSION & ROUND TIMER BAR) -->
+        <div class="free-discussion-hud" id="free-discussion-hud">
+          <div class="discussion-hud-left">
+            <div class="round-badge-row">
+              <span class="round-badge-pill" id="lbl-round-badge"><i class="fa-solid fa-comments"></i> VÒNG 1: TRANH LUẬN TỰ DO</span>
             </div>
-            <div class="narrator-content-wrap">
-              <div class="narrator-meta-row">
-                <span class="narrator-badge-tag"><i class="fa-solid fa-shield-halved"></i> DẪN TRÒ • CỤC CẢNH SÁT HÌNH SỰ</span>
-                <span class="narrator-phase-title" id="narrator-phase-title">VÒNG 1: ĐIỀU TRA & THẢO LUẬN</span>
-              </div>
-              <div class="narrator-instruction-text" id="narrator-instruction-text">
-                Quan sát 6 thẻ Manh Mối của Pháp y và 8 thẻ trước mặt các nghi phạm. Ai có cặp [Hung Khí + Manh Mối] khả nghi nhất?
-              </div>
+            <div class="discussion-guidance-text" id="lbl-discussion-guidance">
+              🗣️ Cả phòng tự do bàn luận qua Mic/Chat! Soi 6 đạn Pháp Y với thẻ nghi phạm. Bất kỳ ai có Huy hiệu đều có thể bấm [Phá Án] bất cứ lúc nào!
             </div>
           </div>
-          <div class="narrator-right">
-            <button type="button" class="btn-narrator-action" id="btn-quick-guide">
-              <i class="fa-solid fa-circle-question"></i>
-              <span>Luật 30 Giây</span>
+
+          <!-- ĐỒNG HỒ ĐẾM NGƯỢC VÒNG -->
+          <div class="discussion-hud-center">
+            <div class="round-countdown-box" id="round-countdown-box" title="Thời gian thảo luận của vòng này">
+              <span class="countdown-icon"><i class="fa-solid fa-stopwatch"></i></span>
+              <span class="countdown-digits" id="round-countdown-digits">03:00</span>
+            </div>
+            <div class="countdown-controls">
+              <button type="button" class="btn-timer-ctrl" id="btn-timer-toggle-pause" title="Tạm dừng / Tiếp tục đếm ngược">
+                <i class="fa-solid fa-pause" id="icon-timer-pause"></i>
+              </button>
+              <button type="button" class="btn-timer-ctrl" id="btn-timer-add-minute" title="Cộng thêm 1 phút thảo luận (+60s)">
+                <i class="fa-solid fa-plus"></i> 1p
+              </button>
+              <button type="button" class="btn-timer-advance" id="btn-timer-advance" title="Kết thúc thời gian vòng này để sang vòng tiếp theo (Pháp y đổi thẻ)">
+                <i class="fa-solid fa-forward-step"></i> <span>Hết Vòng</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="discussion-hud-right">
+            <button type="button" class="btn-hud-accuse" id="btn-hud-accuse" title="Sử dụng Phù hiệu để đập bàn phá án">
+              <i class="fa-solid fa-gavel"></i>
+              <span>🚨 PHÁ ÁN!</span>
             </button>
-          </div>
-        </div>
-
-        <!-- Status Ribbon: Round, Phase, Time, Badges, Notes -->
-        <div class="investigation-ribbon">
-          <div class="ribbon-col">
-            <span class="ribbon-pill pill-gold" id="ribbon-round">VÒNG 1 / 3</span>
-            <span class="ribbon-pill pill-blue" id="ribbon-phase">PHÁP Y ĐẶT ĐẠN</span>
-          </div>
-
-          <!-- 30s Speaker Countdown Bar -->
-          <div class="speaker-hud" id="speaker-hud">
-            <span class="speaker-avatar" id="hud-speaker-avatar">🕵️</span>
-            <div class="speaker-info">
-              <div class="speaker-name-row">
-                <span class="speaker-name" id="hud-speaker-name">Đang trình bày...</span>
-                <span class="speaker-status-tag" id="hud-speaker-status"></span>
-              </div>
-              <div class="speaker-speech-quote" id="hud-speaker-quote" style="display: none;"></div>
-              <div class="speaker-time-bar">
-                <div class="speaker-time-fill" id="hud-time-fill" style="width: 100%;"></div>
-              </div>
-            </div>
-            <span class="speaker-sec-badge" id="hud-speaker-sec">30s</span>
+            <button type="button" class="btn-hud-guide" id="btn-quick-guide" title="Xem hướng dẫn cách chơi Deception">
+              <i class="fa-solid fa-circle-question"></i>
+              <span>Luật Chơi</span>
+            </button>
           </div>
         </div>
 
@@ -378,13 +372,9 @@
         <!-- BOTTOM ACTION DOCK -->
         <div class="floating-action-dock">
           <div class="dock-actions-left">
-            <button type="button" class="btn-dock-btn" id="btn-dock-next-speaker">
-              <i class="fa-solid fa-forward-step"></i>
-              <span>Lượt Kế Tiếp</span>
-            </button>
-            <button type="button" class="btn-dock-btn" id="btn-dock-advance-round">
+            <button type="button" class="btn-dock-btn" id="btn-dock-advance-round" title="Hết thời gian vòng này — Chuyển sang cho Pháp y đổi thẻ">
               <i class="fa-solid fa-circle-arrow-right"></i>
-              <span>Sang Vòng Mới</span>
+              <span>Hết Giờ / Chuyển Vòng</span>
             </button>
           </div>
 
@@ -580,13 +570,13 @@
     </div>
   </div>
 
-  <!-- MODAL 4: HƯỚNG DẪN 30 GIÂY CỰC DỄ HIỂU (QUICK GUIDE) -->
+  <!-- MODAL 4: HƯỚNG DẪN CÁCH CHƠI DECEPTION CỰC DỄ HIỂU (QUICK GUIDE) -->
   <div class="noir-modal-overlay" id="modal-quick-guide">
-    <div class="noir-modal-card">
+    <div class="noir-modal-card modal-wide">
       <div class="noir-modal-header">
         <div>
-          <span class="view-eyebrow text-gold">HƯỚNG DẪN 30 GIÂY CHO NGƯỜI MỚI</span>
-          <h3 class="modal-heading">Cách Chơi Deception Cực Dễ Hiểu</h3>
+          <span class="view-eyebrow text-gold">HƯỚNG DẪN CƠ BẢN CHO NGƯỜI MỚI</span>
+          <h3 class="modal-heading">Luật Chơi & Tiến Trình 3 Vòng Deception</h3>
         </div>
         <button type="button" class="btn-modal-close" data-close="modal-quick-guide"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -597,8 +587,8 @@
             <div class="qg-body">
               <h4 class="qg-title">🎯 Giám Định Pháp Y Không Được Nói!</h4>
               <p class="qg-text">
-                Pháp Y biết chính xác ai là Hung Thủ và cặp vật chứng, nhưng <b>tuyệt đối không được nói thành lời hay ra hiệu</b>.
-                Pháp Y chỉ được đặt <b>6 viên đạn gỗ</b> lên các dòng mô tả trên 6 Thẻ Hiện Trường để dẫn đường cho Cảnh sát.
+                Pháp Y biết chính xác ai là Hung Thủ và cặp vật chứng gây án, nhưng <b>tuyệt đối không được nói thành lời hay ra hiệu</b>.
+                Pháp Y chỉ được đặt <b>6 viên đạn gỗ</b> lên các dòng miêu tả trên 6 Thẻ Hiện Trường để gợi ý manh mối cho Cảnh sát.
               </p>
             </div>
           </div>
@@ -606,10 +596,10 @@
           <div class="quick-guide-card">
             <div class="qg-badge qg-blue">BƯỚC 2</div>
             <div class="qg-body">
-              <h4 class="qg-title">🔍 So Khớp Thẻ Của Từng Nghi Phạm</h4>
+              <h4 class="qg-title">🗣️ Tranh Luận Tự Do & So Khớp Thẻ Nghi Phạm</h4>
               <p class="qg-text">
                 Mỗi người chơi có <b>4 Thẻ Xanh (Hung Khí)</b> và <b>4 Thẻ Đỏ (Manh Mối)</b> đặt ngửa trước mặt.
-                Chỉ có <b>1 người duy nhất</b> giữ đúng cặp thẻ đã gây án! Hãy đối chiếu các viên đạn gỗ của Pháp Y với 8 thẻ của từng người để khoanh vùng thủ phạm.
+                Cả phòng <b>tự do trò chuyện, phản biện qua Mic hoặc Chat</b> (ai nói cũng được, không bị gò bó lượt). Hãy đối chiếu 6 đạn của Pháp Y với 8 thẻ của từng người để tìm ra kẻ tình nghi nhất!
               </p>
             </div>
           </div>
@@ -617,11 +607,24 @@
           <div class="quick-guide-card">
             <div class="qg-badge qg-crimson">BƯỚC 3</div>
             <div class="qg-body">
-              <h4 class="qg-title">🛡️ Mỗi Người 1 Phù Hiệu Phá Án Duy Nhất!</h4>
+              <h4 class="qg-title">🛡️ Đập Bàn Phá Án Bất Kỳ Lúc Nào!</h4>
               <p class="qg-text">
-                Bất cứ lúc nào trong lượt thảo luận, nếu phát hiện ra cặp bài trùng, hãy bấm nút <b>[🚨 ĐẬP BÀN PHÁ ÁN]</b>!
-                Chỉ định 1 Nghi phạm + 1 Thẻ Xanh + 1 Thẻ Đỏ.
-                <b>Đoán đúng: Cảnh sát thắng ngay!</b> Đoán sai: Bạn bị tịch thu phù hiệu và mất quyền phá án suốt ván chơi.
+                Mỗi người chơi (trừ Pháp Y) sở hữu <b>1 Huy Hiệu Phá Án</b>. Bất kỳ lúc nào trong vòng thảo luận, nếu tự tin mình đã tìm ra chân tướng, bạn có thể bấm <b>[🚨 ĐẬP BÀN PHÁ ÁN]</b> để chỉ định 1 Nghi phạm + 1 Hung khí + 1 Manh mối.<br>
+                • <b>Nếu đoán ĐÚNG cả 2:</b> Cảnh sát bắt giữ hung thủ và thắng cuộc!<br>
+                • <b>Nếu đoán SAI (dù chỉ sai 1 thẻ):</b> Pháp Y lắc đầu. Bạn bị tịch thu Huy hiệu nhưng vẫn được tiếp tục ngồi bàn luận cùng đồng đội.
+              </p>
+            </div>
+          </div>
+
+          <div class="quick-guide-card">
+            <div class="qg-badge qg-gold">BƯỚC 4</div>
+            <div class="qg-body">
+              <h4 class="qg-title">🔄 Tiến Trình 3 Vòng & Pháp Y Đổi Thẻ Gợi Ý Thêm</h4>
+              <p class="qg-text">
+                Cuộc điều tra diễn ra trong <b>3 Vòng</b>:<br>
+                • <b>Hết Vòng 1:</b> Pháp Y được <b>rút 1 Thẻ Hiện Trường mới</b>, thay thế 1 thẻ nâu cũ và ghim 1 viên đạn mới để thu hẹp phạm vi nghi vấn.<br>
+                • <b>Hết Vòng 2:</b> Pháp Y tiếp tục <b>đổi thêm 1 thẻ nâu nữa</b> để cung cấp gợi ý then chốt cuối cùng.<br>
+                • <b>Hết Vòng 3 (Chốt án):</b> Nếu hết giờ mà Cảnh sát vẫn không phá được án -> <b>Kẻ Sát Nhân sẽ lên máy bay trốn thoát và giành chiến thắng!</b>
               </p>
             </div>
           </div>
@@ -630,7 +633,7 @@
       <div class="noir-modal-footer">
         <button type="button" class="btn-noir-hero" data-close="modal-quick-guide">
           <i class="fa-solid fa-check"></i>
-          <span>Đã Hiểu — Vào Phá Án Ngay!</span>
+          <span>Đã Hiểu Rõ Luật — Vào Bàn Phá Án!</span>
         </button>
       </div>
     </div>

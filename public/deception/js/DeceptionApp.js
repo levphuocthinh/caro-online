@@ -24,7 +24,10 @@ class DeceptionAppController {
   constructor() {
     this.state = new DeceptionState();
     this.isVi = true;
-    this.speakerTimerId = null;
+    this.roundTimerId = null;
+    this.roundTimeLeft = 180; // 3 phút thảo luận tự do mỗi vòng
+    this.isTimerPaused = false;
+    this.speakerTimerId = null; // backward compatibility
     this.soundEnabled = true;
 
     // Audio Context cho âm thanh kịch tính Noir
@@ -176,23 +179,32 @@ class DeceptionAppController {
       });
     });
 
-    // Dock Actions
-    document.getElementById('btn-dock-next-speaker')?.addEventListener('click', () => {
-      this.playAudio('click');
-      this.stopSpeakerTimer();
-      if (!this.state.nextSpeaker()) {
-        this.advanceInvestigationRound();
-      } else {
-        this.startSpeakerTimer();
-      }
+    // Điều khiển Đồng Hồ Đếm Ngược Vòng Thảo Luận Tự Do
+    document.getElementById('btn-timer-toggle-pause')?.addEventListener('click', () => {
+      this.togglePauseRoundTimer();
     });
 
+    document.getElementById('btn-timer-add-minute')?.addEventListener('click', () => {
+      this.addRoundMinute();
+    });
+
+    document.getElementById('btn-timer-advance')?.addEventListener('click', () => {
+      this.advanceInvestigationRound();
+    });
+
+    document.getElementById('btn-hud-accuse')?.addEventListener('click', () => {
+      this.stopRoundTimer();
+      this.triggerScreenShake(300);
+      this.openAccusationDialog();
+    });
+
+    // Dock Actions
     document.getElementById('btn-dock-advance-round')?.addEventListener('click', () => {
       this.advanceInvestigationRound();
     });
 
     document.getElementById('btn-dock-accuse')?.addEventListener('click', () => {
-      this.stopSpeakerTimer();
+      this.stopRoundTimer();
       this.triggerScreenShake(300);
       this.openAccusationDialog();
     });
@@ -494,16 +506,16 @@ class DeceptionAppController {
       // Pháp y người chơi tự tay đặt 6 viên đạn gỗ
       this.playAudio('chime');
     } else {
-      // Pháp y là Bot tự động đặt đạn xong -> Bắt đầu Vòng tranh luận 1
+      // Pháp y là Bot tự động đặt đạn xong -> Bắt đầu Vòng tranh luận tự do 1 (3:00)
       this.state.startPresentationPhase();
-      this.startSpeakerTimer();
+      this.roundTimeLeft = 180;
+      this.startRoundTimer();
     }
   }
 
   renderInvestigationTable() {
-    this.renderInvestigationHud();
     this.updateInvestigationTimeline();
-    this.updateGameMasterNarrator();
+    this.updateDiscussionHud();
     this.renderActiveSceneTiles();
     this.renderAuthenticSuspectsTable();
   }
@@ -643,90 +655,111 @@ class DeceptionAppController {
     }
   }
 
-  startSpeakerTimer() {
-    this.stopSpeakerTimer();
-    this.state.speakerTimeLeft = this.state.config.presentationSeconds || 30;
-    this.updateSpeakerHud();
+  startRoundTimer() {
+    this.stopRoundTimer();
+    this.isTimerPaused = false;
+    const pauseIcon = document.getElementById('icon-timer-pause');
+    if (pauseIcon) {
+      pauseIcon.className = 'fa-solid fa-pause';
+    }
 
-    this.speakerTimerId = window.setInterval(() => {
-      if (this.state.speakerTimeLeft > 0) {
-        this.state.speakerTimeLeft--;
-        this.updateSpeakerHud();
+    this.updateDiscussionHud();
 
-        if (this.state.speakerTimeLeft <= 5 && this.state.speakerTimeLeft > 0) {
+    this.roundTimerId = window.setInterval(() => {
+      if (this.isTimerPaused) return;
+
+      if (this.roundTimeLeft > 0) {
+        this.roundTimeLeft--;
+        this.updateCountdownDisplay();
+
+        if (this.roundTimeLeft <= 10 && this.roundTimeLeft > 0) {
           this.playAudio('tick');
         }
       } else {
-        // Hết 30 giây của người hiện tại -> Chuyển sang người tiếp theo
-        this.stopSpeakerTimer();
-        this.playAudio('chime');
-        if (!this.state.nextSpeaker()) {
-          this.advanceInvestigationRound();
-        } else {
-          this.startSpeakerTimer();
-        }
+        // Hết thời gian vòng thảo luận -> Chuyển sang cho Pháp Y đổi thẻ (hoặc Kẻ sát nhân trốn thoát nếu vòng 3)
+        this.stopRoundTimer();
+        this.playAudio('gavel');
+        this.advanceInvestigationRound();
       }
     }, 1000);
   }
 
-  stopSpeakerTimer() {
-    if (this.speakerTimerId) {
-      clearInterval(this.speakerTimerId);
-      this.speakerTimerId = null;
+  stopRoundTimer() {
+    if (this.roundTimerId) {
+      clearInterval(this.roundTimerId);
+      this.roundTimerId = null;
     }
   }
 
-  updateSpeakerHud() {
-    const currentSpeaker = this.state.getCurrentSpeaker();
-    const human = this.state.getHumanPlayer();
-    const speakerAvatar = document.getElementById('hud-speaker-avatar');
-    const speakerName = document.getElementById('hud-speaker-name');
-    const speakerStatus = document.getElementById('hud-speaker-status');
-    const speakerQuote = document.getElementById('hud-speaker-quote');
-    const speakerSec = document.getElementById('hud-speaker-sec');
-    const timeFill = document.getElementById('hud-time-fill');
-    const lblPhase = document.getElementById('ribbon-phase');
+  // Alias for backward compatibility
+  startSpeakerTimer() { this.startRoundTimer(); }
+  stopSpeakerTimer() { this.stopRoundTimer(); }
+  updateSpeakerHud() { this.updateDiscussionHud(); }
 
-    if (currentSpeaker && this.state.phase.includes('PRESENTATION')) {
-      const isSelf = currentSpeaker.id === human.id;
-      if (lblPhase) lblPhase.textContent = this.isVi ? 'TRANH LUẬN 30S' : '30S DISCUSSION';
-      if (speakerAvatar) speakerAvatar.textContent = currentSpeaker.avatar;
-      if (speakerName) speakerName.textContent = currentSpeaker.displayName;
-      if (speakerStatus) {
-        speakerStatus.textContent = isSelf ? (this.isVi ? 'LƯỢT CỦA BẠN' : 'YOUR TURN') : (this.isVi ? 'ĐANG NÓI' : 'SPEAKING');
-        speakerStatus.className = `speaker-status-tag ${isSelf ? 'tag-you' : ''}`;
-      }
-      if (speakerSec) speakerSec.textContent = `${this.state.speakerTimeLeft}s`;
-      if (timeFill) {
-        const pct = Math.max(0, Math.min(100, Math.round((this.state.speakerTimeLeft / 30) * 100)));
-        timeFill.style.width = `${pct}%`;
-      }
-
-      if (speakerQuote) {
-        if (isSelf) {
-          speakerQuote.style.display = 'block';
-          speakerQuote.textContent = this.isVi
-            ? '💬 Lượt của bạn! Bạn có thể trao đổi suy luận hoặc bấm "Lượt Kế Tiếp" khi nói xong.'
-            : '💬 Your turn! Share your deduction or click "Next Speaker" when done.';
-        } else {
-          const latestBotLog = this.state.caseLogs.find(l => l.type === 'speech');
-          if (latestBotLog) {
-            speakerQuote.style.display = 'block';
-            speakerQuote.textContent = this.isVi ? latestBotLog.textVi : latestBotLog.textEn;
-          } else {
-            speakerQuote.style.display = 'none';
-          }
-        }
-      }
-    } else {
-      if (lblPhase) lblPhase.textContent = this.isVi ? 'PHÁP Y ĐẶT ĐẠN' : 'FORENSIC MARKERS';
-      if (speakerName) speakerName.textContent = this.isVi ? 'Quan sát hiện trường...' : 'Observe crime scene...';
-      if (speakerStatus) speakerStatus.textContent = '';
-      if (speakerQuote) speakerQuote.style.display = 'none';
-      if (speakerSec) speakerSec.textContent = '—';
-      if (timeFill) timeFill.style.width = '100%';
+  togglePauseRoundTimer() {
+    this.isTimerPaused = !this.isTimerPaused;
+    this.playAudio('click');
+    const pauseIcon = document.getElementById('icon-timer-pause');
+    if (pauseIcon) {
+      pauseIcon.className = this.isTimerPaused ? 'fa-solid fa-play' : 'fa-solid fa-pause';
     }
-    this.updateGameMasterNarrator();
+  }
+
+  addRoundMinute() {
+    this.roundTimeLeft += 60;
+    this.playAudio('chime');
+    this.updateCountdownDisplay();
+  }
+
+  updateCountdownDisplay() {
+    const digits = document.getElementById('round-countdown-digits');
+    const box = document.getElementById('round-countdown-box');
+    if (digits) {
+      const mins = Math.floor(this.roundTimeLeft / 60);
+      const secs = this.roundTimeLeft % 60;
+      digits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+    if (box) {
+      if (this.roundTimeLeft <= 30) {
+        box.classList.add('urgent');
+      } else {
+        box.classList.remove('urgent');
+      }
+    }
+  }
+
+  updateDiscussionHud() {
+    const roundBadge = document.getElementById('lbl-round-badge');
+    const guidance = document.getElementById('lbl-discussion-guidance');
+    const round = this.state.round;
+
+    if (roundBadge) {
+      if (round === 1) {
+        roundBadge.innerHTML = `<i class="fa-solid fa-comments"></i> ${this.isVi ? 'VÒNG 1: TRANH LUẬN TỰ DO' : 'ROUND 1: OPEN DISCUSSION'}`;
+      } else if (round === 2) {
+        roundBadge.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> ${this.isVi ? 'VÒNG 2: TRANH LUẬN (ĐÃ ĐỔI 1 THẺ NÂU)' : 'ROUND 2: DISCUSSION (1 TILE SWAPPED)'}`;
+      } else {
+        roundBadge.innerHTML = `<i class="fa-solid fa-gavel"></i> ${this.isVi ? 'VÒNG 3: TRANH LUẬN LƯỢT CUỐI (CHỐT ÁN)' : 'ROUND 3: FINAL CALL FOR ACCUSATION'}`;
+      }
+    }
+
+    if (guidance) {
+      if (round === 1) {
+        guidance.textContent = this.isVi
+          ? '🗣️ Cả phòng tự do bàn luận qua Mic/Chat! Soi 6 đạn Pháp Y với thẻ nghi phạm. Bất kỳ ai có Huy hiệu đều có thể bấm [Phá Án] bất cứ lúc nào!'
+          : '🗣️ Free discussion for everyone! Match 6 forensic pegs with suspect cards. Anyone with a badge can Accuse at any time!';
+      } else if (round === 2) {
+        guidance.textContent = this.isVi
+          ? '🔍 Pháp Y đã đổi 1 thẻ hiện trường mới! Hãy đối chiếu lại để loại trừ những nghi phạm vô tội.'
+          : '🔍 Forensic Scientist swapped a scene tile! Re-examine cards to eliminate innocent suspects.';
+      } else {
+        guidance.textContent = this.isVi
+          ? '🚨 Lượt thảo luận cuối cùng! Nếu hết giờ mà không ai phá đúng, Kẻ Sát Nhân sẽ trốn thoát vĩnh viễn!'
+          : '🚨 Final round! If time runs out without a correct accusation, the Murderer escapes forever!';
+      }
+    }
+
+    this.updateCountdownDisplay();
     this.updateInvestigationTimeline();
   }
 
@@ -775,19 +808,33 @@ class DeceptionAppController {
           }
           this.playAudio('gavel');
           this.state.startPresentationPhase();
+          this.roundTimeLeft = 180;
           this.renderInvestigationTable();
-          this.startSpeakerTimer();
+          this.startRoundTimer();
         });
       } else if (isHumanForensic && (this.state.phase === GAME_PHASES.ROUND_2_EVIDENCE || this.state.phase === GAME_PHASES.ROUND_3_EVIDENCE)) {
+        const roundNum = this.state.round;
         actionsSlot.innerHTML = `
-          <button type="button" class="btn-noir-small" id="btn-forensic-swap-brown">
-            <i class="fa-solid fa-arrows-rotate"></i> ${this.isVi ? 'Đổi 1 Thẻ Nâu' : 'Swap 1 Brown Tile'}
-          </button>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-noir-small" id="btn-forensic-swap-brown">
+              <i class="fa-solid fa-arrows-rotate"></i> ${this.isVi ? 'Đổi 1 Thẻ Nâu' : 'Swap 1 Brown Tile'}
+            </button>
+            <button type="button" class="btn-noir-hero" id="btn-forensic-confirm-swap" style="font-size: 12px; padding: 6px 14px;">
+              <i class="fa-solid fa-play"></i> ${this.isVi ? `Bắt Đầu Tranh Luận Vòng ${roundNum}` : `Start Round ${roundNum} Discussion`}
+            </button>
+          </div>
         `;
         document.getElementById('btn-forensic-swap-brown')?.addEventListener('click', () => {
           this.state.replaceBrownSceneTile(2);
           this.playAudio('bullet_drop');
           this.renderActiveSceneTiles();
+        });
+        document.getElementById('btn-forensic-confirm-swap')?.addEventListener('click', () => {
+          this.playAudio('gavel');
+          this.state.startPresentationPhase();
+          this.roundTimeLeft = 180;
+          this.renderInvestigationTable();
+          this.startRoundTimer();
         });
       } else {
         actionsSlot.innerHTML = '';
@@ -1027,10 +1074,9 @@ class DeceptionAppController {
 
     this.openModal('modal-card-inspect');
   }
-  }
 
   advanceInvestigationRound() {
-    this.stopSpeakerTimer();
+    this.stopRoundTimer();
     this.playAudio('click');
 
     if (this.state.round === 1) {
@@ -1060,12 +1106,13 @@ class DeceptionAppController {
 
   startInvestigationRoundAfterEvidence() {
     const human = this.state.getHumanPlayer();
+    this.roundTimeLeft = 180; // 3 phút thảo luận tự do mới
     this.renderInvestigationTable();
     this.showView('view-investigation');
 
     if (human.role !== 'FORENSIC_SCIENTIST') {
       this.state.startPresentationPhase();
-      this.startSpeakerTimer();
+      this.startRoundTimer();
     }
   }
 
