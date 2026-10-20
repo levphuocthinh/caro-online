@@ -305,17 +305,38 @@ class DeceptionAppController {
       }
     });
 
-    // Chọn avatar trong phòng chờ
-    document.querySelectorAll('#online-avatar-picker .emoji-chip').forEach(chip => {
+    // Chọn avatar trong phòng chờ (thanh chip trực quan)
+    document.querySelectorAll('#online-avatar-picker .avatar-chip-btn').forEach(chip => {
       chip.addEventListener('click', () => {
+        document.querySelectorAll('#online-avatar-picker .avatar-chip-btn').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
         this.myAvatar = chip.dataset.emoji || '🕵️';
-        const display = document.getElementById('my-active-avatar');
-        if (display) display.textContent = this.myAvatar;
         if (this.socket) {
           this.socket.emit('deception:change_name', {
             avatar: this.myAvatar
           });
         }
+        this.playAudio('click');
+        this.showToast(`Đã đổi biểu tượng sang ${this.myAvatar}`);
+      });
+    });
+
+    // Quick Chat Chips trong phòng chờ
+    document.querySelectorAll('#online-chat-quick-chips .btn-chat-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.dataset.text;
+        if (!text || !this.socket) return;
+        this.socket.emit('deception:send_chat', { message: text });
+        this.playAudio('click');
+      });
+    });
+
+    // Quick Chat Chips trong trận
+    document.querySelectorAll('#ingame-chat-quick-chips .btn-chat-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.dataset.text;
+        if (!text || !this.socket) return;
+        this.socket.emit('deception:send_chat', { message: text });
         this.playAudio('click');
       });
     });
@@ -749,21 +770,22 @@ class DeceptionAppController {
 
     const grid = document.getElementById('online-seats-grid');
     if (grid) {
-      grid.innerHTML = this.onlineRoom.players.map((p, idx) => {
+      const activeSeatsHtml = this.onlineRoom.players.map((p, idx) => {
         const isSelf = p.id === this.myPlayerId;
         const isPReady = Boolean(p.isReady);
         return `
           <div class="online-seat-card ${isSelf ? 'is-self' : ''} ${p.isHost ? 'is-host' : ''} ${p.isBot ? 'is-bot' : ''}">
-            <div class="seat-avatar-wrap">${p.avatar || '👤'}</div>
+            <div class="seat-idx-badge">#${idx + 1}</div>
+            <div class="seat-avatar-wrap ${isPReady ? 'avatar-ready-glow' : ''}">${p.avatar || '👤'}</div>
             <div class="seat-details">
               <div class="seat-name-row">
                 <span class="seat-name-text">${this.escapeHtml(p.displayName || 'Vô danh')}</span>
                 ${isSelf ? '<span class="seat-self-tag">(Bạn)</span>' : ''}
               </div>
               <div class="seat-status-row">
-                ${p.isHost ? '<span class="seat-badge badge-host">⭐ Chủ Phòng</span>' : ''}
-                ${p.isBot ? '<span class="seat-badge badge-bot">🤖 Bot AI</span>' : ''}
-                ${!p.isHost && !p.isBot ? (isPReady ? '<span class="seat-badge badge-ready">✔ Sẵn sàng</span>' : '<span class="seat-badge badge-waiting">⏳ Đang chờ</span>') : ''}
+                ${p.isHost ? '<span class="seat-badge badge-host"><i class="fa-solid fa-crown"></i> Chủ Phòng</span>' : ''}
+                ${p.isBot ? '<span class="seat-badge badge-bot"><i class="fa-solid fa-robot"></i> Bot AI</span>' : ''}
+                ${!p.isHost && !p.isBot ? (isPReady ? '<span class="seat-badge badge-ready"><i class="fa-solid fa-circle-check"></i> Sẵn sàng</span>' : '<span class="seat-badge badge-waiting"><i class="fa-solid fa-clock"></i> Đang chờ</span>') : ''}
               </div>
             </div>
             ${isHost && !isSelf ? `
@@ -775,6 +797,26 @@ class DeceptionAppController {
         `;
       }).join('');
 
+      // Hiển thị các ghế còn trống tới tối đa 9 ghế
+      let emptySeatsHtml = '';
+      const totalSeats = this.onlineRoom.players.length;
+      if (totalSeats < 9) {
+        for (let i = totalSeats + 1; i <= Math.min(totalSeats + 2, 9); i++) {
+          emptySeatsHtml += `
+            <div class="online-seat-card seat-empty-slot ${isHost ? 'slot-can-add' : ''}" ${isHost ? `data-action="add-bot" title="Nhấp để thêm nhanh Bot AI vào ghế #${i}"` : ''}>
+              <div class="seat-idx-badge">#${i}</div>
+              <div class="seat-avatar-wrap empty-avatar-icon">${isHost ? '<i class="fa-solid fa-plus"></i>' : '<i class="fa-solid fa-chair"></i>'}</div>
+              <div class="seat-details">
+                <span class="empty-seat-title">Ghế Trống #${i}</span>
+                <span class="empty-seat-desc">${isHost ? 'Bấm để thêm Bot AI' : 'Đang chờ người chơi...'}</span>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      grid.innerHTML = activeSeatsHtml + emptySeatsHtml;
+
       grid.querySelectorAll('.btn-kick-player').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -785,6 +827,17 @@ class DeceptionAppController {
           }
         });
       });
+
+      if (isHost) {
+        grid.querySelectorAll('.slot-can-add').forEach(slot => {
+          slot.addEventListener('click', () => {
+            if (this.socket) {
+              this.socket.emit('deception:add_bot');
+              this.playAudio('click');
+            }
+          });
+        });
+      }
     }
 
     const chatStream = document.getElementById('online-chat-stream');

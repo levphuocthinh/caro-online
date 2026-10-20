@@ -273,38 +273,43 @@
               <!-- Inline Profile Customizer (Đổi tên & Avatar nhanh) -->
               <div class="profile-quick-editor">
                 <div class="quick-editor-title">
-                  <i class="fa-solid fa-user-pen"></i> Tùy Chỉnh Danh Tính Trong Bàn:
+                  <span><i class="fa-solid fa-id-card-clip"></i> Danh Tính Thám Tử Của Bạn:</span>
+                  <span class="quick-editor-hint">Chọn avatar và sửa tên hiển thị</span>
                 </div>
                 <div class="quick-editor-body">
-                  <div class="avatar-current-wrap">
-                    <span id="my-active-avatar" class="active-avatar-icon">🕵️</span>
-                    <div class="avatar-dropdown-picker" id="online-avatar-picker">
-                      <span class="emoji-chip" data-emoji="🕵️">🕵️</span>
-                      <span class="emoji-chip" data-emoji="🔬">🔬</span>
-                      <span class="emoji-chip" data-emoji="🔪">🔪</span>
-                      <span class="emoji-chip" data-emoji="🎭">🎭</span>
-                      <span class="emoji-chip" data-emoji="🧪">🧪</span>
-                      <span class="emoji-chip" data-emoji="🕶️">🕶️</span>
-                      <span class="emoji-chip" data-emoji="🛡️">🛡️</span>
-                      <span class="emoji-chip" data-emoji="🎩">🎩</span>
-                      <span class="emoji-chip" data-emoji="👁️">👁️</span>
-                    </div>
+                  <div class="avatar-chips-bar" id="online-avatar-picker">
+                    <button type="button" class="avatar-chip-btn active" data-emoji="🕵️">🕵️</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="🔬">🔬</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="🔪">🔪</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="🎭">🎭</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="🧪">🧪</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="🕶️">🕶️</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="🛡️">🛡️</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="🎩">🎩</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="👁️">👁️</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="☕">☕</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="🔍">🔍</button>
                   </div>
-                  <input type="text" id="input-online-display-name" class="noir-ctrl-input input-my-name" placeholder="Tên hiển thị của bạn..." maxlength="18">
-                  <button type="button" class="btn-save-online-name" id="btn-save-online-name" title="Lưu tên mới">
-                    <i class="fa-solid fa-floppy-disk"></i> Đổi Tên
-                  </button>
+                  <div class="name-editor-row">
+                    <div class="name-input-wrap">
+                      <i class="fa-solid fa-pen-nib name-input-icon"></i>
+                      <input type="text" id="input-online-display-name" class="noir-ctrl-input input-my-name" placeholder="Tên hiển thị của bạn..." maxlength="18">
+                    </div>
+                    <button type="button" class="btn-save-online-name" id="btn-save-online-name" title="Lưu tên mới">
+                      <i class="fa-solid fa-floppy-disk"></i> <span>Lưu Tên</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <!-- Seats Roster Container -->
               <div class="seats-roster-box">
                 <div class="seats-roster-header">
-                  <h4><i class="fa-solid fa-chair"></i> Danh Sách Ghế Ngồi (4 – 9 Người Chơi)</h4>
+                  <h4><i class="fa-solid fa-chair"></i> Bàn Hội Chẩn (4 – 9 Người Chơi)</h4>
                   <span class="seats-requirement-hint" id="lbl-seats-hint">Cần tối thiểu 4 người chơi để bắt đầu</span>
                 </div>
                 <div class="seats-cards-grid" id="online-seats-grid">
-                  <!-- Rendered dynamically with host/ready badges and kick buttons -->
+                  <!-- Rendered dynamically with host/ready badges, empty slots and kick buttons -->
                 </div>
               </div>
 
@@ -355,6 +360,14 @@
 
                 <div class="chat-messages-stream" id="online-chat-stream">
                   <!-- Real-time chat messages and system alerts -->
+                </div>
+
+                <!-- Quick Phrases Bar -->
+                <div class="chat-quick-chips" id="online-chat-quick-chips">
+                  <button type="button" class="btn-chat-chip" data-text="👋 Chào mọi người, sẵn sàng phá án nào!">👋 Chào cả nhà</button>
+                  <button type="button" class="btn-chat-chip" data-text="✅ Tôi đã sẵn sàng rồi nhé!">✅ Đã sẵn sàng</button>
+                  <button type="button" class="btn-chat-chip" data-text="🚀 Bắt đầu thôi chủ phòng!">🚀 Bắt đầu thôi</button>
+                  <button type="button" class="btn-chat-chip" data-text="🤖 Chủ phòng thêm 1 bot nữa cho đủ người đi!">🤖 Thêm bot</button>
                 </div>
 
                 <form class="chat-input-bar" id="form-online-room-chat">
@@ -932,6 +945,13 @@
     </div>
     <div class="ingame-chat-feed" id="ingame-chat-feed">
       <!-- Real-time chat messages mirrored here -->
+    </div>
+    <!-- Quick in-game discussion chips -->
+    <div class="chat-quick-chips ingame-quick-chips" id="ingame-chat-quick-chips">
+      <button type="button" class="btn-chat-chip" data-text="🔍 Tôi nghi ngờ manh mối này!">🔍 Nghi vấn</button>
+      <button type="button" class="btn-chat-chip" data-text="🛡️ Tôi là Cảnh sát, đừng nghi ngờ tôi!">🛡️ Tôi vô tội</button>
+      <button type="button" class="btn-chat-chip" data-text="🔬 Chuyên gia Pháp y hãy giải thích thêm đi!">🔬 Xin gợi ý</button>
+      <button type="button" class="btn-chat-chip" data-text="⚖️ Ai có chứng cứ chắc chắn hãy đập bàn phá án!">⚖️ Phá án đi</button>
     </div>
     <form class="ingame-chat-form" id="form-ingame-chat">
       <input type="text" id="input-ingame-chat" placeholder="Thảo luận, đưa ra suy đoán hoặc ngụy tạo..." maxlength="200" autocomplete="off">
