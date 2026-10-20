@@ -467,6 +467,13 @@ class DeceptionAppController {
 
     document.getElementById('btn-close-ingame-chat')?.addEventListener('click', () => {
       document.getElementById('ingame-chat-drawer')?.classList.remove('open');
+      document.getElementById('chat-drawer-backdrop')?.classList.remove('active');
+      this.isInGameChatOpen = false;
+    });
+
+    document.getElementById('chat-drawer-backdrop')?.addEventListener('click', () => {
+      document.getElementById('ingame-chat-drawer')?.classList.remove('open');
+      document.getElementById('chat-drawer-backdrop')?.classList.remove('active');
       this.isInGameChatOpen = false;
     });
 
@@ -1136,9 +1143,11 @@ class DeceptionAppController {
 
   toggleInGameChat() {
     const drawer = document.getElementById('ingame-chat-drawer');
+    const backdrop = document.getElementById('chat-drawer-backdrop');
     if (!drawer) return;
     this.isInGameChatOpen = !this.isInGameChatOpen;
     drawer.classList.toggle('open', this.isInGameChatOpen);
+    if (backdrop) backdrop.classList.toggle('active', this.isInGameChatOpen);
     if (this.isInGameChatOpen) {
       this.unreadInGameChatCount = 0;
       const badge = document.getElementById('hud-chat-badge');

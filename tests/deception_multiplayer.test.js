@@ -221,6 +221,26 @@ describe('Deception Online Multiplayer & WebSocket Suite', () => {
     const toastMatches = js.match(/showToast\([^)]*websocket[^)]*\)/i);
     assertEqual(toastMatches, null, 'showToast must not reference WebSocket');
   });
+
+  test('Mobile UX: Safe-area insets, mobile bottom sheet backdrop, and responsive master table are configured', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const html = fs.readFileSync(path.join(__dirname, '../public/deception/index.html'), 'utf8');
+    const css = fs.readFileSync(path.join(__dirname, '../public/deception/css/deception.css'), 'utf8');
+
+    // Chat drawer backdrop must be present in HTML
+    assert(html.includes('id="chat-drawer-backdrop"'), 'HTML must have #chat-drawer-backdrop element');
+
+    // CSS must include safe area insets for notched screens
+    assert(css.includes('safe-area-inset-top'), 'CSS must handle safe-area-inset-top');
+    assert(css.includes('safe-area-inset-bottom'), 'CSS must handle safe-area-inset-bottom');
+
+    // CSS must optimize table view switch bar on mobile
+    assert(css.includes('.table-view-switch-bar'), 'CSS must style .table-view-switch-bar');
+
+    // Master table panoramic mode must adapt to 100% width on phone screens
+    assert(css.includes('.crime-scene-master-table[data-view-mode="panoramic"]'), 'CSS must adapt panoramic master table for mobile');
+  });
 });
 
 if (require.main === module) {

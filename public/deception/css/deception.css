@@ -5443,6 +5443,23 @@ body.deception-app {
   box-shadow: 0 0 6px #ff4757;
 }
 
+.chat-drawer-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 980;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.chat-drawer-backdrop.active {
+  display: block;
+  opacity: 1;
+}
+
 .ingame-chat-drawer {
   display: none;
   position: fixed;
@@ -5575,13 +5592,18 @@ body.deception-app {
 
   body.deception-app {
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
   }
 
   .deception-container {
-    padding: 8px 8px 70px 8px;
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(75px, calc(60px + env(safe-area-inset-bottom))) max(8px, env(safe-area-inset-left));
     width: 100%;
     max-width: 100vw;
     box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   /* Header Mobile Polish */
@@ -5610,7 +5632,7 @@ body.deception-app {
   }
 
   .btn-hub-return {
-    padding: 6px 10px;
+    padding: 6px 12px;
     font-size: 12px;
     min-height: 40px;
   }
@@ -5621,7 +5643,6 @@ body.deception-app {
 
   .header-right {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     width: 100%;
     gap: 6px;
@@ -5635,33 +5656,49 @@ body.deception-app {
     font-size: 12px;
   }
 
+  .header-right #btn-toggle-sound,
+  .header-right #btn-toggle-lang {
+    flex: 0 0 42px;
+    padding: 6px;
+  }
+
   /* Mode Switch Tabs */
   .lobby-mode-switch {
     margin: 10px 0 16px 0;
     gap: 6px;
     padding: 4px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .btn-lobby-mode-tab {
-    padding: 10px 8px;
-    font-size: 12.5px;
-    gap: 6px;
+    flex: 1;
+    flex-direction: column;
+    padding: 8px 6px;
+    font-size: 12px;
+    gap: 4px;
+    min-height: 52px;
+  }
+
+  .mode-pill-badge {
+    font-size: 9px;
+    padding: 1px 6px;
   }
 
   /* Solo Lobby Controls & Table */
   .lobby-table-wrapper {
-    padding: 10px 0;
+    padding: 12px 6px 20px 6px;
   }
 
   .detective-round-table {
-    width: min(320px, 86vw);
-    height: min(200px, 50vw);
+    width: min(290px, calc(100vw - 64px));
+    height: 175px;
     border-width: 6px;
-    border-radius: 110px;
+    border-radius: 95px;
   }
 
   .table-seats-ring {
-    inset: -18px;
+    inset: -16px;
   }
 
   .lobby-seat-node {
@@ -5673,18 +5710,22 @@ body.deception-app {
   .lobby-seat-label {
     font-size: 8px;
     bottom: -14px;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .lobby-controls-bar {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
+    padding: 12px;
   }
 
   .btn-noir-hero {
     width: 100%;
     min-height: 48px;
     font-size: 14.5px;
-    padding: 12px 18px;
+    padding: 12px 16px;
     justify-content: center;
   }
 
@@ -5719,17 +5760,18 @@ body.deception-app {
   .online-room-card {
     padding: 14px 10px;
     border-radius: 12px;
+    box-sizing: border-box;
   }
 
   .online-room-header {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 10px;
     padding-bottom: 12px;
   }
 
   .room-title-block .view-title {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .room-meta-actions {
@@ -5743,19 +5785,20 @@ body.deception-app {
 
   .room-code-badge-pill {
     flex: 1;
-    min-width: 160px;
+    min-width: 140px;
     justify-content: space-between;
-    padding: 8px 12px;
+    padding: 7px 10px;
   }
 
   .room-occupancy-pill {
-    padding: 8px 10px;
-    font-size: 12px;
+    padding: 7px 9px;
+    font-size: 11.5px;
   }
 
   .btn-leave-online {
-    padding: 8px 10px;
-    min-height: 40px;
+    padding: 7px 10px;
+    min-height: 38px;
+    font-size: 12px;
   }
 
   .online-room-split {
@@ -5771,12 +5814,13 @@ body.deception-app {
   .avatar-chips-bar {
     padding: 4px 0 8px 0;
     gap: 6px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .avatar-chip-btn {
-    width: 42px;
-    height: 42px;
-    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    font-size: 19px;
   }
 
   .name-editor-row {
@@ -5794,31 +5838,33 @@ body.deception-app {
   }
 
   .online-table-wrapper {
-    padding: 16px 4px 24px 4px;
+    padding: 16px 4px 28px 4px;
+    overflow: visible;
   }
 
   .online-round-table {
-    width: min(340px, 92vw);
-    height: 195px;
+    width: min(290px, calc(100vw - 64px));
+    height: 175px;
     border-width: 6px;
-    border-radius: 100px;
+    border-radius: 95px;
   }
 
   .online-round-table .table-emblem {
-    font-size: 22px;
+    font-size: 20px;
+    gap: 2px;
   }
 
   .online-round-table .table-emblem span {
-    font-size: 8.5px;
-    letter-spacing: 1.5px;
+    font-size: 8px;
+    letter-spacing: 1.2px;
   }
 
   .felt-code-tag {
-    font-size: 9.5px;
+    font-size: 9px;
   }
 
   .felt-status-tag {
-    font-size: 9px;
+    font-size: 8.5px;
     padding: 1px 7px;
   }
 
@@ -5828,14 +5874,14 @@ body.deception-app {
   }
 
   .online-table-seat-node .table-seat-avatar {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .online-table-seat-label {
-    top: 40px;
-    font-size: 8.5px;
-    max-width: 70px;
-    padding: 1px 4px;
+    top: 38px;
+    font-size: 8px;
+    max-width: 58px;
+    padding: 1px 3px;
   }
 
   .seat-badge-crown {
@@ -5853,8 +5899,8 @@ body.deception-app {
   }
 
   .table-seat-kick-btn {
-    width: 16px;
-    height: 16px;
+    width: 17px;
+    height: 17px;
     font-size: 9px;
     top: -6px;
     left: -6px;
@@ -5881,41 +5927,46 @@ body.deception-app {
   }
 
   .btn-kick-player {
-    min-height: 38px;
-    padding: 6px 10px;
-    font-size: 11.5px;
+    min-height: 40px;
+    padding: 6px 12px;
+    font-size: 12px;
   }
 
   /* Ready & Host Action Controls */
   .btn-action-ready {
     width: 100%;
     max-width: 100%;
-    min-height: 50px;
-    font-size: 16px;
+    min-height: 48px;
+    font-size: 15px;
   }
 
   .btn-host-start-game {
     width: 100%;
-    min-height: 50px;
-    font-size: 16px;
+    min-height: 48px;
+    font-size: 15px;
   }
 
   .host-bot-management {
     width: 100%;
+    display: flex;
+    gap: 8px;
   }
 
   .btn-host-btn {
+    flex: 1;
     min-height: 44px;
-    font-size: 13px;
+    font-size: 12.5px;
+    justify-content: center;
   }
 
   /* Live Chat Panel */
   .live-chat-panel {
-    height: 340px;
+    height: 320px;
   }
 
   .chat-quick-chips {
     padding: 6px 8px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .chat-input-bar {
@@ -6005,6 +6056,150 @@ body.deception-app {
     font-size: 11.5px;
   }
 
+  /* Table View Switch Bar */
+  .table-view-switch-bar {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    justify-content: space-between;
+    padding: 4px;
+    border-radius: 20px;
+    gap: 4px;
+    box-sizing: border-box;
+    margin: 0 auto 12px auto;
+  }
+
+  .table-switch-btn {
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+    padding: 8px 4px;
+    font-size: 10.5px;
+    gap: 4px;
+    white-space: nowrap;
+    border-radius: 16px;
+  }
+
+  /* Master Table in Mobile View */
+  .crime-scene-master-table[data-view-mode="panoramic"] {
+    min-width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    padding: 10px 6px;
+  }
+
+  .crime-scene-master-table {
+    border-width: 2px;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9);
+  }
+
+  .tape-strip.tape-horizontal-center {
+    font-size: 9.5px;
+    padding: 5px 8px;
+    letter-spacing: 0.8px;
+    margin: 2px 0 8px 0;
+    line-height: 1.3;
+  }
+
+  .table-suspects-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .suspect-station-box {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .suspect-station-badge-col {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .suspect-station-badge-col .police-badge-gold {
+    width: 32px;
+    height: 38px;
+    font-size: 15px;
+  }
+
+  .suspect-station-name {
+    font-size: 12px;
+    text-align: left;
+    flex: 1;
+    margin-left: 8px;
+  }
+
+  .suspect-station-cards-col {
+    width: 100%;
+    gap: 6px;
+  }
+
+  .suspect-cards-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+  }
+
+  .table-card-item {
+    min-width: 0;
+    min-height: 68px;
+    padding: 5px 2px 6px 2px;
+    border-radius: 8px;
+  }
+
+  .table-card-item .card-item-title {
+    font-size: 9px;
+    line-height: 1.15;
+  }
+
+  .table-card-item .card-item-icon {
+    font-size: 16px;
+    margin: 2px 0;
+  }
+
+  .card-inspect-trigger-btn {
+    width: 19px;
+    height: 19px;
+    font-size: 9px;
+    bottom: -2px;
+    right: -2px;
+  }
+
+  /* Center Forensics */
+  .table-center-forensics {
+    padding: 10px 6px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .forensics-tiles-grid,
+  .scene-tiles-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .scene-tile-card {
+    padding: 8px 6px;
+  }
+
+  .tile-opt-btn {
+    padding: 5px 6px;
+    font-size: 10px;
+    min-height: 32px;
+  }
+
   /* Free Discussion HUD & Table Switches */
   .free-discussion-hud {
     flex-direction: column;
@@ -6019,7 +6214,26 @@ body.deception-app {
 
   .discussion-hud-center {
     width: 100%;
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .round-countdown-box {
+    padding: 6px 12px;
+    font-size: 15px;
+  }
+
+  .countdown-controls {
+    display: flex;
+    gap: 6px;
+  }
+
+  .btn-timer-ctrl,
+  .btn-timer-advance {
+    min-height: 40px;
+    padding: 6px 10px;
   }
 
   .discussion-hud-right {
@@ -6034,35 +6248,66 @@ body.deception-app {
     width: 100%;
     min-height: 44px;
     justify-content: center;
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
-  /* Segmented Table Switch Navigation */
-  .table-switch-nav {
-    display: flex;
-    width: 100%;
-    max-width: 100%;
+  /* Criminal Secret Intel Bar */
+  .criminal-secret-dossier-pill {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .dossier-pill-header {
     justify-content: space-between;
-    padding: 4px;
-    border-radius: 20px;
   }
 
-  .table-switch-btn {
-    flex: 1;
+  .dossier-pill-solution {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .solution-chip-preview {
     justify-content: center;
-    padding: 8px 6px;
     font-size: 11px;
-    gap: 4px;
+    padding: 6px 8px;
   }
 
-  /* Scene Tiles Grid */
-  .forensics-tiles-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+  /* Floating Action Dock */
+  .floating-action-dock {
+    bottom: max(10px, calc(8px + env(safe-area-inset-bottom)));
+    padding: 8px 12px;
+    flex-direction: column;
+    gap: 8px;
+    border-radius: 16px;
   }
 
-  .scene-tile-card {
-    padding: 10px;
+  .dock-actions-center {
+    width: 100%;
+  }
+
+  .btn-dock-accuse {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+    font-size: 15px;
+  }
+
+  .dock-actions-left,
+  .dock-actions-right {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-dock-btn {
+    flex: 1;
+    min-height: 42px;
+    justify-content: center;
   }
 
   /* In-Game Floating Live Chat Drawer (Mobile Bottom Sheet) */
@@ -6071,24 +6316,25 @@ body.deception-app {
     right: 0;
     left: 0;
     bottom: 0;
-    border-radius: 18px 18px 0 0;
-    height: 72vh;
-    max-height: 80vh;
+    border-radius: 20px 20px 0 0;
+    height: 75vh;
+    max-height: 85vh;
     max-width: 100vw;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.9);
     border-left: none;
     border-right: none;
     border-bottom: none;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
 
   .ingame-chat-drawer::before {
     content: '';
     display: block;
-    width: 40px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.25);
-    border-radius: 2px;
-    margin: 8px auto 2px auto;
+    width: 44px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    margin: 8px auto 4px auto;
   }
 
   .ingame-chat-form input {
@@ -6104,8 +6350,41 @@ body.deception-app {
   /* Modals on Mobile */
   .noir-modal-card {
     max-width: 95vw;
-    max-height: 90vh;
+    max-height: 88vh;
     padding: 16px 12px;
+    border-radius: 16px;
+  }
+
+  .noir-modal-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+  }
+
+  .noir-modal-footer .btn-noir-hero,
+  .noir-modal-footer .btn-modal-cancel {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .accuse-suspects-picker {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .accuse-suspect-btn {
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .accuse-card-btn {
+    min-height: 42px;
+    padding: 8px 10px;
   }
 
   /* Game Over Dossier on Mobile */
@@ -6124,20 +6403,31 @@ body.deception-app {
 /* Extra small mobile adjustments (<= 400px) */
 @media (max-width: 400px) {
   .btn-lobby-mode-tab span {
-    font-size: 11.5px;
+    font-size: 11px;
   }
 
   .room-title-block .view-title {
-    font-size: 16px;
+    font-size: 15.5px;
   }
 
-  .table-switch-btn span {
-    font-size: 10px;
+  .table-switch-btn {
+    font-size: 9.5px;
+    padding: 7px 2px;
   }
 
   .btn-action-ready,
   .btn-host-start-game {
-    font-size: 14.5px;
+    font-size: 14px;
+    min-height: 46px;
+  }
+
+  .forensics-tiles-grid,
+  .scene-tiles-row {
+    grid-template-columns: 1fr;
+  }
+
+  .accuse-suspects-picker {
+    grid-template-columns: 1fr;
   }
 }
 
