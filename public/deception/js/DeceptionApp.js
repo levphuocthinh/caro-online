@@ -1059,6 +1059,55 @@ class DeceptionAppController {
     if (!topContainer || !bottomContainer) return;
 
     const human = this.state.getHumanPlayer();
+    const isMurderer = human.role === 'MURDERER';
+    const isAccomplice = human.role === 'ACCOMPLICE';
+    const isForensic = human.role === 'FORENSIC_SCIENTIST';
+    const canSeeCrimeSolution = isMurderer || isAccomplice || isForensic;
+
+    const murdererPlayer = this.state.getMurdererPlayer();
+    const accomplicePlayer = this.state.players.find(p => p.role === 'ACCOMPLICE');
+
+    const solMeansId = this.state.solution.meansCardId;
+    const solClueId = this.state.solution.clueCardId;
+
+    // Render Private Criminal Syndicate Bar (chỉ cho Sát nhân & Đồng phạm thấy)
+    const secretIntelBar = document.getElementById('criminal-secret-intel-bar');
+    if (secretIntelBar) {
+      if (isMurderer || isAccomplice) {
+        secretIntelBar.style.display = 'block';
+        const solMeans = this.state.findCardById(solMeansId)?.card;
+        const solClue = this.state.findCardById(solClueId)?.card;
+
+        secretIntelBar.innerHTML = `
+          <div class="criminal-secret-dossier-pill">
+            <div class="dossier-pill-header">
+              <span class="pill-badge-crim">
+                <i class="fa-solid fa-user-secret"></i> 
+                ${isMurderer ? (this.isVi ? 'KẾ HOẠCH GÂY ÁN CỦA BẠN' : 'YOUR CRIME SOLUTION') : (this.isVi ? 'TÌNH BÁO MẬT: HỒ SƠ ĐỒNG PHẠM' : 'SECRET INTEL: ACCOMPLICE DOSSIER')}
+              </span>
+              <span class="pill-ally-info">
+                ${isMurderer 
+                  ? (accomplicePlayer ? `🤝 <b>${this.isVi ? 'Đồng phạm' : 'Accomplice'}:</b> ${accomplicePlayer.displayName}` : `🕶️ <i>(${this.isVi ? 'Không có đồng phạm' : 'No accomplice'})</i>`) 
+                  : `🩸 <b>${this.isVi ? 'Kẻ Sát Nhân' : 'Murderer'}:</b> ${murdererPlayer ? murdererPlayer.displayName : '—'}`
+                }
+              </span>
+            </div>
+            <div class="dossier-pill-solution">
+              <span class="solution-chip-preview chip-blue" title="${this.isVi ? 'Hung khí gây án bí mật' : 'Murder Means'}">
+                <i class="fa-solid fa-skull"></i> <b>${this.isVi ? 'Hung khí' : 'Means'}:</b> ${solMeans ? solMeans.vi : '—'}
+              </span>
+              <span class="solution-chip-preview chip-red" title="${this.isVi ? 'Manh mối hiện trường bí mật' : 'Crime Clue'}">
+                <i class="fa-solid fa-droplet"></i> <b>${this.isVi ? 'Manh mối' : 'Clue'}:</b> ${solClue ? solClue.vi : '—'}
+              </span>
+            </div>
+          </div>
+        `;
+      } else {
+        secretIntelBar.style.display = 'none';
+        secretIntelBar.innerHTML = '';
+      }
+    }
+
     const suspects = this.state.players.filter(p => p.role !== 'FORENSIC_SCIENTIST');
     const currentSpeaker = this.state.getCurrentSpeaker();
 
@@ -1074,6 +1123,28 @@ class DeceptionAppController {
       const pinnedClue = s.clueCards.find(c => this.state.pinnedCardIds.has(c.id));
       const isReadyToAccuse = Boolean(pinnedMeans && pinnedClue);
 
+      const isThisSuspectMurderer = murdererPlayer && s.id === murdererPlayer.id;
+      const isThisSuspectAccomplice = accomplicePlayer && s.id === accomplicePlayer.id;
+
+      let criminalTagHtml = '';
+      if (isMurderer) {
+        if (isThisSuspectMurderer && isSelf) {
+          criminalTagHtml = `<span class="criminal-role-tag tag-self-murderer"><i class="fa-solid fa-skull"></i> ${this.isVi ? 'HUNG THỦ (BẠN)' : 'MURDERER (YOU)'}</span>`;
+        } else if (isThisSuspectAccomplice) {
+          criminalTagHtml = `<span class="criminal-role-tag tag-ally-accomplice" title="${this.isVi ? 'Đồng bọn của bạn' : 'Your accomplice'}"><i class="fa-solid fa-user-secret"></i> ${this.isVi ? 'ĐỒNG PHẠM CỦA BẠN' : 'YOUR ACCOMPLICE'}</span>`;
+        }
+      } else if (isAccomplice) {
+        if (isThisSuspectMurderer) {
+          criminalTagHtml = `<span class="criminal-role-tag tag-ally-murderer" title="${this.isVi ? 'Đồng bọn gây án của bạn' : 'Your partner in crime'}"><i class="fa-solid fa-skull-crossbones"></i> ${this.isVi ? 'HUNG THỦ (ĐỒNG BỌN)' : 'MURDERER (ALLY)'}</span>`;
+        } else if (isThisSuspectAccomplice && isSelf) {
+          criminalTagHtml = `<span class="criminal-role-tag tag-self-accomplice"><i class="fa-solid fa-mask"></i> ${this.isVi ? 'ĐỒNG PHẠM (BẠN)' : 'ACCOMPLICE (YOU)'}</span>`;
+        }
+      } else if (isForensic) {
+        if (isThisSuspectMurderer) {
+          criminalTagHtml = `<span class="criminal-role-tag tag-forensic-target" title="${this.isVi ? 'Hung thủ gây án cần dẫn đường' : 'Target murderer'}"><i class="fa-solid fa-microscope"></i> ${this.isVi ? 'HUNG THỦ THẬT' : 'TRUE MURDERER'}</span>`;
+        }
+      }
+
       return `
         <div class="suspect-station-box ${isSelf ? 'is-self' : ''} ${isSpeaker ? 'is-speaker' : ''} ${isReadyToAccuse ? 'has-ready-pair' : ''}" data-station-id="${s.id}">
           <div class="suspect-station-badge-col">
@@ -1081,6 +1152,7 @@ class DeceptionAppController {
               <i class="fa-solid fa-shield-halved"></i>
             </div>
             <span class="suspect-station-name">${s.displayName} ${isSelf ? '(BẠN)' : ''}</span>
+            ${criminalTagHtml}
             ${human.hasBadge && !isSelf ? (
               isReadyToAccuse ? `
                 <button type="button" class="btn-accuse-badge is-ready" data-accuse-suspect="${s.id}" data-means-id="${pinnedMeans.id}" data-clue-id="${pinnedClue.id}" title="${this.isVi ? `⚡ Bấm để PHÁ ÁN NGAY: ${pinnedMeans.vi} + ${pinnedClue.vi}!` : `⚡ Click to ACCUSE IMMEDIATELY: ${pinnedMeans.en} + ${pinnedClue.en}!`}">
@@ -1099,8 +1171,9 @@ class DeceptionAppController {
             <div class="suspect-cards-strip strip-blue">
               ${s.meansCards.map(m => {
                 const isPinned = this.state.pinnedCardIds.has(m.id);
+                const isSolutionMeans = canSeeCrimeSolution && (m.id === solMeansId);
                 return `
-                  <div class="table-card-item card-blue ${isPinned ? 'is-pinned' : ''}" data-card-id="${m.id}" data-card-type="MEANS" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Hung khí này' : 'Click to select this Means')}">
+                  <div class="table-card-item card-blue ${isPinned ? 'is-pinned' : ''} ${isSolutionMeans ? 'is-crime-solution solution-means' : ''}" data-card-id="${m.id}" data-card-type="MEANS" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Hung khí này' : 'Click to select this Means')}">
                     <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${m.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
                       <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
@@ -1109,6 +1182,11 @@ class DeceptionAppController {
                     <div class="card-icon-area">${renderCardIconHtml(m, 'card-svg')}</div>
                     <div class="card-name-vi">${m.vi}</div>
                     <div class="card-name-en">${m.en}</div>
+                    ${isSolutionMeans ? `
+                      <span class="crime-solution-banner banner-means" title="${this.isVi ? 'Hung khí gây án bí mật' : 'Secret murder means'}">
+                        <i class="fa-solid fa-skull"></i> ${isMurderer ? (this.isVi ? 'BẠN ĐÃ CHỌN' : 'CHOSEN BY YOU') : (this.isVi ? 'HUNG THỦ ĐÃ CHỌN' : 'CHOSEN BY KILLER')}
+                      </span>
+                    ` : ''}
                   </div>
                 `;
               }).join('')}
@@ -1118,8 +1196,9 @@ class DeceptionAppController {
             <div class="suspect-cards-strip strip-red">
               ${s.clueCards.map(c => {
                 const isPinned = this.state.pinnedCardIds.has(c.id);
+                const isSolutionClue = canSeeCrimeSolution && (c.id === solClueId);
                 return `
-                  <div class="table-card-item card-red ${isPinned ? 'is-pinned' : ''}" data-card-id="${c.id}" data-card-type="CLUE" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Manh mối này' : 'Click to select this Clue')}">
+                  <div class="table-card-item card-red ${isPinned ? 'is-pinned' : ''} ${isSolutionClue ? 'is-crime-solution solution-clue' : ''}" data-card-id="${c.id}" data-card-type="CLUE" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Manh mối này' : 'Click to select this Clue')}">
                     <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${c.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
                       <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
@@ -1128,6 +1207,11 @@ class DeceptionAppController {
                     <div class="card-icon-area">${renderCardIconHtml(c, 'card-svg')}</div>
                     <div class="card-name-vi">${c.vi}</div>
                     <div class="card-name-en">${c.en}</div>
+                    ${isSolutionClue ? `
+                      <span class="crime-solution-banner banner-clue" title="${this.isVi ? 'Manh mối hiện trường bí mật' : 'Secret crime clue'}">
+                        <i class="fa-solid fa-droplet"></i> ${isMurderer ? (this.isVi ? 'BẠN ĐÃ CHỌN' : 'CHOSEN BY YOU') : (this.isVi ? 'HUNG THỦ ĐÃ CHỌN' : 'CHOSEN BY KILLER')}
+                      </span>
+                    ` : ''}
                   </div>
                 `;
               }).join('')}
@@ -1252,6 +1336,11 @@ class DeceptionAppController {
           <div class="inspect-card-title-vi">${card.vi}</div>
           <div class="inspect-card-title-en">${card.en}</div>
           <div class="inspect-card-divider"></div>
+          ${(human && (human.role === 'MURDERER' || human.role === 'ACCOMPLICE' || human.role === 'FORENSIC_SCIENTIST') && (card.id === this.state.solution.meansCardId || card.id === this.state.solution.clueCardId)) ? `
+            <div class="inspect-crime-solution-stamp">
+              <i class="fa-solid fa-skull-crossbones"></i> ${this.isVi ? 'VẬT CHỨNG TRONG KẾ HOẠCH GÂY ÁN BÍ MẬT' : 'CONFIDENTIAL: CRIME SOLUTION EVIDENCE'}
+            </div>
+          ` : ''}
           <div class="inspect-card-desc">
             ${type === 'MEANS' 
               ? (this.isVi ? 'Vật chứng này có thể đã được hung thủ sử dụng trực tiếp để hạ sát nạn nhân theo suy luận của Giám định viên.' : 'This object might have been used directly by the murderer to commit the homicide.')

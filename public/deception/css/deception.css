@@ -4170,3 +4170,245 @@ body.deception-app {
   box-shadow: 0 0 14px rgba(255, 215, 0, 0.6);
 }
 
+/* ============================================================
+   PRIVATE CRIMINAL SYNDICATE INTEL BAR (SÁT NHÂN & ĐỒNG PHẠM)
+   ============================================================ */
+.criminal-secret-intel-bar {
+  margin: 10px 0 14px 0;
+  width: 100%;
+}
+
+.criminal-secret-dossier-pill {
+  background: linear-gradient(135deg, rgba(30, 10, 15, 0.95) 0%, rgba(15, 5, 8, 0.98) 100%);
+  border: 1.5px solid rgba(231, 76, 60, 0.65);
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.criminal-secret-dossier-pill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(180deg, #e74c3c, #c0392b, #f39c12);
+}
+
+.dossier-pill-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pill-badge-crim {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #ff7675;
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid rgba(231, 76, 60, 0.55);
+  padding: 4px 10px;
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.3);
+}
+
+.pill-ally-info {
+  font-size: 12.5px;
+  color: #f1f2f6;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill-ally-info b {
+  color: #ffd32a;
+}
+
+.dossier-pill-solution {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.solution-chip-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.solution-chip-preview.chip-blue {
+  background: rgba(0, 210, 211, 0.18);
+  border: 1.5px solid rgba(0, 210, 211, 0.7);
+  color: #55efc4;
+  box-shadow: 0 0 10px rgba(0, 210, 211, 0.25);
+}
+
+.solution-chip-preview.chip-blue b {
+  color: #81ecec;
+}
+
+.solution-chip-preview.chip-red {
+  background: rgba(255, 71, 87, 0.18);
+  border: 1.5px solid rgba(255, 71, 87, 0.7);
+  color: #ff7675;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.25);
+}
+
+.solution-chip-preview.chip-red b {
+  color: #ffb8b8;
+}
+
+/* Criminal Role Tags */
+.criminal-role-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.criminal-role-tag.tag-self-murderer {
+  background: rgba(231, 76, 60, 0.25);
+  border: 1.5px solid #e74c3c;
+  color: #ff7675;
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+}
+
+.criminal-role-tag.tag-ally-murderer {
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.35), rgba(192, 57, 43, 0.45));
+  border: 1.5px solid #ff4757;
+  color: #ffeaa7;
+  box-shadow: 0 0 12px rgba(255, 71, 87, 0.6);
+  animation: pulseAllyGlow 2s infinite ease-in-out;
+}
+
+.criminal-role-tag.tag-ally-accomplice {
+  background: linear-gradient(135deg, rgba(142, 68, 173, 0.35), rgba(41, 128, 185, 0.35));
+  border: 1.5px solid #9b59b6;
+  color: #e056fd;
+  box-shadow: 0 0 12px rgba(155, 89, 182, 0.6);
+  animation: pulseAllyGlow 2s infinite ease-in-out;
+}
+
+.criminal-role-tag.tag-self-accomplice {
+  background: rgba(142, 68, 173, 0.25);
+  border: 1.5px solid #8e44ad;
+  color: #be2edd;
+  box-shadow: 0 0 8px rgba(142, 68, 173, 0.4);
+}
+
+.criminal-role-tag.tag-forensic-target {
+  background: rgba(241, 196, 15, 0.2);
+  border: 1.5px solid #f1c40f;
+  color: #f1c40f;
+  box-shadow: 0 0 8px rgba(241, 196, 15, 0.35);
+}
+
+@keyframes pulseAllyGlow {
+  0% { filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.4)); }
+  50% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.9)); }
+  100% { filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.4)); }
+}
+
+/* True Crime Solution Card Highlighting */
+.table-card-item.is-crime-solution {
+  position: relative;
+  z-index: 5;
+}
+
+.table-card-item.is-crime-solution.solution-means {
+  border: 2px solid #00d2d3 !important;
+  box-shadow: 0 0 16px rgba(0, 210, 211, 0.95), inset 0 0 10px rgba(0, 210, 211, 0.45) !important;
+  animation: pulseCrimeMeans 2s infinite ease-in-out;
+}
+
+.table-card-item.is-crime-solution.solution-clue {
+  border: 2px solid #ff4757 !important;
+  box-shadow: 0 0 16px rgba(255, 71, 87, 0.95), inset 0 0 10px rgba(255, 71, 87, 0.45) !important;
+  animation: pulseCrimeClue 2s infinite ease-in-out;
+}
+
+@keyframes pulseCrimeMeans {
+  0% { box-shadow: 0 0 10px rgba(0, 210, 211, 0.7); }
+  50% { box-shadow: 0 0 22px rgba(0, 210, 211, 1), 0 0 8px #55efc4; }
+  100% { box-shadow: 0 0 10px rgba(0, 210, 211, 0.7); }
+}
+
+@keyframes pulseCrimeClue {
+  0% { box-shadow: 0 0 10px rgba(255, 71, 87, 0.7); }
+  50% { box-shadow: 0 0 22px rgba(255, 71, 87, 1), 0 0 8px #ff7675; }
+  100% { box-shadow: 0 0 10px rgba(255, 71, 87, 0.7); }
+}
+
+.crime-solution-banner {
+  position: absolute;
+  bottom: 2px;
+  left: 3px;
+  right: 3px;
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 2px 3px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  line-height: 1.1;
+  pointer-events: none;
+  z-index: 7;
+}
+
+.crime-solution-banner.banner-means {
+  background: rgba(0, 210, 211, 0.9);
+  color: #071922;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.crime-solution-banner.banner-clue {
+  background: rgba(255, 71, 87, 0.92);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+/* Card Inspect Modal - Confidential Stamp */
+.inspect-crime-solution-stamp {
+  margin: 10px 0 6px 0;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.3), rgba(192, 57, 43, 0.35));
+  border: 1.5px dashed #ff4757;
+  border-radius: 8px;
+  color: #ffeaa7;
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  text-align: center;
+  box-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
+}
+
