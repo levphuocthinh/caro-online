@@ -138,18 +138,26 @@
         </div>
       </section>
 
-      <!-- VIEW 2: ROLE REVEAL (Lật Thẻ Vai Trò Bí Mật) -->
+      <!-- VIEW 2: ROLE REVEAL (Hồ Sơ Mật Chân Tướng Vai Trò - Noir Confidential Dossier) -->
       <section class="noir-view" id="view-role">
         <div class="role-reveal-stage">
-          <div class="role-card-3d" id="role-card-flip">
-            <div class="role-card-inner">
-              <div class="role-card-front" id="role-card-front">
-                <div class="card-crest"><i class="fa-solid fa-shield-halved"></i></div>
-                <div class="card-confidential">TOP SECRET • CASE FILE</div>
+          <div class="confidential-dossier-card" id="role-dossier-card">
+            <div class="dossier-folder-tab">
+              <span class="folder-label"><i class="fa-solid fa-folder-closed"></i> DOSSIER #HK-1997</span>
+              <span class="folder-stamp-red">TOP SECRET</span>
+            </div>
+            <div class="dossier-folder-body">
+              <div class="dossier-left-badge">
+                <div class="police-seal-large"><i class="fa-solid fa-shield-halved"></i></div>
                 <div class="role-icon-box" id="role-display-icon">🕵️</div>
-                <h2 class="role-display-title" id="role-display-title">Điều Tra Viên</h2>
                 <span class="role-faction-pill" id="role-display-faction">PHE ĐIỀU TRA</span>
+              </div>
+              <div class="dossier-right-info">
+                <div class="dossier-header-conf">HỒ SƠ TUYỆT MẬT • BỘ CÔNG AN & CẢNH SÁT HỒNG KÔNG</div>
+                <h2 class="role-display-title" id="role-display-title">Điều Tra Viên</h2>
+                <div class="dossier-divider"></div>
                 <p class="role-display-desc" id="role-display-desc">Mô tả vai trò</p>
+                <div class="dossier-rubber-stamp">CONFIDENTIAL</div>
               </div>
             </div>
           </div>
@@ -214,7 +222,7 @@
         </div>
       </section>
 
-      <!-- VIEW 4: MAIN INVESTIGATION TABLE (Bàn Phá Án Vòng 1, 2, 3) -->
+      <!-- VIEW 4: AUTHENTIC MASTER INVESTIGATION DESK (BÀN GỖ ÁN MẠNG THEO ẢNH MẪU) -->
       <section class="noir-view" id="view-investigation">
         <!-- Status Ribbon: Round, Phase, Time, Badges, Notes -->
         <div class="investigation-ribbon">
@@ -251,48 +259,53 @@
           </div>
         </div>
 
-        <!-- Section Navigation Switch for Mobile & Desktop (Pháp Y 6 Thẻ vs Bàn Nghi Phạm) -->
-        <div class="investigation-tab-switch">
-          <button type="button" class="inv-tab-btn active" data-tab="forensic">
-            <i class="fa-solid fa-bullseye"></i>
-            <span>BẢNG HIỆN TRƯỜNG PHÁP Y (6 THẺ)</span>
+        <!-- View Switcher (Dành cho Mobile / Tablet chuyển đổi linh hoạt) -->
+        <div class="table-view-switch-bar">
+          <button type="button" class="table-switch-btn active" data-view-mode="panoramic">
+            <i class="fa-solid fa-table-cells"></i>
+            <span>Bàn Toàn Cảnh (Ảnh Mẫu)</span>
           </button>
-          <button type="button" class="inv-tab-btn" data-tab="suspects">
+          <button type="button" class="table-switch-btn" data-view-mode="forensic">
+            <i class="fa-solid fa-bullseye"></i>
+            <span>Bảng Pháp Y (6 Thẻ)</span>
+          </button>
+          <button type="button" class="table-switch-btn" data-view-mode="suspects">
             <i class="fa-solid fa-users-viewfinder"></i>
-            <span>BÀN NGHI PHẠM & DANH MỤC VẬT CHỨNG</span>
+            <span>Bàn Nghi Phạm</span>
           </button>
         </div>
 
-        <!-- Investigation Workspace -->
-        <div class="investigation-workspace active-tab-forensic" id="investigation-workspace">
-          <!-- 6 SCENE TILES PANEL (1 Tím + 1 Xanh lá + 4 Nâu) -->
-          <div class="forensic-tiles-stage" id="tab-pane-forensic">
-            <div class="stage-subhead">
-              <div>
-                <h3><i class="fa-solid fa-clipboard-check"></i> Bảng Chỉ Dẫn Hiện Trường Của Chuyên Gia Pháp Y</h3>
-                <p>Quan sát 6 viên đạn gỗ 🎯 đặt trên các thẻ để suy luận ra hung khí và manh mối của Kẻ Sát Nhân.</p>
-              </div>
-              <div id="forensic-actions-slot"></div>
+        <!-- Banner xác nhận / đổi thẻ của Pháp Y -->
+        <div class="forensic-floating-banner" id="forensic-actions-slot"></div>
+
+        <!-- MẶT BÀN GỖ MỘC KHÁM NGHIỆM VỤ ÁN CHUẨN ẢNH MẪU -->
+        <div class="crime-scene-master-table" id="crime-scene-master-table" data-view-mode="panoramic">
+          <!-- Băng vàng cảnh sát vắt ngang mặt bàn gỗ -->
+          <div class="tape-strip tape-horizontal-center">
+            <span class="tape-text">CRIME SCENE DO NOT CROSS • 犯罪現場 請勿越過 • CRIME SCENE DO NOT CROSS • 犯罪現場 請勿越過</span>
+          </div>
+
+          <!-- TIER 1: HÀNG NGHI PHẠM PHÍA TRÊN (TOP SUSPECTS ROW) -->
+          <div class="table-suspects-row table-suspects-top" id="table-suspects-top">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- TIER 2: BẢNG 6 THẺ HIỆN TRƯỜNG PHÁP Y Ở CHÍNH GIỮA (CENTER FORENSICS) -->
+          <div class="table-center-forensics" id="table-center-forensics">
+            <div class="forensic-bullet-rack" id="forensic-bullet-rack" title="Hộp đạn giám định pháp y">
+              <span class="bullet-rack-label">ĐẠN GỖ</span>
+              <div class="bullet-rack-pegs" id="bullet-rack-pegs"></div>
             </div>
 
-            <!-- The 6 Active Scene Tiles -->
-            <div class="scene-tiles-grid" id="active-scene-tiles-grid">
+            <!-- 6 Thẻ Hiện Trường Nằm Ngang -->
+            <div class="scene-tiles-row" id="active-scene-tiles-grid">
               <!-- Rendered dynamically -->
             </div>
           </div>
 
-          <!-- SUSPECTS & EVIDENCE BOARD -->
-          <div class="suspects-table-stage" id="tab-pane-suspects">
-            <div class="stage-subhead">
-              <div>
-                <h3><i class="fa-solid fa-users-viewfinder"></i> Bàn Nghi Phạm & Danh Mục Vật Chứng</h3>
-                <p>Mỗi nghi phạm giữ các thẻ Phương thức (Xanh) và Manh mối (Đỏ). Bấm vào thẻ để Ghim nghi vấn 📌 hoặc dùng Huy hiệu để Phá Án!</p>
-              </div>
-            </div>
-
-            <div class="suspects-grid" id="active-suspects-grid">
-              <!-- Rendered dynamically -->
-            </div>
+          <!-- TIER 3: HÀNG NGHI PHẠM PHÍA DƯỚI (BOTTOM SUSPECTS ROW) -->
+          <div class="table-suspects-row table-suspects-bottom" id="table-suspects-bottom">
+            <!-- Rendered dynamically -->
           </div>
         </div>
 
@@ -497,7 +510,7 @@
     </div>
   </div>
 
-  <!-- CUTSCENE CANVAS OVERLAY (0% GPU Idle) -->
+  <!-- CUTSCENE CANVAS OVERLAY (Pixel Art 2D Noir Animation - 0% GPU Idle) -->
   <div class="noir-cutscene-overlay" id="cutscene-overlay">
     <div class="cutscene-box">
       <div class="cutscene-top">
@@ -507,11 +520,11 @@
         </button>
       </div>
       <div class="cutscene-canvas-wrap">
-        <canvas id="cutscene-canvas" width="320" height="180"></canvas>
+        <canvas id="cutscene-canvas" width="480" height="270"></canvas>
       </div>
       <div class="cutscene-bottom">
-        <h3 id="cutscene-title">Án Mạng Đêm Khuya</h3>
-        <p id="cutscene-sub">Đang tải...</p>
+        <h3 id="cutscene-title">Án Mạng Trong Màn Đêm Phố Cổ</h3>
+        <p id="cutscene-sub">Đang diễn ra...</p>
       </div>
     </div>
   </div>
