@@ -297,12 +297,12 @@ body.deception-app {
 
 .detective-round-table {
   position: relative;
-  width: min(520px, 86vw);
-  height: min(280px, 50vw);
-  background: radial-gradient(ellipse at center, #1b263b 0%, #0d131f 80%);
-  border: 8px solid #2f3640;
-  border-radius: 160px;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(0, 0, 0, 0.6);
+  width: min(540px, 88vw);
+  height: min(290px, 52vw);
+  background: radial-gradient(ellipse at center, #19382b 0%, #0c2018 70%, #06120d 100%);
+  border: 10px solid #382315;
+  border-radius: 170px;
+  box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.45), 0 18px 45px rgba(0, 0, 0, 0.85), inset 0 0 50px rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -316,15 +316,17 @@ body.deception-app {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  color: rgba(255, 255, 255, 0.15);
-  font-size: 28px;
+  gap: 5px;
+  color: rgba(241, 196, 15, 0.35);
+  font-size: 32px;
+  text-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
 }
 
 .table-emblem span {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
+  color: rgba(241, 196, 15, 0.5);
 }
 
 .table-seats-ring {
@@ -466,13 +468,36 @@ body.deception-app {
 }
 
 .role-card-3d {
-  width: min(380px, 90vw);
-  background: linear-gradient(145deg, #1f1828, #120e17);
-  border: 2px solid rgba(241, 196, 15, 0.5);
-  border-radius: 20px;
-  padding: 30px 24px;
+  width: min(390px, 90vw);
+  background: linear-gradient(145deg, #231a30, #100b17);
+  border: 2px solid rgba(241, 196, 15, 0.7);
+  border-radius: 22px;
+  padding: 32px 24px;
   text-align: center;
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(241, 196, 15, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 35px rgba(241, 196, 15, 0.35);
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s ease;
+}
+
+.role-card-3d:hover {
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.95), 0 0 45px rgba(241, 196, 15, 0.5);
+}
+
+.role-card-3d::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  border-radius: 30px;
+  background: radial-gradient(circle, rgba(241, 196, 15, 0.22) 0%, transparent 70%);
+  z-index: -1;
+  animation: legendaryPulse 2.8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes legendaryPulse {
+  0% { transform: scale(0.95); opacity: 0.4; }
+  100% { transform: scale(1.06); opacity: 0.9; }
 }
 
 .card-crest {
@@ -864,8 +889,11 @@ body.deception-app {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-  transition: all 0.2s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.25s ease;
+  will-change: transform;
 }
 
 .scene-tile-card.tile-purple {
@@ -993,16 +1021,26 @@ body.deception-app {
   flex-direction: column;
   gap: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.25s ease;
+  will-change: transform;
 }
 
 .suspect-card.is-self {
   border-color: var(--cyan);
-  box-shadow: 0 0 20px rgba(30, 144, 255, 0.2);
+  box-shadow: 0 0 20px rgba(30, 144, 255, 0.25);
 }
 
 .suspect-card.is-speaker {
   border-color: var(--gold);
-  box-shadow: 0 0 24px rgba(241, 196, 15, 0.35);
+  box-shadow: 0 0 28px rgba(241, 196, 15, 0.5);
+  animation: hearthstoneHeroGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes hearthstoneHeroGlow {
+  0% { box-shadow: 0 0 15px rgba(241, 196, 15, 0.3); border-color: rgba(241, 196, 15, 0.7); }
+  100% { box-shadow: 0 0 35px rgba(241, 196, 15, 0.8); border-color: #ffeaa7; }
 }
 
 .suspect-top {
@@ -1104,8 +1142,34 @@ body.deception-app {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  transition: all 0.15s ease;
+  transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.25s ease;
   min-height: 44px;
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Hearthstone Holographic Foil Glare */
+.evidence-chip::after,
+.scene-tile-card::after,
+.suspect-card::after,
+.role-card-3d::after,
+.reversal-target-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle 150px at var(--glare-x, 50%) var(--glare-y, 50%),
+    rgba(255, 255, 255, 0.42) 0%,
+    rgba(255, 255, 255, 0.15) 30%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  opacity: var(--glare-opacity, 0);
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  mix-blend-mode: overlay;
+  z-index: 5;
 }
 
 .evidence-chip-left {
@@ -1646,13 +1710,14 @@ body.deception-app {
 
 .cutscene-box {
   width: 100%;
-  max-width: 520px;
-  background: #110c17;
-  border: 1.5px solid var(--border-glow);
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+  max-width: 580px;
+  background: #0f0b17;
+  border: 2px solid var(--border-glow);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 40px rgba(255, 71, 87, 0.3);
   text-align: center;
+  position: relative;
 }
 
 .cutscene-top {
@@ -1682,28 +1747,44 @@ body.deception-app {
 .cutscene-canvas-wrap {
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #050308;
-  border-radius: 12px;
+  background: #040207;
+  border-radius: 14px;
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8);
 }
 
 #cutscene-canvas {
   width: 100%;
   height: 100%;
   display: block;
-  image-rendering: pixelated;
 }
 
 .cutscene-bottom h3 {
   font-family: var(--font-title);
-  font-size: 18px;
-  margin: 10px 0 3px 0;
+  font-size: 19px;
+  margin: 12px 0 4px 0;
+  color: #fff;
+  letter-spacing: 0.5px;
 }
 
 .cutscene-bottom p {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--text-secondary);
+}
+
+/* Hearthstone Tactile Screen Shake */
+@keyframes screenShake {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-5px, 3px, 0); }
+  40% { transform: translate3d(5px, -3px, 0); }
+  60% { transform: translate3d(-3px, 2px, 0); }
+  80% { transform: translate3d(3px, -1px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+.screen-shaking {
+  animation: screenShake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 /* ==========================================================================

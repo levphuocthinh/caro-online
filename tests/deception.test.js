@@ -143,20 +143,28 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
   await t.test('Witness Reversal: Murderer shooting wrong target awards victory to Investigation', () => {
     const state = new DeceptionState();
     state.config.playerCount = 6;
+    state.config.preferredRole = 'INVESTIGATOR';
     state.config.includeAccompliceAndWitness = true;
     state.startNewGame();
-    state.proceedToNightCrime();
+
+    const murderer = state.getMurdererPlayer();
+    state.commitMurdererSelection(murderer.meansCards[0].id, murderer.clueCards[0].id);
+
     state.proceedAfterNightCrime();
     state.startRound1Evidence();
     state.startPresentationPhase();
 
-    const murderer = state.getMurdererPlayer();
     const witness = state.players.find(p => p.role === 'WITNESS');
-    const innocentCop = state.players.find(p => p.team === 'INVESTIGATION' && p.role !== 'WITNESS' && p.role !== 'FORENSIC_SCIENTIST');
+    assert.ok(witness, 'Witness should exist');
+    assert.ok(state.solution.witnessPlayerId, 'Witness ID should be in solution');
+
+    const innocentCop = state.players.find(p => p.hasBadge && p.team === 'INVESTIGATION' && p.role !== 'WITNESS' && p.role !== 'FORENSIC_SCIENTIST');
+    assert.ok(innocentCop, 'Innocent detective should exist with a badge');
 
     // Make correct accusation
-    const accuser = innocentCop;
-    state.makeAccusation(accuser.id, murderer.id, state.solution.meansCardId, state.solution.clueCardId);
+    const accRes = state.makeAccusation(innocentCop.id, murderer.id, state.solution.meansCardId, state.solution.clueCardId);
+    assert.equal(accRes.valid, true);
+    assert.equal(accRes.isCorrect, true);
     assert.equal(state.phase, GAME_PHASES.WITNESS_REVERSAL);
 
     // Murderer shoots innocent cop instead of the Witness

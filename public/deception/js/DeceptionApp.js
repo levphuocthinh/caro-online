@@ -11,7 +11,7 @@ import {
   CLUE_CARDS
 } from '/js/games/deception/data/deceptionData.js';
 import { DeceptionState, GAME_PHASES } from '/js/games/deception/DeceptionState.js';
-import { deceptionCutscene } from '/js/games/deception/DeceptionCutscene.js';
+import { deception3D } from '/js/games/deception/Deception3D.js';
 
 class DeceptionAppController {
   constructor() {
@@ -25,6 +25,7 @@ class DeceptionAppController {
   }
 
   init() {
+    deception3D.init();
     this.bindDomEvents();
     this.renderLobbySeatsRing();
     this.updateHeaderInfo();
@@ -244,6 +245,7 @@ class DeceptionAppController {
 
     document.getElementById('btn-dock-accuse')?.addEventListener('click', () => {
       this.stopSpeakerTimer();
+      deception3D.triggerScreenShake(300, 7);
       this.openAccusationDialog();
     });
 
@@ -290,7 +292,18 @@ class DeceptionAppController {
     this.playAudio('chime');
     this.state.startNewGame();
     this.updateHeaderInfo();
-    this.showRoleReveal();
+
+    const human = this.state.getHumanPlayer();
+    const roleDef = ROLE_DEFINITIONS[human.role] || ROLE_DEFINITIONS.INVESTIGATOR;
+
+    this.playCutscene('ROLE_REVEAL', {
+      team: human.team,
+      title: this.isVi ? `BẠN LÀ: ${roleDef.name_vi}` : `YOU ARE: ${roleDef.name_en}`,
+      subtitle: this.isVi ? roleDef.desc_vi : roleDef.desc_en,
+      badgeText: human.team === 'CRIMINAL' ? 'TOP SECRET • CRIMINAL' : 'TOP SECRET • INVESTIGATION'
+    }, () => {
+      this.showRoleReveal();
+    });
   }
 
   /* =========================================================================
@@ -735,12 +748,14 @@ class DeceptionAppController {
 
     // Click đặt đạn (nếu là Pháp y)
     grid.querySelectorAll('.tile-opt-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
         if (!isHumanForensic && !this.state.phase.includes('EVIDENCE')) return;
         const tIdx = parseInt(btn.dataset.tileIdx, 10);
         const optIdx = parseInt(btn.dataset.optIdx, 10);
         this.state.placeBulletOnTile(tIdx, optIdx);
         this.playAudio('bullet_drop');
+        deception3D.triggerScreenShake(240, 5);
+        deception3D.triggerImpactSparks(e.clientX, e.clientY, '#fbc531');
         this.renderActiveSceneTiles();
       });
     });
@@ -1214,17 +1229,14 @@ class DeceptionAppController {
       onComplete = options;
       options = {};
     }
-    deceptionCutscene.play({
+    deception3D.playCutscene({
       type,
-      ...options,
-      onComplete: () => {
-        if (typeof onComplete === 'function') onComplete();
-      }
-    });
+      ...options
+    }, onComplete);
   }
 
   finishCutscene() {
-    deceptionCutscene.finish();
+    deception3D.stopCutscene(true);
   }
 
   renderDossierLogs() {
