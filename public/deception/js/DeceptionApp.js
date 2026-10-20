@@ -159,6 +159,64 @@ class DeceptionAppController {
       this.startInvestigationGame();
     });
 
+    // Nút mở Rạp Chiếu Hoạt Cảnh (Casting Gallery)
+    ['btn-open-cutscene-gallery', 'btn-lobby-theater', 'btn-hud-gallery'].forEach(id => {
+      document.getElementById(id)?.addEventListener('click', () => {
+        this.openModal('modal-cutscene-gallery');
+      });
+    });
+
+    // Nút kích hoạt phát Hoạt Cảnh trong Rạp Chiếu
+    document.querySelectorAll('.btn-play-cutscene').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const scene = btn.dataset.scene;
+        this.closeModal('modal-cutscene-gallery');
+
+        if (scene === 'backstab') {
+          deceptionPixelNoir.playBackStab({
+            meansName: 'Dao găm',
+            clueName: 'Vết máu',
+            murdererName: 'Kẻ Sát Nhân Trong Đêm'
+          });
+        } else if (scene === 'hitandrun') {
+          deceptionPixelNoir.playMotorbikeHitAndRun({
+            meansName: 'Xe máy Dream',
+            clueName: 'Vết lốp xe',
+            murdererName: 'Kẻ Tông Xe Bỏ Chạy'
+          });
+        } else if (scene === 'brawl') {
+          deceptionPixelNoir.playStreetBrawl({
+            meansName: 'Xà beng kim loại',
+            clueName: 'Bụi kim loại',
+            murdererName: 'Kẻ Gây Án Ẩu Đả'
+          });
+        } else if (scene === 'poison') {
+          deceptionPixelNoir.playPoisoning({
+            meansName: 'Thuốc độc thạch tín',
+            clueName: 'Cốc vỡ',
+            murdererName: 'Kẻ Đầu Độc Bí Mật'
+          });
+        } else if (scene === 'arrest') {
+          deceptionPixelNoir.playPoliceArrest({
+            murdererName: 'Kẻ Sát Nhân'
+          });
+        } else if (scene === 'escape') {
+          deceptionPixelNoir.playAirplaneEscape({
+            murdererName: 'Kẻ Sát Nhân'
+          });
+        } else if (scene === 'casting') {
+          this.showAccusationCastingModal({
+            accuserName: 'Điều Tra Viên Phá Án',
+            accuserAvatar: '🕵️',
+            targetPlayer: { displayName: 'Nghi Phạm Chính', avatar: '👤' },
+            meansCard: { vi: 'Dao găm', en: 'Dagger' },
+            clueCard: { vi: 'Vết máu', en: 'Blood' },
+            isCorrect: true
+          });
+        }
+      });
+    });
+
     // Nút Xác nhận đã hiểu vai trò
     document.getElementById('btn-role-ack')?.addEventListener('click', () => {
       this.enterNightCrimePhase();

@@ -2850,18 +2850,35 @@ body.deception-app {
   border: 2px solid #333;
 }
 
+/* Table View Filtering Modes (Desktop & Mobile) */
+.crime-scene-master-table[data-view-mode="forensic"] .table-suspects-row,
+.crime-scene-master-table[data-view-mode="forensic"] .tape-strip {
+  display: none !important;
+}
+
+.crime-scene-master-table[data-view-mode="forensic"] .table-center-forensics {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(241, 196, 15, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.crime-scene-master-table[data-view-mode="suspects"] .table-center-forensics,
+.crime-scene-master-table[data-view-mode="suspects"] .tape-strip {
+  display: none !important;
+}
+
+.crime-scene-master-table[data-view-mode="suspects"] .table-suspects-row {
+  max-width: 1260px;
+  margin: 0 auto;
+  gap: 16px;
+}
+
 /* Responsive view modes for Tablet & Mobile */
 @media (max-width: 1024px) {
-  .crime-scene-master-table[data-view-mode="forensic"] .table-suspects-row,
-  .crime-scene-master-table[data-view-mode="forensic"] .tape-strip {
-    display: none !important;
-  }
-
-  .crime-scene-master-table[data-view-mode="suspects"] .table-center-forensics,
-  .crime-scene-master-table[data-view-mode="suspects"] .tape-strip {
-    display: none !important;
-  }
-
   .crime-scene-master-table[data-view-mode="panoramic"] {
     overflow-x: auto;
     min-width: 880px;
@@ -2870,6 +2887,214 @@ body.deception-app {
   .scene-tiles-row {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* Cutscene / Casting Gallery Modal Styles */
+.cutscene-gallery-modal-card {
+  max-width: 940px;
+  width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.gallery-lead {
+  color: #bdc3c7;
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 3px solid #f1c40f;
+  border-radius: 4px;
+}
+
+.cutscene-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.cutscene-gallery-item {
+  background: rgba(20, 16, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.cutscene-gallery-item:hover {
+  border-color: rgba(241, 196, 15, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.cutscene-gallery-item.item-highlight {
+  border-color: rgba(235, 47, 6, 0.5);
+  background: linear-gradient(180deg, rgba(40, 18, 22, 0.95) 0%, rgba(20, 16, 28, 0.95) 100%);
+}
+
+.cutscene-gallery-item .item-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.item-badge.badge-crim {
+  background: rgba(192, 57, 43, 0.9);
+  color: #fff;
+}
+
+.item-badge.badge-new {
+  background: linear-gradient(90deg, #ff4757, #ff6b81);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+}
+
+.item-badge.badge-police {
+  background: rgba(46, 213, 115, 0.9);
+  color: #111;
+}
+
+.item-badge.badge-accuse {
+  background: rgba(241, 196, 15, 0.9);
+  color: #111;
+}
+
+.cutscene-gallery-item .item-preview {
+  height: 95px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.item-bg-stab {
+  background: radial-gradient(circle at center, #3d1219 0%, #150910 100%);
+}
+
+.item-bg-bike {
+  background: radial-gradient(circle at center, #2c1d38 0%, #0d0a14 100%);
+}
+
+.item-bg-brawl {
+  background: radial-gradient(circle at center, #421814 0%, #150909 100%);
+}
+
+.item-bg-poison {
+  background: radial-gradient(circle at center, #103322 0%, #06150e 100%);
+}
+
+.item-bg-arrest {
+  background: radial-gradient(circle at center, #0f2b38 0%, #061118 100%);
+}
+
+.item-bg-airplane {
+  background: radial-gradient(circle at center, #162438 0%, #080f18 100%);
+}
+
+.item-bg-casting {
+  background: radial-gradient(circle at center, #382d12 0%, #120e06 100%);
+}
+
+.preview-icon {
+  font-size: 38px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+  transition: transform 0.25s ease;
+}
+
+.cutscene-gallery-item:hover .preview-icon {
+  transform: scale(1.15);
+}
+
+.item-info {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.item-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px 0;
+}
+
+.item-desc {
+  font-size: 11.5px;
+  color: #a4b0be;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  flex: 1;
+}
+
+.btn-play-cutscene {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-play-cutscene:hover {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
+}
+
+.btn-noir-theater-lobby {
+  background: rgba(241, 196, 15, 0.12);
+  border: 1px solid rgba(241, 196, 15, 0.35);
+  color: #f1c40f;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-noir-theater-lobby:hover {
+  background: rgba(241, 196, 15, 0.22);
+  border-color: #f1c40f;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(241, 196, 15, 0.25);
+}
+
+.btn-gallery-action {
+  border-color: rgba(241, 196, 15, 0.4) !important;
+  color: #f1c40f !important;
+}
+
+.btn-gallery-action:hover {
+  background: rgba(241, 196, 15, 0.2) !important;
+  color: #fff !important;
 }
 
 @media (max-width: 640px) {

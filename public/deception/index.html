@@ -47,6 +47,10 @@
       </div>
 
       <div class="header-right">
+        <button type="button" class="btn-hdr-action btn-gallery-action" id="btn-open-cutscene-gallery" title="Xem Rạp Chiếu 7 Hoạt Cảnh Hành Động Pixel Noir">
+          <i class="fa-solid fa-clapperboard"></i>
+          <span>Rạp Hoạt Cảnh</span>
+        </button>
         <button type="button" class="btn-hdr-action" id="btn-toggle-lang" title="Đổi ngôn ngữ / Switch Language">
           <i class="fa-solid fa-globe"></i>
           <span id="lbl-lang">VI</span>
@@ -135,6 +139,10 @@
             <button type="button" class="btn-noir-hero" id="btn-start-investigation">
               <i class="fa-solid fa-magnifying-glass"></i>
               <span>BẮT ĐẦU VỤ ÁN MỚI</span>
+            </button>
+            <button type="button" class="btn-noir-theater-lobby" id="btn-lobby-theater" title="Xem trước các hoạt cảnh Pixel Art">
+              <i class="fa-solid fa-clapperboard"></i>
+              <span>Rạp Chiếu Hoạt Cảnh (7 Casting)</span>
             </button>
           </div>
         </div>
@@ -312,6 +320,10 @@
               <i class="fa-solid fa-gavel"></i>
               <span>🚨 PHÁ ÁN!</span>
             </button>
+            <button type="button" class="btn-hud-guide" id="btn-hud-gallery" title="Mở Rạp Chiếu Hoạt Cảnh Pixel Noir">
+              <i class="fa-solid fa-clapperboard"></i>
+              <span>Rạp Casting</span>
+            </button>
             <button type="button" class="btn-hud-guide" id="btn-quick-guide" title="Xem hướng dẫn cách chơi Deception">
               <i class="fa-solid fa-circle-question"></i>
               <span>Luật Chơi</span>
@@ -319,17 +331,17 @@
           </div>
         </div>
 
-        <!-- View Switcher (Dành cho Mobile / Tablet chuyển đổi linh hoạt) -->
+        <!-- View Switcher (Dành cho PC & Mobile chuyển đổi góc nhìn linh hoạt) -->
         <div class="table-view-switch-bar">
-          <button type="button" class="table-switch-btn active" data-view-mode="panoramic">
+          <button type="button" class="table-switch-btn active" data-view-mode="panoramic" title="Xem trọn vẹn cả bàn phá án gồm Bảng Pháp Y và Bàn Nghi Phạm">
             <i class="fa-solid fa-table-cells"></i>
             <span>Bàn Toàn Cảnh (Ảnh Mẫu)</span>
           </button>
-          <button type="button" class="table-switch-btn" data-view-mode="forensic">
+          <button type="button" class="table-switch-btn" data-view-mode="forensic" title="Chỉ phóng to 6 Thẻ Hiện Trường Pháp Y để soi kỹ manh mối">
             <i class="fa-solid fa-bullseye"></i>
             <span>Bảng Pháp Y (6 Thẻ)</span>
           </button>
-          <button type="button" class="table-switch-btn" data-view-mode="suspects">
+          <button type="button" class="table-switch-btn" data-view-mode="suspects" title="Chỉ xem bàn thẻ của các Nghi Phạm để đối chiếu nhanh">
             <i class="fa-solid fa-users-viewfinder"></i>
             <span>Bàn Nghi Phạm</span>
           </button>
@@ -654,6 +666,136 @@
       </div>
       <div class="noir-modal-footer" id="card-inspect-footer">
         <button type="button" class="btn-modal-cancel" data-close="modal-card-inspect">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 6: RẠP CHIẾU HOẠT CẢNH (CUTSCENE / CASTING GALLERY) -->
+  <div class="noir-modal-overlay" id="modal-cutscene-gallery">
+    <div class="noir-modal-card cutscene-gallery-modal-card">
+      <div class="noir-modal-header">
+        <div>
+          <span class="view-eyebrow text-gold"><i class="fa-solid fa-clapperboard"></i> PHÒNG CHIẾU HOẠT CẢNH</span>
+          <h3 class="modal-heading">Rạp Chiếu Hoạt Cảnh Trọng Án (Casting Theater)</h3>
+        </div>
+        <button type="button" class="btn-modal-close" data-close="modal-cutscene-gallery"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body-scroll">
+        <p class="gallery-lead">
+          Thưởng thức toàn bộ <b>7 hoạt cảnh Pixel Art hành động</b> độc quyền của Deception: tái hiện chân thực từ khoảnh khắc gây án đêm mưa phố Hàng Đẫy đến các đại cảnh công an vây bắt và đào tẩu sân bay!
+        </p>
+
+        <div class="cutscene-gallery-grid">
+          <!-- Card 1: Đâm lén phía sau -->
+          <div class="cutscene-gallery-item" data-category="crime">
+            <div class="item-badge badge-crim"><i class="fa-solid fa-skull"></i> Ban Đêm Gây Án</div>
+            <div class="item-preview item-bg-stab">
+              <span class="preview-icon">🗡️</span>
+            </div>
+            <div class="item-info">
+              <h4 class="item-title">1. Đâm Lén Phía Sau</h4>
+              <p class="item-desc">Hung thủ rón rén bám đuôi nạn nhân dưới mưa đêm phố Hàng Đẫy, bất ngờ áp sát đâm ngập dao vào lưng. Nạn nhân ngã gục, hung thủ thở dốc hộc hộc rồi tháo chạy.</p>
+              <button type="button" class="btn-play-cutscene" data-scene="backstab">
+                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Tông xe bỏ chạy -->
+          <div class="cutscene-gallery-item" data-category="crime">
+            <div class="item-badge badge-crim"><i class="fa-solid fa-skull"></i> Ban Đêm Gây Án</div>
+            <div class="item-preview item-bg-bike">
+              <span class="preview-icon">🛵</span>
+            </div>
+            <div class="item-info">
+              <h4 class="item-title">2. Tông Xe Máy Bỏ Chạy</h4>
+              <p class="item-desc">Xe máy Dream rọi đèn pha lao tới tông văng nạn nhân trong đêm phố Hàng Đẫy, phanh khét lẹt tóe lửa. Kẻ tông xe thở dốc run rẩy rồi rồ ga tẩu thoát.</p>
+              <button type="button" class="btn-play-cutscene" data-scene="hitandrun">
+                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Ẩu đả đám đông -->
+          <div class="cutscene-gallery-item item-highlight" data-category="crime">
+            <div class="item-badge badge-new"><i class="fa-solid fa-fire"></i> Mới • Ẩu Đả Đám Đông</div>
+            <div class="item-preview item-bg-brawl">
+              <span class="preview-icon">👊</span>
+            </div>
+            <div class="item-info">
+              <h4 class="item-title">3. Tụ Tập Ẩu Đả & Chạy Tán Loạn</h4>
+              <p class="item-desc">Xô xát hỗn chiến trước Quán Nhậu Bình Dân phố Hàng Đẫy. Cú đấm chí mạng ĐỐP! HUỴCH! hạ gục nạn nhân tử vong, cả đám đông kinh hoàng chạy tán loạn vào các con ngõ!</p>
+              <button type="button" class="btn-play-cutscene" data-scene="brawl">
+                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 4: Đầu độc ly trà -->
+          <div class="cutscene-gallery-item item-highlight" data-category="crime">
+            <div class="item-badge badge-new"><i class="fa-solid fa-flask-vial"></i> Mới • Đầu Độc Kín Đáo</div>
+            <div class="item-preview item-bg-poison">
+              <span class="preview-icon">🍵</span>
+            </div>
+            <div class="item-info">
+              <h4 class="item-title">4. Đầu Độc Ly Trà Vỉa Hè</h4>
+              <p class="item-desc">Tại quán nước chè vỉa hè, hung thủ lén nhỏ giọt độc vào cốc. Nạn nhân uống xong ho sặc sụa, trúng độc co giật rồi gục xuống bàn trà, hung thủ khép áo lẻn đi.</p>
+              <button type="button" class="btn-play-cutscene" data-scene="poison">
+                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 5: Công An vây bắt -->
+          <div class="cutscene-gallery-item" data-category="end">
+            <div class="item-badge badge-police"><i class="fa-solid fa-shield-halved"></i> Phe Cảnh Sát Thắng</div>
+            <div class="item-preview item-bg-arrest">
+              <span class="preview-icon">🚔</span>
+            </div>
+            <div class="item-info">
+              <h4 class="item-title">5. Cảnh Sát 113 Vây Bắt Hung Thủ</h4>
+              <p class="item-desc">Xe 113 hú còi rọi đèn đỏ xanh lao tới chặn đầu tẩu thoát. Cảnh sát hình sự bung cửa quật ngã khống chế hung thủ, tra còng số 8 cạch cạch sa lưới pháp luật!</p>
+              <button type="button" class="btn-play-cutscene" data-scene="arrest">
+                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 6: Máy bay tẩu thoát -->
+          <div class="cutscene-gallery-item" data-category="end">
+            <div class="item-badge badge-crim"><i class="fa-solid fa-plane-departure"></i> Phe Tội Phạm Thắng</div>
+            <div class="item-preview item-bg-airplane">
+              <span class="preview-icon">✈️</span>
+            </div>
+            <div class="item-info">
+              <h4 class="item-title">6. Lên Chuyên Cơ Tẩu Thoát Ngoại Biên</h4>
+              <p class="item-desc">Sân bay Nội Bài đêm mưa giông sấm chớp, hung thủ xách vali chạy lên cầu thang máy bay, vẫy tay thách thức. Phi cơ gầm rú cất cánh mất hút vào tầng mây!</p>
+              <button type="button" class="btn-play-cutscene" data-scene="escape">
+                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 7: Casting Phá Án Kịch Tính -->
+          <div class="cutscene-gallery-item" data-category="accuse">
+            <div class="item-badge badge-accuse"><i class="fa-solid fa-gavel"></i> Đối Chất Phá Án</div>
+            <div class="item-preview item-bg-casting">
+              <span class="preview-icon">⚖️</span>
+            </div>
+            <div class="item-info">
+              <h4 class="item-title">7. Đập Bàn Phá Án (Casting Accusation)</h4>
+              <p class="item-desc">Khoảnh khắc ném phù hiệu phá án, spotlight rọi thẳng vào nghi phạm bị chỉ đích danh, nhịp tim dồn dập và tiếng cộp cộp đóng dấu số phận bị can!</p>
+              <button type="button" class="btn-play-cutscene" data-scene="casting">
+                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="noir-modal-footer">
+        <button type="button" class="btn-modal-cancel" data-close="modal-cutscene-gallery">Đóng Rạp Chiếu</button>
       </div>
     </div>
   </div>

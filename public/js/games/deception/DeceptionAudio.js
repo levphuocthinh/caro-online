@@ -11,6 +11,7 @@ export class DeceptionAudio {
   }
 
   init() {
+    if (typeof window === 'undefined') return;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) {
@@ -231,6 +232,30 @@ export class DeceptionAudio {
           break;
         }
 
+        case 'punch': {
+          // Cú đấm trời giáng / ẩu đả bạo lực
+          this._playPunchImpact(t);
+          break;
+        }
+
+        case 'glassBreak': {
+          // Tiếng cốc chén vỡ tan tành
+          this._playGlassShatter(t);
+          break;
+        }
+
+        case 'cough': {
+          // Tiếng ho sặc sụa / ngộ độc
+          this._playCoughRattle(t);
+          break;
+        }
+
+        case 'droplet': {
+          // Giọt độc nhỏ vào ly nước: Ping...
+          this._playPoisonDroplet(t);
+          break;
+        }
+
         default:
           break;
       }
@@ -309,6 +334,93 @@ export class DeceptionAudio {
 
     whiteNoise.start(time);
     whiteNoise.stop(time + duration);
+  }
+
+  _playPunchImpact(time) {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(200, time);
+    osc.frequency.exponentialRampToValueAtTime(32, time + 0.16);
+
+    gain.gain.setValueAtTime(0.45, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(time);
+    osc.stop(time + 0.18);
+
+    // Thêm tiếng thịch nặng
+    const osc2 = this.ctx.createOscillator();
+    const gain2 = this.ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(95, time);
+    osc2.frequency.exponentialRampToValueAtTime(25, time + 0.22);
+    gain2.gain.setValueAtTime(0.4, time);
+    gain2.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+    osc2.connect(gain2);
+    gain2.connect(this.ctx.destination);
+    osc2.start(time);
+    osc2.stop(time + 0.22);
+  }
+
+  _playGlassShatter(time) {
+    if (!this.ctx) return;
+    // Rơi vỡ: Chuỗi âm kim loại/thủy tinh cao tần
+    const freqs = [1800, 2400, 3100, 1400];
+    freqs.forEach((f, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      const t = time + idx * 0.035;
+      osc.frequency.setValueAtTime(f, t);
+      osc.frequency.exponentialRampToValueAtTime(f * 0.4, t + 0.15);
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.16);
+    });
+  }
+
+  _playCoughRattle(time) {
+    if (!this.ctx) return;
+    // 2 tiếng khụ khụ rát cổ
+    [0, 0.16].forEach(offset => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      const t = time + offset;
+      osc.frequency.setValueAtTime(260, t);
+      osc.frequency.exponentialRampToValueAtTime(90, t + 0.12);
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.13);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.13);
+    });
+  }
+
+  _playPoisonDroplet(time) {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1400, time);
+    osc.frequency.exponentialRampToValueAtTime(2200, time + 0.04);
+    osc.frequency.exponentialRampToValueAtTime(900, time + 0.12);
+
+    gain.gain.setValueAtTime(0.25, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(time);
+    osc.stop(time + 0.13);
   }
 
   startHeartbeatLoop(intervalMs = 900) {

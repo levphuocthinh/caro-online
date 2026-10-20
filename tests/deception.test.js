@@ -237,4 +237,63 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     assert.equal(stripSuccess, true);
     assert.equal(victim.hasBadge, false, 'Victim lost their badge');
   });
+
+  await t.test('DeceptionPixelNoir cutscene modes & dedicated methods', async () => {
+    const { DeceptionPixelNoir } = await import('../public/js/games/deception/DeceptionPixelNoir.js');
+    const noir = new DeceptionPixelNoir();
+
+    // Verify dedicated methods
+    noir.playStreetBrawl();
+    assert.equal(noir.murderMode, 'STREET_BRAWL');
+    noir.playPoisoning();
+    assert.equal(noir.murderMode, 'POISONING');
+    noir.playBackStab();
+    assert.equal(noir.murderMode, 'BACK_STAB');
+    noir.playMotorbikeHitAndRun();
+    assert.equal(noir.murderMode, 'MOTORBIKE_HIT_RUN');
+
+    // Verify smart mode deduction
+    noir.playNightCrime({ meansName: 'Thạch tín', category: 'Poisoning' });
+    assert.equal(noir.murderMode, 'POISONING');
+    noir.playNightCrime({ meansName: 'Xà beng', category: 'Severe Injury' });
+    assert.equal(noir.murderMode, 'STREET_BRAWL');
+    noir.playNightCrime({ meansName: 'Tông xe máy', category: 'Accident' });
+    assert.equal(noir.murderMode, 'MOTORBIKE_HIT_RUN');
+    noir.playNightCrime({ meansName: 'Dao găm', category: 'Loss of Blood' });
+    assert.equal(noir.murderMode, 'BACK_STAB');
+  });
+
+  await t.test('Game-Icons: 100% SVG coverage and semantic accuracy', async () => {
+    const {
+      getCardGameIconKey,
+      getGameIconSvg,
+      MEANS_GAME_ICONS,
+      CLUE_GAME_ICONS
+    } = await import('../public/js/games/deception/data/deceptionIcons.js');
+
+    assert.equal(Object.keys(MEANS_GAME_ICONS).length, 90);
+    assert.equal(Object.keys(CLUE_GAME_ICONS).length, 200);
+
+    // Verify all 90 means
+    for (const m of MEANS_CARDS) {
+      const key = getCardGameIconKey(m);
+      const svg = getGameIconSvg(key);
+      assert.ok(svg && svg.length > 20, `Means card ${m.id} should have valid SVG`);
+    }
+
+    // Verify all 200 clues
+    for (const c of CLUE_CARDS) {
+      const key = getCardGameIconKey(c);
+      const svg = getGameIconSvg(key);
+      assert.ok(svg && svg.length > 20, `Clue card ${c.id} should have valid SVG`);
+    }
+
+    // Semantic accuracy checks
+    assert.equal(CLUE_GAME_ICONS['C014'], 'fork-knife-spoon', 'Menu should be restaurant tableware');
+    assert.equal(CLUE_GAME_ICONS['C004'], 'pay-money', 'Debt note should be payment/debt money');
+    assert.equal(CLUE_GAME_ICONS['C001'], 'love-letter', 'Love letter should be authentic love-letter');
+    assert.equal(CLUE_GAME_ICONS['C177'], 'paper-crane', 'Origami crane should be paper crane');
+    assert.equal(CLUE_GAME_ICONS['C176'], 'drama-masks', 'Theater mask should be drama masks');
+    assert.equal(MEANS_GAME_ICONS['M060'], 'wolf-head', 'Rabid dog should be canine beast head');
+  });
 });

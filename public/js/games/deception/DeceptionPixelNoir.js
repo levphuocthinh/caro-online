@@ -43,6 +43,21 @@ export class DeceptionPixelNoir {
     this.murderer = { x: 60, y: 195, state: 'stalking', panting: false };
     this.motorbike = { x: -80, y: 195, vx: 0, skidding: false, panting: false };
 
+    // Thực thể Ẩu Đả Đám Đông (STREET_BRAWL)
+    this.brawlFighters = [];
+    this.brawlImpactSoundPlayed = false;
+    this.brawlShoutText = '';
+    this.brawlAlertActive = false;
+
+    // Thực thể Đầu Độc Ly Trà (POISONING)
+    this.poisonVictim = { x: 205, y: 195, state: 'seated', coughTimer: 0, poisoned: false, skinTint: '#f5cd79' };
+    this.poisonCulprit = { x: 265, y: 195, state: 'seated', vx: 0 };
+    this.teaTable = { x: 235, y: 195, glassDropped: false };
+    this.poisonDrop = { x: 240, y: 168, vy: 95, active: false, landed: false };
+    this.poisonMist = [];
+    this.poisonDropSoundPlayed = false;
+    this.poisonShatterSoundPlayed = false;
+
     // Thực thể Công An Vây Bắt
     this.policeCar = { x: -160, y: 178, vx: 0, arrived: false };
     this.arrestCulprit = { x: 260, y: 195, state: 'fleeing', panting: false, cuffed: false };
@@ -61,6 +76,7 @@ export class DeceptionPixelNoir {
   }
 
   init(canvasElement = null) {
+    if (typeof document === 'undefined') return;
     this.canvas = canvasElement || document.getElementById('cutscene-canvas');
     if (!this.canvas) return;
     this.ctx = this.canvas.getContext('2d');
@@ -85,8 +101,28 @@ export class DeceptionPixelNoir {
   }
 
   /* =========================================================================
-     CẢNH 1 & 2: BAN ĐÊM GÂY ÁN (ĐÂM PHÍA SAU / TÔNG XE MÁY)
+     CẢNH 1 - 4: BAN ĐÊM GÂY ÁN PHỐ HÀNG ĐẪY
+     - Đâm lén phía sau (BACK_STAB)
+     - Tông xe máy bỏ chạy (MOTORBIKE_HIT_RUN)
+     - Tụ tập xô xát tử vong / Đám đông chạy tán loạn (STREET_BRAWL)
+     - Đầu độc ly trà vỉa hè / Nạn nhân ngộ độc gục ngã (POISONING)
      ========================================================================= */
+  playBackStab(options = {}, onComplete = null) {
+    this.playNightCrime({ ...options, mode: 'BACK_STAB' }, onComplete);
+  }
+
+  playMotorbikeHitAndRun(options = {}, onComplete = null) {
+    this.playNightCrime({ ...options, mode: 'MOTORBIKE_HIT_RUN' }, onComplete);
+  }
+
+  playStreetBrawl(options = {}, onComplete = null) {
+    this.playNightCrime({ ...options, mode: 'STREET_BRAWL' }, onComplete);
+  }
+
+  playPoisoning(options = {}, onComplete = null) {
+    this.playNightCrime({ ...options, mode: 'POISONING' }, onComplete);
+  }
+
   playNightCrime(options = {}, onComplete = null) {
     this.stop(false);
     this.sceneType = 'NIGHT_CRIME';
@@ -99,23 +135,59 @@ export class DeceptionPixelNoir {
       murdererName: options.murdererName || 'Kẻ Sát Nhân'
     };
 
-    const meansLower = (this.sceneData.meansName + ' ' + this.sceneData.category).toLowerCase();
-    if (meansLower.includes('xe') || meansLower.includes('tông') || meansLower.includes('accident') || meansLower.includes('ngã') || meansLower.includes('va chạm')) {
-      this.murderMode = 'MOTORBIKE_HIT_RUN';
-    } else if (meansLower.includes('dao') || meansLower.includes('kéo') || meansLower.includes('đâm') || meansLower.includes('kiếm') || meansLower.includes('nhọn') || meansLower.includes('chém')) {
-      this.murderMode = 'BACK_STAB';
+    if (options.mode) {
+      this.murderMode = options.mode;
     } else {
-      this.murderMode = Math.random() < 0.5 ? 'BACK_STAB' : 'MOTORBIKE_HIT_RUN';
+      const meansLower = (this.sceneData.meansName + ' ' + this.sceneData.category).toLowerCase();
+      if (
+        meansLower.includes('độc') || meansLower.includes('thuốc') || meansLower.includes('rượu') ||
+        meansLower.includes('trà') || meansLower.includes('nước bẩn') || meansLower.includes('tiêm') ||
+        meansLower.includes('thạch tín') || meansLower.includes('thủy ngân') || meansLower.includes('trừ sâu') ||
+        meansLower.includes('poison') || meansLower.includes('arsenic') || meansLower.includes('mercury') ||
+        meansLower.includes('chemical') || meansLower.includes('drug') || meansLower.includes('pill')
+      ) {
+        this.murderMode = 'POISONING';
+      } else if (
+        meansLower.includes('xe') || meansLower.includes('tông') || meansLower.includes('accident') ||
+        meansLower.includes('ngã') || meansLower.includes('va chạm') || meansLower.includes('thang máy') ||
+        meansLower.includes('dù') || meansLower.includes('crash')
+      ) {
+        this.murderMode = 'MOTORBIKE_HIT_RUN';
+      } else if (
+        meansLower.includes('gậy') || meansLower.includes('đấm') || meansLower.includes('búa') ||
+        meansLower.includes('đá') || meansLower.includes('gạch') || meansLower.includes('xà beng') ||
+        meansLower.includes('bẹp') || meansLower.includes('đập') || meansLower.includes('chậu') ||
+        meansLower.includes('ghế') || meansLower.includes('severe injury') || meansLower.includes('brawl') ||
+        meansLower.includes('fist') || meansLower.includes('bat') || meansLower.includes('pipe')
+      ) {
+        this.murderMode = 'STREET_BRAWL';
+      } else if (
+        meansLower.includes('dao') || meansLower.includes('kéo') || meansLower.includes('đâm') ||
+        meansLower.includes('kiếm') || meansLower.includes('nhọn') || meansLower.includes('chém') ||
+        meansLower.includes('rìu') || meansLower.includes('cưa') || meansLower.includes('súng') ||
+        meansLower.includes('knife') || meansLower.includes('blade') || meansLower.includes('dagger')
+      ) {
+        this.murderMode = 'BACK_STAB';
+      } else {
+        const modes = ['BACK_STAB', 'MOTORBIKE_HIT_RUN', 'STREET_BRAWL', 'POISONING'];
+        this.murderMode = modes[Math.floor(Math.random() * modes.length)];
+      }
     }
 
-    const titleEl = document.getElementById('cutscene-title');
-    const subEl = document.getElementById('cutscene-sub');
-    const tagEl = document.getElementById('cutscene-tag');
+    const titleEl = typeof document !== 'undefined' ? document.getElementById('cutscene-title') : null;
+    const subEl = typeof document !== 'undefined' ? document.getElementById('cutscene-sub') : null;
+    const tagEl = typeof document !== 'undefined' ? document.getElementById('cutscene-tag') : null;
 
     if (titleEl) {
-      titleEl.textContent = this.murderMode === 'MOTORBIKE_HIT_RUN'
-        ? 'Án Mạng Đêm Phố Hàng Đẫy: Tông Xe Bỏ Chạy'
-        : 'Án Mạng Đêm Phố Hàng Đẫy: Đâm Lén Phía Sau';
+      if (this.murderMode === 'MOTORBIKE_HIT_RUN') {
+        titleEl.textContent = 'Án Mạng Đêm Phố Hàng Đẫy: Tông Xe Bỏ Chạy';
+      } else if (this.murderMode === 'BACK_STAB') {
+        titleEl.textContent = 'Án Mạng Đêm Phố Hàng Đẫy: Đâm Lén Phía Sau';
+      } else if (this.murderMode === 'STREET_BRAWL') {
+        titleEl.textContent = 'Án Mạng Đêm Phố Hàng Đẫy: Ẩu Đả Đám Đông Bỏ Chạy';
+      } else if (this.murderMode === 'POISONING') {
+        titleEl.textContent = 'Án Mạng Đêm Phố Hàng Đẫy: Đầu Độc Ly Trà Vỉa Hè';
+      }
     }
     if (subEl) {
       subEl.textContent = `Hung khí: ${this.sceneData.meansName} • Vật chứng: ${this.sceneData.clueName}`;
@@ -128,6 +200,28 @@ export class DeceptionPixelNoir {
     this.victim = { x: 280, y: 195, state: 'walking', fallProgress: 0, airVy: 0 };
     this.murderer = { x: 60, y: 195, state: 'stalking', panting: false };
     this.motorbike = { x: -80, y: 195, vx: 0, skidding: false, panting: false };
+
+    // Khởi tạo trạng thái riêng cho Ẩu Đả
+    this.brawlFighters = [
+      { id: 'victim', x: 245, y: 195, role: 'victim', state: 'arguing', fallProgress: 0, color: '#95a5a6' },
+      { id: 'culprit', x: 215, y: 195, role: 'culprit', state: 'arguing', vx: 0, color: '#c0392b' },
+      { id: 'brawlerA', x: 175, y: 195, role: 'runner_left', state: 'arguing', vx: 0, color: '#2980b9' },
+      { id: 'brawlerB', x: 285, y: 195, role: 'runner_right', state: 'arguing', vx: 0, color: '#8e44ad' },
+      { id: 'brawlerC', x: 325, y: 195, role: 'runner_left', state: 'arguing', vx: 0, color: '#d35400' }
+    ];
+    this.brawlImpactSoundPlayed = false;
+    this.brawlShoutText = '';
+    this.brawlAlertActive = false;
+
+    // Khởi tạo trạng thái riêng cho Đầu Độc
+    this.poisonVictim = { x: 205, y: 195, state: 'seated', coughTimer: 0, poisoned: false, skinTint: '#f5cd79' };
+    this.poisonCulprit = { x: 265, y: 195, state: 'seated', vx: 0 };
+    this.teaTable = { x: 235, y: 195, glassDropped: false };
+    this.poisonDrop = { x: 240, y: 168, vy: 95, active: true, landed: false };
+    this.poisonMist = [];
+    this.poisonDropSoundPlayed = false;
+    this.poisonShatterSoundPlayed = false;
+
     this.bloodParticles = [];
     this.vaporParticles = [];
     this.sparks = [];
@@ -149,9 +243,9 @@ export class DeceptionPixelNoir {
       murdererName: options.murdererName || 'Kẻ Sát Nhân'
     };
 
-    const titleEl = document.getElementById('cutscene-title');
-    const subEl = document.getElementById('cutscene-sub');
-    const tagEl = document.getElementById('cutscene-tag');
+    const titleEl = typeof document !== 'undefined' ? document.getElementById('cutscene-title') : null;
+    const subEl = typeof document !== 'undefined' ? document.getElementById('cutscene-sub') : null;
+    const tagEl = typeof document !== 'undefined' ? document.getElementById('cutscene-tag') : null;
 
     if (titleEl) titleEl.textContent = 'Cảnh Sát Hình Sự: Sa Lưới Pháp Luật!';
     if (subEl) subEl.textContent = `Công an 113 đã khống chế và tra còng số 8 đối tượng ${this.sceneData.murdererName}!`;
@@ -185,9 +279,9 @@ export class DeceptionPixelNoir {
       murdererName: options.murdererName || 'Kẻ Sát Nhân'
     };
 
-    const titleEl = document.getElementById('cutscene-title');
-    const subEl = document.getElementById('cutscene-sub');
-    const tagEl = document.getElementById('cutscene-tag');
+    const titleEl = typeof document !== 'undefined' ? document.getElementById('cutscene-title') : null;
+    const subEl = typeof document !== 'undefined' ? document.getElementById('cutscene-sub') : null;
+    const tagEl = typeof document !== 'undefined' ? document.getElementById('cutscene-tag') : null;
 
     if (titleEl) titleEl.textContent = 'Hung Thủ Bỏ Trốn: Tẩu Thoát Ngoại Biên!';
     if (subEl) subEl.textContent = `Vụ án bế tắc! ${this.sceneData.murdererName} đã lên chuyên cơ tẩu thoát thành công!`;
@@ -209,7 +303,11 @@ export class DeceptionPixelNoir {
   }
 
   startLoop() {
-    const overlay = document.getElementById('cutscene-overlay');
+    if (typeof requestAnimationFrame === 'undefined') {
+      this.isPlaying = true;
+      return;
+    }
+    const overlay = typeof document !== 'undefined' ? document.getElementById('cutscene-overlay') : null;
     if (overlay) overlay.classList.add('active');
 
     this.elapsed = 0;
@@ -241,7 +339,7 @@ export class DeceptionPixelNoir {
       this.animId = null;
     }
 
-    const overlay = document.getElementById('cutscene-overlay');
+    const overlay = typeof document !== 'undefined' ? document.getElementById('cutscene-overlay') : null;
     if (overlay) overlay.classList.remove('active');
 
     if (triggerCallback && typeof this.onFinishCallback === 'function') {
@@ -314,6 +412,16 @@ export class DeceptionPixelNoir {
       if (s.alpha <= 0) this.sparks.splice(i, 1);
     }
 
+    // 5b. Khói độc (cho cảnh đầu độc)
+    for (let i = this.poisonMist.length - 1; i >= 0; i--) {
+      const p = this.poisonMist[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.alpha -= dt * 0.7;
+      p.size += dt * 2.2;
+      if (p.alpha <= 0) this.poisonMist.splice(i, 1);
+    }
+
     // 6. Phân luồng cập nhật theo từng Scene
     if (this.sceneType === 'POLICE_ARREST') {
       this.updatePoliceArrest(t, dt);
@@ -322,8 +430,12 @@ export class DeceptionPixelNoir {
     } else {
       if (this.murderMode === 'BACK_STAB') {
         this.updateBackStabScenario(t, dt);
-      } else {
+      } else if (this.murderMode === 'MOTORBIKE_HIT_RUN') {
         this.updateMotorbikeScenario(t, dt);
+      } else if (this.murderMode === 'STREET_BRAWL') {
+        this.updateStreetBrawlScenario(t, dt);
+      } else if (this.murderMode === 'POISONING') {
+        this.updatePoisoningScenario(t, dt);
       }
     }
 
@@ -489,6 +601,244 @@ export class DeceptionPixelNoir {
       }
     } else {
       this.victim.state = 'dead';
+    }
+  }
+
+  /* =========================================================================
+     CẬP NHẬT KỊCH BẢN ẨU ĐẢ ĐÁM ĐÔNG & CHẠY TÁN LOẠN (STREET BRAWL)
+     ========================================================================= */
+  updateStreetBrawlScenario(t, dt) {
+    const v = this.brawlFighters.find(f => f.role === 'victim');
+    const c = this.brawlFighters.find(f => f.role === 'culprit');
+
+    // 0s - 1.6s: Tranh cãi, xô đẩy nhau ngoài cửa quán bia
+    if (t < 1.6) {
+      this.brawlFighters.forEach((f, idx) => {
+        const bob = Math.sin(t * 12 + idx * 1.5) * 2;
+        f.y = 195 + bob;
+        if (f.role === 'culprit') {
+          f.x = 215 + Math.sin(t * 8) * 3;
+        } else if (f.role === 'victim') {
+          f.x = 245 - Math.sin(t * 8) * 2;
+        }
+      });
+      if (t > 0.6) {
+        this.brawlShoutText = 'MÀY NÓI GÌ ĐẤY?!';
+      }
+    }
+    // 1.6s - 3.2s: Cú đấm trời giáng! BỐP! HUỴCH! Nạn nhân ngã gục tử vong
+    else if (t < 3.2) {
+      if (c) {
+        c.x = Math.min(235, 215 + (t - 1.6) * 60);
+        c.state = 'punching';
+      }
+
+      if (t >= 1.85 && !this.brawlImpactSoundPlayed) {
+        this.brawlImpactSoundPlayed = true;
+        this.screenShakeTime = 0.45;
+        this.screenShakeIntensity = 11;
+        deceptionAudio.play('punch');
+        deceptionAudio.play('gavel');
+        this.brawlShoutText = 'BỐP! HUỴCH!';
+
+        // Máu bắn tóe loe
+        for (let i = 0; i < 40; i++) {
+          const angle = -Math.PI * 0.15 - Math.random() * Math.PI * 0.7;
+          const spd = 90 + Math.random() * 200;
+          this.bloodParticles.push({
+            x: 245,
+            y: 165,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd,
+            size: 2 + Math.random() * 3,
+            color: Math.random() < 0.3 ? '#ff3838' : '#a80000',
+            life: 1.6
+          });
+        }
+        // Tia lửa va chạm
+        for (let i = 0; i < 25; i++) {
+          this.sparks.push({
+            x: 240,
+            y: 168,
+            vx: 80 - Math.random() * 160,
+            vy: -40 - Math.random() * 100,
+            alpha: 1
+          });
+        }
+      }
+
+      if (v) {
+        v.state = 'falling';
+        v.fallProgress = Math.min(1, (t - 1.85) / 0.6);
+        v.x += 16 * dt;
+        if (v.fallProgress >= 1) v.state = 'dead';
+      }
+    }
+    // 3.2s - 4.4s: Cả đám đông kinh hãi chết lặng: CHẾT NGƯỜI RỒI! CHẠY ĐI!
+    else if (t < 4.4) {
+      if (v) v.state = 'dead';
+      if (c) c.state = 'shocked';
+      this.brawlAlertActive = true;
+      this.brawlShoutText = '⚠️ CHẾT NGƯỜI RỒI! CHẠY ĐI!!';
+
+      this.brawlFighters.forEach(f => {
+        if (f.role !== 'victim') {
+          f.state = 'shocked';
+          // Run rẩy trong mưa lạnh
+          f.x += Math.sin(t * 30) * 0.8;
+          // Khói thở dồn dập vì sợ hãi
+          if (Math.random() < 0.25) {
+            this.vaporParticles.push({
+              x: f.x + 4,
+              y: f.y - 35,
+              vx: (Math.random() - 0.5) * 15,
+              vy: -15 - Math.random() * 10,
+              size: 3,
+              alpha: 0.8,
+              fade: 1.0,
+              color: 'rgba(230, 230, 230,'
+            });
+          }
+        }
+      });
+    }
+    // 4.4s - 6.2s: CẢ ĐÁM CHẠY TÁN LOẠN VÀO CÁC CON NGÕ!
+    else if (t < 6.2) {
+      if (v) v.state = 'dead';
+
+      this.brawlFighters.forEach(f => {
+        if (f.role === 'culprit') {
+          f.state = 'running_right';
+          f.x += 330 * dt;
+        } else if (f.role === 'runner_left') {
+          f.state = 'running_left';
+          f.x -= 300 * dt;
+        } else if (f.role === 'runner_right') {
+          f.state = 'running_right';
+          f.x += 290 * dt;
+        }
+
+        // Bụi chân chạy tháo thân
+        if (f.role !== 'victim' && Math.random() < 0.35) {
+          this.vaporParticles.push({
+            x: f.x,
+            y: 205,
+            vx: f.state === 'running_right' ? -40 : 40,
+            vy: -5 - Math.random() * 10,
+            size: 4,
+            alpha: 0.6,
+            fade: 1.4,
+            color: 'rgba(100, 100, 100,'
+          });
+        }
+      });
+    }
+    // 6.2s - 6.8s: Đường phố vắng tanh, chỉ còn nạn nhân nằm bất động dưới mưa
+    else {
+      if (v) v.state = 'dead';
+    }
+  }
+
+  /* =========================================================================
+     CẬP NHẬT KỊCH BẢN ĐẦU ĐỘC LY TRÀ VỈA HÈ (POISONING)
+     ========================================================================= */
+  updatePoisoningScenario(t, dt) {
+    const v = this.poisonVictim;
+    const c = this.poisonCulprit;
+
+    // 0s - 1.8s: Lén nhỏ giọt độc vào cốc trà đá trên bàn
+    if (t < 1.8) {
+      v.state = 'seated';
+      c.state = 'poisoning';
+
+      // Giọt độc rơi từ tay hung thủ xuống cốc trà
+      if (t >= 0.5 && t < 1.1) {
+        this.poisonDrop.active = true;
+        this.poisonDrop.y += this.poisonDrop.vy * dt;
+        if (this.poisonDrop.y >= 185 && !this.poisonDropSoundPlayed) {
+          this.poisonDropSoundPlayed = true;
+          this.poisonDrop.landed = true;
+          this.poisonDrop.active = false;
+          deceptionAudio.play('droplet');
+
+          // Độc tố tỏa ánh sáng xanh tím trong cốc
+          for (let i = 0; i < 15; i++) {
+            this.sparks.push({
+              x: 236,
+              y: 187,
+              vx: 30 - Math.random() * 60,
+              vy: -20 - Math.random() * 40,
+              alpha: 0.9
+            });
+          }
+        }
+      }
+    }
+    // 1.8s - 3.2s: Nạn nhân bưng cốc trà lên uống
+    else if (t < 3.2) {
+      c.state = 'seated';
+      v.state = 'drinking';
+    }
+    // 3.2s - 4.8s: TRÚNG ĐỘC! Cốc rơi vỡ tan, ôm cổ họng ho sặc sụa và gục xuống bàn!
+    else if (t < 4.8) {
+      c.state = 'watching';
+      v.state = 'poisoned_struggling';
+
+      if (!this.poisonShatterSoundPlayed) {
+        this.poisonShatterSoundPlayed = true;
+        this.teaTable.glassDropped = true;
+        this.screenShakeTime = 0.4;
+        this.screenShakeIntensity = 8;
+        deceptionAudio.play('glassBreak');
+        deceptionAudio.play('cough');
+
+        // Mảnh kính vỡ bắn tung tóe
+        for (let i = 0; i < 25; i++) {
+          this.sparks.push({
+            x: 235,
+            y: 205,
+            vx: 60 - Math.random() * 120,
+            vy: -30 - Math.random() * 50,
+            alpha: 1
+          });
+        }
+      }
+
+      // Khói độc bốc lên từ người nạn nhân
+      if (Math.random() < 0.5) {
+        this.poisonMist.push({
+          x: v.x + (Math.random() - 0.5) * 12,
+          y: v.y - 32,
+          vx: (Math.random() - 0.5) * 20,
+          vy: -25 - Math.random() * 20,
+          size: 3.5,
+          alpha: 0.85
+        });
+      }
+
+      if (t >= 4.1) {
+        v.state = 'dead_slumped';
+      }
+    }
+    // 4.8s - 6.8s: Hung thủ khép áo, bình thản bỏ trốn vào màn đêm mưa
+    else {
+      v.state = 'dead_slumped';
+      c.state = 'fleeing';
+      c.x += 105 * dt;
+
+      // Hơi thở lạnh lùng
+      if (Math.random() < 0.25) {
+        this.vaporParticles.push({
+          x: c.x + 6,
+          y: c.y - 38,
+          vx: 15 + Math.random() * 10,
+          vy: -10 - Math.random() * 8,
+          size: 3,
+          alpha: 0.7,
+          fade: 0.8,
+          color: 'rgba(220, 220, 220,'
+        });
+      }
     }
   }
 
@@ -660,10 +1010,174 @@ export class DeceptionPixelNoir {
     } else if (this.sceneType === 'AIRPLANE_ESCAPE') {
       this.renderAirplaneEscapeScene(ctx);
     } else {
-      this.renderNightCrimeScene(ctx);
+      if (this.murderMode === 'STREET_BRAWL') {
+        this.renderStreetBrawlScene(ctx);
+      } else if (this.murderMode === 'POISONING') {
+        this.renderPoisoningScene(ctx);
+      } else {
+        this.renderNightCrimeScene(ctx);
+      }
     }
 
     ctx.restore();
+  }
+
+  /* =========================================================================
+     RENDER 1B: ÁN MẠNG ẨU ĐẢ ĐÁM ĐÔNG PHỐ HÀNG ĐẪY
+     ========================================================================= */
+  renderStreetBrawlScene(ctx) {
+    this.drawHangDayBackground(ctx);
+
+    // Biển hiệu Quán Nhậu Bình Dân & Bia Hơi Phố Hàng Đẫy
+    this.drawNeonSign(ctx, 160, 48, 'QUÁN NHẬU BÌNH DÂN', '#ff4757', '#ffa502');
+    this.drawNeonSign(ctx, 350, 48, 'BIA HƠI 1997', '#2ed573', '#70a1ff');
+
+    // Bàn ghế quán nhậu vỉa hè bị đạp đổ xiêu vẹo
+    ctx.save();
+    ctx.fillStyle = '#2f3542';
+    ctx.fillRect(130, 204, 20, 10);
+    ctx.fillStyle = '#ff4757'; // Ghế nhựa đỏ ngã lăn lóc
+    ctx.fillRect(115, 207, 12, 5);
+    ctx.fillRect(118, 203, 3, 7);
+    ctx.fillStyle = '#2ed573'; // Ghế nhựa xanh
+    ctx.fillRect(285, 208, 12, 5);
+    ctx.restore();
+
+    // Vũng máu loang nếu nạn nhân đã ngã
+    const v = this.brawlFighters.find(f => f.role === 'victim');
+    if (v && (v.state === 'dead' || v.state === 'falling')) {
+      const bloodRadius = Math.min(26, (this.elapsed - 1.85) * 12);
+      if (bloodRadius > 0) {
+        ctx.fillStyle = 'rgba(160, 0, 0, 0.88)';
+        ctx.beginPath();
+        ctx.ellipse(v.x + 8, 207, bloodRadius, bloodRadius * 0.38, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Vẽ từng người tham gia ẩu đả / tháo chạy
+    this.brawlFighters.forEach(f => {
+      this.drawBrawlFighter(ctx, f);
+    });
+
+    this.drawCommonParticles(ctx);
+
+    // Comic FX cú đấm nổ: BỐP! HUỴCH!
+    if (this.elapsed >= 1.85 && this.elapsed < 3.2) {
+      ctx.save();
+      ctx.translate(245, 140);
+      ctx.rotate(-0.06);
+
+      // Ngôi sao nổ comic
+      ctx.fillStyle = '#fffa65';
+      ctx.beginPath();
+      for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI) / 4;
+        const r1 = 28;
+        const r2 = 14;
+        ctx.lineTo(Math.cos(angle) * r1, Math.sin(angle) * r1);
+        ctx.lineTo(Math.cos(angle + Math.PI / 8) * r2, Math.sin(angle + Math.PI / 8) * r2);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#ff3838';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#c0392b';
+      ctx.font = '900 13px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('BỐP! HUỴCH!', 0, 0);
+      ctx.restore();
+    }
+
+    // Biểu ngữ cảnh báo chớp nháy: CHẾT NGƯỜI RỒI! CHẠY ĐI!
+    if (this.brawlAlertActive && this.elapsed < 5.8) {
+      const strobe = Math.floor(this.elapsed * 6) % 2;
+      ctx.fillStyle = strobe ? 'rgba(235, 47, 6, 0.94)' : 'rgba(245, 205, 121, 0.94)';
+      ctx.fillRect(25, 18, this.W - 50, 32);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(25, 18, this.W - 50, 32);
+
+      ctx.fillStyle = strobe ? '#fff' : '#111';
+      ctx.font = '900 12px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('⚠️ CHẾT NGƯỜI RỒI! TẤT CẢ CHẠY ĐI!!', this.W / 2, 38);
+    }
+
+    // Còi cảnh sát nhấp nháy từ xa ở cuối cảnh
+    if (this.elapsed > 4.8) {
+      this.drawPoliceStrobeEffect(ctx);
+    }
+  }
+
+  /* =========================================================================
+     RENDER 1C: ÁN MẠNG ĐẦU ĐỘC LY TRÀ VỈA HÈ
+     ========================================================================= */
+  renderPoisoningScene(ctx) {
+    this.drawHangDayBackground(ctx);
+
+    // Biển hiệu Quán Nước Chè Vỉa Hè Phố Hàng Đẫy
+    this.drawNeonSign(ctx, 160, 48, 'QUÁN NƯỚC CHÈ', '#2ed573', '#7bed9f');
+    this.drawNeonSign(ctx, 350, 48, 'TRÀ ĐÁ VỈA HÈ', '#eccc68', '#ffa502');
+
+    // Bàn trà đá vỉa hè
+    this.drawTeaStall(ctx, this.teaTable.x, this.teaTable.y);
+
+    // Giọt độc tố rơi xuống cốc
+    if (this.poisonDrop.active && !this.poisonDrop.landed) {
+      ctx.fillStyle = '#2ed573';
+      ctx.beginPath();
+      ctx.arc(this.poisonDrop.x, this.poisonDrop.y, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(46, 213, 115, 0.45)';
+      ctx.beginPath();
+      ctx.arc(this.poisonDrop.x, this.poisonDrop.y, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Vẽ nạn nhân và hung thủ đầu độc
+    this.drawPoisonVictim(ctx, this.poisonVictim);
+    this.drawPoisonCulprit(ctx, this.poisonCulprit);
+
+    // Khói độc xanh ma quái bốc lên
+    this.poisonMist.forEach(p => {
+      ctx.fillStyle = `rgba(46, 213, 115, ${p.alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    this.drawCommonParticles(ctx);
+
+    // Lời thoại ho sặc sụa trúng độc
+    if (this.poisonVictim.state === 'poisoned_struggling' && this.elapsed < 4.4) {
+      ctx.save();
+      ctx.fillStyle = '#ff4757';
+      ctx.font = '900 11px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('KHỤ! KHỤ! CỨU...!', this.poisonVictim.x, this.poisonVictim.y - 48);
+      ctx.restore();
+    }
+
+    // Biểu ngữ vụ án đầu độc ở cuối
+    if (this.elapsed > 4.6) {
+      ctx.fillStyle = 'rgba(10, 6, 16, 0.88)';
+      ctx.fillRect(20, 18, this.W - 40, 36);
+      ctx.strokeStyle = '#2ed573';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(20, 18, this.W - 40, 36);
+
+      ctx.fillStyle = '#2ed573';
+      ctx.font = 'bold 11px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('☠️ ÁN MẠNG ĐẦU ĐỘC KÍN ĐÁO: NẠN NHÂN TỬ VONG TẠI CHỖ!', this.W / 2, 34);
+      ctx.fillStyle = '#ced6e0';
+      ctx.font = '10px monospace';
+      ctx.fillText(`KẺ THỦ ÁC ĐÃ LẺN ĐI KHÔNG ĐỂ LẠI DẤU VẾT`, this.W / 2, 47);
+    }
   }
 
   /* =========================================================================
@@ -1479,6 +1993,309 @@ export class DeceptionPixelNoir {
     if (isPanting) {
       ctx.fillStyle = '#111';
       ctx.fillRect(-2, -10, 4, 14);
+    }
+
+    ctx.restore();
+  }
+
+  /* =========================================================================
+     CÁC HÀM VẼ CHO CẢNH ẨU ĐẢ ĐÁM ĐÔNG (STREET BRAWL)
+     ========================================================================= */
+  drawBrawlFighter(ctx, f) {
+    if (f.x < -60 || f.x > 540) return;
+
+    ctx.save();
+    ctx.translate(f.x, f.y);
+
+    if (f.role === 'victim') {
+      if (f.state === 'dead') {
+        // Nằm bất động trên vỉa hè
+        ctx.rotate(Math.PI / 2);
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(-4, -14, 3, 14);
+        ctx.fillRect(1, -14, 3, 14);
+        ctx.fillStyle = f.color || '#95a5a6';
+        ctx.fillRect(-5, -30, 10, 18);
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(-3, -36, 6, 6);
+
+        // Mắt nhắm X X
+        ctx.fillStyle = '#111';
+        ctx.fillRect(-2, -34, 1.5, 1.5);
+        ctx.fillRect(1, -34, 1.5, 1.5);
+      } else if (f.state === 'falling') {
+        ctx.rotate((f.fallProgress * Math.PI) / 2);
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(-4, -14, 3, 14);
+        ctx.fillRect(1, -14, 3, 14);
+        ctx.fillStyle = f.color || '#95a5a6';
+        ctx.fillRect(-5, -30, 10, 18);
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(-3, -36, 6, 6);
+      } else {
+        // Đang tranh cãi
+        const bob = Math.sin(this.elapsed * 12);
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(-5, -14, 3, 14);
+        ctx.fillRect(1, -14, 3, 14);
+        ctx.fillStyle = f.color || '#95a5a6';
+        ctx.fillRect(-5, -30 + bob, 10, 18);
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(-3, -36 + bob, 6, 6);
+
+        // Nắm đấm giơ lên
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(-9, -24 + bob, 4, 4);
+      }
+    } else {
+      // Các nhân vật khác (Culprit, Brawlers chạy tán loạn)
+      const isRunning = f.state === 'running_left' || f.state === 'running_right';
+      const isShocked = f.state === 'shocked';
+      const isPunching = f.state === 'punching';
+
+      if (isRunning) {
+        const dir = f.state === 'running_right' ? 1 : -1;
+        ctx.scale(dir, 1);
+        ctx.rotate(0.2); // Nghiêng người lao về phía trước
+
+        const legCycle = Math.sin(this.elapsed * 22);
+        ctx.fillStyle = '#111';
+        ctx.fillRect(-6 + legCycle * 5, -14, 4, 14);
+        ctx.fillRect(2 - legCycle * 5, -14, 4, 14);
+
+        ctx.fillStyle = f.color || '#333';
+        ctx.fillRect(-6, -32, 12, 18);
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(-3, -39, 7, 7);
+
+        // Mắt kinh hoàng
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(1, -37, 3, 3);
+        ctx.fillStyle = '#111';
+        ctx.fillRect(2, -36, 1.5, 1.5);
+      } else if (isShocked) {
+        // Đứng chết lặng ôm đầu
+        ctx.fillStyle = '#111';
+        ctx.fillRect(-5, -14, 3, 14);
+        ctx.fillRect(2, -14, 3, 14);
+
+        ctx.fillStyle = f.color || '#333';
+        ctx.fillRect(-6, -30, 12, 18);
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(-3, -36, 6, 6);
+
+        // Hai tay ôm đầu
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(-7, -37, 4, 4);
+        ctx.fillRect(3, -37, 4, 4);
+      } else if (isPunching) {
+        // Cú đấm vươn thẳng
+        ctx.fillStyle = '#111';
+        ctx.fillRect(-7, -14, 4, 14);
+        ctx.fillRect(1, -14, 4, 14);
+
+        ctx.fillStyle = f.color || '#c0392b';
+        ctx.fillRect(-6, -30, 12, 18);
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(-3, -37, 6, 7);
+
+        // Cánh tay đấm thẳng sang phải
+        ctx.fillStyle = f.color || '#c0392b';
+        ctx.fillRect(6, -26, 14, 4);
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(18, -27, 5, 6); // Nắm đấm
+      } else {
+        // Tranh cãi giơ tay
+        const bob = Math.sin(this.elapsed * 10);
+        ctx.fillStyle = '#111';
+        ctx.fillRect(-5, -14, 3, 14);
+        ctx.fillRect(1, -14, 3, 14);
+
+        ctx.fillStyle = f.color || '#333';
+        ctx.fillRect(-6, -30 + bob, 12, 18);
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(-3, -36 + bob, 6, 6);
+
+        ctx.fillStyle = '#f5cd79';
+        ctx.fillRect(6, -26 + bob, 4, 4);
+      }
+    }
+
+    ctx.restore();
+  }
+
+  /* =========================================================================
+     CÁC HÀM VẼ CHO CẢNH ĐẦU ĐỘC (POISONING)
+     ========================================================================= */
+  drawTeaStall(ctx, x, y) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Bàn gỗ mộc thấp quán trà đá
+    ctx.fillStyle = '#4b382a';
+    ctx.fillRect(-18, -16, 36, 16);
+    ctx.fillStyle = '#3a2b1f';
+    ctx.fillRect(-16, -14, 32, 14);
+
+    // Ấm trà xanh Bát Tràng
+    ctx.fillStyle = '#1b4332';
+    ctx.fillRect(-6, -22, 12, 7);
+    ctx.fillRect(6, -20, 3, 3); // Vòi ấm
+    ctx.fillStyle = '#2d6a4f';
+    ctx.fillRect(-8, -21, 2, 4); // Quai ấm
+
+    // Ly trà đá bên phải
+    ctx.fillStyle = '#a8e6cf';
+    ctx.fillRect(8, -21, 5, 6);
+    ctx.fillStyle = '#d8f3dc';
+    ctx.fillRect(9, -20, 3, 2); // Nước chè
+
+    // Ly trà đá nạn nhân bên trái
+    if (!this.teaTable.glassDropped) {
+      ctx.fillStyle = '#a8e6cf';
+      ctx.fillRect(-14, -21, 5, 6);
+      ctx.fillStyle = this.poisonDrop.landed ? '#2ed573' : '#d8f3dc';
+      ctx.fillRect(-13, -20, 3, 2);
+    } else {
+      // Mảnh thủy tinh vỡ lấp lánh trên vỉa hè
+      ctx.fillStyle = '#c7ecee';
+      ctx.fillRect(-22, -3, 3, 2);
+      ctx.fillRect(-18, -1, 4, 2);
+      ctx.fillRect(-25, -2, 2, 3);
+      ctx.fillRect(-14, -2, 3, 1.5);
+    }
+
+    // Hai ghế nhựa đỏ hai bên
+    ctx.fillStyle = '#ff4757';
+    ctx.fillRect(-32, -9, 12, 9);
+    ctx.fillRect(20, -9, 12, 9);
+
+    ctx.restore();
+  }
+
+  drawPoisonVictim(ctx, v) {
+    ctx.save();
+    ctx.translate(v.x, v.y);
+
+    const isDead = v.state === 'dead_slumped';
+    const isStruggling = v.state === 'poisoned_struggling';
+    const isDrinking = v.state === 'drinking';
+
+    if (isDead) {
+      // Gục gục sấp mặt xuống bàn trà đá
+      ctx.fillStyle = '#2c3e50';
+      ctx.fillRect(-10, -9, 10, 9); // Chân ngồi ghế
+
+      ctx.fillStyle = '#7f8c8d';
+      ctx.fillRect(-4, -18, 18, 12); // Lưng gập về phía trước
+      ctx.fillStyle = '#2ed573'; // Da mặt trúng độc tím tái
+      ctx.fillRect(10, -18, 7, 7);
+
+      ctx.fillStyle = '#111';
+      ctx.fillRect(12, -16, 1.5, 1.5); // Mắt nhắm nghiền
+    } else if (isStruggling) {
+      // Co giật ôm cổ họng
+      const shake = Math.sin(this.elapsed * 32) * 2;
+      ctx.fillStyle = '#2c3e50';
+      ctx.fillRect(-8, -9, 8, 9);
+
+      ctx.fillStyle = '#7f8c8d';
+      ctx.fillRect(-6 + shake, -26, 12, 18);
+      ctx.fillStyle = '#2ed573'; // Mặt tím tái xanh lét
+      ctx.fillRect(-3 + shake, -34, 7, 7);
+
+      // Hai tay ôm cổ họng
+      ctx.fillStyle = '#2ed573';
+      ctx.fillRect(-2 + shake, -27, 5, 4);
+    } else if (isDrinking) {
+      // Đang bưng cốc uống
+      ctx.fillStyle = '#2c3e50';
+      ctx.fillRect(-8, -9, 8, 9);
+
+      ctx.fillStyle = '#95a5a6';
+      ctx.fillRect(-6, -26, 12, 18);
+      ctx.fillStyle = '#f5cd79';
+      ctx.fillRect(-3, -34, 7, 7);
+
+      // Cánh tay đưa cốc lên miệng
+      ctx.fillStyle = '#f5cd79';
+      ctx.fillRect(2, -29, 6, 4);
+      ctx.fillStyle = '#a8e6cf';
+      ctx.fillRect(6, -32, 4, 5); // Cốc trà
+    } else {
+      // Ngồi chờ thanh bình
+      const bob = Math.sin(this.elapsed * 6);
+      ctx.fillStyle = '#2c3e50';
+      ctx.fillRect(-8, -9, 8, 9);
+
+      ctx.fillStyle = '#95a5a6';
+      ctx.fillRect(-6, -26 + bob, 12, 18);
+      ctx.fillStyle = '#f5cd79';
+      ctx.fillRect(-3, -34 + bob, 7, 7);
+    }
+
+    ctx.restore();
+  }
+
+  drawPoisonCulprit(ctx, c) {
+    if (c.x > 560) return;
+
+    ctx.save();
+    ctx.translate(c.x, c.y);
+
+    const isFleeing = c.state === 'fleeing';
+    const isPoisoning = c.state === 'poisoning';
+
+    if (isFleeing) {
+      // Bước đi nhanh lẩn vào màn đêm
+      const legCycle = Math.sin(this.elapsed * 12);
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(-5 + legCycle * 3, -14, 4, 14);
+      ctx.fillRect(2 - legCycle * 3, -14, 4, 14);
+
+      // Măng-tô đen dựng cổ áo
+      ctx.fillStyle = '#151121';
+      ctx.fillRect(-6, -34, 14, 22);
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(-4, -42, 8, 7);
+      ctx.fillStyle = '#0f0c18';
+      ctx.fillRect(-8, -45, 16, 4); // Mũ phớt đen
+      ctx.fillRect(-5, -49, 10, 5);
+
+      // Mắt đỏ ma quái
+      ctx.fillStyle = '#ff3838';
+      ctx.fillRect(1, -40, 2, 1.5);
+    } else if (isPoisoning) {
+      // Ngồi đối diện, vươn tay nhỏ giọt độc vào cốc
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(1, -9, 8, 9);
+
+      ctx.fillStyle = '#151121';
+      ctx.fillRect(-4, -26, 12, 18);
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(-2, -34, 8, 7);
+      ctx.fillStyle = '#0f0c18';
+      ctx.fillRect(-5, -37, 14, 4);
+
+      // Cánh tay vươn sang trái qua cốc nước
+      ctx.fillStyle = '#151121';
+      ctx.fillRect(-20, -26, 18, 4);
+      // Lọ độc nhỏ
+      ctx.fillStyle = '#2ed573';
+      ctx.fillRect(-23, -28, 4, 4);
+    } else {
+      // Ngồi nhìn bình thản
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(1, -9, 8, 9);
+
+      ctx.fillStyle = '#151121';
+      ctx.fillRect(-4, -26, 12, 18);
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(-2, -34, 8, 7);
+      ctx.fillStyle = '#0f0c18';
+      ctx.fillRect(-5, -37, 14, 4);
+      ctx.fillStyle = '#ff3838';
+      ctx.fillRect(-1, -32, 2, 1.5);
     }
 
     ctx.restore();
