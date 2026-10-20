@@ -1,10 +1,12 @@
 /**
- * DeceptionPixelNoir: Động Cơ Hoạt Cảnh Pixel Art Hành Động Hong Kong Noir
- * Thay thế hoàn toàn hiệu ứng 3D trước đó theo đúng yêu cầu người dùng:
- * 1. Hoạt cảnh pixel ban đêm: Cảnh hung thủ rình rập và sát hại nạn nhân dưới mưa đêm Hồng Kông.
- * 2. Tùy biến đòn đánh theo nhóm hung khí (Dao/Chém tóe máu, Độc dược sủi bọt, Súng lục lóe lửa, Đập nghẹt thở).
- * 3. Đồ họa Retro Neo-Noir 2D chân thực, mưa rơi, đèn neon nhấp nháy, vệt phản chiếu vũng nước và xe cảnh sát hú còi.
- * 4. Tối ưu nhẹ nhàng 100% bằng Canvas 2D Native, 0% idle GPU, tương thích mọi trình duyệt và thiết bị di động.
+ * DeceptionPixelNoir: Động Cơ Hoạt Cảnh Pixel Art Hành Động Trọng Án Việt Nam
+ * Bối cảnh: Đêm mưa phố Hàng Đẫy, Hà Nội Noir.
+ * 
+ * Tính năng chính theo yêu cầu:
+ * 1. Bối cảnh đậm chất Việt Nam: Biển tên phố "PHỐ HÀNG ĐẪY", biển hiệu "PHỞ ĐÊM", "CÀ PHÊ NỘI", "TIỆM VÀNG".
+ * 2. Cảnh 1 - ĐÂM TỪ PHÍA SAU: Hung thủ rón rén áp sát, đâm ngập dao vào lưng nạn nhân, thở dốc hộc hộc rồi bỏ chạy.
+ * 3. Cảnh 2 - TÔNG XE MÁY BỎ CHẠY: Xe máy Dream/Wave rọi đèn pha lao tới tông văng nạn nhân, phanh khét lẹt, người lái khom lưng thở dốc rồi rồ ga tháo chạy!
+ * 4. Tối ưu nhẹ 100% Canvas 2D, 0% idle GPU, hiệu ứng thở dốc (breath vapors), rung chấn màn hình, còi cảnh sát 113.
  */
 
 export class DeceptionPixelNoir {
@@ -15,24 +17,26 @@ export class DeceptionPixelNoir {
     this.isPlaying = false;
     this.onFinishCallback = null;
 
-    // Kích thước chuẩn Pixel Art 16:9 sắc nét (Integer Pixel Scaling)
+    // Chuẩn Pixel Art 16:9
     this.W = 480;
     this.H = 270;
 
-    // Trạng thái hoạt cảnh
     this.elapsed = 0;
-    this.duration = 6.2; // 6.2s tổng hoạt cảnh (có nút Bỏ Qua)
+    this.duration = 6.8;
     this.sceneData = null;
+    this.murderMode = 'BACK_STAB'; // 'BACK_STAB' hoặc 'MOTORBIKE_HIT_RUN'
 
-    // Hạt mưa rơi
+    // Hạt hiệu ứng
     this.raindrops = [];
     this.splashes = [];
     this.bloodParticles = [];
     this.vaporParticles = [];
+    this.sparks = [];
 
-    // Trạng thái nhân vật
-    this.victim = { x: 300, y: 195, state: 'idle', frame: 0, fallProgress: 0 };
-    this.murderer = { x: 80, y: 195, state: 'stalking', frame: 0, slashFrame: 0 };
+    // Thực thể
+    this.victim = { x: 290, y: 195, state: 'walking', fallProgress: 0, airVy: 0 };
+    this.murderer = { x: 60, y: 195, state: 'stalking', panting: false };
+    this.motorbike = { x: -80, y: 195, vx: 0, skidding: false, panting: false };
 
     this.screenShakeTime = 0;
     this.screenShakeIntensity = 0;
@@ -45,21 +49,17 @@ export class DeceptionPixelNoir {
     this.canvas.width = this.W;
     this.canvas.height = this.H;
 
-    // Tạo sẵn 90 hạt mưa
+    // 100 hạt mưa rơi
     this.raindrops = [];
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 100; i++) {
       this.raindrops.push({
-        x: Math.random() * this.W * 1.3 - 50,
+        x: Math.random() * this.W * 1.3 - 60,
         y: Math.random() * this.H,
         len: 8 + Math.random() * 12,
-        speed: 12 + Math.random() * 8
+        speed: 13 + Math.random() * 8
       });
     }
 
-    this.bindOverlayEvents();
-  }
-
-  bindOverlayEvents() {
     const skipBtn = document.getElementById('btn-cutscene-skip');
     if (skipBtn) {
       skipBtn.onclick = () => this.stop(true);
@@ -67,39 +67,56 @@ export class DeceptionPixelNoir {
   }
 
   /**
-   * Khởi chạy Hoạt Cảnh Án Mạng Ban Đêm
-   * @param {Object} options { meansCategory, meansName, clueName, murdererName }
-   * @param {Function} onComplete Gọi lại khi hoạt cảnh kết thúc
+   * Khởi chạy Hoạt Cảnh Án Mạng Phố Hàng Đẫy
    */
   playNightCrime(options = {}, onComplete = null) {
     this.stop(false);
     this.onFinishCallback = onComplete;
     this.sceneData = {
       category: (options.category || 'Severe Injury').toLowerCase(),
-      meansName: options.meansName || 'Hung Khí Bí Ẩn',
-      clueName: options.clueName || 'Vật Chứng Hiện Trường',
+      meansName: options.meansName || 'Hung Khí',
+      clueName: options.clueName || 'Manh Mối',
       murdererName: options.murdererName || 'Kẻ Sát Nhân'
     };
+
+    // Phân loại hoạt cảnh: Tông xe máy hoặc Đâm từ phía sau
+    const meansLower = (this.sceneData.meansName + ' ' + this.sceneData.category).toLowerCase();
+    if (meansLower.includes('xe') || meansLower.includes('tông') || meansLower.includes('accident') || meansLower.includes('ngã') || meansLower.includes('va chạm')) {
+      this.murderMode = 'MOTORBIKE_HIT_RUN';
+    } else if (meansLower.includes('dao') || meansLower.includes('kéo') || meansLower.includes('đâm') || meansLower.includes('kiếm') || meansLower.includes('nhọn') || meansLower.includes('chém')) {
+      this.murderMode = 'BACK_STAB';
+    } else {
+      // Random 50/50 giữa 2 cảnh kinh điển
+      this.murderMode = Math.random() < 0.5 ? 'BACK_STAB' : 'MOTORBIKE_HIT_RUN';
+    }
 
     const overlay = document.getElementById('cutscene-overlay');
     const titleEl = document.getElementById('cutscene-title');
     const subEl = document.getElementById('cutscene-sub');
     const tagEl = document.getElementById('cutscene-tag');
 
-    if (titleEl) titleEl.textContent = 'Án Mạng Trong Màn Đêm Phố Cổ';
-    if (subEl) subEl.textContent = `Hung khí: ${this.sceneData.meansName} • Manh mối: ${this.sceneData.clueName}`;
+    if (titleEl) {
+      titleEl.textContent = this.murderMode === 'MOTORBIKE_HIT_RUN'
+        ? 'Án Mạng Đêm Phố Hàng Đẫy: Tông Xe Bỏ Chạy'
+        : 'Án Mạng Đêm Phố Hàng Đẫy: Đâm Lén Phía Sau';
+    }
+    if (subEl) {
+      subEl.textContent = `Hung khí: ${this.sceneData.meansName} • Vật chứng: ${this.sceneData.clueName}`;
+    }
     if (tagEl) {
-      tagEl.textContent = 'HONG KONG 1997 • PIXEL NOIR CRIME';
+      tagEl.textContent = 'HÀ NỘI NOIR • ÁN MẠNG PHỐ HÀNG ĐẪY';
       tagEl.className = 'cutscene-tag badge-criminal';
     }
 
     if (overlay) overlay.classList.add('active');
 
-    // Khởi tạo lại nhân vật
-    this.victim = { x: 300, y: 195, state: 'smoking', frame: 0, fallProgress: 0 };
-    this.murderer = { x: 50, y: 195, state: 'stalking', frame: 0, slashFrame: 0 };
+    // Thiết lập vị trí ban đầu
+    this.victim = { x: 280, y: 195, state: 'walking', fallProgress: 0, airVy: 0 };
+    this.murderer = { x: 60, y: 195, state: 'stalking', panting: false };
+    this.motorbike = { x: -80, y: 195, vx: 0, skidding: false, panting: false };
     this.bloodParticles = [];
     this.vaporParticles = [];
+    this.sparks = [];
     this.splashes = [];
     this.elapsed = 0;
     this.isPlaying = true;
@@ -141,50 +158,50 @@ export class DeceptionPixelNoir {
   }
 
   /* =========================================================================
-     CẬP NHẬT LOGIC HOẠT CẢNH (TIMELINE CỦA VỤ ÁN)
+     CẬP NHẬT LOGIC HOẠT CẢNH (HÀNG ĐẪY NOIR)
      ========================================================================= */
 
   update(dt) {
     this.elapsed += dt;
     const t = this.elapsed;
 
-    // 1. Cập nhật hạt mưa
+    // 1. Cập nhật mưa
     for (const r of this.raindrops) {
       r.y += r.speed;
-      r.x -= 2.5; // Gió thổi nghiêng
+      r.x -= 2.2;
       if (r.y > 220) {
         if (Math.random() < 0.25) {
           this.splashes.push({ x: r.x, y: 220 + Math.random() * 20, r: 1, alpha: 0.6 });
         }
         r.y = -10;
-        r.x = Math.random() * this.W * 1.3 - 50;
+        r.x = Math.random() * this.W * 1.3 - 60;
       }
     }
 
-    // Cập nhật tia tóe nước
+    // 2. Tia tóe nước
     for (let i = this.splashes.length - 1; i >= 0; i--) {
       const sp = this.splashes[i];
-      sp.r += 0.4;
+      sp.r += 0.45;
       sp.alpha -= dt * 2.5;
       if (sp.alpha <= 0) this.splashes.splice(i, 1);
     }
 
-    // 2. Cập nhật khói thuốc / hơi độc
+    // 3. Khói thở dốc / bô xe / sương mù
     for (let i = this.vaporParticles.length - 1; i >= 0; i--) {
       const p = this.vaporParticles[i];
       p.x += p.vx * dt;
       p.y += p.vy * dt;
       p.alpha -= dt * p.fade;
-      p.size += dt * 3;
+      p.size += dt * 3.5;
       if (p.alpha <= 0) this.vaporParticles.splice(i, 1);
     }
 
-    // 3. Cập nhật máu tóe
+    // 4. Máu bắn
     for (let i = this.bloodParticles.length - 1; i >= 0; i--) {
       const b = this.bloodParticles[i];
       b.x += b.vx * dt;
       b.y += b.vy * dt;
-      b.vy += 280 * dt; // Trọng lực
+      b.vy += 320 * dt;
       if (b.y > 225) {
         b.y = 225;
         b.vx = 0;
@@ -194,54 +211,21 @@ export class DeceptionPixelNoir {
       if (b.life <= 0) this.bloodParticles.splice(i, 1);
     }
 
-    // 4. TIMELINE VỤ ÁN
-    // Giai đoạn 1: Nạn nhân đứng hút thuốc vô tư dưới ngọn đèn đường (0s - 1.4s)
-    if (t < 1.4) {
-      this.victim.state = 'smoking';
-      if (Math.random() < 0.15) {
-        this.vaporParticles.push({
-          x: this.victim.x + 8,
-          y: this.victim.y - 32,
-          vx: 10 + Math.random() * 8,
-          vy: -15 - Math.random() * 10,
-          size: 2,
-          alpha: 0.7,
-          fade: 0.9,
-          color: 'rgba(230,230,230,'
-        });
-      }
-      // Hung thủ rón rén bước tới từ bóng tối
-      this.murderer.x = 60 + (t / 1.4) * 80;
+    // 5. Tia lửa phanh xe
+    for (let i = this.sparks.length - 1; i >= 0; i--) {
+      const s = this.sparks[i];
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.vy += 200 * dt;
+      s.alpha -= dt * 3.5;
+      if (s.alpha <= 0) this.sparks.splice(i, 1);
     }
-    // Giai đoạn 2: Hung thủ tăng tốc áp sát từ phía sau (1.4s - 2.1s)
-    else if (t < 2.1) {
-      const subT = (t - 1.4) / 0.7;
-      this.murderer.x = 140 + subT * 125; // Áp sát ngay sau lưng nạn nhân (khoảng cách x = 265)
-      this.murderer.state = 'stalking';
-    }
-    // Giai đoạn 3: RA TAY SÁT HẠI ĐẪM MÁU (2.1s - 3.2s)
-    else if (t < 3.2) {
-      if (this.victim.state !== 'hit') {
-        this.victim.state = 'hit';
-        this.murderer.state = 'attacking';
-        this.triggerStrikeEffect();
-      }
-      // Nạn nhân quỵ dần
-      this.victim.fallProgress = Math.min(1, (t - 2.1) / 0.8);
-    }
-    // Giai đoạn 4: Nạn nhân ngã gục, hung thủ lục lọi rời hiện trường (3.2s - 4.6s)
-    else if (t < 4.6) {
-      this.victim.state = 'dead';
-      this.victim.fallProgress = 1;
-      // Hung thủ quay ngoắt người, chạy trốn vào màn đêm bên phải
-      const escapeT = (t - 3.2) / 1.4;
-      this.murderer.state = 'fleeing';
-      this.murderer.x = 265 + escapeT * 240;
-    }
-    // Giai đoạn 5: Xe cảnh sát tới, còi hụ xanh đỏ rực rỡ (4.6s - 6.2s)
-    else {
-      this.victim.state = 'dead';
-      this.murderer.x = 600; // Đã chạy mất dạng
+
+    // 6. TIMELINE THEO TỪNG KỊCH BẢN
+    if (this.murderMode === 'BACK_STAB') {
+      this.updateBackStabScenario(t, dt);
+    } else {
+      this.updateMotorbikeScenario(t, dt);
     }
 
     if (this.screenShakeTime > 0) {
@@ -250,169 +234,329 @@ export class DeceptionPixelNoir {
   }
 
   /**
-   * Tạo hiệu ứng đặc trưng theo nhóm hung khí
+   * KỊCH BẢN 1: ĐÂM LÉN TỪ PHÍA SAU VÀ THỞ DỐC BỎ CHẠY
    */
-  triggerStrikeEffect() {
-    this.screenShakeTime = 0.35;
-    this.screenShakeIntensity = 7;
-
-    const cat = this.sceneData.category;
-    const impactX = this.victim.x;
-    const impactY = this.victim.y - 25;
-
-    // A. Hung khí sắc nhọn / chém / thương tích nặng -> Máu tóe hình vòng cung
-    if (cat.includes('injury') || cat.includes('blood') || cat.includes('severe') || cat.includes('cut')) {
-      for (let i = 0; i < 45; i++) {
-        const angle = -Math.PI * 0.15 - Math.random() * Math.PI * 0.7;
-        const spd = 90 + Math.random() * 200;
-        this.bloodParticles.push({
-          x: impactX,
-          y: impactY,
-          vx: Math.cos(angle) * spd,
-          vy: Math.sin(angle) * spd,
-          size: 2 + Math.random() * 3,
-          color: Math.random() < 0.4 ? '#ff2a2a' : '#b30000',
-          life: 1.4 + Math.random() * 0.8
-        });
-      }
+  updateBackStabScenario(t, dt) {
+    // 0s - 1.5s: Nạn nhân đi bộ thong thả trong mưa phố Hàng Đẫy
+    if (t < 1.5) {
+      this.victim.x += 12 * dt;
+      // Hung thủ rón rén đi nhanh từ góc tối phía sau
+      this.murderer.x = 70 + (t / 1.5) * 120;
+      this.murderer.state = 'stalking';
     }
-    // B. Độc dược / Hóa chất -> Khói độc xanh tím bốc lên cuồn cuộn
-    else if (cat.includes('poison') || cat.includes('illness') || cat.includes('disease')) {
-      for (let i = 0; i < 35; i++) {
+    // 1.5s - 2.2s: Hung thủ tăng tốc lao vút tới áp sát ngay sau lưng
+    else if (t < 2.2) {
+      const subT = (t - 1.5) / 0.7;
+      this.murderer.x = 190 + subT * (this.victim.x - 25 - 190);
+    }
+    // 2.2s - 3.2s: ĐÂM MẠNH TỪ PHÍA SAU VÀO LƯNG!
+    else if (t < 3.2) {
+      if (this.victim.state !== 'stabbed') {
+        this.victim.state = 'stabbed';
+        this.murderer.state = 'stabbing';
+        this.screenShakeTime = 0.4;
+        this.screenShakeIntensity = 8;
+
+        // Bắn tung máu đỏ thẫm
+        for (let i = 0; i < 45; i++) {
+          const angle = -Math.PI * 0.1 - Math.random() * Math.PI * 0.8;
+          const spd = 100 + Math.random() * 220;
+          this.bloodParticles.push({
+            x: this.victim.x - 5,
+            y: this.victim.y - 28,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd,
+            size: 2 + Math.random() * 3,
+            color: Math.random() < 0.4 ? '#ff2a2a' : '#a80000',
+            life: 1.5
+          });
+        }
+      }
+      this.victim.fallProgress = Math.min(1, (t - 2.2) / 0.7);
+    }
+    // 3.2s - 4.6s: Nạn nhân ngã sấp, HUNG THỦ KHOM LƯNG THỞ DỐC HỘC HỘC!
+    else if (t < 4.6) {
+      this.victim.state = 'dead';
+      this.murderer.state = 'panting'; // Thở dốc!
+
+      // Hơi thở dốc bốc khói trắng trong đêm mưa
+      if (Math.random() < 0.35) {
         this.vaporParticles.push({
-          x: impactX - 10 + Math.random() * 20,
-          y: impactY,
-          vx: -20 + Math.random() * 40,
-          vy: -40 - Math.random() * 60,
-          size: 4 + Math.random() * 6,
-          alpha: 0.9,
-          fade: 0.7,
-          color: Math.random() < 0.5 ? 'rgba(46,213,115,' : 'rgba(165,94,234,'
+          x: this.murderer.x + 8,
+          y: this.murderer.y - 32,
+          vx: 15 + Math.random() * 10,
+          vy: -10 - Math.random() * 8,
+          size: 3,
+          alpha: 0.8,
+          fade: 0.8,
+          color: 'rgba(240, 240, 240,'
         });
       }
     }
-    // C. Ngạt thở / Siết cổ / Chấn động
+    // 4.6s - 5.8s: Hung thủ hoảng loạn quay ngoắt người BỎ CHẠY vào ngõ!
+    else if (t < 5.8) {
+      this.victim.state = 'dead';
+      this.murderer.state = 'fleeing';
+      const escapeT = (t - 4.6) / 1.2;
+      this.murderer.x = (this.victim.x - 25) + escapeT * 280;
+    }
+    // 5.8s - 6.8s: Cảnh sát 113 tới
     else {
-      for (let i = 0; i < 25; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const spd = 60 + Math.random() * 120;
-        this.bloodParticles.push({
-          x: impactX,
-          y: impactY,
-          vx: Math.cos(angle) * spd,
-          vy: Math.sin(angle) * spd,
-          size: 2 + Math.random() * 2,
-          color: '#e02424',
-          life: 1.0
+      this.victim.state = 'dead';
+      this.murderer.x = 650;
+    }
+  }
+
+  /**
+   * KỊCH BẢN 2: ĐI XE MÁY TÔNG NẠN NHÂN XONG THỞ DỐC BỎ CHẠY
+   */
+  updateMotorbikeScenario(t, dt) {
+    // 0s - 1.4s: Nạn nhân đang băng qua đường trong mưa
+    if (t < 1.4) {
+      this.victim.x = 240 + (t / 1.4) * 30;
+      // Xe máy ở xa bên trái bắt đầu lao tới
+      this.motorbike.x = -80 + (t / 1.4) * 160; // tới x = 80
+      this.motorbike.vx = 220;
+    }
+    // 1.4s - 2.1s: XE MÁY LAO VÚT TỚI VÀ TÔNG THẲNG VÀO NẠN NHÂN!
+    else if (t < 2.1) {
+      this.motorbike.x += 340 * dt;
+      // Va chạm tại thời điểm t ≈ 1.8s
+      if (t >= 1.75 && this.victim.state !== 'hit_by_bike') {
+        this.victim.state = 'hit_by_bike';
+        this.screenShakeTime = 0.45;
+        this.screenShakeIntensity = 10;
+        this.victim.airVy = -180; // Bị hất văng lên cao
+
+        // Tóe tia lửa va chạm và trượt phanh
+        for (let i = 0; i < 35; i++) {
+          this.sparks.push({
+            x: this.victim.x,
+            y: this.victim.y - 15,
+            vx: 80 - Math.random() * 160,
+            vy: -40 - Math.random() * 100,
+            alpha: 1
+          });
+        }
+        // Vệt máu tóe trên đường
+        for (let i = 0; i < 30; i++) {
+          this.bloodParticles.push({
+            x: this.victim.x + 10,
+            y: this.victim.y - 10,
+            vx: 120 + Math.random() * 80,
+            vy: -60 - Math.random() * 80,
+            size: 2 + Math.random() * 3,
+            color: '#b30000',
+            life: 1.6
+          });
+        }
+      }
+
+      if (this.victim.state === 'hit_by_bike') {
+        // Nạn nhân bay trên không và rơi đập xuống đường
+        this.victim.x += 160 * dt;
+        this.victim.airVy += 500 * dt;
+        this.victim.y += this.victim.airVy * dt;
+        if (this.victim.y >= 200) {
+          this.victim.y = 200;
+          this.victim.airVy = 0;
+        }
+      }
+    }
+    // 2.1s - 2.7s: Xe máy phanh khét lẹt trượt dừng lại cách đó vài mét
+    else if (t < 2.7) {
+      if (this.motorbike.x < 370) {
+        this.motorbike.x += 90 * dt;
+        this.motorbike.skidding = true;
+        // Bụi và tia lửa phanh
+        if (Math.random() < 0.4) {
+          this.sparks.push({
+            x: this.motorbike.x - 15,
+            y: 215,
+            vx: -60 - Math.random() * 40,
+            vy: -15 - Math.random() * 20,
+            alpha: 0.9
+          });
+        }
+      }
+      this.victim.y = 200;
+      this.victim.state = 'dead';
+    }
+    // 2.7s - 4.6s: XE MÁY DỪNG LẠI, NGƯỜI LÁI XE CÒNG LƯNG THỞ DỐC HỘC HỘC!
+    else if (t < 4.6) {
+      this.motorbike.skidding = false;
+      this.motorbike.panting = true; // Thở dốc!
+      this.victim.state = 'dead';
+
+      // Hơi thở dốc bốc lên từ ngực/miệng người lái
+      if (Math.random() < 0.4) {
+        this.vaporParticles.push({
+          x: this.motorbike.x + 6,
+          y: this.motorbike.y - 38,
+          vx: 14 + Math.random() * 12,
+          vy: -14 - Math.random() * 10,
+          size: 3.5,
+          alpha: 0.85,
+          fade: 0.75,
+          color: 'rgba(235, 235, 235,'
         });
       }
+    }
+    // 4.6s - 5.8s: RỒ GA VROOOM PHÓNG BẠT MẠNG TẨU THOÁT!
+    else if (t < 5.8) {
+      this.motorbike.panting = false;
+      const speedT = (t - 4.6) / 1.2;
+      this.motorbike.x = 370 + speedT * 300; // Phóng vụt sang phải
+      // Khói bô xả đen mù mịt
+      if (Math.random() < 0.6) {
+        this.vaporParticles.push({
+          x: this.motorbike.x - 20,
+          y: 210,
+          vx: -60 - Math.random() * 30,
+          vy: -5 - Math.random() * 10,
+          size: 5,
+          alpha: 0.7,
+          fade: 1.2,
+          color: 'rgba(70, 70, 70,'
+        });
+      }
+    }
+    // 5.8s - 6.8s: Cảnh sát 113 tới
+    else {
+      this.victim.state = 'dead';
     }
   }
 
   /* =========================================================================
-     VẼ TOÀN BỘ KHUNG CẢNH PIXEL RETRO HONG KONG NOIR
+     VẼ TOÀN BỘ KHUNG CẢNH HÀ NỘI NOIR (PHỐ HÀNG ĐẪY ĐÊM MƯA)
      ========================================================================= */
 
   render() {
     const ctx = this.ctx;
     ctx.save();
 
-    // Rung màn hình khi va chạm
     if (this.screenShakeTime > 0) {
       const shakeX = (Math.random() - 0.5) * this.screenShakeIntensity;
       const shakeY = (Math.random() - 0.5) * this.screenShakeIntensity;
       ctx.translate(shakeX, shakeY);
     }
 
-    // 1. Bầu trời đêm Hồng Kông & bóng nhà cao tầng
-    ctx.fillStyle = '#09070f';
+    // 1. Bầu trời đêm & Silhouette nhà phố cổ
+    ctx.fillStyle = '#08060c';
     ctx.fillRect(0, 0, this.W, this.H);
 
-    // Hiệu ứng chớp sấm sét xa xa
-    const lightning = (this.elapsed > 4.4 && this.elapsed < 4.55) || (this.elapsed > 4.65 && this.elapsed < 4.72);
+    // Chớp sấm sét
+    const lightning = (this.elapsed > 4.5 && this.elapsed < 4.62) || (this.elapsed > 4.75 && this.elapsed < 4.82);
     if (lightning) {
-      ctx.fillStyle = 'rgba(180, 200, 255, 0.35)';
+      ctx.fillStyle = 'rgba(190, 210, 255, 0.35)';
       ctx.fillRect(0, 0, this.W, this.H);
     }
 
-    // Silhouette các tòa chung cư cũ kỹ Cửu Long (Kowloon Walled City)
-    ctx.fillStyle = '#120f1a';
-    ctx.fillRect(20, 40, 80, 160);
-    ctx.fillRect(110, 25, 95, 175);
-    ctx.fillRect(215, 60, 70, 140);
-    ctx.fillRect(295, 30, 110, 170);
-    ctx.fillRect(415, 45, 65, 155);
+    // Các ngôi nhà tường vàng mái ngói kiểu Pháp cổ Hà Nội
+    ctx.fillStyle = '#17130e'; // Tường vàng sẫm đêm
+    ctx.fillRect(15, 45, 90, 155);
+    ctx.fillRect(115, 30, 110, 170);
+    ctx.fillRect(235, 55, 80, 145);
+    ctx.fillRect(325, 35, 120, 165);
 
-    // Một vài cửa sổ chung cư có ánh đèn vàng lờ mờ
-    ctx.fillStyle = '#f6e58d';
-    for (let x = 30; x < 90; x += 16) {
-      for (let y = 60; y < 140; y += 22) {
-        if ((x + y) % 3 === 0) ctx.fillRect(x, y, 6, 8);
-      }
-    }
-    for (let x = 310; x < 390; x += 18) {
-      for (let y = 50; y < 150; y += 24) {
-        if ((x * y) % 5 === 0) ctx.fillRect(x, y, 6, 8);
-      }
-    }
-
-    // 2. Biển hiệu Neon nhấp nháy chữ Hoa đặc trưng Hong Kong
-    this.drawNeonSign(ctx, 40, 75, '九龍冰室', '#ff3838', '#ff7675');
-    this.drawNeonSign(ctx, 320, 65, 'HOTEL 1997', '#00d2d3', '#55efc4');
-    this.drawNeonSign(ctx, 230, 95, 'BAR 夜總會', '#f368e0', '#ff9ff3');
-
-    // 3. Tường gạch hẻm tối & Dây điện chằng chịt
-    ctx.strokeStyle = '#1e1a2b';
-    ctx.lineWidth = 1.5;
+    // Mái ngói dốc phố cổ
+    ctx.fillStyle = '#2d140e';
     ctx.beginPath();
-    ctx.moveTo(0, 50);
-    ctx.bezierCurveTo(120, 75, 250, 65, 480, 55);
-    ctx.moveTo(0, 65);
-    ctx.bezierCurveTo(180, 90, 320, 80, 480, 70);
+    ctx.moveTo(10, 45);
+    ctx.lineTo(60, 25);
+    ctx.lineTo(110, 45);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(110, 30);
+    ctx.lineTo(170, 12);
+    ctx.lineTo(230, 30);
+    ctx.fill();
+
+    // Ô cửa chớp màu xanh lá cổ điển
+    ctx.fillStyle = '#1b3b27';
+    for (let x = 30; x < 95; x += 22) {
+      for (let y = 60; y < 140; y += 30) {
+        ctx.fillRect(x, y, 10, 16);
+      }
+    }
+    for (let x = 135; x < 215; x += 24) {
+      for (let y = 50; y < 150; y += 32) {
+        ctx.fillRect(x, y, 11, 18);
+      }
+    }
+
+    // 2. BIỂN HIỆU VIỆT NAM ĐẶC TRƯNG: PHỐ HÀNG ĐẪY & CÁC CỬA HÀNG
+    this.drawStreetPlate(ctx, 40, 95, 'PHỐ HÀNG ĐẪY');
+    this.drawNeonSign(ctx, 130, 75, 'PHỞ ĐÊM HÀNG ĐẪY', '#ff4757', '#ff6b81');
+    this.drawNeonSign(ctx, 335, 65, 'CÀ PHÊ NỘI', '#00d2d3', '#48dbfb');
+    this.drawNeonSign(ctx, 245, 95, 'BIA HƠI 1997', '#2ed573', '#7bed9f');
+
+    // 3. Dây điện chằng chịt đặc trưng phố Hà Nội
+    ctx.strokeStyle = '#1a1822';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(0, 40);
+    ctx.bezierCurveTo(120, 70, 240, 60, 480, 45);
+    ctx.moveTo(0, 55);
+    ctx.bezierCurveTo(160, 85, 320, 75, 480, 60);
+    ctx.moveTo(0, 70);
+    ctx.bezierCurveTo(200, 100, 360, 90, 480, 75);
     ctx.stroke();
 
-    // 4. Mặt đường đá ướt mưa (Wet Cobblestone Asphalt)
+    // 4. Mặt đường đá ẩm ướt
     const groundGrad = ctx.createLinearGradient(0, 185, 0, this.H);
-    groundGrad.addColorStop(0, '#1a1622');
-    groundGrad.addColorStop(0.3, '#100c17');
-    groundGrad.addColorStop(1, '#08060c');
+    groundGrad.addColorStop(0, '#1c1722');
+    groundGrad.addColorStop(0.3, '#110d17');
+    groundGrad.addColorStop(1, '#09070c');
     ctx.fillStyle = groundGrad;
     ctx.fillRect(0, 185, this.W, this.H - 185);
 
-    // Vũng nước phản chiếu ánh neon
-    ctx.fillStyle = 'rgba(255, 56, 56, 0.12)';
+    // Vũng nước mưa phản chiếu biển hiệu Phố Hàng Đẫy
+    ctx.fillStyle = 'rgba(255, 71, 87, 0.14)';
     ctx.beginPath();
-    ctx.ellipse(80, 225, 45, 12, 0, 0, Math.PI * 2);
+    ctx.ellipse(140, 225, 55, 12, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = 'rgba(0, 210, 211, 0.14)';
+    ctx.fillStyle = 'rgba(0, 210, 211, 0.15)';
     ctx.beginPath();
-    ctx.ellipse(330, 220, 65, 14, 0, 0, Math.PI * 2);
+    ctx.ellipse(340, 220, 65, 14, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // 5. Cột đèn đường cổ điển chiếu hình nón ánh sáng ấm áp
+    // 5. Cột đèn đường vàng
     this.drawStreetLamp(ctx, 330, 195);
 
-    // Vũng máu loang dần sau khi bị sát hại
-    if (this.victim.state === 'dead' || this.victim.state === 'hit') {
-      const bloodRadius = Math.min(26, (this.elapsed - 2.1) * 12);
-      ctx.fillStyle = 'rgba(150, 0, 0, 0.85)';
+    // Vũng máu loang dần
+    if (this.victim.state === 'dead' || this.victim.state === 'stabbed') {
+      const bloodRadius = Math.min(28, (this.elapsed - 2.0) * 11);
+      ctx.fillStyle = 'rgba(160, 0, 0, 0.88)';
       ctx.beginPath();
-      ctx.ellipse(this.victim.x + 10, 205, bloodRadius, bloodRadius * 0.4, 0, 0, Math.PI * 2);
+      ctx.ellipse(this.victim.x + 8, 206, bloodRadius, bloodRadius * 0.4, 0, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // 6. Vẽ các nhân vật Pixel
+    // 6. Vẽ các thực thể (Nạn nhân, Sát nhân / Xe máy)
     this.drawVictim(ctx);
-    this.drawMurderer(ctx);
 
-    // 7. Vẽ hạt máu bắn tung tóe
+    if (this.murderMode === 'BACK_STAB') {
+      this.drawStabbingMurderer(ctx);
+    } else {
+      this.drawMotorbike(ctx);
+    }
+
+    // 7. Vẽ hạt máu
     for (const b of this.bloodParticles) {
       ctx.fillStyle = b.color;
       ctx.fillRect(Math.floor(b.x), Math.floor(b.y), b.size, b.size);
     }
 
-    // 8. Vẽ khói độc / hơi thở
+    // 8. Vẽ tia lửa
+    for (const s of this.sparks) {
+      ctx.fillStyle = `rgba(255, 230, 100, ${s.alpha})`;
+      ctx.fillRect(Math.floor(s.x), Math.floor(s.y), 2, 2);
+    }
+
+    // 9. Vẽ khói thở dốc / bô xe
     for (const v of this.vaporParticles) {
       ctx.fillStyle = v.color + v.alpha + ')';
       ctx.beginPath();
@@ -420,8 +564,8 @@ export class DeceptionPixelNoir {
       ctx.fill();
     }
 
-    // 9. Cơn mưa rào đêm pixel
-    ctx.strokeStyle = 'rgba(200, 225, 255, 0.45)';
+    // 10. Mưa rơi
+    ctx.strokeStyle = 'rgba(210, 230, 255, 0.45)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (const r of this.raindrops) {
@@ -430,7 +574,7 @@ export class DeceptionPixelNoir {
     }
     ctx.stroke();
 
-    // Vết tóe nước trên mặt đường
+    // Vết tóe nước
     ctx.strokeStyle = 'rgba(220, 240, 255, 0.35)';
     for (const sp of this.splashes) {
       ctx.beginPath();
@@ -438,44 +582,65 @@ export class DeceptionPixelNoir {
       ctx.stroke();
     }
 
-    // 10. Đèn cảnh sát chớp nháy (Red & Blue Police Siren Strobes) ở cuối hoạt cảnh
-    if (this.elapsed > 4.4) {
+    // 11. Đèn cảnh sát 113 nhấp nháy đỏ xanh ở cuối
+    if (this.elapsed > 4.6) {
       const strobe = Math.floor(this.elapsed * 8) % 2;
       const sirenGrad = ctx.createRadialGradient(
         strobe ? 40 : 440, 180, 10,
         strobe ? 40 : 440, 180, 260
       );
-      sirenGrad.addColorStop(0, strobe ? 'rgba(255, 30, 30, 0.35)' : 'rgba(0, 150, 255, 0.35)');
+      sirenGrad.addColorStop(0, strobe ? 'rgba(255, 30, 30, 0.38)' : 'rgba(0, 150, 255, 0.38)');
       sirenGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = sirenGrad;
       ctx.fillRect(0, 0, this.W, this.H);
 
-      // Banner thông báo kịch tính
-      ctx.fillStyle = 'rgba(10, 6, 16, 0.88)';
-      ctx.fillRect(20, 18, this.W - 40, 38);
-      ctx.strokeStyle = '#fbc531';
+      // Banner thông báo đậm chất Việt Nam
+      ctx.fillStyle = 'rgba(10, 6, 16, 0.92)';
+      ctx.fillRect(15, 16, this.W - 30, 42);
+      ctx.strokeStyle = '#f1c40f';
       ctx.lineWidth = 1.5;
-      ctx.strokeRect(20, 18, this.W - 40, 38);
+      ctx.strokeRect(15, 16, this.W - 30, 42);
 
       ctx.fillStyle = '#ff4757';
       ctx.font = 'bold 12px Nunito, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🚨 ÁN MẠNG ĐÊM ĐÃ XẢY RA • PHÁP Y VÀ ĐỘI ĐIỀU TRA VÀO CUỘC', this.W / 2, 34);
+      ctx.fillText('🚨 ÁN MẠNG PHỐ HÀNG ĐẪY • CẢNH SÁT HÌNH SỰ ĐÃ PHONG TỎA HIỆN TRƯỜNG', this.W / 2, 33);
       ctx.fillStyle = '#dcdde1';
-      ctx.font = '10px Nunito, sans-serif';
-      ctx.fillText(`Kẻ Sát Nhân đã tẩu thoát. Hãy tìm cặp [${this.sceneData.meansName}] & [${this.sceneData.clueName}]!`, this.W / 2, 48);
+      ctx.font = '10.5px Nunito, sans-serif';
+      const actionDesc = this.murderMode === 'MOTORBIKE_HIT_RUN' ? 'Tông xe máy bỏ chạy' : 'Đâm lén từ phía sau';
+      ctx.fillText(`Kẻ Sát Nhân (${actionDesc}) đã tẩu thoát. Hãy tìm cặp [${this.sceneData.meansName}] & [${this.sceneData.clueName}]!`, this.W / 2, 48);
     }
 
     ctx.restore();
   }
 
   /* =========================================================================
-     CÁC HÀM VẼ SPRITE PIXEL NHÂN VẬT & MÔI TRƯỜNG CHI TIẾT
+     CÁC HÀM VẼ SPRITE: BIỂN PHỐ HÀNG ĐẪY, NẠN NHÂN, SÁT NHÂN, XE MÁY
      ========================================================================= */
+
+  /**
+   * Biển tên phố chuẩn Việt Nam (Biển xanh viền trắng)
+   */
+  drawStreetPlate(ctx, x, y, name) {
+    ctx.save();
+    // Bảng xanh đậm
+    ctx.fillStyle = '#0984e3';
+    ctx.fillRect(x, y, 92, 18);
+    // Viền trắng
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x, y, 92, 18);
+    // Chữ trắng in hoa
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 9px Nunito, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(name, x + 46, y + 12.5);
+    ctx.restore();
+  }
 
   drawNeonSign(ctx, x, y, text, colorGlow, colorCore) {
     ctx.save();
-    ctx.font = 'bold 13px "Courier New", monospace';
+    ctx.font = 'bold 12px "Courier New", monospace';
     ctx.shadowColor = colorGlow;
     ctx.shadowBlur = 10;
     ctx.fillStyle = colorGlow;
@@ -487,12 +652,9 @@ export class DeceptionPixelNoir {
   }
 
   drawStreetLamp(ctx, x, y) {
-    // Trụ đèn kim loại màu đen
     ctx.fillStyle = '#222';
     ctx.fillRect(x - 2, y - 80, 4, 80);
-    // Cần đèn uốn cong
     ctx.fillRect(x - 14, y - 84, 16, 4);
-    // Chụp đèn
     ctx.fillStyle = '#333';
     ctx.beginPath();
     ctx.moveTo(x - 20, y - 76);
@@ -500,13 +662,11 @@ export class DeceptionPixelNoir {
     ctx.lineTo(x - 14, y - 84);
     ctx.fill();
 
-    // Bóng đèn phát sáng vàng ấm
     ctx.fillStyle = '#fff275';
     ctx.beginPath();
     ctx.arc(x - 14, y - 75, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Hình nón ánh sáng chiếu xuống mặt đường
     const coneGrad = ctx.createLinearGradient(x - 14, y - 75, x - 14, y + 10);
     coneGrad.addColorStop(0, 'rgba(255, 242, 117, 0.45)');
     coneGrad.addColorStop(0.6, 'rgba(255, 242, 117, 0.12)');
@@ -522,7 +682,7 @@ export class DeceptionPixelNoir {
   }
 
   /**
-   * Vẽ Nạn Nhân (Victim) bằng Pixel Art
+   * Vẽ Nạn Nhân
    */
   drawVictim(ctx) {
     const v = this.victim;
@@ -530,130 +690,209 @@ export class DeceptionPixelNoir {
     ctx.translate(v.x, v.y);
 
     if (v.state === 'dead' || v.fallProgress >= 1) {
-      // Nạn nhân ngã sấp trên mặt đường
-      ctx.fillStyle = '#1c2230'; // Quần âu tối màu
-      ctx.fillRect(-12, 0, 20, 6);
-      ctx.fillStyle = '#c8a37e'; // Áo măng tô màu be
-      ctx.fillRect(-6, -4, 22, 7);
+      // Nằm bất động trên đường
+      ctx.fillStyle = '#1c2230';
+      ctx.fillRect(-14, 0, 22, 6);
+      ctx.fillStyle = '#8c7ae6'; // Áo khoác
+      ctx.fillRect(-8, -4, 22, 7);
       ctx.fillStyle = '#f5cd79'; // Đầu
-      ctx.fillRect(16, -3, 6, 6);
-      ctx.fillStyle = '#2f3542'; // Tóc
-      ctx.fillRect(17, -4, 6, 4);
-    } else if (v.state === 'hit') {
-      // Đang quỵ xuống khi bị đâm/bắn/đầu độc
-      const tilt = v.fallProgress * 0.9;
-      ctx.rotate(tilt);
+      ctx.fillRect(14, -3, 6, 6);
+    } else if (v.state === 'stabbed' || v.state === 'hit_by_bike') {
+      // Đang bị đâm / ngã quỵ / văng trên không
+      const rot = v.fallProgress * 1.2;
+      ctx.rotate(rot);
 
-      // Thân nạn nhân
       ctx.fillStyle = '#1c2230';
       ctx.fillRect(-4, -14, 8, 14);
-      ctx.fillStyle = '#c8a37e';
+      ctx.fillStyle = '#8c7ae6';
       ctx.fillRect(-6, -30, 12, 18);
       ctx.fillStyle = '#f5cd79';
       ctx.fillRect(-4, -38, 8, 8);
-      ctx.fillStyle = '#2f3542';
-      ctx.fillRect(-4, -40, 8, 4);
     } else {
-      // Đang đứng hút thuốc bình thường
-      // Chân
+      // Đang đi bộ trong đêm mưa
+      const legCycle = Math.sin(this.elapsed * 10);
       ctx.fillStyle = '#1c2230';
-      ctx.fillRect(-5, -16, 4, 16);
-      ctx.fillRect(1, -16, 4, 16);
+      ctx.fillRect(-5 + legCycle * 3, -16, 4, 16);
+      ctx.fillRect(1 - legCycle * 3, -16, 4, 16);
 
-      // Áo măng tô be Hong Kong
-      ctx.fillStyle = '#c8a37e';
+      ctx.fillStyle = '#8c7ae6';
       ctx.fillRect(-6, -34, 12, 20);
 
-      // Cà vạt đỏ mận
-      ctx.fillStyle = '#ff4757';
-      ctx.fillRect(-1, -31, 2, 10);
-
-      // Đầu & khuôn mặt
       ctx.fillStyle = '#f5cd79';
       ctx.fillRect(-4, -42, 8, 8);
 
-      // Mũ phớt hoặc tóc đen
+      // Tóc đen
       ctx.fillStyle = '#2f3542';
-      ctx.fillRect(-6, -46, 12, 5);
-      ctx.fillRect(-4, -48, 8, 4);
+      ctx.fillRect(-5, -45, 10, 4);
 
-      // Điếu thuốc lá cháy đỏ
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(4, -39, 4, 1.5);
-      ctx.fillStyle = '#ff4757';
-      ctx.fillRect(8, -39, 1.5, 1.5);
+      // Ô che mưa cầm tay
+      ctx.strokeStyle = '#555';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(4, -30);
+      ctx.lineTo(8, -50);
+      ctx.stroke();
+
+      ctx.fillStyle = '#e84118'; // Dù đỏ
+      ctx.beginPath();
+      ctx.arc(8, -50, 14, Math.PI, 0);
+      ctx.fill();
     }
 
     ctx.restore();
   }
 
   /**
-   * Vẽ Kẻ Sát Nhân (Murderer) bằng Pixel Art
+   * Vẽ Kẻ Sát Nhân Đâm Lén & Thở Dốc
    */
-  drawMurderer(ctx) {
+  drawStabbingMurderer(ctx) {
     const m = this.murderer;
-    if (m.x > 500) return; // Đã trốn xong
+    if (m.x > 550) return;
 
     ctx.save();
     ctx.translate(m.x, m.y);
 
     const isRunning = m.state === 'fleeing';
-    const isAttacking = m.state === 'attacking';
+    const isPanting = m.state === 'panting';
+    const isStabbing = m.state === 'stabbing';
 
-    // Chân & dáng chạy
-    ctx.fillStyle = '#0a0812';
-    if (isRunning) {
-      const legCycle = Math.sin(this.elapsed * 18);
-      ctx.fillRect(-6 + legCycle * 4, -16, 4, 16);
-      ctx.fillRect(2 - legCycle * 4, -16, 4, 16);
+    // Dáng khom người thở dốc
+    if (isPanting) {
+      const pantBreath = Math.sin(this.elapsed * 14) * 2; // Nhịp thở dốc hộc hộc!
+
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(-6, -14, 5, 14);
+      ctx.fillRect(2, -14, 5, 14);
+
+      // Thân khom về phía trước thở dốc
+      ctx.fillStyle = '#1e1a2b';
+      ctx.fillRect(-6, -30 + pantBreath, 15, 18);
+
+      // Đầu cúi thở
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(-2, -37 + pantBreath, 8, 8);
+      // Mũ phớt trùm sụp
+      ctx.fillStyle = '#111';
+      ctx.fillRect(-5, -40 + pantBreath, 14, 4);
+
+      // Tay cầm dao dính máu rũ xuống
+      ctx.fillStyle = '#747d8c';
+      ctx.fillRect(6, -22 + pantBreath, 2.5, 10);
+      ctx.fillStyle = '#ff2a2a'; // Máu trên mũi dao
+      ctx.fillRect(6, -12 + pantBreath, 2.5, 3);
     } else {
-      ctx.fillRect(-5, -16, 4, 16);
-      ctx.fillRect(1, -16, 4, 16);
+      // Dáng đi rón rén hoặc chạy trốn
+      ctx.fillStyle = '#0a0812';
+      if (isRunning) {
+        const legCycle = Math.sin(this.elapsed * 18);
+        ctx.fillRect(-6 + legCycle * 4, -16, 4, 16);
+        ctx.fillRect(2 - legCycle * 4, -16, 4, 16);
+      } else {
+        ctx.fillRect(-5, -16, 4, 16);
+        ctx.fillRect(1, -16, 4, 16);
+      }
+
+      ctx.fillStyle = '#151121';
+      ctx.fillRect(-7, -35, 14, 22);
+
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(-4, -43, 8, 7);
+      ctx.fillStyle = '#ff3838'; // Mắt đỏ
+      ctx.fillRect(1, -41, 2, 1.5);
+
+      ctx.fillStyle = '#0f0c18';
+      ctx.fillRect(-8, -46, 16, 4);
+      ctx.fillRect(-5, -50, 10, 5);
+
+      // Hành động đâm dao từ phía sau
+      if (isStabbing) {
+        ctx.fillStyle = '#f1f2f6'; // Lưỡi dao bạc đâm ngập
+        ctx.fillRect(7, -29, 16, 3);
+        ctx.fillStyle = '#c0392b'; // Máu trên lưỡi dao
+        ctx.fillRect(15, -30, 8, 4);
+      }
     }
 
-    // Áo choàng đen sát thủ dài quá gối (Noir Trench Coat)
-    ctx.fillStyle = '#151121';
-    ctx.fillRect(-7, -35, 14, 22);
+    ctx.restore();
+  }
 
-    // Cổ áo lật cao giấu mặt
-    ctx.fillStyle = '#201a33';
-    ctx.fillRect(-6, -37, 12, 6);
+  /**
+   * Vẽ Xe Máy Honda Dream / Wave Việt Nam Tông Xong Thở Dốc
+   */
+  drawMotorbike(ctx) {
+    const b = this.motorbike;
+    if (b.x < -100 || b.x > 550) return;
 
-    // Mặt khuất trong bóng tối, mắt đỏ hoặc trắng lạnh lùng
-    ctx.fillStyle = '#0a0812';
-    ctx.fillRect(-4, -43, 8, 7);
-    ctx.fillStyle = '#ff3838'; // Ánh mắt đỏ hung thủ
-    ctx.fillRect(1, -41, 2, 1.5);
+    ctx.save();
+    ctx.translate(b.x, b.y);
 
-    // Mũ phớt đen che nửa trán
-    ctx.fillStyle = '#0f0c18';
-    ctx.fillRect(-8, -46, 16, 4);
-    ctx.fillRect(-5, -50, 10, 5);
+    // 1. Ánh đèn pha xe máy rọi sáng đường phía trước
+    const beamGrad = ctx.createRadialGradient(25, -15, 5, 120, -15, 160);
+    beamGrad.addColorStop(0, 'rgba(255, 245, 160, 0.7)');
+    beamGrad.addColorStop(0.5, 'rgba(255, 245, 160, 0.2)');
+    beamGrad.addColorStop(1, 'rgba(255, 245, 160, 0)');
+    ctx.fillStyle = beamGrad;
+    ctx.beginPath();
+    ctx.moveTo(25, -15);
+    ctx.lineTo(160, -45);
+    ctx.lineTo(160, 15);
+    ctx.closePath();
+    ctx.fill();
 
-    // Vũ khí cầm trên tay khi tấn công
-    if (isAttacking) {
-      const cat = this.sceneData.category;
-      if (cat.includes('injury') || cat.includes('blood') || cat.includes('cut')) {
-        // Dao găm lưỡi bạc lóe sáng
-        ctx.fillStyle = '#f1f2f6';
-        ctx.fillRect(8, -28, 14, 2.5);
-        ctx.fillStyle = '#747d8c';
-        ctx.fillRect(6, -29, 3, 4.5);
-      } else if (cat.includes('poison')) {
-        // Lọ độc dược phát quang xanh lá
-        ctx.fillStyle = '#2ed573';
-        ctx.fillRect(8, -29, 5, 8);
-      } else {
-        // Súng lục / vũ khí sắt
-        ctx.fillStyle = '#2f3542';
-        ctx.fillRect(7, -30, 10, 4);
-        ctx.fillRect(7, -26, 3, 5);
-      }
+    // 2. Hai bánh xe máy pixel
+    ctx.fillStyle = '#111'; // Lốp xe
+    ctx.fillRect(-22, -8, 12, 12);
+    ctx.fillRect(12, -8, 12, 12);
+    ctx.fillStyle = '#7f8c8d'; // Vành nan hoa
+    ctx.fillRect(-18, -4, 4, 4);
+    ctx.fillRect(16, -4, 4, 4);
+
+    // 3. Khung sườn xe Wave/Dream đỏ đô hoặc xanh thẫm
+    ctx.fillStyle = '#8b0000'; // Thân xe đỏ đô
+    ctx.fillRect(-16, -18, 30, 8);
+    // Yếm xe màu trắng sữa đặc trưng
+    ctx.fillStyle = '#f5f6fa';
+    ctx.fillRect(4, -22, 6, 12);
+
+    // 4. Tay lái & Đèn pha
+    ctx.fillStyle = '#2f3542';
+    ctx.fillRect(10, -28, 4, 10);
+    ctx.fillRect(7, -30, 10, 3);
+    // Đèn pha sáng
+    ctx.fillStyle = '#fff275';
+    ctx.fillRect(16, -26, 4, 4);
+
+    // 5. Ống xả (bô xe)
+    ctx.fillStyle = '#747d8c';
+    ctx.fillRect(-18, -6, 20, 3.5);
+
+    // 6. NGƯỜI LÁI XE TRÙM ÁO MƯA
+    const isPanting = b.panting;
+    const pantOffset = isPanting ? Math.sin(this.elapsed * 15) * 2.5 : 0; // Thở dốc dữ dội!
+
+    // Thân người lái khom trên xe
+    ctx.fillStyle = '#2c3e50'; // Áo mưa xám đen
+    ctx.fillRect(-10, -36 + pantOffset, 16, 18);
+
+    // Đầu đội mũ bảo hiểm
+    ctx.fillStyle = '#1e272e';
+    ctx.fillRect(-4, -46 + pantOffset, 12, 12);
+    // Kính chắn gió mũ bảo hiểm
+    ctx.fillStyle = '#3498db';
+    ctx.fillRect(4, -43 + pantOffset, 4, 6);
+
+    // Tay bám tay lái
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(2, -26 + pantOffset, 8, 4);
+
+    // Chân chống xuống đất khi dừng lại thở dốc
+    if (isPanting) {
+      ctx.fillStyle = '#111';
+      ctx.fillRect(-2, -10, 4, 14);
     }
 
     ctx.restore();
   }
 }
 
-// Khởi tạo thực thể duy nhất dùng toàn game
 export const deceptionPixelNoir = new DeceptionPixelNoir();
