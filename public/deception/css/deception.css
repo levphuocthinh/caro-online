@@ -24,8 +24,11 @@
   --text-secondary: #a4b0be;
   --text-muted: #747d8c;
   
-  --font-title: 'Cinzel', serif;
-  --font-body: 'Nunito', sans-serif;
+  --font-title: 'Playfair Display', 'Be Vietnam Pro', Georgia, serif;
+  --font-headline: 'Be Vietnam Pro', 'Playfair Display', sans-serif;
+  --font-display: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Nunito', 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-code: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
 }
 
 * {
@@ -42,6 +45,9 @@ body.deception-app {
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Ambient Noir Backdrop Glow */
@@ -413,10 +419,11 @@ body.deception-app {
 }
 
 .table-emblem span {
-  font-size: 10.5px;
+  font-family: var(--font-headline);
+  font-size: 11px;
   font-weight: 900;
-  letter-spacing: 2.5px;
-  color: rgba(241, 196, 15, 0.5);
+  letter-spacing: 1px;
+  color: rgba(241, 196, 15, 0.65);
 }
 
 .table-seats-ring {
@@ -642,9 +649,10 @@ body.deception-app {
 }
 
 .card-confidential {
+  font-family: var(--font-headline);
   font-size: 10px;
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   color: var(--text-muted);
   margin-bottom: 20px;
 }
@@ -830,11 +838,11 @@ body.deception-app {
 }
 
 .round-badge-pill {
-  font-family: 'Cinzel', Impact, sans-serif;
+  font-family: var(--font-headline);
   font-size: 13px;
   font-weight: 900;
   color: var(--gold);
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -886,11 +894,12 @@ body.deception-app {
 }
 
 .countdown-digits {
-  font-family: 'Cinzel', monospace, sans-serif;
+  font-family: var(--font-code);
   font-size: 20px;
   font-weight: 900;
   color: #ffffff;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
 }
 
 .countdown-controls {
@@ -1269,10 +1278,10 @@ body.deception-app {
 
 .dossier-stamp {
   display: inline-block;
-  font-family: var(--font-title);
+  font-family: var(--font-headline);
   font-size: 13px;
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 1.2px;
   padding: 4px 16px;
   border: 2px solid var(--crimson);
   color: var(--crimson);
@@ -1763,10 +1772,10 @@ body.deception-app {
   width: 100%;
   background: linear-gradient(180deg, #f5cd79 0%, #e1b12c 50%, #f5cd79 100%);
   color: #111;
-  font-family: 'Cinzel', Impact, sans-serif;
+  font-family: var(--font-headline);
   font-weight: 900;
-  font-size: 12.5px;
-  letter-spacing: 1.5px;
+  font-size: 12px;
+  letter-spacing: 0.8px;
   text-align: center;
   padding: 8px 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.5), inset 0 -2px 4px rgba(0, 0, 0, 0.4);
@@ -2470,11 +2479,11 @@ body.deception-app {
 }
 
 .folder-label {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-title);
   font-weight: 900;
-  font-size: 13px;
+  font-size: 13.5px;
   color: #4a3520;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .folder-stamp-red {
@@ -2526,7 +2535,7 @@ body.deception-app {
 }
 
 .role-display-title {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-title);
   font-size: 26px;
   font-weight: 900;
   color: #1a120b;
@@ -2655,14 +2664,14 @@ body.deception-app {
   right: 20px;
   border: 3px solid rgba(192, 57, 43, 0.7);
   color: rgba(192, 57, 43, 0.7);
-  font-family: 'Cinzel', Impact, sans-serif;
-  font-size: 22px;
+  font-family: var(--font-headline);
+  font-size: 20px;
   font-weight: 900;
   padding: 4px 14px;
   transform: rotate(-12deg);
   border-radius: 6px;
   pointer-events: none;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 }
 
 /* Header & HUD Role Reminder Badges */
@@ -3806,8 +3815,8 @@ body.deception-app {
 }
 
 .inspect-card-title-vi {
-  font-family: 'Cinzel', Impact, serif, sans-serif;
-  font-size: 21px;
+  font-family: var(--font-title);
+  font-size: 22px;
   font-weight: 900;
   color: #ffffff;
   line-height: 1.25;
@@ -4306,10 +4315,10 @@ body.deception-app {
 
 .online-card-title {
   margin: 0 0 4px 0;
-  font-family: 'Cinzel', serif;
-  font-size: 17px;
+  font-family: var(--font-title);
+  font-size: 17.5px;
   color: #fff;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .online-card-desc {
@@ -4361,9 +4370,9 @@ body.deception-app {
 }
 
 .input-room-code {
-  font-family: 'Cinzel', monospace;
+  font-family: var(--font-code);
   font-weight: 800;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   font-size: 16px;
   text-align: center;
   color: #00d2d3;
@@ -4445,8 +4454,9 @@ body.deception-app {
 
 .room-title-block .code-highlight {
   color: #f1c40f;
-  font-family: 'Cinzel', monospace;
-  letter-spacing: 1.5px;
+  font-family: var(--font-code);
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
 .room-meta-actions {
@@ -4471,8 +4481,9 @@ body.deception-app {
 .room-code-badge-pill b {
   color: #f1c40f;
   font-size: 16px;
-  letter-spacing: 2px;
-  font-family: 'Cinzel', monospace;
+  letter-spacing: 1px;
+  font-family: var(--font-code);
+  font-weight: 800;
 }
 
 .room-occupancy-pill {
@@ -4665,9 +4676,10 @@ body.deception-app {
 
 .seats-roster-header h4 {
   margin: 0;
-  font-size: 14px;
+  font-size: 14.5px;
   color: #fff;
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-title);
+  letter-spacing: 0.3px;
 }
 
 .seats-requirement-hint {
@@ -4928,8 +4940,8 @@ body.deception-app {
   top: 6px;
   right: 8px;
   font-size: 10.5px;
-  font-family: 'Cinzel', monospace;
-  font-weight: 900;
+  font-family: var(--font-code);
+  font-weight: 800;
   color: #636e72;
 }
 
@@ -5708,8 +5720,9 @@ body.deception-app {
   }
 
   .lobby-seat-label {
+    top: 38px;
+    bottom: auto;
     font-size: 8px;
-    bottom: -14px;
     max-width: 60px;
     overflow: hidden;
     text-overflow: ellipsis;

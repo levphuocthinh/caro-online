@@ -241,6 +241,25 @@ describe('Deception Online Multiplayer & WebSocket Suite', () => {
     // Master table panoramic mode must adapt to 100% width on phone screens
     assert(css.includes('.crime-scene-master-table[data-view-mode="panoramic"]'), 'CSS must adapt panoramic master table for mobile');
   });
+
+  test('Typography & Vietnamese Optimization: Native Vietnamese fonts configured and legacy unlocalized fonts eliminated', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const html = fs.readFileSync(path.join(__dirname, '../public/deception/index.html'), 'utf8');
+    const css = fs.readFileSync(path.join(__dirname, '../public/deception/css/deception.css'), 'utf8');
+
+    // Must import Be Vietnam Pro and Playfair Display with full diacritics
+    assert(html.includes('Be+Vietnam+Pro'), 'Must import Be Vietnam Pro for Vietnamese UI');
+    assert(html.includes('Playfair+Display'), 'Must import Playfair Display for Noir titles');
+
+    // Must define --font-title and --font-headline with native Vietnamese fonts
+    assert(css.includes('--font-title: \'Playfair Display\''), 'Must use Playfair Display for --font-title');
+    assert(css.includes('--font-headline: \'Be Vietnam Pro\''), 'Must use Be Vietnam Pro for --font-headline');
+
+    // Zero legacy Cinzel references in CSS or HTML
+    assertEqual(css.includes('Cinzel'), false, 'CSS must have 0 occurrences of Cinzel font');
+    assertEqual(html.includes('Cinzel'), false, 'HTML must have 0 occurrences of Cinzel font');
+  });
 });
 
 if (require.main === module) {
