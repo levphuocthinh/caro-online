@@ -460,6 +460,9 @@ body.deception-app {
 .lobby-seat-label {
   position: absolute;
   top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
   font-size: 10px;
   font-weight: 800;
   white-space: nowrap;
@@ -1515,6 +1518,9 @@ body.deception-app {
   font-weight: 800;
   text-align: left;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .accuse-card-btn.active-blue {
@@ -2046,6 +2052,12 @@ body.deception-app {
   z-index: 6;
   opacity: 0.8;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.card-inspect-trigger-btn::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
 }
 
 .table-card-item:hover .card-inspect-trigger-btn {
@@ -4888,6 +4900,9 @@ body.deception-app {
 .online-table-seat-label {
   position: absolute;
   top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
   font-size: 10px;
   font-weight: 700;
   white-space: nowrap;
@@ -5646,11 +5661,54 @@ body.deception-app {
   .btn-hub-return {
     padding: 6px 12px;
     font-size: 12px;
-    min-height: 40px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .header-center {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 0;
+  }
+
+  .header-center .case-file-tag {
     display: none;
+  }
+
+  .header-center .ws-status-badge {
+    font-size: 10px;
+    padding: 2px 9px;
+  }
+
+  .btn-modal-close {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    padding: 6px;
+  }
+
+  .btn-copy-code {
+    min-width: 36px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+  }
+
+  .btn-drawer-close {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
   }
 
   .header-right {
@@ -5722,6 +5780,9 @@ body.deception-app {
   .lobby-seat-label {
     top: 38px;
     bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
     font-size: 8px;
     max-width: 60px;
     overflow: hidden;
@@ -5797,20 +5858,25 @@ body.deception-app {
   }
 
   .room-code-badge-pill {
-    flex: 1;
-    min-width: 140px;
+    flex: 1 1 100%;
+    min-width: 0;
     justify-content: space-between;
-    padding: 7px 10px;
+    padding: 8px 12px;
   }
 
   .room-occupancy-pill {
-    padding: 7px 9px;
-    font-size: 11.5px;
+    flex: 1;
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 12px;
+    min-height: 40px;
   }
 
   .btn-leave-online {
-    padding: 7px 10px;
-    min-height: 38px;
+    flex: 1;
+    justify-content: center;
+    padding: 8px 10px;
+    min-height: 40px;
     font-size: 12px;
   }
 
@@ -5892,6 +5958,9 @@ body.deception-app {
 
   .online-table-seat-label {
     top: 38px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
     font-size: 8px;
     max-width: 58px;
     padding: 1px 3px;
@@ -6194,6 +6263,50 @@ body.deception-app {
     padding: 10px 6px;
     width: 100%;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .forensic-bullet-rack {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+
+  .bullet-rack-label {
+    margin-bottom: 0;
+    font-size: 9.5px;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+  }
+
+  .bullet-rack-pegs {
+    flex-direction: row;
+    gap: 7px;
+  }
+
+  .bullet-rack-done {
+    flex-direction: row;
+    gap: 6px;
+    padding: 3px 8px;
+    min-width: 0;
+  }
+
+  .forensic-floating-banner {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .forensic-floating-banner .btn-noir-hero {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
   }
 
   .forensics-tiles-grid,
@@ -6400,7 +6513,139 @@ body.deception-app {
     padding: 8px 10px;
   }
 
-  /* Game Over Dossier on Mobile */
+  .modal-heading {
+    font-size: 16px;
+    word-break: break-word;
+    line-height: 1.25;
+  }
+
+  .quick-guide-card {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 10px;
+  }
+
+  .rules-summary-grid,
+  .rules-roles-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Timeline & Badges Bar on Mobile */
+  .timeline-steps-track {
+    width: 100%;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .timeline-badges-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .timeline-badges-panel .timeline-pill,
+  .timeline-badges-panel .btn-timeline-log {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 4px;
+    font-size: 11px;
+    min-height: 38px;
+    text-align: center;
+  }
+
+  /* Investigation View Safe Padding to prevent Floating Dock overlap */
+  .noir-view#view-investigation {
+    padding-bottom: max(140px, calc(125px + env(safe-area-inset-bottom)));
+  }
+
+  /* Accusation Dramatic Casting Overlay on Mobile */
+  .accusation-casting-overlay {
+    padding: 10px;
+  }
+
+  .casting-modal-card {
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 12px;
+    gap: 12px;
+  }
+
+  .casting-title {
+    font-size: 20px;
+  }
+
+  .casting-suspects-row {
+    padding: 10px 8px;
+  }
+
+  .casting-avatar {
+    font-size: 28px;
+  }
+
+  .casting-name {
+    font-size: 12px;
+  }
+
+  .casting-cards-row {
+    gap: 8px;
+  }
+
+  .evidence-card-cast {
+    padding: 8px 6px;
+  }
+
+  .evidence-card-cast .ev-cast-icon {
+    font-size: 22px;
+  }
+
+  .evidence-card-cast .ev-cast-title {
+    font-size: 12px;
+  }
+
+  /* Witness Reversal & Game Over Dossier on Mobile */
+  .reversal-card {
+    max-width: 95vw;
+    padding: 16px 14px;
+  }
+
+  .reversal-targets-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .reversal-target-btn {
+    min-height: 48px;
+    padding: 10px 14px;
+  }
+
+  .roster-chip {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 38px;
+  }
+
+  .cutscene-box {
+    width: 95%;
+    max-width: 95vw;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .btn-cutscene-skip {
+    min-height: 38px;
+    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
   .dossier-cta-row {
     flex-direction: column;
     width: 100%;

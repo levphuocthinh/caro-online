@@ -260,6 +260,35 @@ describe('Deception Online Multiplayer & WebSocket Suite', () => {
     assertEqual(css.includes('Cinzel'), false, 'CSS must have 0 occurrences of Cinzel font');
     assertEqual(html.includes('Cinzel'), false, 'HTML must have 0 occurrences of Cinzel font');
   });
+
+  test('Mobile Phone UX & Touch Ergonomics Audit: Targets >= 44px, centered labels, horizontal rack, and safe padding', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const css = fs.readFileSync(path.join(__dirname, '../public/deception/css/deception.css'), 'utf8');
+    const js = fs.readFileSync(path.join(__dirname, '../public/deception/js/DeceptionApp.js'), 'utf8');
+
+    // 1. Table seat labels must be horizontally centered beneath avatar nodes
+    assert(css.includes('.lobby-seat-label') && css.includes('transform: translateX(-50%)'), 'Lobby seat labels must be centered with translateX(-50%)');
+    assert(css.includes('.online-table-seat-label') && css.includes('transform: translateX(-50%)'), 'Online table seat labels must be centered with translateX(-50%)');
+
+    // 2. Forensics bullet rack adapts to horizontal ammo bar on mobile
+    assert(css.includes('.forensic-bullet-rack') && css.includes('flex-direction: row'), 'Forensic bullet rack must become horizontal on mobile');
+
+    // 3. Touch target expansions on mobile
+    assert(css.includes('.btn-modal-close') && css.includes('min-height: 44px'), 'Modal close buttons must meet 44px touch ergonomics');
+    assert(css.includes('.btn-hub-return') && css.includes('min-height: 44px'), 'Hub return button must have min 44px touch height');
+    assert(css.includes('.card-inspect-trigger-btn::before'), 'Card inspect trigger must have expanded touch target');
+
+    // 4. Investigation safe-padding at bottom to prevent floating action dock overlap
+    assert(css.includes('.noir-view#view-investigation'), 'Investigation view must have dedicated bottom spacing for mobile floating dock');
+
+    // 5. Toast notification responsive width and safe-area support
+    assert(js.includes('max-width: min(92vw'), 'Toast notification must constrain max-width on mobile');
+    assert(js.includes('env(safe-area-inset-bottom'), 'Toast notification must respect safe-area-inset-bottom');
+
+    // 6. Accusation casting modal mobile responsiveness
+    assert(css.includes('.casting-modal-card') && css.includes('max-height: 90vh'), 'Casting modal must adapt max-height on mobile');
+  });
 });
 
 if (require.main === module) {

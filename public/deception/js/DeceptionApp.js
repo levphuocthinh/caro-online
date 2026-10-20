@@ -690,21 +690,28 @@ class DeceptionAppController {
       toast.id = 'noir-toast-notification';
       toast.style.cssText = `
         position: fixed;
-        bottom: 24px;
+        bottom: max(24px, calc(16px + env(safe-area-inset-bottom, 0px)));
         left: 50%;
         transform: translateX(-50%) translateY(20px);
-        background: rgba(15, 23, 42, 0.95);
+        background: rgba(15, 23, 42, 0.96);
         color: #f1c40f;
         border: 1px solid rgba(241, 196, 15, 0.5);
-        border-radius: 10px;
-        padding: 10px 18px;
-        font-size: 13.5px;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-size: 13px;
         font-weight: 800;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.85);
         z-index: 99999;
         opacity: 0;
         transition: all 0.3s ease;
         pointer-events: none;
+        max-width: min(92vw, 440px);
+        width: max-content;
+        box-sizing: border-box;
+        text-align: center;
+        line-height: 1.35;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
       `;
       document.body.appendChild(toast);
     }
