@@ -12,6 +12,7 @@ import {
 } from '/js/games/deception/data/deceptionData.js';
 import { DeceptionState, GAME_PHASES } from '/js/games/deception/DeceptionState.js';
 import { deceptionPixelNoir } from '/js/games/deception/DeceptionPixelNoir.js';
+import { deceptionAudio } from '/js/games/deception/DeceptionAudio.js';
 
 class DeceptionAppController {
   constructor() {
@@ -46,76 +47,7 @@ class DeceptionAppController {
 
   playAudio(type = 'click') {
     if (!this.soundEnabled) return;
-    try {
-      if (!this.audioCtx) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (AudioContext) this.audioCtx = new AudioContext();
-      }
-      if (!this.audioCtx) return;
-      if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
-
-      const t = this.audioCtx.currentTime;
-      const osc = this.audioCtx.createOscillator();
-      const gain = this.audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(this.audioCtx.destination);
-
-      if (type === 'click') {
-        osc.frequency.setValueAtTime(440, t);
-        osc.frequency.exponentialRampToValueAtTime(880, t + 0.05);
-        gain.gain.setValueAtTime(0.12, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
-        osc.start(t);
-        osc.stop(t + 0.05);
-      } else if (type === 'gavel') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(140, t);
-        osc.frequency.exponentialRampToValueAtTime(40, t + 0.25);
-        gain.gain.setValueAtTime(0.4, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
-        osc.start(t);
-        osc.stop(t + 0.25);
-      } else if (type === 'bullet_drop') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(240, t);
-        osc.frequency.exponentialRampToValueAtTime(70, t + 0.15);
-        gain.gain.setValueAtTime(0.35, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-        osc.start(t);
-        osc.stop(t + 0.15);
-      } else if (type === 'badge_loss') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(420, t);
-        osc.frequency.linearRampToValueAtTime(140, t + 0.28);
-        gain.gain.setValueAtTime(0.25, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
-        osc.start(t);
-        osc.stop(t + 0.28);
-      } else if (type === 'chime') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, t); // D5
-        osc.frequency.setValueAtTime(880, t + 0.1); // A5
-        gain.gain.setValueAtTime(0.15, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
-        osc.start(t);
-        osc.stop(t + 0.4);
-      } else if (type === 'tick') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(850, t);
-        gain.gain.setValueAtTime(0.06, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-        osc.start(t);
-        osc.stop(t + 0.04);
-      } else if (type === 'revolver') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(320, t);
-        osc.frequency.exponentialRampToValueAtTime(25, t + 0.38);
-        gain.gain.setValueAtTime(0.5, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
-        osc.start(t);
-        osc.stop(t + 0.38);
-      }
-    } catch (_) {}
+    deceptionAudio.play(type);
   }
 
   showView(viewId) {
@@ -262,6 +194,25 @@ class DeceptionAppController {
     // Nút Chơi lại sau khi Game Over
     document.getElementById('btn-rematch-case')?.addEventListener('click', () => {
       this.startInvestigationGame();
+    });
+
+    // Nút Xem lại Hoạt cảnh kết trận
+    document.getElementById('btn-replay-ending')?.addEventListener('click', () => {
+      const murderer = this.state.getMurdererPlayer();
+      if (this.lastEndingType === 'POLICE_ARREST') {
+        deceptionPixelNoir.playPoliceArrest({ murdererName: murderer ? murderer.displayName : 'Hung thủ' }, () => {
+          this.renderGameOverDossier();
+        });
+      } else {
+        deceptionPixelNoir.playAirplaneEscape({ murdererName: murderer ? murderer.displayName : 'Hung thủ' }, () => {
+          this.renderGameOverDossier();
+        });
+      }
+    });
+
+    // Nút Hướng dẫn 30 giây nhanh
+    document.getElementById('btn-quick-guide')?.addEventListener('click', () => {
+      this.openModal('modal-quick-guide');
     });
   }
 
@@ -545,8 +496,114 @@ class DeceptionAppController {
 
   renderInvestigationTable() {
     this.renderInvestigationHud();
+    this.updateInvestigationTimeline();
+    this.updateGameMasterNarrator();
     this.renderActiveSceneTiles();
     this.renderAuthenticSuspectsTable();
+  }
+
+  updateInvestigationTimeline() {
+    const stepNight = document.getElementById('tl-step-night');
+    const stepEvidence = document.getElementById('tl-step-evidence');
+    const stepR1 = document.getElementById('tl-step-r1');
+    const stepR2 = document.getElementById('tl-step-r2');
+    const stepR3 = document.getElementById('tl-step-r3');
+
+    const round = this.state.round;
+    const phase = this.state.phase;
+
+    [stepNight, stepEvidence, stepR1, stepR2, stepR3].forEach(s => {
+      if (s) s.classList.remove('active', 'completed');
+    });
+
+    if (stepNight) stepNight.classList.add('completed');
+
+    if (phase.includes('EVIDENCE')) {
+      if (stepEvidence) stepEvidence.classList.add('active');
+      if (round === 2 && stepR1) stepR1.classList.add('completed');
+      if (round === 3) {
+        if (stepR1) stepR1.classList.add('completed');
+        if (stepR2) stepR2.classList.add('completed');
+      }
+    } else {
+      if (stepEvidence) stepEvidence.classList.add('completed');
+      if (round === 1) {
+        if (stepR1) stepR1.classList.add('active');
+      } else if (round === 2) {
+        if (stepR1) stepR1.classList.add('completed');
+        if (stepR2) stepR2.classList.add('active');
+      } else if (round >= 3) {
+        if (stepR1) stepR1.classList.add('completed');
+        if (stepR2) stepR2.classList.add('completed');
+        if (stepR3) stepR3.classList.add('active');
+      }
+    }
+
+    const activeHolders = this.state.players.filter(p => p.role !== 'FORENSIC_SCIENTIST');
+    const badgesLeft = activeHolders.filter(p => p.hasBadge).length;
+    const lblBadges = document.getElementById('lbl-badges-count');
+    if (lblBadges) lblBadges.textContent = `${badgesLeft}/${activeHolders.length}`;
+
+    const markedCount = this.state.activeSceneTiles.filter(t => t.selectedOptionIndex !== null).length;
+    const lblBullets = document.getElementById('lbl-bullets-marked-count');
+    if (lblBullets) lblBullets.textContent = `${markedCount}/${this.state.activeSceneTiles.length}`;
+
+    const lblLogs = document.getElementById('lbl-logs-count');
+    if (lblLogs) lblLogs.textContent = `${this.state.caseLogs.length}`;
+  }
+
+  updateGameMasterNarrator() {
+    const titleEl = document.getElementById('narrator-phase-title');
+    const textEl = document.getElementById('narrator-instruction-text');
+    if (!titleEl || !textEl) return;
+
+    const human = this.state.getHumanPlayer();
+    const isForensic = human.role === 'FORENSIC_SCIENTIST';
+    const phase = this.state.phase;
+    const round = this.state.round;
+
+    if (phase.includes('EVIDENCE')) {
+      titleEl.textContent = this.isVi
+        ? `VÒNG ${round}: PHÁP Y ĐẶT ĐẠN MANH MỐI`
+        : `ROUND ${round}: FORENSIC MARKERS`;
+
+      if (isForensic) {
+        textEl.textContent = this.isVi
+          ? '🎯 BẠN LÀ PHÁP Y: Hãy nhấp vào 1 dòng mô tả trên mỗi thẻ hiện trường để ghim đầu đạn gỗ. Tuyệt đối không được nói thành lời!'
+          : '🎯 YOU ARE FORENSIC: Click the closest option on each scene tile to place bullet pegs. Do not speak!';
+      } else {
+        textEl.textContent = this.isVi
+          ? '🎯 PHÁP Y ĐANG KHÁM NGHIỆM: Đồng chí Giám định đang đặt các viên đạn manh mối lên 6 tấm thẻ hiện trường. Quan sát kỹ!'
+          : '🎯 FORENSIC OBSERVATION: Forensic Scientist is placing bullet markers on the scene tiles. Observe closely!';
+      }
+    } else if (phase.includes('PRESENTATION')) {
+      titleEl.textContent = this.isVi
+        ? `VÒNG ${round}: TRANH LUẬN & ĐIỀU TRA (30S)`
+        : `ROUND ${round}: DISCUSSION (30S)`;
+
+      const currentSpeaker = this.state.getCurrentSpeaker();
+      const isCurrentSpeaker = currentSpeaker && currentSpeaker.id === human.id;
+
+      if (isCurrentSpeaker) {
+        textEl.textContent = this.isVi
+          ? '🎤 LƯỢT CỦA BẠN (30s): Hãy chia sẻ nghi vấn hoặc bấm [🚨 ĐẬP BÀN PHÁ ÁN] nếu bạn đã tìm ra hung thủ!'
+          : '🎤 YOUR TURN (30s): Share deduction or hit [🚨 ACCUSE] if you identified the murder cards!';
+      } else {
+        textEl.textContent = this.isVi
+          ? `🎤 Đồng chí ${currentSpeaker ? currentSpeaker.displayName : 'Điều tra viên'} đang phát biểu. Hãy so sánh 6 đạn Pháp Y với 8 thẻ của các nghi phạm!`
+          : `🎤 ${currentSpeaker ? currentSpeaker.displayName : 'Investigator'} is speaking. Match 6 forensic pegs with suspect cards!`;
+      }
+    } else if (phase === GAME_PHASES.ALLIES_NIGHT_PHASE) {
+      titleEl.textContent = this.isVi ? 'ĐÊM ĐẶC NHIỆM: KỸ THUẬT VIÊN & NỘI GIÁN' : 'UNDERCOVER ALLIES NIGHT';
+      textEl.textContent = this.isVi
+        ? 'Kỹ thuật viên phòng thí nghiệm và Nội gián đang bí mật sử dụng quyền hạn đặc biệt...'
+        : 'Special roles are resolving secret actions in the dark...';
+    } else if (phase === GAME_PHASES.WITNESS_REVERSAL) {
+      titleEl.textContent = this.isVi ? 'LẬT KÈO CUỐI TRẬN: PHÁT SÚNG CỦA HUNG THỦ' : 'WITNESS REVERSAL SHOT';
+      textEl.textContent = this.isVi
+        ? 'Kẻ Sát Nhân đang tìm kiếm và nhắm bắn Nhân Chứng để lật ngược tình thế chiến thắng!'
+        : 'The Murderer is aiming to assassinate the Witness to steal the victory!';
+    }
   }
 
   renderInvestigationHud() {
@@ -663,6 +720,8 @@ class DeceptionAppController {
       if (speakerSec) speakerSec.textContent = '—';
       if (timeFill) timeFill.style.width = '100%';
     }
+    this.updateGameMasterNarrator();
+    this.updateInvestigationTimeline();
   }
 
   renderActiveSceneTiles() {
@@ -1104,29 +1163,94 @@ class DeceptionAppController {
     }
   }
 
+  showAccusationCastingModal(data, onDone) {
+    const overlay = document.getElementById('accusation-casting-overlay');
+    const castAccuserAvatar = document.getElementById('cast-accuser-avatar');
+    const castAccuserName = document.getElementById('cast-accuser-name');
+    const castTargetAvatar = document.getElementById('cast-target-avatar');
+    const castTargetName = document.getElementById('cast-target-name');
+    const castMeansIcon = document.getElementById('cast-means-icon');
+    const castMeansName = document.getElementById('cast-means-name');
+    const castClueIcon = document.getElementById('cast-clue-icon');
+    const castClueName = document.getElementById('cast-clue-name');
+    const suspensePulse = document.getElementById('cast-suspense-pulse');
+    const stampResult = document.getElementById('cast-stamp-result');
+
+    if (castAccuserAvatar) castAccuserAvatar.textContent = data.accuserAvatar || '🕵️';
+    if (castAccuserName) castAccuserName.textContent = data.accuserName || 'Điều tra viên';
+    if (castTargetAvatar) castTargetAvatar.textContent = data.targetPlayer?.avatar || '👤';
+    if (castTargetName) castTargetName.textContent = data.targetPlayer?.displayName || 'Nghi phạm';
+
+    if (castMeansIcon) castMeansIcon.textContent = data.meansCard?.icon || '🔪';
+    if (castMeansName) castMeansName.textContent = (data.meansCard?.vi || 'Hung khí') + (data.meansCard?.en ? ` (${data.meansCard.en})` : '');
+    if (castClueIcon) castClueIcon.textContent = data.clueCard?.icon || '🩸';
+    if (castClueName) castClueName.textContent = (data.clueCard?.vi || 'Manh mối') + (data.clueCard?.en ? ` (${data.clueCard.en})` : '');
+
+    if (suspensePulse) suspensePulse.style.display = 'inline-flex';
+    if (stampResult) {
+      stampResult.style.display = 'none';
+      stampResult.className = 'casting-stamp-result';
+    }
+
+    if (overlay) overlay.classList.add('active');
+
+    // Âm thanh nhịp tim dồn dập và tiếng rít kịch tính
+    deceptionAudio.startHeartbeatLoop(550);
+    deceptionAudio.play('suspenseRiser');
+
+    // Sau 1.5s hồi hộp -> Đóng dấu kết quả
+    setTimeout(() => {
+      deceptionAudio.stopHeartbeatLoop();
+      if (suspensePulse) suspensePulse.style.display = 'none';
+
+      if (stampResult) {
+        stampResult.style.display = 'inline-block';
+        if (data.isCorrect) {
+          stampResult.className = 'casting-stamp-result stamp-correct';
+          stampResult.textContent = this.isVi ? '✓ CHÍNH XÁC! PHÁ ÁN THÀNH CÔNG!' : '✓ CONFIRMED! CASE SOLVED!';
+          deceptionAudio.play('correctFanfare');
+          this.triggerScreenShake(350);
+        } else {
+          stampResult.className = 'casting-stamp-result stamp-wrong';
+          stampResult.textContent = this.isVi ? '✗ BÁC BỎ! MẤT 1 PHÙ HIỆU!' : '✗ DISMISSED! BADGE LOST!';
+          deceptionAudio.play('errorBuzzer');
+          this.triggerScreenShake(200);
+        }
+      }
+
+      // Sau thêm 1.8s nữa -> Ẩn overlay và gọi tiếp
+      setTimeout(() => {
+        if (overlay) overlay.classList.remove('active');
+        if (typeof onDone === 'function') onDone();
+      }, 1800);
+    }, 1500);
+  }
+
   executeAccusation(targetId, meansId, clueId) {
     const human = this.state.getHumanPlayer();
     const res = this.state.makeAccusation(human.id, targetId, meansId, clueId);
 
     if (!res.valid) return;
 
-    this.playCutscene('ACCUSATION', {
-      isSuccess: res.isCorrect,
-      title: this.isVi ? 'Đập Bàn Phá Án' : 'Official Accusation',
-      subtitle: res.isCorrect
-        ? (this.isVi ? 'Cáo buộc chính xác!' : 'Accusation confirmed!')
-        : (this.isVi ? 'Bác bỏ! Đoán sai!' : 'Dismissed! Accusation false!')
+    const targetPlayer = this.state.getPlayerById(targetId);
+    const meansCard = this.state.findCardById(meansId)?.card;
+    const clueCard = this.state.findCardById(clueId)?.card;
+
+    this.showAccusationCastingModal({
+      accuserName: human.displayName,
+      accuserAvatar: human.avatar,
+      targetPlayer,
+      meansCard,
+      clueCard,
+      isCorrect: res.isCorrect
     }, () => {
       if (res.isCorrect) {
-        this.playAudio('chime');
         if (this.state.phase === GAME_PHASES.WITNESS_REVERSAL) {
           this.showWitnessReversalView();
         } else {
           this.showGameOverView();
         }
       } else {
-        this.playAudio('badge_loss');
-        alert(this.isVi ? 'BÁC BỎ! Lời cáo buộc không chính xác. Bạn đã mất Huy hiệu!' : 'DISMISSED! Accusation incorrect. Badge lost!');
         if (this.state.phase === GAME_PHASES.GAME_OVER) {
           this.showGameOverView();
         } else {
@@ -1185,6 +1309,26 @@ class DeceptionAppController {
     this.stopSpeakerTimer();
     const isPoliceWin = this.state.winnerTeam === 'INVESTIGATION';
     const murderer = this.state.getMurdererPlayer();
+    this.lastEndingType = isPoliceWin ? 'POLICE_ARREST' : 'AIRPLANE_ESCAPE';
+
+    if (isPoliceWin) {
+      deceptionPixelNoir.playPoliceArrest({
+        murdererName: murderer ? murderer.displayName : 'Hung thủ'
+      }, () => {
+        this.renderGameOverDossier();
+      });
+    } else {
+      deceptionPixelNoir.playAirplaneEscape({
+        murdererName: murderer ? murderer.displayName : 'Hung thủ'
+      }, () => {
+        this.renderGameOverDossier();
+      });
+    }
+  }
+
+  renderGameOverDossier() {
+    const isPoliceWin = this.state.winnerTeam === 'INVESTIGATION';
+    const murderer = this.state.getMurdererPlayer();
     const solMeans = this.state.findCardById(this.state.solution.meansCardId)?.card;
     const solClue = this.state.findCardById(this.state.solution.clueCardId)?.card;
 
@@ -1210,9 +1354,12 @@ class DeceptionAppController {
     if (roster) {
       roster.innerHTML = this.state.players.map(p => {
         const def = ROLE_DEFINITIONS[p.role] || ROLE_DEFINITIONS.INVESTIGATOR;
+        const isMurderer = p.id === murderer?.id;
+        const color = p.team === 'INVESTIGATION' ? '#2ed573' : '#ff4757';
         return `
-          <div class="roster-chip">
-            <b>${p.avatar} ${p.displayName}:</b> ${def.icon} ${this.isVi ? def.name_vi : def.name_en}
+          <div class="roster-chip" style="border-left: 3px solid ${color};">
+            <b>${p.avatar} ${p.displayName}:</b> <span style="color: ${color}; font-weight: 800;">${def.icon} ${this.isVi ? def.name_vi : def.name_en}</span>
+            ${isMurderer ? '<span style="color: var(--crimson); font-weight: 900; margin-left: 4px;">[HUNG THỦ]</span>' : ''}
           </div>
         `;
       }).join('');

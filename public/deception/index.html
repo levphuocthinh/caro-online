@@ -225,6 +225,80 @@
 
       <!-- VIEW 4: AUTHENTIC MASTER INVESTIGATION DESK (BÀN GỖ ÁN MẠNG THEO ẢNH MẪU) -->
       <section class="noir-view" id="view-investigation">
+        <!-- THANH LỊCH SỬ TIẾN TRÌNH VỤ ÁN (PROGRESS TIMELINE BAR) -->
+        <div class="investigation-timeline-bar" id="investigation-timeline-bar">
+          <div class="timeline-steps-track">
+            <div class="timeline-step" id="tl-step-night" data-phase="NIGHT">
+              <span class="step-num">1</span>
+              <span class="step-icon"><i class="fa-solid fa-moon"></i></span>
+              <span class="step-label">Đêm Gây Án</span>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-step" id="tl-step-evidence" data-phase="EVIDENCE">
+              <span class="step-num">2</span>
+              <span class="step-icon"><i class="fa-solid fa-bullseye"></i></span>
+              <span class="step-label">Pháp Y Ghim Đạn</span>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-step" id="tl-step-r1" data-phase="R1">
+              <span class="step-num">3</span>
+              <span class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+              <span class="step-label">Vòng 1</span>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-step" id="tl-step-r2" data-phase="R2">
+              <span class="step-num">4</span>
+              <span class="step-icon"><i class="fa-solid fa-arrows-rotate"></i></span>
+              <span class="step-label">Vòng 2 (Đổi Thẻ)</span>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-step" id="tl-step-r3" data-phase="R3">
+              <span class="step-num">5</span>
+              <span class="step-icon"><i class="fa-solid fa-gavel"></i></span>
+              <span class="step-label">Vòng 3 (Chốt Án)</span>
+            </div>
+          </div>
+
+          <div class="timeline-badges-panel">
+            <span class="timeline-pill pill-badges" id="timeline-badges-pill" title="Số phù hiệu cảnh sát còn lại">
+              <i class="fa-solid fa-shield"></i>
+              <span>Phù Hiệu: <b id="lbl-badges-count">5/5</b></span>
+            </span>
+            <span class="timeline-pill pill-bullets" id="timeline-bullets-pill" title="Số đạn pháp y đã ghim">
+              <i class="fa-solid fa-bullseye"></i>
+              <span>Đạn Ghim: <b id="lbl-bullets-marked-count">6/6</b></span>
+            </span>
+            <button type="button" class="btn-timeline-log" id="btn-toggle-dossier" title="Xem Nhật Ký Biên Bản Vụ Án">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span>Nhật Ký (<b id="lbl-logs-count">0</b>)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- THÔNG BÁO DẪN TRÒ THÔNG MINH (GAME MASTER NARRATOR BAR) -->
+        <div class="game-master-narrator-bar" id="game-master-narrator-bar">
+          <div class="narrator-left">
+            <div class="narrator-officer-badge">
+              <i class="fa-solid fa-user-secret"></i>
+            </div>
+            <div class="narrator-content-wrap">
+              <div class="narrator-meta-row">
+                <span class="narrator-badge-tag"><i class="fa-solid fa-shield-halved"></i> DẪN TRÒ • CỤC CẢNH SÁT HÌNH SỰ</span>
+                <span class="narrator-phase-title" id="narrator-phase-title">VÒNG 1: ĐIỀU TRA & THẢO LUẬN</span>
+              </div>
+              <div class="narrator-instruction-text" id="narrator-instruction-text">
+                Quan sát 6 thẻ Manh Mối của Pháp y và 8 thẻ trước mặt các nghi phạm. Ai có cặp [Hung Khí + Manh Mối] khả nghi nhất?
+              </div>
+            </div>
+          </div>
+          <div class="narrator-right">
+            <button type="button" class="btn-narrator-action" id="btn-quick-guide">
+              <i class="fa-solid fa-circle-question"></i>
+              <span>Luật 30 Giây</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Status Ribbon: Round, Phase, Time, Badges, Notes -->
         <div class="investigation-ribbon">
           <div class="ribbon-col">
@@ -246,17 +320,6 @@
               </div>
             </div>
             <span class="speaker-sec-badge" id="hud-speaker-sec">30s</span>
-          </div>
-
-          <div class="ribbon-col">
-            <div class="badge-counter-badge" id="ribbon-badges">
-              <i class="fa-solid fa-shield"></i>
-              <span>Huy Hiệu: <b id="lbl-badges-count">5/5</b></span>
-            </div>
-            <button type="button" class="btn-noir-small" id="btn-toggle-dossier" title="Xem Hồ Sơ Vụ Án">
-              <i class="fa-solid fa-scroll"></i>
-              <span>Nhật Ký</span>
-            </button>
           </div>
         </div>
 
@@ -391,6 +454,10 @@
                 <i class="fa-solid fa-rotate-right"></i>
                 <span>MỞ VỤ ÁN MỚI</span>
               </button>
+              <button type="button" class="btn-noir-hero btn-secondary" id="btn-replay-ending">
+                <i class="fa-solid fa-film"></i>
+                <span>XEM LẠI HOẠT CẢNH</span>
+              </button>
               <a href="/" class="btn-noir-hero btn-secondary">
                 <i class="fa-solid fa-house"></i>
                 <span>VỀ CỔNG GAME</span>
@@ -507,6 +574,113 @@
       </div>
       <div class="noir-modal-footer">
         <button type="button" class="btn-modal-cancel" data-close="modal-dossier">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: HƯỚNG DẪN 30 GIÂY CỰC DỄ HIỂU (QUICK GUIDE) -->
+  <div class="noir-modal-overlay" id="modal-quick-guide">
+    <div class="noir-modal-card">
+      <div class="noir-modal-header">
+        <div>
+          <span class="view-eyebrow text-gold">HƯỚNG DẪN 30 GIÂY CHO NGƯỜI MỚI</span>
+          <h3 class="modal-heading">Cách Chơi Deception Cực Dễ Hiểu</h3>
+        </div>
+        <button type="button" class="btn-modal-close" data-close="modal-quick-guide"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body-scroll">
+        <div class="quick-guide-list">
+          <div class="quick-guide-card">
+            <div class="qg-badge qg-gold">BƯỚC 1</div>
+            <div class="qg-body">
+              <h4 class="qg-title">🎯 Giám Định Pháp Y Không Được Nói!</h4>
+              <p class="qg-text">
+                Pháp Y biết chính xác ai là Hung Thủ và cặp vật chứng, nhưng <b>tuyệt đối không được nói thành lời hay ra hiệu</b>.
+                Pháp Y chỉ được đặt <b>6 viên đạn gỗ</b> lên các dòng mô tả trên 6 Thẻ Hiện Trường để dẫn đường cho Cảnh sát.
+              </p>
+            </div>
+          </div>
+
+          <div class="quick-guide-card">
+            <div class="qg-badge qg-blue">BƯỚC 2</div>
+            <div class="qg-body">
+              <h4 class="qg-title">🔍 So Khớp Thẻ Của Từng Nghi Phạm</h4>
+              <p class="qg-text">
+                Mỗi người chơi có <b>4 Thẻ Xanh (Hung Khí)</b> và <b>4 Thẻ Đỏ (Manh Mối)</b> đặt ngửa trước mặt.
+                Chỉ có <b>1 người duy nhất</b> giữ đúng cặp thẻ đã gây án! Hãy đối chiếu các viên đạn gỗ của Pháp Y với 8 thẻ của từng người để khoanh vùng thủ phạm.
+              </p>
+            </div>
+          </div>
+
+          <div class="quick-guide-card">
+            <div class="qg-badge qg-crimson">BƯỚC 3</div>
+            <div class="qg-body">
+              <h4 class="qg-title">🛡️ Mỗi Người 1 Phù Hiệu Phá Án Duy Nhất!</h4>
+              <p class="qg-text">
+                Bất cứ lúc nào trong lượt thảo luận, nếu phát hiện ra cặp bài trùng, hãy bấm nút <b>[🚨 ĐẬP BÀN PHÁ ÁN]</b>!
+                Chỉ định 1 Nghi phạm + 1 Thẻ Xanh + 1 Thẻ Đỏ.
+                <b>Đoán đúng: Cảnh sát thắng ngay!</b> Đoán sai: Bạn bị tịch thu phù hiệu và mất quyền phá án suốt ván chơi.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="noir-modal-footer">
+        <button type="button" class="btn-noir-hero" data-close="modal-quick-guide">
+          <i class="fa-solid fa-check"></i>
+          <span>Đã Hiểu — Vào Phá Án Ngay!</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCUSATION DRAMATIC CASTING OVERLAY (HIỆU ỨNG CASTING KỊCH TÍNH KHI PHÁ ÁN) -->
+  <div class="accusation-casting-overlay" id="accusation-casting-overlay">
+    <div class="casting-modal-card" id="casting-modal-card">
+      <div class="casting-light-strobe"></div>
+      <div class="casting-header">
+        <span class="casting-tag"><i class="fa-solid fa-gavel"></i> TÒA ÁN HÌNH SỰ • LỆNH KHẨN CẤP</span>
+        <h2 class="casting-title">CÁO BUỘC TRỌNG TỘI</h2>
+      </div>
+
+      <div class="casting-suspects-row">
+        <div class="casting-player-side">
+          <div class="side-badge">NGƯỜI TỐ CÁO</div>
+          <div class="casting-avatar" id="cast-accuser-avatar">🕵️</div>
+          <div class="casting-name" id="cast-accuser-name">Điều tra viên</div>
+        </div>
+
+        <div class="casting-vs-arrow">
+          <i class="fa-solid fa-arrow-right"></i>
+          <span>CHỈ DANH</span>
+        </div>
+
+        <div class="casting-player-side target-side">
+          <div class="side-badge badge-suspect">ĐỐI TƯỢNG BỊ BẮT</div>
+          <div class="casting-avatar" id="cast-target-avatar">👤</div>
+          <div class="casting-name" id="cast-target-name">Nghi phạm</div>
+        </div>
+      </div>
+
+      <div class="casting-cards-row">
+        <div class="evidence-card-cast card-means">
+          <span class="ev-cast-label"><i class="fa-solid fa-skull"></i> HUNG KHÍ (PHƯƠNG THỨC)</span>
+          <div class="ev-cast-icon" id="cast-means-icon">🔪</div>
+          <div class="ev-cast-title" id="cast-means-name">Dao găm</div>
+        </div>
+        <div class="evidence-card-cast card-clue">
+          <span class="ev-cast-label"><i class="fa-solid fa-fingerprint"></i> VẬT CHỨNG (MANH MỐI)</span>
+          <div class="ev-cast-icon" id="cast-clue-icon">🩸</div>
+          <div class="ev-cast-title" id="cast-clue-name">Vết máu</div>
+        </div>
+      </div>
+
+      <div class="casting-status-area">
+        <div class="casting-suspense-pulse" id="cast-suspense-pulse">
+          <i class="fa-solid fa-circle-notch fa-spin"></i>
+          <span id="cast-suspense-text">ĐANG ĐỐI CHIẾU HỒ SƠ PHÁP Y...</span>
+        </div>
+        <div class="casting-stamp-result" id="cast-stamp-result" style="display: none;"></div>
       </div>
     </div>
   </div>
