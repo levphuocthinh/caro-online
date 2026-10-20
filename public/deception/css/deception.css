@@ -1863,11 +1863,11 @@ body.deception-app {
   border: 3px solid #2d1c12;
   box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.9), 0 15px 40px rgba(0, 0, 0, 0.7);
   border-radius: 12px;
-  padding: 24px 16px;
-  margin-bottom: 90px;
+  padding: 16px 14px;
+  margin-bottom: 40px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 16px;
   transition: all 0.3s ease;
 }
 
@@ -1875,22 +1875,21 @@ body.deception-app {
 .tape-strip.tape-horizontal-center {
   position: relative;
   width: 100%;
-  background: #f1c40f;
+  background: linear-gradient(180deg, #f5cd79 0%, #e1b12c 50%, #f5cd79 100%);
   color: #111;
   font-family: 'Cinzel', Impact, sans-serif;
   font-weight: 900;
-  font-size: 13px;
-  letter-spacing: 2px;
+  font-size: 12.5px;
+  letter-spacing: 1.5px;
   text-align: center;
-  padding: 6px 0;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+  padding: 8px 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.5), inset 0 -2px 4px rgba(0, 0, 0, 0.4);
   border-top: 3px dashed #111;
   border-bottom: 3px dashed #111;
-  transform: rotate(-0.5deg);
-  margin: 6px 0 -12px 0;
+  margin: 2px 0 10px 0;
   z-index: 1;
-  white-space: nowrap;
-  overflow: hidden;
+  white-space: normal;
+  line-height: 1.35;
   user-select: none;
 }
 
@@ -1901,7 +1900,7 @@ body.deception-app {
 /* Suspects Rows */
 .table-suspects-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
   gap: 14px;
   width: 100%;
   z-index: 2;
@@ -1909,14 +1908,15 @@ body.deception-app {
 
 /* Suspect Station Box (Gold Badge + 4 Blue Means + 4 Red Clues) */
 .suspect-station-box {
-  background: rgba(18, 13, 10, 0.88);
-  border: 1.5px solid rgba(139, 90, 43, 0.45);
-  border-radius: 10px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
-  padding: 8px 10px;
+  background: rgba(18, 13, 10, 0.94);
+  border: 1.5px solid rgba(139, 90, 43, 0.55);
+  border-radius: 12px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7);
+  padding: 10px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 310px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -1928,15 +1928,17 @@ body.deception-app {
 
 .suspect-station-box.is-self {
   border-color: #00d2d3;
-  box-shadow: 0 0 16px rgba(0, 210, 211, 0.4);
+  box-shadow: 0 0 18px rgba(0, 210, 211, 0.5);
 }
 
 .suspect-station-badge-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-width: 62px;
+  gap: 5px;
+  width: 76px;
+  min-width: 76px;
+  flex-shrink: 0;
   text-align: center;
 }
 
@@ -1963,13 +1965,14 @@ body.deception-app {
 }
 
 .suspect-station-name {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
   color: #f1f2f6;
-  white-space: nowrap;
-  max-width: 75px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  text-align: center;
+  line-height: 1.25;
+  max-width: 100%;
 }
 
 .btn-accuse-badge {
@@ -2004,44 +2007,46 @@ body.deception-app {
 .suspect-cards-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
+  gap: 6px;
 }
 
 .table-card-item {
   position: relative;
-  border-radius: 6px;
-  padding: 4px 3px;
+  border-radius: 8px;
+  padding: 5px 3px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   cursor: pointer;
   user-select: none;
-  min-height: 52px;
-  justify-content: center;
-  transition: transform 0.15s, box-shadow 0.15s;
+  min-height: 72px;
+  min-width: 54px;
+  justify-content: flex-start;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
 }
 
 .table-card-item:hover {
-  transform: translateY(-2px);
-  z-index: 5;
+  transform: translateY(-3px) scale(1.04);
+  z-index: 10;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8) !important;
 }
 
 .table-card-item.card-blue {
-  background: linear-gradient(180deg, #103b4d 0%, #091f2a 100%);
-  border: 1.5px solid #1e8fa5;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, #134559 0%, #081d26 100%);
+  border: 1.5px solid #00d2d3;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .table-card-item.card-red {
-  background: linear-gradient(180deg, #4d1418 0%, #2a0a0d 100%);
-  border: 1.5px solid #a52834;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, #5c181d 0%, #240a0c 100%);
+  border: 1.5px solid #ff4757;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .table-card-item.is-pinned {
   border-color: #f1c40f !important;
-  box-shadow: 0 0 12px rgba(241, 196, 15, 0.75) !important;
+  box-shadow: 0 0 14px rgba(241, 196, 15, 0.85) !important;
 }
 
 .card-pin-indicator {
@@ -2050,35 +2055,102 @@ body.deception-app {
   right: -4px;
   font-size: 13px;
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+  pointer-events: none;
+  z-index: 6;
 }
 
-.card-icon-area {
-  font-size: 15px;
-  line-height: 1;
+.card-pin-corner-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+  z-index: 5;
+}
+
+.card-pin-corner-btn:hover {
+  background: rgba(241, 196, 15, 0.35);
+  border-color: #f1c40f;
+  color: #f1c40f;
+  transform: scale(1.15);
+}
+
+.card-pin-corner-btn.active {
+  background: rgba(241, 196, 15, 0.9);
+  border-color: #f1c40f;
+  color: #111;
+  font-size: 11px;
+  box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
+}
+
+.card-type-tag {
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  border-radius: 3px;
   margin-bottom: 2px;
 }
 
+.card-type-tag.tag-blue {
+  background: rgba(0, 210, 211, 0.25);
+  color: #7bed9f;
+  border: 0.5px solid rgba(0, 210, 211, 0.5);
+}
+
+.card-type-tag.tag-red {
+  background: rgba(255, 71, 87, 0.25);
+  color: #ff6b81;
+  border: 0.5px solid rgba(255, 71, 87, 0.5);
+}
+
+.card-icon-area {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  margin-bottom: 2px;
+  flex-shrink: 0;
+}
+
 .card-name-vi {
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 800;
-  color: #f5f6fa;
-  line-height: 1.15;
+  color: #ffffff;
+  line-height: 1.2;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  word-break: break-word;
+  white-space: normal;
+  text-align: center;
+  overflow: visible;
 }
 
 .card-name-en {
-  font-size: 8px;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  font-size: 7.5px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.1;
+  white-space: normal;
+  word-break: break-word;
+  text-align: center;
+  overflow: visible;
+  margin-top: 1px;
 }
 
 /* Center Forensics Strip: Bullet Rack + 6 Horizontal Scene Tiles */
@@ -2120,10 +2192,53 @@ body.deception-app {
   gap: 5px;
 }
 
+.bullet-rack-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(39, 174, 96, 0.25);
+  border: 1px solid #2ecc71;
+  border-radius: 6px;
+  padding: 6px 3px;
+  min-width: 44px;
+}
+
+.bullet-rack-check {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.bullet-rack-done-text {
+  font-size: 8px;
+  font-weight: 900;
+  color: #2ecc71;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.1;
+  white-space: normal;
+}
+
 .bullet-peg-token {
   font-size: 13px;
   line-height: 1;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.bullet-peg-token.peg-available {
+  color: #f1c40f;
+  animation: pegPulse 2s infinite ease-in-out;
+}
+
+.bullet-peg-token.peg-used {
+  opacity: 0.25;
+  filter: grayscale(1);
+}
+
+@keyframes pegPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px #f1c40f); }
+  50% { transform: scale(1.18); filter: drop-shadow(0 0 6px #f1c40f); }
 }
 
 .scene-tiles-row {
@@ -3029,3 +3144,174 @@ body.deception-app {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   Card Inspect Modal & Enhanced Inspector Showcase
+   ========================================================================== */
+.card-inspect-modal-card {
+  max-width: 440px;
+  width: 95%;
+  background: linear-gradient(180deg, #1f140e 0%, #0d0805 100%);
+  border: 2px solid #8b5a2b;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.95), 0 0 35px rgba(218, 165, 32, 0.25);
+  border-radius: 12px;
+}
+
+.card-inspect-showcase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 6px;
+}
+
+.card-inspect-card {
+  width: 100%;
+  max-width: 340px;
+  border-radius: 14px;
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.card-inspect-card.card-blue {
+  background: linear-gradient(180deg, #154c63 0%, #081d26 100%);
+  border: 2.5px solid #00d2d3;
+}
+
+.card-inspect-card.card-red {
+  background: linear-gradient(180deg, #6b1c22 0%, #290a0d 100%);
+  border: 2.5px solid #ff4757;
+}
+
+.inspect-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.inspect-type-pill {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.inspect-badge-blue {
+  background: rgba(0, 210, 211, 0.25);
+  color: #7bed9f;
+  border: 1px solid #00d2d3;
+}
+
+.inspect-badge-red {
+  background: rgba(255, 71, 87, 0.25);
+  color: #ff6b81;
+  border: 1px solid #ff4757;
+}
+
+.inspect-owner-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #e4c49b;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.inspect-card-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  margin: 6px 0 14px 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+}
+
+.inspect-card-title-vi {
+  font-family: 'Cinzel', Impact, serif, sans-serif;
+  font-size: 21px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.inspect-card-title-en {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.inspect-card-divider {
+  width: 70%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  margin-bottom: 14px;
+}
+
+.inspect-card-desc {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #dfe4ea;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 16px;
+  width: 100%;
+  text-align: left;
+}
+
+.inspect-card-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn-inspect-pin {
+  flex: 1;
+  background: linear-gradient(180deg, #3d2b1f 0%, #1f140e 100%);
+  border: 1.5px solid #8b5a2b;
+  color: #f1f2f6;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-inspect-pin:hover {
+  border-color: #f1c40f;
+  color: #f1c40f;
+  transform: translateY(-2px);
+}
+
+.btn-inspect-pin.is-pinned {
+  background: linear-gradient(180deg, #b8860b 0%, #7b5804 100%);
+  border-color: #ffd700;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.6);
+}
+

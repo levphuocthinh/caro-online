@@ -737,9 +737,20 @@ class DeceptionAppController {
     if (rackPegs) {
       const markedCount = this.state.activeSceneTiles.filter(t => t.selectedOptionIndex !== null).length;
       const remaining = Math.max(0, 6 - markedCount);
-      rackPegs.innerHTML = Array.from({ length: 6 }).map((_, i) => `
-        <span class="bullet-peg-token" style="opacity: ${i < remaining ? '1' : '0.2'}" title="Đạn gỗ ${i + 1}">🎯</span>
-      `).join('');
+      if (remaining === 0) {
+        rackPegs.innerHTML = `
+          <div class="bullet-rack-done" title="${this.isVi ? 'Tất cả 6 đạn gỗ đã ghim vào các thẻ hiện trường' : 'All 6 bullets placed on scene tiles'}">
+            <span class="bullet-rack-check">✅</span>
+            <span class="bullet-rack-done-text">${this.isVi ? '6/6 ĐÃ GHIM' : '6/6 PLACED'}</span>
+          </div>
+        `;
+      } else {
+        rackPegs.innerHTML = Array.from({ length: 6 }).map((_, i) => `
+          <span class="bullet-peg-token ${i < remaining ? 'peg-available' : 'peg-used'}" style="opacity: ${i < remaining ? '1' : '0.25'}" title="Đạn gỗ ${i + 1}: ${i < remaining ? 'Còn trong hộp' : 'Đã ghim'}">
+            ${i < remaining ? '🎯' : '🔘'}
+          </span>
+        `).join('');
+      }
     }
 
     if (actionsSlot) {
@@ -863,11 +874,14 @@ class DeceptionAppController {
             <!-- 4 Thẻ Hung Khí (Xanh) -->
             <div class="suspect-cards-strip strip-blue">
               ${s.meansCards.map(m => `
-                <div class="table-card-item card-blue ${this.state.pinnedCardIds.has(m.id) ? 'is-pinned' : ''}" data-pin-card="${m.id}" title="${m.vi} (${m.en})">
+                <div class="table-card-item card-blue ${this.state.pinnedCardIds.has(m.id) ? 'is-pinned' : ''}" data-inspect-card="${m.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en}) - Nhấp để xem chi tiết / ghim">
+                  <span class="card-type-tag tag-blue">${this.isVi ? 'HUNG KHÍ' : 'MEANS'}</span>
                   <div class="card-icon-area">${m.icon || '🔪'}</div>
                   <div class="card-name-vi">${m.vi}</div>
                   <div class="card-name-en">${m.en}</div>
-                  ${this.state.pinnedCardIds.has(m.id) ? '<span class="card-pin-indicator">📌</span>' : ''}
+                  <button type="button" class="card-pin-corner-btn ${this.state.pinnedCardIds.has(m.id) ? 'active' : ''}" data-pin-card="${m.id}" title="${this.state.pinnedCardIds.has(m.id) ? 'Đã ghim nghi vấn (nhấp để bỏ ghim)' : 'Ghim nghi vấn 📌'}">
+                    ${this.state.pinnedCardIds.has(m.id) ? '📌' : '•'}
+                  </button>
                 </div>
               `).join('')}
             </div>
@@ -875,11 +889,14 @@ class DeceptionAppController {
             <!-- 4 Thẻ Manh Mối (Đỏ) -->
             <div class="suspect-cards-strip strip-red">
               ${s.clueCards.map(c => `
-                <div class="table-card-item card-red ${this.state.pinnedCardIds.has(c.id) ? 'is-pinned' : ''}" data-pin-card="${c.id}" title="${c.vi} (${c.en})">
+                <div class="table-card-item card-red ${this.state.pinnedCardIds.has(c.id) ? 'is-pinned' : ''}" data-inspect-card="${c.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en}) - Nhấp để xem chi tiết / ghim">
+                  <span class="card-type-tag tag-red">${this.isVi ? 'MANH MỐI' : 'CLUE'}</span>
                   <div class="card-icon-area">${c.icon || '🩸'}</div>
                   <div class="card-name-vi">${c.vi}</div>
                   <div class="card-name-en">${c.en}</div>
-                  ${this.state.pinnedCardIds.has(c.id) ? '<span class="card-pin-indicator">📌</span>' : ''}
+                  <button type="button" class="card-pin-corner-btn ${this.state.pinnedCardIds.has(c.id) ? 'active' : ''}" data-pin-card="${c.id}" title="${this.state.pinnedCardIds.has(c.id) ? 'Đã ghim nghi vấn (nhấp để bỏ ghim)' : 'Ghim nghi vấn 📌'}">
+                    ${this.state.pinnedCardIds.has(c.id) ? '📌' : '•'}
+                  </button>
                 </div>
               `).join('')}
             </div>
@@ -891,7 +908,7 @@ class DeceptionAppController {
     topContainer.innerHTML = topSuspects.map(renderSuspectBox).join('');
     bottomContainer.innerHTML = bottomSuspects.map(renderSuspectBox).join('');
 
-    // Ghim nghi vấn 📌 khi bấm vào thẻ
+    // Ghim nghi vấn 📌 khi bấm vào nút ghim góc
     document.querySelectorAll('[data-pin-card]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -906,6 +923,16 @@ class DeceptionAppController {
       });
     });
 
+    // Mở Modal phóng to chi tiết thẻ bài
+    document.querySelectorAll('[data-inspect-card]').forEach(cardEl => {
+      cardEl.addEventListener('click', (e) => {
+        if (e.target.closest('[data-pin-card]')) return;
+        const cardId = cardEl.dataset.inspectCard;
+        const ownerName = cardEl.dataset.ownerName || '';
+        this.openCardInspectModal(cardId, ownerName);
+      });
+    });
+
     // Bấm nút Phá án từ trạm nghi phạm
     document.querySelectorAll('[data-accuse-suspect]').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -914,6 +941,86 @@ class DeceptionAppController {
         this.openAccusationDialog(btn.dataset.accuseSuspect);
       });
     });
+  }
+
+  openCardInspectModal(cardId, ownerName = '') {
+    let card = null;
+    let type = 'MEANS';
+    let owner = null;
+
+    for (const p of this.state.players) {
+      const foundM = p.meansCards?.find(m => m.id === cardId);
+      if (foundM) {
+        card = foundM;
+        type = 'MEANS';
+        owner = p;
+        break;
+      }
+      const foundC = p.clueCards?.find(c => c.id === cardId);
+      if (foundC) {
+        card = foundC;
+        type = 'CLUE';
+        owner = p;
+        break;
+      }
+    }
+
+    if (!card) return;
+
+    const isPinned = this.state.pinnedCardIds.has(card.id);
+    const showcase = document.getElementById('card-inspect-showcase');
+    const eyebrow = document.getElementById('inspect-eyebrow');
+    const heading = document.getElementById('inspect-heading');
+
+    if (eyebrow) {
+      eyebrow.textContent = type === 'MEANS' ? (this.isVi ? 'HỒ SƠ HUNG KHÍ GÂY ÁN' : 'MEANS OF MURDER DOSSIER') : (this.isVi ? 'HỒ SƠ MANH MỐI HIỆN TRƯỜNG' : 'CLUE EVIDENCE DOSSIER');
+    }
+    if (heading) {
+      heading.textContent = `${card.vi} • ${card.en}`;
+    }
+
+    if (showcase) {
+      const typeLabel = type === 'MEANS' ? (this.isVi ? 'HUNG KHÍ' : 'MEANS') : (this.isVi ? 'MANH MỐI' : 'CLUE');
+      const badgeClass = type === 'MEANS' ? 'inspect-badge-blue' : 'inspect-badge-red';
+      const oName = owner ? owner.displayName : ownerName;
+
+      showcase.innerHTML = `
+        <div class="card-inspect-card ${type === 'MEANS' ? 'card-blue' : 'card-red'}">
+          <div class="inspect-card-top">
+            <span class="inspect-type-pill ${badgeClass}">${typeLabel}</span>
+            <span class="inspect-owner-pill"><i class="fa-solid fa-user-shield"></i> ${oName}</span>
+          </div>
+          <div class="inspect-card-icon">${card.icon || (type === 'MEANS' ? '🔪' : '🩸')}</div>
+          <div class="inspect-card-title-vi">${card.vi}</div>
+          <div class="inspect-card-title-en">${card.en}</div>
+          <div class="inspect-card-divider"></div>
+          <div class="inspect-card-desc">
+            ${type === 'MEANS' 
+              ? (this.isVi ? 'Vật chứng này có thể đã được hung thủ sử dụng trực tiếp để hạ sát nạn nhân theo suy luận của Giám định viên.' : 'This object might have been used directly by the murderer to commit the homicide.')
+              : (this.isVi ? 'Dấu vết hoặc vật thể được thu thập tại hiện trường vụ án, có mối liên hệ mật thiết với hung thủ.' : 'Physical trace or evidence collected at the crime scene closely associated with the perpetrator.')}
+          </div>
+          <div class="inspect-card-actions">
+            <button type="button" class="btn-inspect-pin ${isPinned ? 'is-pinned' : ''}" id="btn-inspect-toggle-pin">
+              <i class="fa-solid fa-thumbtack"></i> <span>${isPinned ? (this.isVi ? 'Đã Ghim — Nhấp để Bỏ Ghim' : 'Pinned — Click to Unpin') : (this.isVi ? 'Ghim Nghi Vấn Này 📌' : 'Pin Suspicion 📌')}</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('btn-inspect-toggle-pin')?.addEventListener('click', () => {
+        if (this.state.pinnedCardIds.has(card.id)) {
+          this.state.pinnedCardIds.delete(card.id);
+        } else {
+          this.state.pinnedCardIds.add(card.id);
+        }
+        this.playAudio('click');
+        this.openCardInspectModal(card.id, ownerName);
+        this.renderAuthenticSuspectsTable();
+      });
+    }
+
+    this.openModal('modal-card-inspect');
+  }
   }
 
   advanceInvestigationRound() {
