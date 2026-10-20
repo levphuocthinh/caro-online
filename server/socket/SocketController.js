@@ -5,6 +5,7 @@
 const { RoomManager } = require('./RoomManager');
 const { MatchManager } = require('./MatchManager');
 const { ChatManager } = require('./ChatManager');
+const { DeceptionSocketManager } = require('./DeceptionSocketManager');
 
 class SocketController {
   constructor(io) {
@@ -12,6 +13,7 @@ class SocketController {
     this.roomManager = new RoomManager();
     this.matchManager = new MatchManager();
     this.chatManager = new ChatManager();
+    this.deceptionSocketManager = new DeceptionSocketManager(io);
   }
 
   /**
@@ -53,6 +55,9 @@ class SocketController {
       socket.on('error', (err) => {
         console.error(`[Socket Error] Socket ${socket.id} transport error:`, err);
       });
+
+      // Đăng ký bộ xử lý phòng & tin nhắn Deception: Murder in Viet Nam
+      this.deceptionSocketManager.registerSocketHandlers(socket, this._safeHandler.bind(this));
 
       // 1. Sự kiện tạo phòng
       socket.on('create_room', this._safeHandler(socket, 'create_room', (data) => {
@@ -125,6 +130,11 @@ class SocketController {
           this.chatManager.cleanupSocket(socket.id);
         } catch (err) {
           console.error('[SocketController Error] Failed to cleanup chat for socket:', err);
+        }
+        try {
+          this.deceptionSocketManager.handleDisconnect(socket);
+        } catch (err) {
+          console.error('[SocketController Error] Failed to cleanup Deception socket:', err);
         }
         this.roomManager.handleDisconnect(socket, this.io);
       }));

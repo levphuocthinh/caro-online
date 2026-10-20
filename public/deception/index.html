@@ -52,10 +52,6 @@
           <span id="hdr-my-role-name">Vai Trò</span>
           <i class="fa-solid fa-circle-info" style="font-size: 11px; margin-left: 4px; color: #f1c40f;"></i>
         </button>
-        <button type="button" class="btn-hdr-action btn-gallery-action" id="btn-open-cutscene-gallery" title="Xem Rạp Chiếu 7 Hoạt Cảnh Hành Động Pixel Noir">
-          <i class="fa-solid fa-clapperboard"></i>
-          <span>Rạp Hoạt Cảnh</span>
-        </button>
         <button type="button" class="btn-hdr-action" id="btn-toggle-lang" title="Đổi ngôn ngữ / Switch Language">
           <i class="fa-solid fa-globe"></i>
           <span id="lbl-lang">VI</span>
@@ -79,76 +75,296 @@
           <div class="lobby-card-header">
             <div>
               <span class="view-eyebrow"><i class="fa-solid fa-users"></i> PHÒNG ĐIỀU TRA VỤ ÁN</span>
-              <h2 class="view-title">Thiết Lập Bàn Phá Án (4 – 9 Người Chơi)</h2>
+              <h2 class="view-title">Bàn Hội Chẩn Trọng Án (4 – 9 Người Chơi)</h2>
             </div>
             <div class="room-share-badge">
               <span>MÃ BÀN: <b id="lbl-room-code">#HANG-DAY-88</b></span>
-              <button type="button" class="btn-copy-code" id="btn-copy-code">
+              <button type="button" class="btn-copy-code" id="btn-copy-code" title="Sao chép mã bàn">
                 <i class="fa-solid fa-copy"></i>
               </button>
             </div>
           </div>
 
-          <!-- Central Detective Table Layout Preview -->
-          <div class="lobby-table-wrapper">
-            <div class="detective-round-table">
-              <div class="table-felt">
-                <div class="table-emblem">
-                  <i class="fa-solid fa-fingerprint"></i>
-                  <span>CẢNH SÁT HÌNH SỰ • HÀ NỘI</span>
+          <!-- LOBBY MODE SWITCH TABS: SOLO BOT VS ONLINE MULTIPLAYER -->
+          <div class="lobby-mode-switch">
+            <button type="button" class="btn-lobby-mode-tab active" id="tab-btn-solo" data-mode="solo">
+              <i class="fa-solid fa-robot"></i>
+              <span>Chơi Với Máy (Bot AI)</span>
+            </button>
+            <button type="button" class="btn-lobby-mode-tab" id="tab-btn-online" data-mode="online">
+              <i class="fa-solid fa-earth-americas"></i>
+              <span>Phòng Chơi Online (Multiplayer)</span>
+            </button>
+          </div>
+
+          <!-- TAB 1: SOLO PLAY WITH AI BOTS -->
+          <div class="lobby-panel active" id="panel-lobby-solo">
+            <!-- Central Detective Table Layout Preview -->
+            <div class="lobby-table-wrapper">
+              <div class="detective-round-table">
+                <div class="table-felt">
+                  <div class="table-emblem">
+                    <i class="fa-solid fa-fingerprint"></i>
+                    <span>CẢNH SÁT HÌNH SỰ • HÀ NỘI</span>
+                  </div>
+                </div>
+                <div class="table-seats-ring" id="lobby-seats-ring">
+                  <!-- Rendered dynamically -->
                 </div>
               </div>
-              <div class="table-seats-ring" id="lobby-seats-ring">
-                <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Compact Configuration Bar -->
+            <div class="lobby-controls-bar">
+              <div class="cfg-group">
+                <label for="cfg-player-name">Tên thám tử của bạn:</label>
+                <input type="text" id="cfg-player-name" class="noir-ctrl-input" value="Thám tử Trưởng" maxlength="18">
+              </div>
+
+              <div class="cfg-group">
+                <label for="cfg-player-count">Số người chơi:</label>
+                <select id="cfg-player-count" class="noir-ctrl-select">
+                  <option value="4">4 Người (1 Pháp y, 1 Hung thủ, 2 Điều tra)</option>
+                  <option value="5">5 Người (Có thêm Thám tử Cố vấn)</option>
+                  <option value="6" selected>6 Người (Chuẩn: Có Đồng phạm & Nhân chứng ★)</option>
+                  <option value="7">7 Người (+ Kỹ thuật viên Lab ★)</option>
+                  <option value="8">8 Người (+ Nội gián đánh cắp huy hiệu ★)</option>
+                  <option value="9">9 Người (Bàn đại tiệc phá án tối đa)</option>
+                </select>
+              </div>
+
+              <div class="cfg-group">
+                <label for="cfg-preferred-role">Vai trò bạn muốn cầm:</label>
+                <select id="cfg-preferred-role" class="noir-ctrl-select">
+                  <option value="RANDOM">🎲 Ngẫu Nhiên (Trải nghiệm chuẩn)</option>
+                  <option value="FORENSIC_SCIENTIST">🔬 Chuyên gia Pháp y</option>
+                  <option value="MURDERER">🔪 Kẻ Sát Nhân</option>
+                  <option value="INVESTIGATOR">🕵️ Điều tra viên</option>
+                  <option value="WITNESS">👁️ Nhân chứng</option>
+                  <option value="ACCOMPLICE">🎭 Đồng phạm</option>
+                  <option value="LAB_TECHNICIAN">🧪 Kỹ thuật viên Phòng Lab</option>
+                  <option value="INSIDE_MAN">🕶️ Nội gián</option>
+                  <option value="PROTECTIVE_DETAIL">🛡️ Đặc vụ Bảo vệ</option>
+                  <option value="CONSULTING_DETECTIVE">🎩 Thám tử Cố vấn</option>
+                </select>
               </div>
             </div>
-          </div>
 
-          <!-- Compact Configuration Bar -->
-          <div class="lobby-controls-bar">
-            <div class="cfg-group">
-              <label for="cfg-player-name">Tên thám tử của bạn:</label>
-              <input type="text" id="cfg-player-name" class="noir-ctrl-input" value="Thám tử Trưởng" maxlength="18">
-            </div>
-
-            <div class="cfg-group">
-              <label for="cfg-player-count">Số người chơi:</label>
-              <select id="cfg-player-count" class="noir-ctrl-select">
-                <option value="4">4 Người (1 Pháp y, 1 Hung thủ, 2 Điều tra)</option>
-                <option value="5">5 Người (Có thêm Thám tử Cố vấn)</option>
-                <option value="6" selected>6 Người (Chuẩn: Có Đồng phạm & Nhân chứng ★)</option>
-                <option value="7">7 Người (+ Kỹ thuật viên Lab ★)</option>
-                <option value="8">8 Người (+ Nội gián đánh cắp huy hiệu ★)</option>
-                <option value="9">9 Người (Bàn đại tiệc phá án tối đa)</option>
-              </select>
-            </div>
-
-            <div class="cfg-group">
-              <label for="cfg-preferred-role">Vai trò bạn muốn cầm:</label>
-              <select id="cfg-preferred-role" class="noir-ctrl-select">
-                <option value="RANDOM">🎲 Ngẫu Nhiên (Trải nghiệm chuẩn)</option>
-                <option value="FORENSIC_SCIENTIST">🔬 Chuyên gia Pháp y</option>
-                <option value="MURDERER">🔪 Kẻ Sát Nhân</option>
-                <option value="INVESTIGATOR">🕵️ Điều tra viên</option>
-                <option value="WITNESS">👁️ Nhân chứng</option>
-                <option value="ACCOMPLICE">🎭 Đồng phạm</option>
-                <option value="LAB_TECHNICIAN">🧪 Kỹ thuật viên Phòng Lab</option>
-                <option value="INSIDE_MAN">🕶️ Nội gián</option>
-                <option value="PROTECTIVE_DETAIL">🛡️ Đặc vụ Bảo vệ</option>
-                <option value="CONSULTING_DETECTIVE">🎩 Thám tử Cố vấn</option>
-              </select>
+            <div class="lobby-cta-row">
+              <button type="button" class="btn-noir-hero" id="btn-start-investigation">
+                <i class="fa-solid fa-play"></i>
+                <span>BẮT ĐẦU VỤ ÁN VỚI BOT</span>
+              </button>
             </div>
           </div>
 
-          <div class="lobby-cta-row">
-            <button type="button" class="btn-noir-hero" id="btn-start-investigation">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <span>BẮT ĐẦU VỤ ÁN MỚI</span>
-            </button>
-            <button type="button" class="btn-noir-theater-lobby" id="btn-lobby-theater" title="Xem trước các hoạt cảnh Pixel Art">
-              <i class="fa-solid fa-clapperboard"></i>
-              <span>Rạp Chiếu Hoạt Cảnh (7 Casting)</span>
-            </button>
+          <!-- TAB 2: ONLINE MULTIPLAYER ROOM (CREATE / JOIN) -->
+          <div class="lobby-panel" id="panel-lobby-online" style="display: none;">
+            <div class="online-lobby-grid">
+              <!-- CARD 1: TẠO PHÒNG MỚI (LÀM CHỦ PHÒNG) -->
+              <div class="online-mode-card card-create-room">
+                <div class="online-card-header">
+                  <div class="online-card-icon"><i class="fa-solid fa-crown"></i></div>
+                  <div>
+                    <h3 class="online-card-title">Tạo Bàn Phá Án Mới</h3>
+                    <p class="online-card-desc">Làm Chủ phòng, nhận mã phòng để chia sẻ và toàn quyền thêm Bot AI hoặc bắt đầu trận.</p>
+                  </div>
+                </div>
+
+                <div class="online-card-form">
+                  <div class="cfg-group">
+                    <label for="online-create-name">Tên hiển thị của bạn:</label>
+                    <input type="text" id="online-create-name" class="noir-ctrl-input" value="Thám tử Trưởng" maxlength="18">
+                  </div>
+
+                  <div class="cfg-group">
+                    <label>Chọn biểu tượng đại diện (Avatar):</label>
+                    <div class="avatar-quick-selector" id="create-avatar-picker">
+                      <button type="button" class="btn-avatar-choice active" data-avatar="🕵️">🕵️</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🔬">🔬</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🔪">🔪</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🎭">🎭</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🧪">🧪</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🕶️">🕶️</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🛡️">🛡️</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🎩">🎩</button>
+                    </div>
+                  </div>
+
+                  <button type="button" class="btn-noir-hero btn-create-online" id="btn-create-online-room">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>TẠO PHÒNG MỚI (HOST)</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- CARD 2: VÀO PHÒNG CÓ SẴN (THAM GIA) -->
+              <div class="online-mode-card card-join-room">
+                <div class="online-card-header">
+                  <div class="online-card-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+                  <div>
+                    <h3 class="online-card-title">Vào Phòng Đã Có Mã</h3>
+                    <p class="online-card-desc">Tham gia bàn chơi của bạn bè bằng mã phòng gồm 6 ký tự (VD: DEC842).</p>
+                  </div>
+                </div>
+
+                <div class="online-card-form">
+                  <div class="cfg-group">
+                    <label for="online-join-code">Nhập mã phòng (6 ký tự):</label>
+                    <input type="text" id="online-join-code" class="noir-ctrl-input input-room-code" placeholder="VD: DEC842" maxlength="8" style="text-transform: uppercase;">
+                  </div>
+
+                  <div class="cfg-group">
+                    <label for="online-join-name">Tên hiển thị của bạn:</label>
+                    <input type="text" id="online-join-name" class="noir-ctrl-input" value="Điều Tra Viên" maxlength="18">
+                  </div>
+
+                  <button type="button" class="btn-noir-hero btn-join-online" id="btn-join-online-room">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>VÀO PHÒNG NGAY</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ONLINE PERKS / FEATURE TAGS -->
+            <div class="online-perks-row">
+              <span class="online-perk"><i class="fa-solid fa-bolt"></i> WebSocket Thời Gian Thực</span>
+              <span class="online-perk"><i class="fa-solid fa-comments"></i> Kênh Chat & Đàm Thoại Trực Tiếp</span>
+              <span class="online-perk"><i class="fa-solid fa-robot"></i> Thêm Bot AI Lấp Đầy Ghế</span>
+              <span class="online-perk"><i class="fa-solid fa-gavel"></i> Chủ Phòng Quyền Lực (Kick / Start)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 1.5: ONLINE WAITING ROOM (Phòng Chờ Trực Tuyến & Nhắn Tin WebSocket) -->
+      <section class="noir-view" id="view-online-room">
+        <div class="online-room-card">
+          <!-- Room Header Bar -->
+          <div class="online-room-header">
+            <div class="room-title-block">
+              <span class="view-eyebrow text-gold"><i class="fa-solid fa-wifi"></i> PHÒNG CHỜ TRỰC TUYẾN WEBSOCKET</span>
+              <h2 class="view-title">Bàn Hội Chẩn Trọng Án <span id="online-room-title-code" class="code-highlight">#DEC---</span></h2>
+            </div>
+            <div class="room-meta-actions">
+              <div class="room-code-badge-pill">
+                <span>MÃ PHÒNG:</span>
+                <b id="lbl-online-room-code">DEC---</b>
+                <button type="button" class="btn-copy-code" id="btn-copy-online-room-code" title="Sao chép mã phòng để gửi bạn bè">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
+              <div class="room-occupancy-pill">
+                <i class="fa-solid fa-users"></i>
+                <span id="lbl-online-occupancy">1/9 Người</span>
+              </div>
+              <button type="button" class="btn-leave-online" id="btn-leave-online-room" title="Rời khỏi phòng chờ">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Rời Phòng</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Main 2-Column Split: Left Roster & Controls, Right Live Chat -->
+          <div class="online-room-split">
+            <!-- LEFT COLUMN: Profile customizer, Seat Roster & Host/Guest Actions -->
+            <div class="online-col-seats">
+              <!-- Inline Profile Customizer (Đổi tên & Avatar nhanh) -->
+              <div class="profile-quick-editor">
+                <div class="quick-editor-title">
+                  <i class="fa-solid fa-user-pen"></i> Tùy Chỉnh Danh Tính Trong Bàn:
+                </div>
+                <div class="quick-editor-body">
+                  <div class="avatar-current-wrap">
+                    <span id="my-active-avatar" class="active-avatar-icon">🕵️</span>
+                    <div class="avatar-dropdown-picker" id="online-avatar-picker">
+                      <span class="emoji-chip" data-emoji="🕵️">🕵️</span>
+                      <span class="emoji-chip" data-emoji="🔬">🔬</span>
+                      <span class="emoji-chip" data-emoji="🔪">🔪</span>
+                      <span class="emoji-chip" data-emoji="🎭">🎭</span>
+                      <span class="emoji-chip" data-emoji="🧪">🧪</span>
+                      <span class="emoji-chip" data-emoji="🕶️">🕶️</span>
+                      <span class="emoji-chip" data-emoji="🛡️">🛡️</span>
+                      <span class="emoji-chip" data-emoji="🎩">🎩</span>
+                      <span class="emoji-chip" data-emoji="👁️">👁️</span>
+                    </div>
+                  </div>
+                  <input type="text" id="input-online-display-name" class="noir-ctrl-input input-my-name" placeholder="Tên hiển thị của bạn..." maxlength="18">
+                  <button type="button" class="btn-save-online-name" id="btn-save-online-name" title="Lưu tên mới">
+                    <i class="fa-solid fa-floppy-disk"></i> Đổi Tên
+                  </button>
+                </div>
+              </div>
+
+              <!-- Seats Roster Container -->
+              <div class="seats-roster-box">
+                <div class="seats-roster-header">
+                  <h4><i class="fa-solid fa-chair"></i> Danh Sách Ghế Ngồi (4 – 9 Người Chơi)</h4>
+                  <span class="seats-requirement-hint" id="lbl-seats-hint">Cần tối thiểu 4 người chơi để bắt đầu</span>
+                </div>
+                <div class="seats-cards-grid" id="online-seats-grid">
+                  <!-- Rendered dynamically with host/ready badges and kick buttons -->
+                </div>
+              </div>
+
+              <!-- Action Controls Bar -->
+              <div class="online-controls-bar">
+                <!-- GUEST ACTIONS (For non-host human players) -->
+                <div id="wrap-guest-controls" class="controls-guest" style="display: none;">
+                  <button type="button" class="btn-action-ready" id="btn-guest-toggle-ready">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span id="lbl-guest-ready-status">BẤM SẴN SÀNG</span>
+                  </button>
+                  <p class="guest-ready-tip">Hãy bấm Sẵn sàng để Chủ phòng có thể bắt đầu vụ án!</p>
+                </div>
+
+                <!-- HOST ACTIONS (For room host) -->
+                <div id="wrap-host-controls" class="controls-host" style="display: none;">
+                  <div class="host-bot-management">
+                    <button type="button" class="btn-host-btn btn-add-bot" id="btn-host-add-bot" title="Thêm một Bot AI vào bàn chơi">
+                      <i class="fa-solid fa-robot"></i> + Thêm Bot AI
+                    </button>
+                    <button type="button" class="btn-host-btn btn-remove-bot" id="btn-host-remove-bot" title="Xóa bớt Bot AI">
+                      <i class="fa-solid fa-user-minus"></i> - Bớt Bot
+                    </button>
+                  </div>
+                  <button type="button" class="btn-host-start-game" id="btn-host-start-online-game">
+                    <i class="fa-solid fa-play"></i> BẮT ĐẦU VỤ ÁN
+                  </button>
+                  <div class="host-start-status-hint" id="host-start-status-hint">
+                    Đang chờ đủ 4 người chơi và mọi thành viên sẵn sàng...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: LIVE REAL-TIME CHAT (WEBSOCKET) -->
+            <div class="online-col-chat">
+              <div class="live-chat-panel">
+                <div class="chat-panel-header">
+                  <div class="chat-header-title">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>Kênh Đàm Thoại Mật</span>
+                  </div>
+                  <div class="chat-live-pulse">
+                    <span class="pulse-dot"></span>
+                    <span>WebSocket Live</span>
+                  </div>
+                </div>
+
+                <div class="chat-messages-stream" id="online-chat-stream">
+                  <!-- Real-time chat messages and system alerts -->
+                </div>
+
+                <form class="chat-input-bar" id="form-online-room-chat">
+                  <input type="text" id="input-online-room-chat" class="chat-text-input" placeholder="Gõ tin nhắn bàn luận, đặt nghi vấn..." maxlength="200" autocomplete="off">
+                  <button type="submit" class="btn-send-message" id="btn-send-room-chat" title="Gửi tin nhắn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -349,9 +565,10 @@
               <i class="fa-solid fa-gavel"></i>
               <span>🚨 PHÁ ÁN!</span>
             </button>
-            <button type="button" class="btn-hud-guide" id="btn-hud-gallery" title="Mở Rạp Chiếu Hoạt Cảnh Pixel Noir">
-              <i class="fa-solid fa-clapperboard"></i>
-              <span>Rạp Casting</span>
+            <button type="button" class="btn-hud-guide btn-hud-chat" id="btn-toggle-ingame-chat" title="Mở Kênh Chat Đàm Thoại Trực Tuyến">
+              <i class="fa-solid fa-comments"></i>
+              <span>Trò Chuyện</span>
+              <span class="chat-badge-dot" id="hud-chat-badge" style="display: none;"></span>
             </button>
             <button type="button" class="btn-hud-guide" id="btn-quick-guide" title="Xem hướng dẫn cách chơi Deception">
               <i class="fa-solid fa-circle-question"></i>
@@ -702,137 +919,27 @@
     </div>
   </div>
 
-  <!-- MODAL 6: RẠP CHIẾU HOẠT CẢNH (CUTSCENE / CASTING GALLERY) -->
-  <div class="noir-modal-overlay" id="modal-cutscene-gallery">
-    <div class="noir-modal-card cutscene-gallery-modal-card">
-      <div class="noir-modal-header">
-        <div>
-          <span class="view-eyebrow text-gold"><i class="fa-solid fa-clapperboard"></i> PHÒNG CHIẾU HOẠT CẢNH</span>
-          <h3 class="modal-heading">Rạp Chiếu Hoạt Cảnh Trọng Án (Casting Theater)</h3>
-        </div>
-        <button type="button" class="btn-modal-close" data-close="modal-cutscene-gallery"><i class="fa-solid fa-xmark"></i></button>
+  <!-- IN-GAME LIVE CHAT FLOATING DRAWER (Dành cho việc đàm thoại thời gian thực khi đang phá án) -->
+  <div class="ingame-chat-drawer" id="ingame-chat-drawer">
+    <div class="chat-drawer-header">
+      <div class="drawer-title">
+        <i class="fa-solid fa-comments"></i>
+        <span>Đàm Thoại Trọng Án (WebSocket Live)</span>
       </div>
-
-      <div class="modal-body-scroll">
-        <p class="gallery-lead">
-          Thưởng thức toàn bộ <b>7 hoạt cảnh Pixel Art hành động</b> độc quyền của Deception: tái hiện chân thực từ khoảnh khắc gây án đêm mưa phố Hàng Đẫy đến các đại cảnh công an vây bắt và đào tẩu sân bay!
-        </p>
-
-        <div class="cutscene-gallery-grid">
-          <!-- Card 1: Đâm lén phía sau -->
-          <div class="cutscene-gallery-item" data-category="crime">
-            <div class="item-badge badge-crim"><i class="fa-solid fa-skull"></i> Ban Đêm Gây Án</div>
-            <div class="item-preview item-bg-stab">
-              <span class="preview-icon">🗡️</span>
-            </div>
-            <div class="item-info">
-              <h4 class="item-title">1. Đâm Lén Phía Sau</h4>
-              <p class="item-desc">Hung thủ rón rén bám đuôi nạn nhân dưới mưa đêm phố Hàng Đẫy, bất ngờ áp sát đâm ngập dao vào lưng. Nạn nhân ngã gục, hung thủ thở dốc hộc hộc rồi tháo chạy.</p>
-              <button type="button" class="btn-play-cutscene" data-scene="backstab">
-                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 2: Tông xe bỏ chạy -->
-          <div class="cutscene-gallery-item" data-category="crime">
-            <div class="item-badge badge-crim"><i class="fa-solid fa-skull"></i> Ban Đêm Gây Án</div>
-            <div class="item-preview item-bg-bike">
-              <span class="preview-icon">🛵</span>
-            </div>
-            <div class="item-info">
-              <h4 class="item-title">2. Tông Xe Máy Bỏ Chạy</h4>
-              <p class="item-desc">Xe máy Dream rọi đèn pha lao tới tông văng nạn nhân trong đêm phố Hàng Đẫy, phanh khét lẹt tóe lửa. Kẻ tông xe thở dốc run rẩy rồi rồ ga tẩu thoát.</p>
-              <button type="button" class="btn-play-cutscene" data-scene="hitandrun">
-                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 3: Ẩu đả đám đông -->
-          <div class="cutscene-gallery-item item-highlight" data-category="crime">
-            <div class="item-badge badge-new"><i class="fa-solid fa-fire"></i> Mới • Ẩu Đả Đám Đông</div>
-            <div class="item-preview item-bg-brawl">
-              <span class="preview-icon">👊</span>
-            </div>
-            <div class="item-info">
-              <h4 class="item-title">3. Tụ Tập Ẩu Đả & Chạy Tán Loạn</h4>
-              <p class="item-desc">Xô xát hỗn chiến trước Quán Nhậu Bình Dân phố Hàng Đẫy. Cú đấm chí mạng ĐỐP! HUỴCH! hạ gục nạn nhân tử vong, cả đám đông kinh hoàng chạy tán loạn vào các con ngõ!</p>
-              <button type="button" class="btn-play-cutscene" data-scene="brawl">
-                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 4: Đầu độc ly trà -->
-          <div class="cutscene-gallery-item item-highlight" data-category="crime">
-            <div class="item-badge badge-new"><i class="fa-solid fa-flask-vial"></i> Mới • Đầu Độc Kín Đáo</div>
-            <div class="item-preview item-bg-poison">
-              <span class="preview-icon">🍵</span>
-            </div>
-            <div class="item-info">
-              <h4 class="item-title">4. Đầu Độc Ly Trà Vỉa Hè</h4>
-              <p class="item-desc">Tại quán nước chè vỉa hè, hung thủ lén nhỏ giọt độc vào cốc. Nạn nhân uống xong ho sặc sụa, trúng độc co giật rồi gục xuống bàn trà, hung thủ khép áo lẻn đi.</p>
-              <button type="button" class="btn-play-cutscene" data-scene="poison">
-                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 5: Công An vây bắt -->
-          <div class="cutscene-gallery-item" data-category="end">
-            <div class="item-badge badge-police"><i class="fa-solid fa-shield-halved"></i> Phe Cảnh Sát Thắng</div>
-            <div class="item-preview item-bg-arrest">
-              <span class="preview-icon">🚔</span>
-            </div>
-            <div class="item-info">
-              <h4 class="item-title">5. Cảnh Sát 113 Vây Bắt Hung Thủ</h4>
-              <p class="item-desc">Xe 113 hú còi rọi đèn đỏ xanh lao tới chặn đầu tẩu thoát. Cảnh sát hình sự bung cửa quật ngã khống chế hung thủ, tra còng số 8 cạch cạch sa lưới pháp luật!</p>
-              <button type="button" class="btn-play-cutscene" data-scene="arrest">
-                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 6: Máy bay tẩu thoát -->
-          <div class="cutscene-gallery-item" data-category="end">
-            <div class="item-badge badge-crim"><i class="fa-solid fa-plane-departure"></i> Phe Tội Phạm Thắng</div>
-            <div class="item-preview item-bg-airplane">
-              <span class="preview-icon">✈️</span>
-            </div>
-            <div class="item-info">
-              <h4 class="item-title">6. Lên Chuyên Cơ Tẩu Thoát Ngoại Biên</h4>
-              <p class="item-desc">Sân bay Nội Bài đêm mưa giông sấm chớp, hung thủ xách vali chạy lên cầu thang máy bay, vẫy tay thách thức. Phi cơ gầm rú cất cánh mất hút vào tầng mây!</p>
-              <button type="button" class="btn-play-cutscene" data-scene="escape">
-                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 7: Casting Phá Án Kịch Tính -->
-          <div class="cutscene-gallery-item" data-category="accuse">
-            <div class="item-badge badge-accuse"><i class="fa-solid fa-gavel"></i> Đối Chất Phá Án</div>
-            <div class="item-preview item-bg-casting">
-              <span class="preview-icon">⚖️</span>
-            </div>
-            <div class="item-info">
-              <h4 class="item-title">7. Đập Bàn Phá Án (Casting Accusation)</h4>
-              <p class="item-desc">Khoảnh khắc ném phù hiệu phá án, spotlight rọi thẳng vào nghi phạm bị chỉ đích danh, nhịp tim dồn dập và tiếng cộp cộp đóng dấu số phận bị can!</p>
-              <button type="button" class="btn-play-cutscene" data-scene="casting">
-                <i class="fa-solid fa-play"></i> Xem Hoạt Cảnh
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="noir-modal-footer">
-        <button type="button" class="btn-modal-cancel" data-close="modal-cutscene-gallery">Đóng Rạp Chiếu</button>
-      </div>
+      <button type="button" class="btn-drawer-close" id="btn-close-ingame-chat" title="Thu nhỏ khung chat">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
+    <div class="ingame-chat-feed" id="ingame-chat-feed">
+      <!-- Real-time chat messages mirrored here -->
+    </div>
+    <form class="ingame-chat-form" id="form-ingame-chat">
+      <input type="text" id="input-ingame-chat" placeholder="Thảo luận, đưa ra suy đoán hoặc ngụy tạo..." maxlength="200" autocomplete="off">
+      <button type="submit" id="btn-ingame-chat-submit"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
   </div>
 
-  <!-- MODAL 7: CẨM NANG VAI TRÒ DỄ HIỂU (MY ROLE GUIDE POPUP) -->
+  <!-- MODAL 6: CẨM NANG VAI TRÒ DỄ HIỂU (MY ROLE GUIDE POPUP) -->
   <div class="noir-modal-overlay" id="modal-my-role-guide">
     <div class="noir-modal-card role-guide-modal-card">
       <div class="noir-modal-header">
@@ -928,6 +1035,8 @@
     </div>
   </div>
 
+  <!-- Socket.io Client Library for Real-Time Multiplayer & Live Chat -->
+  <script src="/socket.io/socket.io.js"></script>
   <!-- Application Entry Point -->
   <script type="module" src="js/DeceptionApp.js"></script>
 </body>

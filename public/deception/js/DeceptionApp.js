@@ -31,6 +31,16 @@ class DeceptionAppController {
     this.speakerTimerId = null; // backward compatibility
     this.soundEnabled = true;
 
+    // WebSocket Multiplayer properties
+    this.socket = null;
+    this.onlineRoom = null;
+    this.myPlayerId = null;
+    this.myAvatar = '🕵️';
+    this.unreadInGameChatCount = 0;
+    this.isInGameChatOpen = false;
+    this.isOnlineMatch = false;
+    this.onlineSecretIntel = null;
+
     // Cache các phần tử DOM thường xuyên truy vấn để tối ưu hiệu năng
     this.dom = {};
   }
@@ -67,6 +77,7 @@ class DeceptionAppController {
     } catch (err) {
       console.warn('[DeceptionApp] Pixel Noir engine init warning:', err);
     }
+    this.initSocket();
     this.bindDomEvents();
     this.renderLobbySeatsRing();
     this.updateHeaderInfo();
@@ -181,67 +192,193 @@ class DeceptionAppController {
       this.playAudio('click');
     });
 
-    // Nút BẮT ĐẦU VỤ ÁN MỚI
+    // Nút BẮT ĐẦU VỤ ÁN MỚI VỚI BOT
     document.getElementById('btn-start-investigation')?.addEventListener('click', () => {
+      this.isOnlineMatch = false;
       this.startInvestigationGame();
     });
 
-    // Nút mở Rạp Chiếu Hoạt Cảnh (Casting Gallery)
-    ['btn-open-cutscene-gallery', 'btn-lobby-theater', 'btn-hud-gallery'].forEach(id => {
-      document.getElementById(id)?.addEventListener('click', () => {
-        this.openModal('modal-cutscene-gallery');
+    // Chuyển đổi Tab Lobby: Chơi Solo Với Máy vs Phòng Chơi Online
+    document.getElementById('tab-btn-solo')?.addEventListener('click', () => {
+      document.getElementById('tab-btn-solo')?.classList.add('active');
+      document.getElementById('tab-btn-online')?.classList.remove('active');
+      const pSolo = document.getElementById('panel-lobby-solo');
+      const pOnline = document.getElementById('panel-lobby-online');
+      if (pSolo) pSolo.style.display = 'block';
+      if (pOnline) pOnline.style.display = 'none';
+      this.playAudio('click');
+    });
+
+    document.getElementById('tab-btn-online')?.addEventListener('click', () => {
+      document.getElementById('tab-btn-online')?.classList.add('active');
+      document.getElementById('tab-btn-solo')?.classList.remove('active');
+      const pSolo = document.getElementById('panel-lobby-solo');
+      const pOnline = document.getElementById('panel-lobby-online');
+      if (pSolo) pSolo.style.display = 'none';
+      if (pOnline) pOnline.style.display = 'block';
+      this.playAudio('click');
+    });
+
+    // Chọn avatar trong form tạo phòng
+    document.querySelectorAll('#create-avatar-picker .btn-avatar-choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#create-avatar-picker .btn-avatar-choice').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.myAvatar = btn.dataset.avatar || '🕵️';
+        this.playAudio('click');
       });
     });
 
-    // Nút kích hoạt phát Hoạt Cảnh trong Rạp Chiếu
-    document.querySelectorAll('.btn-play-cutscene').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const scene = btn.dataset.scene;
-        this.closeModal('modal-cutscene-gallery');
+    // Nút Tạo Phòng Online Mới (Chủ Phòng)
+    document.getElementById('btn-create-online-room')?.addEventListener('click', () => {
+      const name = (document.getElementById('online-create-name')?.value || '').trim() || 'Thám tử Trưởng';
+      if (!this.socket) {
+        this.showToast('Chưa kết nối máy chủ WebSocket! Vui lòng tải lại trang.');
+        return;
+      }
+      this.playAudio('click');
+      this.socket.emit('deception:create_room', {
+        playerName: name,
+        avatar: this.myAvatar
+      });
+    });
 
-        if (scene === 'backstab') {
-          deceptionPixelNoir.playBackStab({
-            meansName: 'Dao găm',
-            clueName: 'Vết máu',
-            murdererName: 'Kẻ Sát Nhân Trong Đêm'
-          });
-        } else if (scene === 'hitandrun') {
-          deceptionPixelNoir.playMotorbikeHitAndRun({
-            meansName: 'Xe máy Dream',
-            clueName: 'Vết lốp xe',
-            murdererName: 'Kẻ Tông Xe Bỏ Chạy'
-          });
-        } else if (scene === 'brawl') {
-          deceptionPixelNoir.playStreetBrawl({
-            meansName: 'Xà beng kim loại',
-            clueName: 'Bụi kim loại',
-            murdererName: 'Kẻ Gây Án Ẩu Đả'
-          });
-        } else if (scene === 'poison') {
-          deceptionPixelNoir.playPoisoning({
-            meansName: 'Thuốc độc thạch tín',
-            clueName: 'Cốc vỡ',
-            murdererName: 'Kẻ Đầu Độc Bí Mật'
-          });
-        } else if (scene === 'arrest') {
-          deceptionPixelNoir.playPoliceArrest({
-            murdererName: 'Kẻ Sát Nhân'
-          });
-        } else if (scene === 'escape') {
-          deceptionPixelNoir.playAirplaneEscape({
-            murdererName: 'Kẻ Sát Nhân'
-          });
-        } else if (scene === 'casting') {
-          this.showAccusationCastingModal({
-            accuserName: 'Điều Tra Viên Phá Án',
-            accuserAvatar: '🕵️',
-            targetPlayer: { displayName: 'Nghi Phạm Chính', avatar: '👤' },
-            meansCard: { vi: 'Dao găm', en: 'Dagger' },
-            clueCard: { vi: 'Vết máu', en: 'Blood' },
-            isCorrect: true
+    // Nút Vào Phòng Online Có Sẵn (Khách)
+    document.getElementById('btn-join-online-room')?.addEventListener('click', () => {
+      const code = (document.getElementById('online-join-code')?.value || '').trim().toUpperCase();
+      const name = (document.getElementById('online-join-name')?.value || '').trim() || 'Điều Tra Viên';
+      if (!code) {
+        this.showToast('Vui lòng nhập mã phòng 6 ký tự (VD: DEC842)!');
+        return;
+      }
+      if (!this.socket) {
+        this.showToast('Chưa kết nối máy chủ WebSocket! Vui lòng tải lại trang.');
+        return;
+      }
+      this.playAudio('click');
+      this.socket.emit('deception:join_room', {
+        roomCode: code,
+        playerName: name,
+        avatar: this.myAvatar
+      });
+    });
+
+    // Sao chép mã phòng Online
+    document.getElementById('btn-copy-online-room-code')?.addEventListener('click', () => {
+      if (!this.onlineRoom) return;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(this.onlineRoom.roomCode).catch(() => {});
+      }
+      this.playAudio('chime');
+      this.showToast(`Đã sao chép mã phòng #${this.onlineRoom.roomCode}!`);
+    });
+
+    // Rời phòng Online
+    document.getElementById('btn-leave-online-room')?.addEventListener('click', () => {
+      if (this.socket) {
+        this.socket.emit('deception:leave_room');
+      }
+      this.onlineRoom = null;
+      this.showView('view-lobby');
+      this.playAudio('click');
+    });
+
+    // Lưu tên mới trong phòng chờ
+    const saveNameAction = () => {
+      const input = document.getElementById('input-online-display-name');
+      const newName = (input?.value || '').trim();
+      if (!newName) return;
+      if (this.socket) {
+        this.socket.emit('deception:change_name', {
+          newName,
+          avatar: this.myAvatar
+        });
+        this.playAudio('click');
+        this.showToast('Đã cập nhật danh tính thành công!');
+      }
+    };
+    document.getElementById('btn-save-online-name')?.addEventListener('click', saveNameAction);
+    document.getElementById('input-online-display-name')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        saveNameAction();
+      }
+    });
+
+    // Chọn avatar trong phòng chờ
+    document.querySelectorAll('#online-avatar-picker .emoji-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        this.myAvatar = chip.dataset.emoji || '🕵️';
+        const display = document.getElementById('my-active-avatar');
+        if (display) display.textContent = this.myAvatar;
+        if (this.socket) {
+          this.socket.emit('deception:change_name', {
+            avatar: this.myAvatar
           });
         }
+        this.playAudio('click');
       });
+    });
+
+    // Toggle Sẵn sàng (Guest)
+    document.getElementById('btn-guest-toggle-ready')?.addEventListener('click', () => {
+      if (this.socket) {
+        this.socket.emit('deception:toggle_ready');
+        this.playAudio('click');
+      }
+    });
+
+    // Thêm Bot AI (Host)
+    document.getElementById('btn-host-add-bot')?.addEventListener('click', () => {
+      if (this.socket) {
+        this.socket.emit('deception:add_bot');
+        this.playAudio('click');
+      }
+    });
+
+    // Xóa Bot AI (Host)
+    document.getElementById('btn-host-remove-bot')?.addEventListener('click', () => {
+      if (this.socket) {
+        this.socket.emit('deception:remove_bot');
+        this.playAudio('click');
+      }
+    });
+
+    // Bắt đầu Vụ Án Online (Host)
+    document.getElementById('btn-host-start-online-game')?.addEventListener('click', () => {
+      if (this.socket) {
+        this.socket.emit('deception:start_game');
+        this.playAudio('start');
+      }
+    });
+
+    // Gửi tin nhắn trong phòng chờ
+    document.getElementById('form-online-room-chat')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('input-online-room-chat');
+      const text = (input?.value || '').trim();
+      if (!text || !this.socket) return;
+      this.socket.emit('deception:send_chat', { message: text });
+      input.value = '';
+    });
+
+    // Bật/tắt thanh đàm thoại trong trận (In-game Live Chat Drawer)
+    document.getElementById('btn-toggle-ingame-chat')?.addEventListener('click', () => {
+      this.toggleInGameChat();
+    });
+
+    document.getElementById('btn-close-ingame-chat')?.addEventListener('click', () => {
+      document.getElementById('ingame-chat-drawer')?.classList.remove('open');
+      this.isInGameChatOpen = false;
+    });
+
+    document.getElementById('form-ingame-chat')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('input-ingame-chat');
+      const text = (input?.value || '').trim();
+      if (!text || !this.socket) return;
+      this.socket.emit('deception:send_chat', { message: text });
+      input.value = '';
     });
 
     // Nút Xác nhận đã hiểu vai trò
@@ -420,6 +557,355 @@ class DeceptionAppController {
     } else if (this.state.phase.includes('ROUND_')) {
       this.renderInvestigationTable();
     }
+  }
+
+  /* =========================================================================
+     WEBSOCKET & MULTIPLAYER REAL-TIME SUITE
+     ========================================================================= */
+
+  escapeHtml(text = '') {
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  showToast(message) {
+    let toast = document.getElementById('noir-toast-notification');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'noir-toast-notification';
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: rgba(15, 23, 42, 0.95);
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.5);
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-size: 13.5px;
+        font-weight: 800;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        z-index: 99999;
+        opacity: 0;
+        transition: all 0.3s ease;
+        pointer-events: none;
+      `;
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(this._toastTimeout);
+    this._toastTimeout = setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(20px)';
+    }, 3500);
+  }
+
+  initSocket() {
+    if (typeof window.io === 'function') {
+      try {
+        this.socket = window.io();
+
+        this.socket.on('connect', () => {
+          this.myPlayerId = this.socket.id;
+          console.log('[DeceptionApp] Connected to WebSocket server:', this.socket.id);
+        });
+
+        this.socket.on('deception:room_created', (data) => {
+          this.handleRoomCreated(data);
+        });
+
+        this.socket.on('deception:room_joined', (data) => {
+          this.handleRoomJoined(data);
+        });
+
+        this.socket.on('deception:room_updated', (data) => {
+          this.handleRoomUpdated(data);
+        });
+
+        this.socket.on('deception:kicked', (data) => {
+          this.handleKicked(data);
+        });
+
+        this.socket.on('deception:new_chat', (chatItem) => {
+          this.handleNewChat(chatItem);
+        });
+
+        this.socket.on('deception:game_started', (data) => {
+          this.handleOnlineGameStarted(data);
+        });
+
+        this.socket.on('deception:error', (data) => {
+          this.showToast(data.message || 'Lỗi thao tác phòng!');
+        });
+      } catch (err) {
+        console.warn('[DeceptionApp] Socket initialization warning:', err);
+      }
+    }
+  }
+
+  handleRoomCreated(data) {
+    this.onlineRoom = data.room;
+    this.myPlayerId = data.yourPlayerId || (this.socket ? this.socket.id : null);
+    this.isOnlineMatch = true;
+    this.showView('view-online-room');
+    this.renderOnlineRoom();
+    this.playAudio('start');
+    this.showToast(`Phòng #${data.roomCode} đã được khởi tạo!`);
+  }
+
+  handleRoomJoined(data) {
+    this.onlineRoom = data.room;
+    this.myPlayerId = data.yourPlayerId || (this.socket ? this.socket.id : null);
+    this.isOnlineMatch = true;
+    this.showView('view-online-room');
+    this.renderOnlineRoom();
+    this.playAudio('start');
+    this.showToast(`Đã tham gia phòng #${data.roomCode}!`);
+  }
+
+  handleRoomUpdated(data) {
+    this.onlineRoom = data.room;
+    this.renderOnlineRoom();
+  }
+
+  handleKicked(data) {
+    this.onlineRoom = null;
+    this.showToast(data.message || 'Bạn đã bị mời ra khỏi phòng.');
+    this.showView('view-lobby');
+  }
+
+  renderOnlineRoom() {
+    if (!this.onlineRoom) return;
+
+    const codeTag = document.getElementById('online-room-title-code');
+    if (codeTag) codeTag.textContent = `#${this.onlineRoom.roomCode}`;
+
+    const codeBadge = document.getElementById('lbl-online-room-code');
+    if (codeBadge) codeBadge.textContent = this.onlineRoom.roomCode;
+
+    const occPill = document.getElementById('lbl-online-occupancy');
+    if (occPill) {
+      occPill.textContent = `${this.onlineRoom.players.length}/9 Người`;
+    }
+
+    const isHost = this.onlineRoom.hostId === this.myPlayerId;
+    const me = this.onlineRoom.players.find(p => p.id === this.myPlayerId);
+
+    const myNameInput = document.getElementById('input-online-display-name');
+    if (myNameInput && me && document.activeElement !== myNameInput) {
+      myNameInput.value = me.displayName;
+    }
+    const myAvatarEl = document.getElementById('my-active-avatar');
+    if (myAvatarEl && me) {
+      myAvatarEl.textContent = me.avatar || '🕵️';
+      this.myAvatar = me.avatar || '🕵️';
+    }
+
+    const hostWrap = document.getElementById('wrap-host-controls');
+    const guestWrap = document.getElementById('wrap-guest-controls');
+
+    if (isHost) {
+      if (hostWrap) hostWrap.style.display = 'flex';
+      if (guestWrap) guestWrap.style.display = 'none';
+
+      const playerCount = this.onlineRoom.players.length;
+      const unreadyHumans = this.onlineRoom.players.filter(p => !p.isBot && !p.isReady && p.id !== this.onlineRoom.hostId);
+      const startBtn = document.getElementById('btn-host-start-online-game');
+      const hint = document.getElementById('host-start-status-hint');
+
+      if (playerCount < 4) {
+        if (startBtn) startBtn.disabled = true;
+        if (hint) hint.textContent = `Cần thêm ít nhất ${4 - playerCount} người chơi (Bạn có thể bấm [+ Thêm Bot AI] để lấp đầy)!`;
+      } else if (unreadyHumans.length > 0) {
+        if (startBtn) startBtn.disabled = true;
+        const names = unreadyHumans.map(p => p.displayName).join(', ');
+        if (hint) hint.textContent = `Đang chờ thành viên bấm Sẵn sàng: ${names}`;
+      } else {
+        if (startBtn) startBtn.disabled = false;
+        if (hint) hint.textContent = `✨ Toàn bộ thành viên đã sẵn sàng! Bấm [BẮT ĐẦU VỤ ÁN] để phát thẻ.`;
+      }
+    } else {
+      if (hostWrap) hostWrap.style.display = 'none';
+      if (guestWrap) guestWrap.style.display = 'flex';
+
+      const readyBtn = document.getElementById('btn-guest-toggle-ready');
+      const readyLabel = document.getElementById('lbl-guest-ready-status');
+      const isReady = Boolean(me && me.isReady);
+
+      if (readyBtn) {
+        readyBtn.classList.toggle('is-ready', isReady);
+      }
+      if (readyLabel) {
+        readyLabel.textContent = isReady ? 'HỦY SẴN SÀNG' : 'BẤM SẴN SÀNG';
+      }
+    }
+
+    const grid = document.getElementById('online-seats-grid');
+    if (grid) {
+      grid.innerHTML = this.onlineRoom.players.map((p, idx) => {
+        const isSelf = p.id === this.myPlayerId;
+        const isPReady = Boolean(p.isReady);
+        return `
+          <div class="online-seat-card ${isSelf ? 'is-self' : ''} ${p.isHost ? 'is-host' : ''} ${p.isBot ? 'is-bot' : ''}">
+            <div class="seat-avatar-wrap">${p.avatar || '👤'}</div>
+            <div class="seat-details">
+              <div class="seat-name-row">
+                <span class="seat-name-text">${this.escapeHtml(p.displayName || 'Vô danh')}</span>
+                ${isSelf ? '<span class="seat-self-tag">(Bạn)</span>' : ''}
+              </div>
+              <div class="seat-status-row">
+                ${p.isHost ? '<span class="seat-badge badge-host">⭐ Chủ Phòng</span>' : ''}
+                ${p.isBot ? '<span class="seat-badge badge-bot">🤖 Bot AI</span>' : ''}
+                ${!p.isHost && !p.isBot ? (isPReady ? '<span class="seat-badge badge-ready">✔ Sẵn sàng</span>' : '<span class="seat-badge badge-waiting">⏳ Đang chờ</span>') : ''}
+              </div>
+            </div>
+            ${isHost && !isSelf ? `
+              <button type="button" class="btn-kick-player" data-player-id="${p.id}" title="Mời người này ra khỏi phòng">
+                <i class="fa-solid fa-user-xmark"></i> Mời ra
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('.btn-kick-player').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetPlayerId = btn.dataset.playerId;
+          if (targetPlayerId && this.socket) {
+            this.socket.emit('deception:kick_player', { targetPlayerId });
+            this.playAudio('click');
+          }
+        });
+      });
+    }
+
+    const chatStream = document.getElementById('online-chat-stream');
+    if (chatStream && this.onlineRoom.chatMessages) {
+      chatStream.innerHTML = '';
+      this.onlineRoom.chatMessages.forEach(msg => {
+        this.renderChatMessageBubble(msg, chatStream);
+      });
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+  }
+
+  handleNewChat(chatItem) {
+    if (!chatItem) return;
+    if (this.onlineRoom) {
+      this.onlineRoom.chatMessages = this.onlineRoom.chatMessages || [];
+      this.onlineRoom.chatMessages.push(chatItem);
+      if (this.onlineRoom.chatMessages.length > 80) this.onlineRoom.chatMessages.shift();
+    }
+
+    const waitingContainer = document.getElementById('online-chat-stream');
+    if (waitingContainer) {
+      this.renderChatMessageBubble(chatItem, waitingContainer);
+    }
+
+    const inGameContainer = document.getElementById('ingame-chat-feed');
+    if (inGameContainer) {
+      this.renderChatMessageBubble(chatItem, inGameContainer);
+    }
+
+    if (!this.isInGameChatOpen && !chatItem.isSystem) {
+      this.unreadInGameChatCount++;
+      const badge = document.getElementById('hud-chat-badge');
+      if (badge) badge.style.display = 'block';
+    }
+
+    if (!chatItem.isSystem) {
+      this.playAudio('click');
+    }
+  }
+
+  renderChatMessageBubble(chatItem, container) {
+    if (!container || !chatItem) return;
+    const isSys = Boolean(chatItem.isSystem);
+    const isSelf = chatItem.senderId === this.myPlayerId;
+
+    const el = document.createElement('div');
+    if (isSys) {
+      el.className = 'chat-bubble bubble-sys';
+      el.innerHTML = `<span>📢 ${this.escapeHtml(chatItem.text)}</span>`;
+    } else {
+      el.className = `chat-bubble ${isSelf ? 'bubble-self' : 'bubble-other'}`;
+      const timeStr = new Date(chatItem.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      el.innerHTML = `
+        <div class="bubble-meta">
+          <span class="bubble-avatar">${chatItem.avatar || '👤'}</span>
+          <span class="bubble-sender">${this.escapeHtml(chatItem.senderName || 'Người chơi')}</span>
+          <span class="bubble-time">${timeStr}</span>
+        </div>
+        <div class="bubble-text">${this.escapeHtml(chatItem.text)}</div>
+      `;
+    }
+    container.appendChild(el);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  toggleInGameChat() {
+    const drawer = document.getElementById('ingame-chat-drawer');
+    if (!drawer) return;
+    this.isInGameChatOpen = !this.isInGameChatOpen;
+    drawer.classList.toggle('open', this.isInGameChatOpen);
+    if (this.isInGameChatOpen) {
+      this.unreadInGameChatCount = 0;
+      const badge = document.getElementById('hud-chat-badge');
+      if (badge) badge.style.display = 'none';
+      const input = document.getElementById('input-ingame-chat');
+      if (input) input.focus();
+    }
+    this.playAudio('click');
+  }
+
+  handleOnlineGameStarted(data) {
+    console.log('[DeceptionApp] Online game started:', data);
+    this.isOnlineMatch = true;
+    this.onlineSecretIntel = data.yourSecretRole || null;
+
+    this.state.roomCode = data.roomCode;
+    this.state.caseId = data.publicState.caseId;
+    this.state.round = data.publicState.round || 1;
+    this.state.phase = data.publicState.phase || 'NIGHT_MURDER';
+    this.state.activeSceneTiles = data.publicState.activeSceneTiles || [];
+
+    this.state.players = data.publicState.players.map((p, idx) => {
+      const isMe = p.socketId === this.myPlayerId || idx === data.yourPlayerIndex;
+      return {
+        id: p.id,
+        seatIndex: p.seatIndex !== undefined ? p.seatIndex : idx,
+        displayName: p.displayName,
+        avatar: p.avatar,
+        isHuman: isMe,
+        isBot: Boolean(p.isBot),
+        role: isMe ? data.yourSecretRole.role : 'UNKNOWN',
+        team: isMe ? data.yourSecretRole.team : 'UNKNOWN',
+        hasBadge: p.hasBadge !== false,
+        meansCards: p.meansCards || [],
+        clueCards: p.clueCards || [],
+        isRoleRevealed: false
+      };
+    });
+
+    if (data.yourSecretRole && data.yourSecretRole.solution) {
+      this.state.solution = data.yourSecretRole.solution;
+    }
+
+    this.updateHeaderInfo();
+    this.showRoleReveal();
+
+    const hudChatBtn = document.getElementById('btn-toggle-ingame-chat');
+    if (hudChatBtn) hudChatBtn.style.display = 'inline-flex';
+
+    this.showToast('Vụ án trực tuyến đã bắt đầu! Toàn bộ người chơi đã vào vị trí.');
   }
 
   /* =========================================================================
@@ -1205,13 +1691,14 @@ class DeceptionAppController {
     const isMurderer = human.role === 'MURDERER';
     const isAccomplice = human.role === 'ACCOMPLICE';
     const isForensic = human.role === 'FORENSIC_SCIENTIST';
+    const isWitness = human.role === 'WITNESS';
     const canSeeCrimeSolution = isMurderer || isAccomplice || isForensic;
 
-    const murdererPlayer = this.state.getMurdererPlayer();
-    const accomplicePlayer = this.state.players.find(p => p.role === 'ACCOMPLICE');
+    const murdererPlayer = this.state.getMurdererPlayer() || (this.onlineSecretIntel && this.onlineSecretIntel.murderer);
+    const accomplicePlayer = this.state.players.find(p => p.role === 'ACCOMPLICE') || (this.onlineSecretIntel && this.onlineSecretIntel.accomplice);
 
-    const solMeansId = this.state.solution.meansCardId;
-    const solClueId = this.state.solution.clueCardId;
+    const solMeansId = (this.state.solution && this.state.solution.meansCardId) || (this.onlineSecretIntel && this.onlineSecretIntel.solution && this.onlineSecretIntel.solution.meansCardId);
+    const solClueId = (this.state.solution && this.state.solution.clueCardId) || (this.onlineSecretIntel && this.onlineSecretIntel.solution && this.onlineSecretIntel.solution.clueCardId);
 
     // Render Private Criminal Syndicate Bar (chỉ cho Sát nhân & Đồng phạm thấy)
     const secretIntelBar = document.getElementById('criminal-secret-intel-bar');
@@ -1241,6 +1728,21 @@ class DeceptionAppController {
               </span>
               <span class="solution-chip-preview chip-red" title="${this.isVi ? 'Manh mối hiện trường bí mật' : 'Crime Clue'}">
                 <i class="fa-solid fa-droplet"></i> <b>${this.isVi ? 'Manh mối' : 'Clue'}:</b> ${solClue ? solClue.vi : '—'}
+              </span>
+            </div>
+          </div>
+        `;
+      } else if (isWitness && this.onlineSecretIntel && this.onlineSecretIntel.seenCulprits) {
+        secretIntelBar.style.display = 'block';
+        const culpritsList = this.onlineSecretIntel.seenCulprits.map(c => `<b>${c.avatar || '👤'} ${c.displayName}</b>`).join(' & ');
+        secretIntelBar.innerHTML = `
+          <div class="criminal-secret-dossier-pill" style="border-color: #00d2d3;">
+            <div class="dossier-pill-header">
+              <span class="pill-badge-crim" style="background: rgba(0, 210, 211, 0.2); color: #00d2d3; border-color: rgba(0, 210, 211, 0.4);">
+                <i class="fa-solid fa-eye"></i> TÌNH BÁO NHÂN CHỨNG (WITNESS INTEL)
+              </span>
+              <span class="pill-ally-info">
+                👁️ Bạn đã thấy 2 kẻ tà ác trong đêm: ${culpritsList} <i>(Bạn không biết ai là Hung thủ ai là Đồng phạm)</i>
               </span>
             </div>
           </div>
