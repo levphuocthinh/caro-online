@@ -251,9 +251,7 @@ class DeceptionAppController {
     });
 
     document.getElementById('btn-hud-accuse')?.addEventListener('click', () => {
-      this.stopRoundTimer();
-      this.triggerScreenShake(300);
-      this.openAccusationDialog();
+      this.handleGlobalAccuseTrigger();
     });
 
     // Dock Actions
@@ -262,9 +260,7 @@ class DeceptionAppController {
     });
 
     document.getElementById('btn-dock-accuse')?.addEventListener('click', () => {
-      this.stopRoundTimer();
-      this.triggerScreenShake(300);
-      this.openAccusationDialog();
+      this.handleGlobalAccuseTrigger();
     });
 
     // Nút Chơi lại sau khi Game Over
@@ -967,49 +963,67 @@ class DeceptionAppController {
       const isSelf = s.id === human.id;
       const isSpeaker = currentSpeaker && currentSpeaker.id === s.id;
 
+      const pinnedMeans = s.meansCards.find(m => this.state.pinnedCardIds.has(m.id));
+      const pinnedClue = s.clueCards.find(c => this.state.pinnedCardIds.has(c.id));
+      const isReadyToAccuse = Boolean(pinnedMeans && pinnedClue);
+
       return `
-        <div class="suspect-station-box ${isSelf ? 'is-self' : ''} ${isSpeaker ? 'is-speaker' : ''}">
+        <div class="suspect-station-box ${isSelf ? 'is-self' : ''} ${isSpeaker ? 'is-speaker' : ''} ${isReadyToAccuse ? 'has-ready-pair' : ''}" data-station-id="${s.id}">
           <div class="suspect-station-badge-col">
             <div class="police-badge-gold ${s.hasBadge ? 'badge-active' : 'badge-spent'}" title="${s.hasBadge ? 'Huy hiệu phá án còn hiệu lực' : 'Đã sử dụng huy hiệu'}">
               <i class="fa-solid fa-shield-halved"></i>
             </div>
             <span class="suspect-station-name">${s.displayName} ${isSelf ? '(BẠN)' : ''}</span>
-            ${human.hasBadge && !isSelf ? `
-              <button type="button" class="btn-accuse-badge" data-accuse-suspect="${s.id}">
-                <i class="fa-solid fa-gavel"></i> ${this.isVi ? 'Phá án' : 'Accuse'}
-              </button>
-            ` : ''}
+            ${human.hasBadge && !isSelf ? (
+              isReadyToAccuse ? `
+                <button type="button" class="btn-accuse-badge is-ready" data-accuse-suspect="${s.id}" data-means-id="${pinnedMeans.id}" data-clue-id="${pinnedClue.id}" title="${this.isVi ? `⚡ Bấm để PHÁ ÁN NGAY: ${pinnedMeans.vi} + ${pinnedClue.vi}!` : `⚡ Click to ACCUSE IMMEDIATELY: ${pinnedMeans.en} + ${pinnedClue.en}!`}">
+                  <i class="fa-solid fa-bolt"></i> <span>${this.isVi ? '⚡ Phá án ngay' : '⚡ Accuse now'}</span>
+                </button>
+              ` : `
+                <button type="button" class="btn-accuse-badge" data-accuse-suspect="${s.id}" title="${this.isVi ? 'Chọn 1 Hung khí & 1 Manh mối để phá án ngay, hoặc bấm để mở hộp thoại' : 'Select 1 Means & 1 Clue to accuse instantly, or click to open dialog'}">
+                  <i class="fa-solid fa-gavel"></i> <span>${this.isVi ? 'Phá án' : 'Accuse'}</span>
+                </button>
+              `
+            ) : ''}
           </div>
 
           <div class="suspect-station-cards-col">
             <!-- 4 Thẻ Hung Khí (Xanh) -->
             <div class="suspect-cards-strip strip-blue">
-              ${s.meansCards.map(m => `
-                <div class="table-card-item card-blue ${this.state.pinnedCardIds.has(m.id) ? 'is-pinned' : ''}" data-inspect-card="${m.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en}) - Nhấp để xem chi tiết / ghim">
-                  <span class="card-type-tag tag-blue">${this.isVi ? 'HUNG KHÍ' : 'MEANS'}</span>
-                  <div class="card-icon-area">${renderCardIconHtml(m, 'card-svg')}</div>
-                  <div class="card-name-vi">${m.vi}</div>
-                  <div class="card-name-en">${m.en}</div>
-                  <button type="button" class="card-pin-corner-btn ${this.state.pinnedCardIds.has(m.id) ? 'active' : ''}" data-pin-card="${m.id}" title="${this.state.pinnedCardIds.has(m.id) ? 'Đã ghim nghi vấn (nhấp để bỏ ghim)' : 'Ghim nghi vấn 📌'}">
-                    ${this.state.pinnedCardIds.has(m.id) ? '📌' : '•'}
-                  </button>
-                </div>
-              `).join('')}
+              ${s.meansCards.map(m => {
+                const isPinned = this.state.pinnedCardIds.has(m.id);
+                return `
+                  <div class="table-card-item card-blue ${isPinned ? 'is-pinned' : ''}" data-card-id="${m.id}" data-card-type="MEANS" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Hung khí này' : 'Click to select this Means')}">
+                    <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${m.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    ${isPinned ? `<span class="card-pin-indicator" title="Đã chọn nghi vấn">📌</span>` : ''}
+                    <span class="card-type-tag tag-blue">${this.isVi ? 'HUNG KHÍ' : 'MEANS'}</span>
+                    <div class="card-icon-area">${renderCardIconHtml(m, 'card-svg')}</div>
+                    <div class="card-name-vi">${m.vi}</div>
+                    <div class="card-name-en">${m.en}</div>
+                  </div>
+                `;
+              }).join('')}
             </div>
 
             <!-- 4 Thẻ Manh Mối (Đỏ) -->
             <div class="suspect-cards-strip strip-red">
-              ${s.clueCards.map(c => `
-                <div class="table-card-item card-red ${this.state.pinnedCardIds.has(c.id) ? 'is-pinned' : ''}" data-inspect-card="${c.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en}) - Nhấp để xem chi tiết / ghim">
-                  <span class="card-type-tag tag-red">${this.isVi ? 'MANH MỐI' : 'CLUE'}</span>
-                  <div class="card-icon-area">${renderCardIconHtml(c, 'card-svg')}</div>
-                  <div class="card-name-vi">${c.vi}</div>
-                  <div class="card-name-en">${c.en}</div>
-                  <button type="button" class="card-pin-corner-btn ${this.state.pinnedCardIds.has(c.id) ? 'active' : ''}" data-pin-card="${c.id}" title="${this.state.pinnedCardIds.has(c.id) ? 'Đã ghim nghi vấn (nhấp để bỏ ghim)' : 'Ghim nghi vấn 📌'}">
-                    ${this.state.pinnedCardIds.has(c.id) ? '📌' : '•'}
-                  </button>
-                </div>
-              `).join('')}
+              ${s.clueCards.map(c => {
+                const isPinned = this.state.pinnedCardIds.has(c.id);
+                return `
+                  <div class="table-card-item card-red ${isPinned ? 'is-pinned' : ''}" data-card-id="${c.id}" data-card-type="CLUE" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Manh mối này' : 'Click to select this Clue')}">
+                    <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${c.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    ${isPinned ? `<span class="card-pin-indicator" title="Đã chọn nghi vấn">📌</span>` : ''}
+                    <span class="card-type-tag tag-red">${this.isVi ? 'MANH MỐI' : 'CLUE'}</span>
+                    <div class="card-icon-area">${renderCardIconHtml(c, 'card-svg')}</div>
+                    <div class="card-name-vi">${c.vi}</div>
+                    <div class="card-name-en">${c.en}</div>
+                  </div>
+                `;
+              }).join('')}
             </div>
           </div>
         </div>
@@ -1019,27 +1033,39 @@ class DeceptionAppController {
     topContainer.innerHTML = topSuspects.map(renderSuspectBox).join('');
     bottomContainer.innerHTML = bottomSuspects.map(renderSuspectBox).join('');
 
-    // Ghim nghi vấn 📌 khi bấm vào nút ghim góc
-    document.querySelectorAll('[data-pin-card]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = btn.dataset.pinCard;
-        if (this.state.pinnedCardIds.has(id)) {
-          this.state.pinnedCardIds.delete(id);
+    // Nhấp vào thẻ bài để chọn / bỏ chọn ghim (Tự động gán 1 Hung khí + 1 Manh mối cho nghi phạm)
+    document.querySelectorAll('.table-card-item[data-card-id]').forEach(cardEl => {
+      cardEl.addEventListener('click', (e) => {
+        if (e.target.closest('.card-inspect-trigger-btn')) return;
+
+        const cardId = cardEl.dataset.cardId;
+        const cardType = cardEl.dataset.cardType;
+        const ownerId = cardEl.dataset.ownerId;
+        const owner = this.state.getPlayerById(ownerId);
+        if (!owner) return;
+
+        if (this.state.pinnedCardIds.has(cardId)) {
+          this.state.pinnedCardIds.delete(cardId);
+          this.playAudio('click');
         } else {
-          this.state.pinnedCardIds.add(id);
+          if (cardType === 'MEANS') {
+            owner.meansCards.forEach(m => this.state.pinnedCardIds.delete(m.id));
+          } else {
+            owner.clueCards.forEach(c => this.state.pinnedCardIds.delete(c.id));
+          }
+          this.state.pinnedCardIds.add(cardId);
+          this.playAudio('cardSlide');
         }
-        this.playAudio('click');
         this.renderAuthenticSuspectsTable();
       });
     });
 
-    // Mở Modal phóng to chi tiết thẻ bài
-    document.querySelectorAll('[data-inspect-card]').forEach(cardEl => {
-      cardEl.addEventListener('click', (e) => {
-        if (e.target.closest('[data-pin-card]')) return;
-        const cardId = cardEl.dataset.inspectCard;
-        const ownerName = cardEl.dataset.ownerName || '';
+    // Mở Modal phóng to chi tiết thẻ bài khi bấm nút kính lúp
+    document.querySelectorAll('.card-inspect-trigger-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const cardId = btn.dataset.inspectCard;
+        const ownerName = btn.dataset.ownerName || '';
         this.openCardInspectModal(cardId, ownerName);
       });
     });
@@ -1048,8 +1074,22 @@ class DeceptionAppController {
     document.querySelectorAll('[data-accuse-suspect]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
+        const suspectId = btn.dataset.accuseSuspect;
+        const meansId = btn.dataset.meansId;
+        const clueId = btn.dataset.clueId;
+
+        // Nếu đã chọn đủ cặp 1 Hung khí + 1 Manh mối -> Phá án trực tiếp ngay lập tức!
+        if (meansId && clueId) {
+          this.stopSpeakerTimer();
+          this.stopRoundTimer();
+          this.triggerScreenShake(300);
+          this.executeAccusation(suspectId, meansId, clueId);
+          return;
+        }
+
+        // Nếu chưa chọn đủ cặp, mở popup chọn
         this.stopSpeakerTimer();
-        this.openAccusationDialog(btn.dataset.accuseSuspect);
+        this.openAccusationDialog(suspectId);
       });
     });
   }
@@ -1122,6 +1162,13 @@ class DeceptionAppController {
         if (this.state.pinnedCardIds.has(card.id)) {
           this.state.pinnedCardIds.delete(card.id);
         } else {
+          if (owner) {
+            if (type === 'MEANS') {
+              owner.meansCards?.forEach(m => this.state.pinnedCardIds.delete(m.id));
+            } else {
+              owner.clueCards?.forEach(c => this.state.pinnedCardIds.delete(c.id));
+            }
+          }
           this.state.pinnedCardIds.add(card.id);
         }
         this.playAudio('click');
@@ -1283,8 +1330,40 @@ class DeceptionAppController {
   }
 
   /* =========================================================================
-     STAGE 5: ACCUSATION MODAL
+     STAGE 5: ACCUSATION MODAL & DIRECT ACCUSATION DISPATCHER
      ========================================================================= */
+
+  handleGlobalAccuseTrigger() {
+    const human = this.state.getHumanPlayer();
+    if (!human || !human.hasBadge) {
+      alert(this.isVi ? 'Bạn đã hết Huy hiệu Phá án!' : 'You have no badges remaining!');
+      return;
+    }
+
+    const suspects = this.state.players.filter(p => p.role !== 'FORENSIC_SCIENTIST' && p.id !== human.id);
+    const readySuspects = suspects.filter(s => {
+      const pMeans = s.meansCards.find(m => this.state.pinnedCardIds.has(m.id));
+      const pClue = s.clueCards.find(c => this.state.pinnedCardIds.has(c.id));
+      return pMeans && pClue;
+    });
+
+    // Nếu đã chọn đủ 1 Hung khí + 1 Manh mối cho duy nhất 1 nghi phạm -> Phá án trực tiếp ngay!
+    if (readySuspects.length === 1) {
+      const target = readySuspects[0];
+      const means = target.meansCards.find(m => this.state.pinnedCardIds.has(m.id));
+      const clue = target.clueCards.find(c => this.state.pinnedCardIds.has(c.id));
+      this.stopRoundTimer();
+      this.stopSpeakerTimer();
+      this.triggerScreenShake(300);
+      this.executeAccusation(target.id, means.id, clue.id);
+      return;
+    }
+
+    this.stopRoundTimer();
+    this.triggerScreenShake(300);
+    const preselectedId = readySuspects[0]?.id || suspects[0]?.id || null;
+    this.openAccusationDialog(preselectedId);
+  }
 
   openAccusationDialog(preselectedSuspectId = null) {
     const human = this.state.getHumanPlayer();
@@ -1297,9 +1376,13 @@ class DeceptionAppController {
     const target = suspects.find(s => s.id === preselectedSuspectId) || suspects[0];
     if (!target) return;
 
+    // Ưu tiên chọn các thẻ đã được ghim/chọn nếu có
+    const pinnedMeans = target.meansCards.find(m => this.state.pinnedCardIds.has(m.id));
+    const pinnedClue = target.clueCards.find(c => this.state.pinnedCardIds.has(c.id));
+
     this.state.pendingSelection.accuseTargetPlayerId = target.id;
-    this.state.pendingSelection.accuseMeansId = target.meansCards[0]?.id || null;
-    this.state.pendingSelection.accuseClueId = target.clueCards[0]?.id || null;
+    this.state.pendingSelection.accuseMeansId = pinnedMeans?.id || target.meansCards[0]?.id || null;
+    this.state.pendingSelection.accuseClueId = pinnedClue?.id || target.clueCards[0]?.id || null;
 
     this.renderAccusationModalContent(target, suspects);
     this.openModal('modal-accuse');
@@ -1323,9 +1406,11 @@ class DeceptionAppController {
           this.playAudio('click');
           const nextTarget = suspects.find(s => s.id === btn.dataset.selSuspect);
           if (nextTarget) {
+            const nextPinnedMeans = nextTarget.meansCards.find(m => this.state.pinnedCardIds.has(m.id));
+            const nextPinnedClue = nextTarget.clueCards.find(c => this.state.pinnedCardIds.has(c.id));
             this.state.pendingSelection.accuseTargetPlayerId = nextTarget.id;
-            this.state.pendingSelection.accuseMeansId = nextTarget.meansCards[0]?.id || null;
-            this.state.pendingSelection.accuseClueId = nextTarget.clueCards[0]?.id || null;
+            this.state.pendingSelection.accuseMeansId = nextPinnedMeans?.id || nextTarget.meansCards[0]?.id || null;
+            this.state.pendingSelection.accuseClueId = nextPinnedClue?.id || nextTarget.clueCards[0]?.id || null;
             this.renderAccusationModalContent(nextTarget, suspects);
           }
         });
