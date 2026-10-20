@@ -952,6 +952,45 @@ class DeceptionAppController {
         if (this.roundTimeLeft <= 10 && this.roundTimeLeft > 0) {
           this.playAudio('tick');
         }
+
+        // Sinh lời thoại suy luận của Bot định kỳ
+        if (this.roundTimeLeft === 120 || this.roundTimeLeft === 60) {
+          this.state.generateBotRoundDeductions();
+        }
+
+        // Cơ hội phá án của Bot Investigator (đặc biệt hữu ích khi Human là Pháp y hoặc Sát nhân)
+        if (this.roundTimeLeft === 90 || this.roundTimeLeft === 30) {
+          const human = this.state.getHumanPlayer();
+          if (human && (human.role === 'FORENSIC_SCIENTIST' || human.team === 'CRIMINAL')) {
+            const botAttempt = this.state.triggerBotAccusationAttempt();
+            if (botAttempt && botAttempt.accusationResult.valid) {
+              this.stopRoundTimer();
+              this.triggerScreenShake(300);
+              this.showAccusationCastingModal({
+                accuserName: botAttempt.bot.displayName,
+                accuserAvatar: botAttempt.bot.avatar,
+                targetPlayer: botAttempt.suspect,
+                meansCard: botAttempt.meansCard,
+                clueCard: botAttempt.clueCard,
+                isCorrect: botAttempt.accusationResult.isCorrect
+              }, () => {
+                this.renderInvestigationTable();
+                if (botAttempt.accusationResult.isCorrect) {
+                  if (this.state.solution.witnessPlayerId) {
+                    this.showWitnessReversalView();
+                  } else {
+                    this.showGameOverView();
+                  }
+                } else {
+                  if (this.state.phase.includes('ROUND_') || this.state.phase.includes('PRESENTATION')) {
+                    this.startRoundTimer();
+                  }
+                }
+              });
+              return;
+            }
+          }
+        }
       } else {
         // Hết thời gian vòng thảo luận -> Chuyển sang cho Pháp Y đổi thẻ (hoặc Kẻ sát nhân trốn thoát nếu vòng 3)
         this.stopRoundTimer();
@@ -1438,15 +1477,59 @@ class DeceptionAppController {
       this.state.startRound3Evidence();
       this.startInvestigationRoundAfterEvidence();
     } else {
-      // Hết 3 vòng mà chưa phá án thành công -> Hung thủ thắng!
-      this.state.finishGame(
-        'CRIMINAL',
-        'TIME_EXPIRED',
-        'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra thủ phạm. Kẻ Sát Nhân đã cao chạy xa bay!',
-        'All 3 investigation rounds finished without an arrest. The Murderer escaped into the night!'
-      );
-      this.showGameOverView();
+      // Hết vòng 3: Áp dụng luật chốt hạ cuối cùng của Deception (Final Accusation)
+      const human = this.state.getHumanPlayer();
+      const hasHumanBadge = human && human.hasBadge && human.role !== 'FORENSIC_SCIENTIST';
+
+      if (hasHumanBadge) {
+        const wantsAccuse = confirm(
+          this.isVi
+            ? '⚠️ ĐÃ HẾT 3 VÒNG ĐIỀU TRA!\nBạn vẫn còn 1 Huy hiệu Phá án cuối cùng. Bạn có muốn thực hiện LƯỢT PHÁ ÁN CHỐT HẠ ngay bây giờ không?\n(Bấm [OK] để chỉ định thủ phạm; bấm [Cancel] để bỏ qua và kết thúc vụ án)'
+            : '⚠️ 3 INVESTIGATION ROUNDS HAVE CONCLUDED!\nYou still have 1 Badge remaining. Do you want to attempt your FINAL ACCUSATION now?\n(Click [OK] to accuse; click [Cancel] to concede)'
+        );
+        if (wantsAccuse) {
+          this.openAccusationDialog();
+          return;
+        }
+      }
+
+      // Nếu còn Bot điều tra viên có Huy hiệu -> Cho Bot cơ hội phá án chốt hạ
+      const botAccuse = this.state.triggerBotAccusationAttempt();
+      if (botAccuse && botAccuse.accusationResult.valid) {
+        this.showAccusationCastingModal({
+          accuserName: botAccuse.bot.displayName,
+          accuserAvatar: botAccuse.bot.avatar,
+          targetPlayer: botAccuse.suspect,
+          meansCard: botAccuse.meansCard,
+          clueCard: botAccuse.clueCard,
+          isCorrect: botAccuse.accusationResult.isCorrect
+        }, () => {
+          this.renderInvestigationTable();
+          if (botAccuse.accusationResult.isCorrect) {
+            if (this.state.solution.witnessPlayerId) {
+              this.showWitnessReversalView();
+            } else {
+              this.showGameOverView();
+            }
+          } else {
+            this.finishGameCriminalWin();
+          }
+        });
+        return;
+      }
+
+      this.finishGameCriminalWin();
     }
+  }
+
+  finishGameCriminalWin() {
+    this.state.finishGame(
+      'CRIMINAL',
+      'TIME_EXPIRED',
+      'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra thủ phạm. Kẻ Sát Nhân đã cao chạy xa bay!',
+      'All 3 investigation rounds finished without an arrest. The Murderer escaped into the night!'
+    );
+    this.showGameOverView();
   }
 
   startInvestigationRoundAfterEvidence() {
@@ -1809,22 +1892,53 @@ class DeceptionAppController {
      ========================================================================= */
 
   showWitnessReversalView() {
+    const human = this.state.getHumanPlayer();
+    const isCriminal = human && (human.role === 'MURDERER' || human.role === 'ACCOMPLICE');
     const grid = document.getElementById('reversal-targets-grid');
+    const title = document.querySelector('#view-witness-reversal .view-title');
+    const desc = document.querySelector('#view-witness-reversal .reversal-desc');
     const targets = this.state.players.filter(p => p.team === 'INVESTIGATION' && p.role !== 'FORENSIC_SCIENTIST');
 
-    if (grid) {
-      grid.innerHTML = targets.map(t => `
-        <button type="button" class="reversal-target-btn" data-shoot-target="${t.id}">
-          🎯 ${t.avatar} ${t.displayName}
-        </button>
-      `).join('');
+    if (isCriminal) {
+      if (title) title.textContent = this.isVi ? '🔫 BẠN CÓ 1 CƠ HỘI DUY NHẤT: BẮN NHÂN CHỨNG!' : '🔫 YOU HAVE ONE SHOT: ASSASSINATE THE WITNESS!';
+      if (desc) desc.textContent = this.isVi
+        ? 'Dù đã bị vạch trần, nếu bạn bấm chọn và bắn trúng người giữ vai trò [Nhân Chứng], phe Tội phạm sẽ cướp lấy CHIẾN THẮNG!'
+        : 'Even though you were caught, if you identify and shoot the [Witness], the Criminals STEAL the victory!';
 
-      grid.querySelectorAll('[data-shoot-target]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const targetId = btn.dataset.shootTarget;
-          this.executeWitnessReversalShot(targetId);
+      if (grid) {
+        grid.innerHTML = targets.map(t => `
+          <button type="button" class="reversal-target-btn" data-shoot-target="${t.id}">
+            🎯 ${t.avatar} ${t.displayName}
+          </button>
+        `).join('');
+
+        grid.querySelectorAll('[data-shoot-target]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetId = btn.dataset.shootTarget;
+            this.executeWitnessReversalShot(targetId);
+          });
         });
-      });
+      }
+    } else {
+      // Human là phe Điều tra / Pháp y
+      if (title) title.textContent = this.isVi ? '⚠️ NGUY HIỂM: HUNG THỦ RÚT SÚNG NHẮM BẮN NHÂN CHỨNG!' : '⚠️ DANGER: MURDERER DRAWS GUN TO SHOOT WITNESS!';
+      if (desc) desc.textContent = this.isVi
+        ? 'Vụ án đã được phá, nhưng Kẻ Sát Nhân đang cuống cuồng nhắm bắn một người trong số các bạn để lật ngược tình thế...'
+        : 'The crime was solved, but the cornered Murderer is desperately aiming at someone to steal the win...';
+
+      if (grid) {
+        grid.innerHTML = `
+          <div style="text-align: center; padding: 24px;">
+            <i class="fa-solid fa-crosshairs fa-spin" style="font-size: 42px; color: #ff4757; margin-bottom: 14px; display: inline-block;"></i>
+            <p style="font-size: 15px; color: #f1c40f;"><b>${this.isVi ? 'Kẻ Sát Nhân đang chọn mục tiêu trong số các Điều tra viên...' : 'The Murderer is selecting a target...'}</b></p>
+          </div>
+        `;
+      }
+
+      setTimeout(() => {
+        const botTargetId = this.state.witnessShotTargetId || targets[0]?.id;
+        this.executeWitnessReversalShot(botTargetId);
+      }, 2500);
     }
 
     this.showView('view-witness-reversal');

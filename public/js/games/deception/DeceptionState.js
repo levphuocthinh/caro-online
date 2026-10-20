@@ -628,6 +628,113 @@ export class DeceptionState {
   }
 
   /**
+   * Tính toán điểm số nghi vấn của một cặp Thẻ (Means, Clue) dựa trên các Thẻ Hiện Trường đang có đạn
+   */
+  evaluateCardPairScore(meansCard, clueCard) {
+    if (!meansCard || !clueCard) return 0;
+    let score = 0;
+    const mCat = (meansCard.category || '').toLowerCase();
+    const cCat = (clueCard.category || '').toLowerCase();
+
+    for (const tile of this.activeSceneTiles) {
+      if (tile.selectedOptionIndex === null) continue;
+      const optIdx = tile.selectedOptionIndex;
+      const optVi = (tile.options_vi[optIdx] || '').toLowerCase();
+      const optEn = (tile.options_en ? tile.options_en[optIdx] : '').toLowerCase();
+
+      // 1. Khớp Nguyên nhân Tử vong (Ô Tím)
+      if (tile.id === 'tile_cause_01') {
+        if (optIdx === 4 && mCat.includes('poison')) score += 4;
+        if (optIdx === 0 && mCat.includes('suffoc')) score += 4;
+        if (optIdx === 2 && mCat.includes('blood')) score += 4;
+        if (optIdx === 1 && mCat.includes('severe')) score += 4;
+        if (optIdx === 3 && mCat.includes('illness')) score += 4;
+        if (optIdx === 5 && mCat.includes('accident')) score += 4;
+      }
+
+      // 2. Khớp Địa điểm (Ô Xanh)
+      if (tile.color === 'GREEN') {
+        if (optVi.includes(meansCard.vi.toLowerCase()) || meansCard.vi.toLowerCase().includes(optVi)) score += 3;
+        if (optVi.includes(clueCard.vi.toLowerCase()) || clueCard.vi.toLowerCase().includes(optVi)) score += 3;
+      }
+
+      // 3. Khớp Bản chất Vật chứng (Ô Nâu 04)
+      if (tile.id === 'tile_scene_04') {
+        if (optIdx === 0 && cCat.includes('natural')) score += 2;
+        if (optIdx === 1 && cCat.includes('artistic')) score += 2;
+        if (optIdx === 2 && cCat.includes('written')) score += 2;
+        if (optIdx === 3 && cCat.includes('synthetic')) score += 2;
+        if (optIdx === 4 && cCat.includes('personal')) score += 2;
+      }
+
+      // 4. Nếu là cặp bài chuẩn của vụ án -> được cộng điểm tương quan
+      if (meansCard.id === this.solution.meansCardId && clueCard.id === this.solution.clueCardId) {
+        score += 3;
+      }
+    }
+    return score;
+  }
+
+  /**
+   * Tìm ứng viên nghi phạm hàng đầu của một Đặc vụ Bot
+   */
+  findTopSuspectForBot(botPlayerId) {
+    const bot = this.getPlayerById(botPlayerId);
+    if (!bot || !bot.hasBadge) return null;
+
+    const suspects = this.players.filter(p => p.role !== 'FORENSIC_SCIENTIST' && p.id !== bot.id);
+    let best = null;
+    let maxScore = -1;
+
+    for (const s of suspects) {
+      for (const m of s.meansCards) {
+        for (const c of s.clueCards) {
+          const score = this.evaluateCardPairScore(m, c);
+          if (score > maxScore) {
+            maxScore = score;
+            best = { suspect: s, meansCard: m, clueCard: c, score };
+          }
+        }
+      }
+    }
+    return best;
+  }
+
+  /**
+   * Thử nghiệm lượt Phá Án của Bot Investigator khi có bằng chứng rõ ràng (hoặc ở vòng 2-3)
+   */
+  triggerBotAccusationAttempt() {
+    const eligibleBots = this.players.filter(
+      p => !p.isHuman && p.team === 'INVESTIGATION' && p.hasBadge && p.role !== 'FORENSIC_SCIENTIST'
+    );
+    if (eligibleBots.length === 0) return null;
+
+    // Chọn bot có điểm nghi vấn cao nhất
+    let chosenBot = null;
+    let chosenTop = null;
+    let highestScore = -1;
+
+    for (const bot of eligibleBots) {
+      const top = this.findTopSuspectForBot(bot.id);
+      if (top && top.score > highestScore) {
+        highestScore = top.score;
+        chosenBot = bot;
+        chosenTop = top;
+      }
+    }
+
+    if (!chosenBot || !chosenTop) return null;
+
+    // Ngưỡng điểm phá án: Vòng 1 cần score >= 8, Vòng 2 score >= 6, Vòng 3 score >= 4
+    const requiredScore = this.round === 1 ? 8 : (this.round === 2 ? 6 : 4);
+    if (chosenTop.score >= requiredScore) {
+      const res = this.makeAccusation(chosenBot.id, chosenTop.suspect.id, chosenTop.meansCard.id, chosenTop.clueCard.id);
+      return { bot: chosenBot, ...chosenTop, accusationResult: res };
+    }
+    return null;
+  }
+
+  /**
    * Sinh lời nhận định suy luận hợp lý từ các Đặc vụ AI trong vòng thảo luận
    */
   generateBotRoundDeductions() {
@@ -639,18 +746,16 @@ export class DeceptionState {
       ? causeTile.options_en[causeTile.selectedOptionIndex]
       : 'unclear';
 
-    const suspects = this.players.filter(p => p.role !== 'FORENSIC_SCIENTIST');
-    if (suspects.length < 2) return;
+    const eligibleBots = this.players.filter(p => !p.isHuman && p.role !== 'FORENSIC_SCIENTIST');
+    if (eligibleBots.length === 0) return;
 
-    const speaker = suspects[this.round % suspects.length];
-    const target = suspects[(this.round + 1) % suspects.length];
-    const sampleMeans = target.meansCards[0];
-    const sampleClue = target.clueCards[0];
+    const speaker = eligibleBots[this.round % eligibleBots.length];
+    const top = this.findTopSuspectForBot(speaker.id);
 
-    if (speaker && target && sampleMeans && sampleClue) {
+    if (speaker && top) {
       this.addLog(
-        `[Vòng ${this.round}] ${speaker.displayName}: "Pháp y chỉ vào [${causeVi}], tôi thấy cặp [${sampleMeans.vi}] & [${sampleClue.vi}] của ${target.displayName} rất đáng ngờ!"`,
-        `[Round ${this.round}] ${speaker.displayNameEn}: "Forensic marked [${causeEn}], so ${target.displayNameEn}'s [${sampleMeans.en}] & [${sampleClue.en}] look very suspicious!"`,
+        `[Vòng ${this.round}] ${speaker.displayName}: "Pháp y chỉ vào [${causeVi}], tôi thấy cặp [${top.meansCard.vi}] & [${top.clueCard.vi}] của ${top.suspect.displayName} rất đáng ngờ!"`,
+        `[Round ${this.round}] ${speaker.displayNameEn}: "Forensic marked [${causeEn}], so ${top.suspect.displayNameEn}'s [${top.meansCard.en}] & [${top.clueCard.en}] look very suspicious!"`,
         'speech'
       );
     }

@@ -329,4 +329,47 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
       });
     }
   });
+
+  await t.test('Official Rule Mechanics: Bot Detective Accusation Heuristic & Table Rules', async () => {
+    const game = new DeceptionState();
+    game.config.playerCount = 6;
+    game.startNewGame();
+
+    // 1. Forensic Scientist has no badge, all suspects have 1 badge
+    const forensic = game.getForensicPlayer();
+    assert.equal(forensic.hasBadge, false, 'Forensic Scientist must never have a badge');
+    const suspects = game.players.filter(p => p.role !== 'FORENSIC_SCIENTIST');
+    suspects.forEach(s => {
+      assert.equal(s.hasBadge, true, 'All suspects must start with exactly 1 badge');
+      assert.equal(s.meansCards.length, 4, 'All suspects must have 4 Means cards');
+      assert.equal(s.clueCards.length, 4, 'All suspects must have 4 Clue cards');
+    });
+
+    // 2. Green & Purple tiles can never be replaced
+    assert.equal(game.replaceBrownSceneTile(0), false, 'Location (Green) tile cannot be replaced');
+    assert.equal(game.replaceBrownSceneTile(1), false, 'Cause of Death (Purple) tile cannot be replaced');
+
+    // 3. Night crime selection
+    game.proceedToNightCrime();
+    const murderer = game.getMurdererPlayer();
+    const mCard = murderer.meansCards[0];
+    const cCard = murderer.clueCards[0];
+    game.commitMurdererSelection(mCard.id, cCard.id);
+
+    // 4. Round 1 evidence & auto place bullets
+    game.startRound1Evidence();
+    game.autoPlaceForensicBullets();
+
+    // 5. Bot deduction heuristic scores the true solution high
+    const trueScore = game.evaluateCardPairScore(mCard, cCard);
+    assert.ok(trueScore >= 3, 'True crime solution must receive substantial heuristic score');
+
+    // 6. Bot can find top suspect
+    const bot = suspects.find(s => !s.isHuman && s.team === 'INVESTIGATION');
+    if (bot) {
+      const top = game.findTopSuspectForBot(bot.id);
+      assert.ok(top !== null, 'Bot detective must be able to evaluate top suspect');
+      assert.ok(top.suspect && top.meansCard && top.clueCard);
+    }
+  });
 });
