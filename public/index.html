@@ -557,6 +557,9 @@
             <i class="fa-solid fa-comments" style="color: #ff3366;"></i>
             <span data-i18n="chat_title">Tám Chuyện & Tương Tác</span>
             <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);" id="room-code-tag"><span data-i18n="room_code_prefix">Phòng</span>: ----</span>
+            <button type="button" class="btn-chat-invite-mini" id="btn-reopen-room-invite" title="Xem mã và link mời bạn" style="display: none;">
+              <i class="fa-solid fa-share-nodes"></i>
+            </button>
             <span class="spectator-counter" id="spectator-counter" style="display: none;" title="Số khán giả đang theo dõi">
               <i class="fa-solid fa-eye"></i> <span id="spectator-count-val">0</span>
             </span>
@@ -624,6 +627,57 @@
         <button class="btn-secondary" data-close="modal-create-room" data-i18n="btn_cancel">Hủy</button>
         <button class="btn-primary" id="btn-confirm-create-room">
           <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_create_room">Tạo Phòng Ngay</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PHÒNG ĐÃ TẠO - MÃ PHÒNG & LINK THAM GIA (CARO) -->
+  <div class="modal-overlay" id="modal-room-created">
+    <div class="modal-content room-created-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-circle-check modal-icon text-pink"></i> <span>Tạo Phòng Thành Công!</span></h3>
+        <button class="modal-close" data-close="modal-room-created"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="room-created-body">
+        <p class="room-created-lead">Phòng chơi cờ Caro đã sẵn sàng! Hãy gửi <b>Mã phòng</b> hoặc <b>Link tham gia trực tiếp</b> dưới đây cho bạn bè để cùng vào so tài:</p>
+
+        <!-- Box 1: Mã Phòng -->
+        <div class="share-box-field">
+          <label class="share-box-label"><i class="fa-solid fa-key" style="color: #ff3366;"></i> <span>Mã phòng:</span></label>
+          <div class="share-box-row">
+            <span class="share-box-code" id="modal-created-room-code">CARO--</span>
+            <button type="button" class="btn-copy-action" id="btn-modal-caro-copy-code" title="Sao chép mã phòng">
+              <i class="fa-solid fa-copy"></i> <span id="lbl-caro-copy-code-text">Sao chép mã</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Box 2: Link Tham Gia -->
+        <div class="share-box-field">
+          <label class="share-box-label"><i class="fa-solid fa-link" style="color: #ff3366;"></i> <span>Link tham gia nhanh:</span></label>
+          <div class="share-box-row">
+            <input type="text" readonly class="share-box-input" id="modal-created-room-link" value="" placeholder="Đang tạo link tham gia...">
+            <button type="button" class="btn-copy-action btn-copy-link-accent" id="btn-modal-caro-copy-link" title="Sao chép link tham gia">
+              <i class="fa-solid fa-clone"></i> <span id="lbl-caro-copy-link-text">Sao chép link</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="share-box-subaction">
+          <button type="button" class="btn-native-share" id="btn-modal-caro-native-share">
+            <i class="fa-solid fa-share-nodes"></i> <span>Gửi qua Zalo / Messenger / Tin nhắn</span>
+          </button>
+        </div>
+
+        <div class="share-box-hint">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>Khi bạn bè nhấp vào link, hệ thống sẽ mở bàn cờ và tự động điền sẵn mã phòng!</span>
+        </div>
+      </div>
+      <div class="modal-btn-row">
+        <button class="btn-primary" data-close="modal-room-created">
+          <i class="fa-solid fa-gamepad"></i> <span>Vào Bàn Chờ Đối Thủ</span>
         </button>
       </div>
     </div>

@@ -101,6 +101,53 @@ export class CaroUIBinder {
     document.getElementById('btn-share-room')?.addEventListener('click', copyLink);
     document.getElementById('btn-mobile-share')?.addEventListener('click', copyLink);
 
+    // Xử lý các nút trong Modal Tạo Phòng Thành Công (Caro)
+    document.getElementById('btn-modal-caro-copy-code')?.addEventListener('click', () => {
+      const code = caroOnline.roomId || document.getElementById('modal-created-room-code')?.textContent || '';
+      if (!code) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          CaroModal.showToast('Đã sao chép mã phòng!');
+        }).catch(() => prompt('Sao chép mã này:', code));
+      } else {
+        prompt('Sao chép mã này:', code);
+      }
+      const lbl = document.getElementById('lbl-caro-copy-code-text');
+      if (lbl) {
+        lbl.textContent = '✓ Đã chép!';
+        setTimeout(() => { lbl.textContent = 'Sao chép mã'; }, 2000);
+      }
+    });
+
+    document.getElementById('btn-modal-caro-copy-link')?.addEventListener('click', () => {
+      copyLink();
+      const lbl = document.getElementById('lbl-caro-copy-link-text');
+      if (lbl) {
+        lbl.textContent = '✓ Đã chép link!';
+        setTimeout(() => { lbl.textContent = 'Sao chép link'; }, 2000);
+      }
+    });
+
+    document.getElementById('btn-modal-caro-native-share')?.addEventListener('click', () => {
+      const code = caroOnline.roomId;
+      const shareUrl = `${window.location.origin}/?room=${encodeURIComponent(code || '')}`;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Chơi Cờ Caro Online',
+          text: `Vào chơi cờ Caro với mình nhé! Mã phòng: ${code}`,
+          url: shareUrl
+        }).catch(() => copyLink());
+      } else {
+        copyLink();
+      }
+    });
+
+    document.getElementById('btn-reopen-room-invite')?.addEventListener('click', () => {
+      if (caroOnline.roomId) {
+        caroModule?.showRoomCreatedModal?.(caroOnline.roomId);
+      }
+    });
+
     const isSpectator = () => caroModule?.state?.gameMode === 'online' && caroModule?.state?.mySymbol === 'SPECTATOR';
 
     // 6. Nút Đầu hàng

@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 /**
  * Tests for Deception Multiplayer WebSocket Integration:
  * - Create Room
@@ -288,6 +290,42 @@ describe('Deception Online Multiplayer & WebSocket Suite', () => {
 
     // 6. Accusation casting modal mobile responsiveness
     assert(css.includes('.casting-modal-card') && css.includes('max-height: 90vh'), 'Casting modal must adapt max-height on mobile');
+  });
+
+  test('Room Creation & Invite: Room code and direct join link available across Deception and Caro', async () => {
+    // 1. Deception HTML contains room invite modal and quick invite banner
+    const decHtml = fs.readFileSync(path.join(__dirname, '../public/deception/index.html'), 'utf8');
+    assert(decHtml.includes('id="modal-room-invite"'), 'Deception must include modal-room-invite');
+    assert(decHtml.includes('id="invite-modal-code"'), 'Deception modal must display room code');
+    assert(decHtml.includes('id="invite-modal-link"'), 'Deception modal must display join link input');
+    assert(decHtml.includes('id="online-invite-banner"'), 'Deception must have online-invite-banner in waiting room');
+    assert(decHtml.includes('id="banner-online-room-code"'), 'Invite banner must display room code');
+    assert(decHtml.includes('id="banner-online-room-link"'), 'Invite banner must display join link input');
+    assert(decHtml.includes('id="btn-copy-online-room-link"'), 'Header must have copy invite link button');
+
+    // 2. DeceptionApp JS contains copy, share, link generation, and URL parameter check
+    const decJs = fs.readFileSync(path.join(__dirname, '../public/deception/js/DeceptionApp.js'), 'utf8');
+    assert(decJs.includes('getInviteLink('), 'DeceptionApp must implement getInviteLink');
+    assert(decJs.includes('openRoomInviteModal('), 'DeceptionApp must implement openRoomInviteModal');
+    assert(decJs.includes('copyRoomCode('), 'DeceptionApp must implement copyRoomCode');
+    assert(decJs.includes('copyInviteLink('), 'DeceptionApp must implement copyInviteLink');
+    assert(decJs.includes('shareRoomInvite('), 'DeceptionApp must implement shareRoomInvite');
+    assert(decJs.includes('checkUrlForRoom('), 'DeceptionApp must implement checkUrlForRoom');
+
+    // 3. Deception CSS contains styles for invite banner, modal, and action pills
+    const decCss = fs.readFileSync(path.join(__dirname, '../public/deception/css/deception.css'), 'utf8');
+    assert(decCss.includes('.online-invite-banner'), 'Deception CSS must style .online-invite-banner');
+    assert(decCss.includes('.room-invite-modal-card'), 'Deception CSS must style .room-invite-modal-card');
+    assert(decCss.includes('.btn-room-action-pill'), 'Deception CSS must style .btn-room-action-pill');
+
+    // 4. Caro HTML & JS contain room created modal with room code and invite link
+    const caroHtml = fs.readFileSync(path.join(__dirname, '../public/index.html'), 'utf8');
+    assert(caroHtml.includes('id="modal-room-created"'), 'Caro index.html must include modal-room-created');
+    assert(caroHtml.includes('id="modal-created-room-code"'), 'Caro modal must display room code');
+    assert(caroHtml.includes('id="modal-created-room-link"'), 'Caro modal must display join link');
+
+    const caroOnlineJs = fs.readFileSync(path.join(__dirname, '../public/js/games/caro/CaroOnlineGame.js'), 'utf8');
+    assert(caroOnlineJs.includes('showRoomCreatedModal('), 'CaroOnlineGame must implement showRoomCreatedModal');
   });
 });
 

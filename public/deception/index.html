@@ -266,6 +266,14 @@
                   <i class="fa-solid fa-copy"></i>
                 </button>
               </div>
+              <button type="button" class="btn-room-action-pill btn-pill-copy-link" id="btn-copy-online-room-link" title="Sao chép link tham gia phòng">
+                <i class="fa-solid fa-link"></i>
+                <span>Sao Chép Link</span>
+              </button>
+              <button type="button" class="btn-room-action-pill btn-pill-invite-modal" id="btn-open-online-invite-modal" title="Xem mã và link mời bạn">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Mời Bạn</span>
+              </button>
               <div class="room-occupancy-pill">
                 <i class="fa-solid fa-users"></i>
                 <span id="lbl-online-occupancy">1/9 Người</span>
@@ -274,6 +282,37 @@
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 <span>Rời Phòng</span>
               </button>
+            </div>
+          </div>
+
+          <!-- Room Invite Banner: Mã Phòng & Link Tham Gia Trực Tiếp -->
+          <div class="online-invite-banner" id="online-invite-banner">
+            <div class="invite-banner-inner">
+              <div class="invite-banner-lead">
+                <span class="invite-pill-tag"><i class="fa-solid fa-bullhorn"></i> MỜI ĐỒNG ĐỘI</span>
+                <span class="invite-lead-text">Gửi mã phòng hoặc đường link dưới đây để bạn bè vào bàn cùng phá án:</span>
+              </div>
+              <div class="invite-banner-controls">
+                <div class="invite-control-box invite-box-code">
+                  <span class="invite-box-label"><i class="fa-solid fa-key"></i> Mã phòng:</span>
+                  <span class="invite-box-val" id="banner-online-room-code">DEC---</span>
+                  <button type="button" class="btn-banner-copy" id="btn-banner-copy-code" title="Sao chép mã phòng">
+                    <i class="fa-solid fa-copy"></i> <span>Sao Chép Mã</span>
+                  </button>
+                </div>
+                <div class="invite-control-box invite-box-link">
+                  <span class="invite-box-label"><i class="fa-solid fa-link"></i> Link tham gia:</span>
+                  <div class="invite-link-field">
+                    <input type="text" readonly class="input-banner-invite-link" id="banner-online-room-link" value="" placeholder="Đang tạo link tham gia...">
+                    <button type="button" class="btn-banner-copy btn-highlight" id="btn-banner-copy-link" title="Sao chép link tham gia">
+                      <i class="fa-solid fa-clone"></i> <span>Sao Chép Link</span>
+                    </button>
+                    <button type="button" class="btn-banner-share" id="btn-banner-share" title="Chia sẻ qua Zalo, Messenger, tin nhắn...">
+                      <i class="fa-solid fa-share-nodes"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1015,6 +1054,71 @@
         <button type="button" class="btn-noir-hero" data-close="modal-my-role-guide">
           <i class="fa-solid fa-check"></i>
           <span>Đã Nắm Rõ — Tiếp Tục Điều Tra!</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PHÒNG ĐÃ TẠO - MÃ PHÒNG & LINK THAM GIA (INVITE FRIENDS) -->
+  <div class="noir-modal-overlay" id="modal-room-invite">
+    <div class="noir-modal-card room-invite-modal-card">
+      <div class="noir-modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-tag text-gold"><i class="fa-solid fa-circle-check"></i> TẠO PHÒNG THÀNH CÔNG</span>
+          <h3 class="modal-heading">Mời Bạn Bè Vào Phá Án</h3>
+        </div>
+        <button type="button" class="btn-modal-close" data-close="modal-room-invite"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body-scroll room-invite-body">
+        <p class="room-invite-lead">
+          Phòng điều tra trực tuyến đã sẵn sàng! Bạn hãy gửi <b>Mã Phòng</b> hoặc <b>Link tham gia trực tiếp</b> dưới đây cho bạn bè cùng vào bàn:
+        </p>
+
+        <!-- Box 1: Mã Phòng -->
+        <div class="invite-share-card">
+          <div class="invite-share-hdr">
+            <i class="fa-solid fa-key text-gold"></i>
+            <span>Mã Phòng Điều Tra (Room Code):</span>
+          </div>
+          <div class="invite-code-row">
+            <span class="invite-code-big" id="invite-modal-code">DEC---</span>
+            <button type="button" class="btn-noir-copy-big" id="btn-modal-copy-code">
+              <i class="fa-solid fa-copy"></i>
+              <span id="lbl-modal-copy-code-text">Sao Chép Mã</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Box 2: Link Tham Gia -->
+        <div class="invite-share-card">
+          <div class="invite-share-hdr">
+            <i class="fa-solid fa-link text-gold"></i>
+            <span>Link Tham Gia Nhanh (Bấm vào là vào thẳng phòng):</span>
+          </div>
+          <div class="invite-link-row">
+            <input type="text" readonly class="noir-ctrl-input invite-link-input-modal" id="invite-modal-link" value="" placeholder="Đang tạo link tham gia...">
+            <button type="button" class="btn-noir-copy-big btn-accent" id="btn-modal-copy-link">
+              <i class="fa-solid fa-clone"></i>
+              <span id="lbl-modal-copy-link-text">Sao Chép Link</span>
+            </button>
+          </div>
+          <button type="button" class="btn-noir-share-native" id="btn-modal-web-share">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span>Gửi Qua Zalo / Messenger / Tin Nhắn</span>
+          </button>
+        </div>
+
+        <div class="invite-guide-tip">
+          <i class="fa-solid fa-circle-info"></i>
+          <span><b>Mẹo:</b> Khi bạn bè bấm vào link, hệ thống sẽ tự động chuyển đến phòng chờ và điền sẵn mã phòng. Bạn bè chỉ cần nhập tên là có thể vào bàn chơi ngay lập tức!</span>
+        </div>
+      </div>
+
+      <div class="noir-modal-footer">
+        <button type="button" class="btn-noir-hero" data-close="modal-room-invite">
+          <i class="fa-solid fa-door-open"></i>
+          <span>Vào Bàn Chờ Ngay</span>
         </button>
       </div>
     </div>

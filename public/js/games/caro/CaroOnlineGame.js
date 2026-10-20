@@ -36,6 +36,7 @@ export class CaroOnlineGame extends CaroBaseGame {
       this.state.mySymbol = data.yourSymbol;
       this.setupOnlineUI(data.roomState);
       CaroModal.showToast(i18n.getText('toast_room_created', { roomId: data.roomId }));
+      this.showRoomCreatedModal(data.roomId);
       caroChat.addMessage({ senderName: i18n.getText('chat_system_sender'), text: i18n.getText('chat_room_ready', { roomId: data.roomId }) });
     });
 
@@ -135,6 +136,26 @@ export class CaroOnlineGame extends CaroBaseGame {
     caroOnline.on('spectator_left', (data) => {
       this.updateSpectatorCount(data.count);
     });
+  }
+
+  showRoomCreatedModal(roomId) {
+    if (!roomId) return;
+    const codeEl = document.getElementById('modal-created-room-code');
+    if (codeEl) codeEl.textContent = roomId;
+
+    const linkEl = document.getElementById('modal-created-room-link');
+    const shareUrl = `${window.location.origin}/?room=${encodeURIComponent(roomId)}`;
+    if (linkEl) linkEl.value = shareUrl;
+
+    const btnReopen = document.getElementById('btn-reopen-room-invite');
+    if (btnReopen) btnReopen.style.display = 'inline-flex';
+
+    const lblCode = document.getElementById('lbl-caro-copy-code-text');
+    if (lblCode) lblCode.textContent = 'Sao chép mã';
+    const lblLink = document.getElementById('lbl-caro-copy-link-text');
+    if (lblLink) lblLink.textContent = 'Sao chép link';
+
+    CaroModal.open('modal-room-created');
   }
 
   setupOnlineUI(roomState) {

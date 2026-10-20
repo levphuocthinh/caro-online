@@ -83,6 +83,8 @@ class DeceptionAppController {
     this.updateHeaderInfo();
     this.renderRulesEncyclopedia();
     this.showView('view-lobby');
+    this.restoreSavedPlayerName();
+    this.checkUrlForRoom();
   }
 
   triggerScreenShake(duration = 280) {
@@ -302,6 +304,7 @@ class DeceptionAppController {
       }
 
       this.playAudio('click');
+      try { localStorage.setItem('deception_player_name', name); } catch (_) {}
       this.socket.emit('deception:create_room', {
         playerName: name,
         avatar: this.myAvatar
@@ -333,6 +336,7 @@ class DeceptionAppController {
       }
 
       this.playAudio('click');
+      try { localStorage.setItem('deception_player_name', name); } catch (_) {}
       this.socket.emit('deception:join_room', {
         roomCode: code,
         playerName: name,
@@ -342,12 +346,55 @@ class DeceptionAppController {
 
     // Sao chép mã phòng Online
     document.getElementById('btn-copy-online-room-code')?.addEventListener('click', () => {
-      if (!this.onlineRoom) return;
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(this.onlineRoom.roomCode).catch(() => {});
+      this.copyRoomCode();
+    });
+
+    // Sao chép link tham gia Online
+    document.getElementById('btn-copy-online-room-link')?.addEventListener('click', () => {
+      this.copyInviteLink();
+    });
+
+    // Mở modal mời bạn bè từ header
+    document.getElementById('btn-open-online-invite-modal')?.addEventListener('click', () => {
+      this.openRoomInviteModal();
+    });
+
+    // Sao chép mã phòng từ banner
+    document.getElementById('btn-banner-copy-code')?.addEventListener('click', () => {
+      this.copyRoomCode();
+    });
+
+    // Sao chép link tham gia từ banner
+    document.getElementById('btn-banner-copy-link')?.addEventListener('click', () => {
+      this.copyInviteLink();
+    });
+
+    // Chia sẻ từ banner (Zalo/Messenger/WebShare)
+    document.getElementById('btn-banner-share')?.addEventListener('click', () => {
+      this.shareRoomInvite();
+    });
+
+    // Các nút trong Modal Mời Bạn Bè
+    document.getElementById('btn-modal-copy-code')?.addEventListener('click', () => {
+      this.copyRoomCode();
+      const lbl = document.getElementById('lbl-modal-copy-code-text');
+      if (lbl) {
+        lbl.textContent = '✓ Đã Chép!';
+        setTimeout(() => { lbl.textContent = 'Sao Chép Mã'; }, 2200);
       }
-      this.playAudio('chime');
-      this.showToast(`Đã sao chép mã phòng #${this.onlineRoom.roomCode}!`);
+    });
+
+    document.getElementById('btn-modal-copy-link')?.addEventListener('click', () => {
+      this.copyInviteLink();
+      const lbl = document.getElementById('lbl-modal-copy-link-text');
+      if (lbl) {
+        lbl.textContent = '✓ Đã Chép Link!';
+        setTimeout(() => { lbl.textContent = 'Sao Chép Link'; }, 2200);
+      }
+    });
+
+    document.getElementById('btn-modal-web-share')?.addEventListener('click', () => {
+      this.shareRoomInvite();
     });
 
     // Rời phòng Online
@@ -820,7 +867,8 @@ class DeceptionAppController {
     this.showView('view-online-room');
     this.renderOnlineRoom();
     this.playAudio('start');
-    this.showToast(`Phòng #${data.roomCode} đã được khởi tạo!`);
+    this.showToast(`Phòng #${data.roomCode} đã được khởi tạo thành công! Hãy gửi mã hoặc link cho bạn bè.`);
+    this.openRoomInviteModal(data.roomCode);
   }
 
   handleRoomJoined(data) {
@@ -857,6 +905,22 @@ class DeceptionAppController {
     if (occPill) {
       occPill.textContent = `${this.onlineRoom.players.length}/9 Người`;
     }
+
+    // Cập nhật Mã phòng và Link tham gia trực tiếp trên Banner & Modal
+    const roomCode = this.onlineRoom.roomCode;
+    const inviteLink = this.getInviteLink(roomCode);
+
+    const bannerCode = document.getElementById('banner-online-room-code');
+    if (bannerCode) bannerCode.textContent = `#${roomCode}`;
+
+    const bannerLink = document.getElementById('banner-online-room-link');
+    if (bannerLink) bannerLink.value = inviteLink;
+
+    const modalCode = document.getElementById('invite-modal-code');
+    if (modalCode) modalCode.textContent = `#${roomCode}`;
+
+    const modalLink = document.getElementById('invite-modal-link');
+    if (modalLink) modalLink.value = inviteLink;
 
     const isHost = this.onlineRoom.hostId === this.myPlayerId;
     const me = this.onlineRoom.players.find(p => p.id === this.myPlayerId);
@@ -992,6 +1056,155 @@ class DeceptionAppController {
         this.renderChatMessageBubble(msg, chatStream);
       });
       chatStream.scrollTop = chatStream.scrollHeight;
+    }
+  }
+
+
+  /* =========================================================================
+     ONLINE ROOM INVITE & SHARE UTILITIES (MÃ PHÒNG & LINK THAM GIA)
+     ========================================================================= */
+
+  restoreSavedPlayerName() {
+    try {
+      const savedName = localStorage.getItem('deception_player_name') || localStorage.getItem('caro_player_name');
+      if (savedName) {
+        const createNameInp = document.getElementById('online-create-name');
+        if (createNameInp && (!createNameInp.value || createNameInp.value === 'Thám tử Trưởng')) {
+          createNameInp.value = savedName;
+        }
+        const joinNameInp = document.getElementById('online-join-name');
+        if (joinNameInp && (!joinNameInp.value || joinNameInp.value === 'Điều Tra Viên')) {
+          joinNameInp.value = savedName;
+        }
+      }
+    } catch (_) {}
+  }
+
+  getInviteLink(roomCode) {
+    const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
+    if (!code) return '';
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('room', code);
+      url.hash = '';
+      return url.toString();
+    } catch {
+      return `${window.location.origin}/deception/?room=${encodeURIComponent(code)}`;
+    }
+  }
+
+  openRoomInviteModal(roomCode) {
+    const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
+    if (!code) return;
+    const inviteLink = this.getInviteLink(code);
+
+    const modalCode = document.getElementById('invite-modal-code');
+    if (modalCode) modalCode.textContent = `#${code}`;
+
+    const modalLink = document.getElementById('invite-modal-link');
+    if (modalLink) modalLink.value = inviteLink;
+
+    const lblCode = document.getElementById('lbl-modal-copy-code-text');
+    if (lblCode) lblCode.textContent = 'Sao Chép Mã';
+
+    const lblLink = document.getElementById('lbl-modal-copy-link-text');
+    if (lblLink) lblLink.textContent = 'Sao Chép Link';
+
+    this.playAudio('chime');
+    this.openModal('modal-room-invite');
+  }
+
+  copyRoomCode(roomCode) {
+    const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
+    if (!code) return;
+    this.copyToClipboard(code, `Đã sao chép mã phòng #${code}! Gửi cho bạn bè để cùng vào bàn.`);
+  }
+
+  copyInviteLink(roomCode) {
+    const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
+    const link = this.getInviteLink(code);
+    if (!link) return;
+    this.copyToClipboard(link, `Đã sao chép link tham gia phòng #${code}! Gửi ngay qua Zalo hoặc Messenger.`);
+  }
+
+  shareRoomInvite(roomCode) {
+    const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
+    const link = this.getInviteLink(code);
+    if (!link) return;
+
+    if (navigator.share) {
+      navigator.share({
+        title: 'Tham gia Bàn Phá Án Deception: Murder in Hong Kong',
+        text: `Vào phá án Deception cùng mình nhé! Mã phòng: #${code}`,
+        url: link
+      }).then(() => {
+        this.showToast('Đã mở bảng chia sẻ thành công!');
+      }).catch((err) => {
+        if (err.name !== 'AbortError') {
+          this.copyInviteLink(code);
+        }
+      });
+    } else {
+      this.copyInviteLink(code);
+    }
+  }
+
+  copyToClipboard(text, successToast = 'Đã sao chép vào bộ nhớ tạm!') {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.playAudio('chime');
+        this.showToast(successToast);
+      }).catch(() => {
+        this.fallbackPromptCopy(text, successToast);
+      });
+    } else {
+      this.fallbackPromptCopy(text, successToast);
+    }
+  }
+
+  fallbackPromptCopy(text, successToast) {
+    try {
+      window.prompt('Sao chép nội dung dưới đây:', text);
+      this.playAudio('chime');
+      this.showToast(successToast);
+    } catch (_) {}
+  }
+
+  checkUrlForRoom() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomParam = (urlParams.get('room') || urlParams.get('code') || '').trim().toUpperCase();
+      if (!roomParam) return;
+
+      // 1. Chuyển sang Tab Online trong Lobby
+      const onlineTabBtn = document.getElementById('tab-btn-online');
+      if (onlineTabBtn) {
+        document.querySelectorAll('.noir-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.lobby-tab-content').forEach(p => p.classList.remove('active'));
+        onlineTabBtn.classList.add('active');
+        document.getElementById('tab-pane-online')?.classList.add('active');
+      }
+
+      // 2. Điền mã phòng vào input
+      const joinCodeInput = document.getElementById('online-join-code');
+      if (joinCodeInput) {
+        joinCodeInput.value = roomParam;
+        joinCodeInput.style.borderColor = '#f1c40f';
+        joinCodeInput.style.boxShadow = '0 0 16px rgba(241, 196, 15, 0.4)';
+      }
+
+      // 3. Khôi phục tên đã lưu nếu có
+      this.restoreSavedPlayerName();
+
+      this.showToast(`🔍 Nhận được lời mời tham gia phòng #${roomParam}! Kiểm tra tên và bấm "VÀO PHÒNG NGAY".`, 5000);
+
+      setTimeout(() => {
+        document.querySelector('.card-join-room')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const nameInput = document.getElementById('online-join-name');
+        nameInput?.focus();
+      }, 350);
+    } catch (e) {
+      console.warn('[DeceptionApp] checkUrlForRoom warning:', e);
     }
   }
 

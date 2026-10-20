@@ -4577,6 +4577,457 @@ body.deception-app {
   transform: translateY(-1px);
 }
 
+
+
+
+/* =========================================================================
+   ROOM INVITE PILLS, BANNER & MODAL (MÃ PHÒNG & LINK THAM GIA)
+   ========================================================================= */
+
+.btn-room-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 10px;
+  padding: 8px 13px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 38px;
+  box-sizing: border-box;
+}
+
+.btn-pill-copy-link {
+  background: rgba(46, 204, 113, 0.12);
+  border: 1.5px solid rgba(46, 204, 113, 0.45);
+  color: #2ecc71;
+}
+
+.btn-pill-copy-link:hover {
+  background: rgba(46, 204, 113, 0.25);
+  border-color: #2ecc71;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.25);
+}
+
+.btn-pill-invite-modal {
+  background: rgba(155, 89, 182, 0.12);
+  border: 1.5px solid rgba(155, 89, 182, 0.45);
+  color: #d1a4e8;
+}
+
+.btn-pill-invite-modal:hover {
+  background: rgba(155, 89, 182, 0.25);
+  border-color: #bb6bd9;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(155, 89, 182, 0.25);
+}
+
+/* Online Room Invite Banner */
+.online-invite-banner {
+  background: linear-gradient(135deg, rgba(26, 31, 46, 0.85) 0%, rgba(18, 22, 34, 0.95) 100%);
+  border: 1.5px solid rgba(241, 196, 15, 0.3);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.invite-banner-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.invite-banner-lead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.invite-pill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(241, 196, 15, 0.15);
+  border: 1px solid rgba(241, 196, 15, 0.4);
+  color: #f1c40f;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.invite-lead-text {
+  font-size: 13px;
+  color: #b2bec3;
+  font-weight: 500;
+}
+
+.invite-banner-controls {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.invite-control-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+}
+
+.invite-box-code {
+  flex-shrink: 0;
+}
+
+.invite-box-link {
+  flex: 1;
+  min-width: 0;
+}
+
+.invite-box-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #95a5a6;
+  white-space: nowrap;
+}
+
+.invite-box-val {
+  font-family: var(--font-code);
+  font-size: 16px;
+  font-weight: 800;
+  color: #f1c40f;
+  letter-spacing: 1.2px;
+  padding: 2px 6px;
+  background: rgba(241, 196, 15, 0.1);
+  border-radius: 6px;
+}
+
+.btn-banner-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #dfe4ea;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-banner-copy:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-banner-copy.btn-highlight {
+  background: rgba(46, 204, 113, 0.15);
+  border-color: rgba(46, 204, 113, 0.45);
+  color: #2ecc71;
+}
+
+.btn-banner-copy.btn-highlight:hover {
+  background: rgba(46, 204, 113, 0.28);
+  border-color: #2ecc71;
+  color: #fff;
+}
+
+.btn-banner-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(52, 152, 219, 0.15);
+  border: 1px solid rgba(52, 152, 219, 0.45);
+  color: #3498db;
+  border-radius: 8px;
+  padding: 6px 11px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-banner-share:hover {
+  background: rgba(52, 152, 219, 0.3);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.invite-link-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.input-banner-invite-link {
+  flex: 1;
+  min-width: 0;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #ecf0f1;
+  font-family: var(--font-code);
+  text-overflow: ellipsis;
+  outline: none;
+  cursor: text;
+}
+
+.input-banner-invite-link:focus {
+  border-color: rgba(46, 204, 113, 0.5);
+}
+
+/* =========================================================================
+   ROOM INVITE MODAL (#modal-room-invite)
+   ========================================================================= */
+
+.room-invite-modal-card {
+  max-width: 520px;
+  width: 92vw;
+  box-sizing: border-box;
+}
+
+.room-invite-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 22px;
+}
+
+.room-invite-lead {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #dfe4ea;
+  margin: 0;
+}
+
+.invite-share-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+}
+
+.invite-share-hdr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ecf0f1;
+}
+
+.invite-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(241, 196, 15, 0.08);
+  border: 1.5px dashed rgba(241, 196, 15, 0.35);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.invite-code-big {
+  font-family: var(--font-code);
+  font-size: 26px;
+  font-weight: 900;
+  color: #f1c40f;
+  letter-spacing: 2px;
+}
+
+.btn-noir-copy-big {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(241, 196, 15, 0.2);
+  border: 1.5px solid rgba(241, 196, 15, 0.6);
+  color: #f1c40f;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-height: 40px;
+}
+
+.btn-noir-copy-big:hover {
+  background: #f1c40f;
+  color: #0b0f19;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(241, 196, 15, 0.35);
+}
+
+.btn-noir-copy-big.btn-accent {
+  background: rgba(46, 204, 113, 0.2);
+  border-color: rgba(46, 204, 113, 0.6);
+  color: #2ecc71;
+}
+
+.btn-noir-copy-big.btn-accent:hover {
+  background: #2ecc71;
+  color: #0b0f19;
+  box-shadow: 0 4px 14px rgba(46, 204, 113, 0.35);
+}
+
+.invite-link-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.invite-link-input-modal {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-family: var(--font-code);
+  padding: 10px 12px;
+  color: #ecf0f1;
+}
+
+.btn-noir-share-native {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.2) 0%, rgba(41, 128, 185, 0.3) 100%);
+  border: 1px solid rgba(52, 152, 219, 0.5);
+  color: #74b9ff;
+  border-radius: 9px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 42px;
+}
+
+.btn-noir-share-native:hover {
+  background: rgba(52, 152, 219, 0.35);
+  border-color: #74b9ff;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.invite-guide-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(52, 73, 94, 0.25);
+  border-left: 3px solid #3498db;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #b2bec3;
+}
+
+.invite-guide-tip i {
+  color: #3498db;
+  font-size: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .btn-room-action-pill {
+    padding: 7px 10px;
+    font-size: 12px;
+    min-height: 40px;
+  }
+
+  .online-invite-banner {
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+
+  .invite-banner-controls {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .invite-box-code,
+  .invite-box-link {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .invite-link-field {
+    width: 100%;
+  }
+
+  .invite-code-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .invite-link-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .invite-link-input-modal {
+    width: 100%;
+  }
+
+  .btn-noir-copy-big {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+}
+`;
+
+if (!content.includes(marker)) {
+  console.error('Marker not found in deception.css!');
+  process.exit(1);
+}
+
+content = content.replace(marker, cssToAdd);
+fs.writeFileSync(targetPath, content, 'utf8');
+console.log('Successfully updated deception.css!');
+
+
 /* 2-Column Split */
 .online-room-split {
   display: grid;
@@ -5992,20 +6443,31 @@ body.deception-app {
     padding: 8px 12px;
   }
 
+  .btn-room-action-pill {
+    flex: 1 1 calc(50% - 4px);
+    justify-content: center;
+    padding: 8px 6px;
+    font-size: 11.5px;
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+
   .room-occupancy-pill {
-    flex: 1;
+    flex: 1 1 calc(50% - 4px);
     justify-content: center;
     padding: 8px 10px;
     font-size: 12px;
     min-height: 40px;
+    box-sizing: border-box;
   }
 
   .btn-leave-online {
-    flex: 1;
+    flex: 1 1 calc(50% - 4px);
     justify-content: center;
     padding: 8px 10px;
     min-height: 40px;
     font-size: 12px;
+    box-sizing: border-box;
   }
 
   #view-online-room {
