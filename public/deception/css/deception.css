@@ -2745,7 +2745,7 @@ body.deception-app {
    ========================================================================= */
 
 .confidential-dossier-card {
-  max-width: 580px;
+  max-width: 680px;
   width: 100%;
   background: #e8d7ba;
   border: 3px solid #8c6e4e;
@@ -2786,10 +2786,10 @@ body.deception-app {
 }
 
 .dossier-folder-body {
-  padding: 24px;
+  padding: 22px 24px;
   display: flex;
-  gap: 20px;
-  align-items: center;
+  gap: 22px;
+  align-items: flex-start;
   position: relative;
 }
 
@@ -2828,19 +2828,122 @@ body.deception-app {
   font-size: 26px;
   font-weight: 900;
   color: #1a120b;
+  margin: 0 0 2px 0;
+}
+
+.role-display-motto {
+  font-style: italic;
+  font-size: 12.5px;
+  color: #63432b;
+  font-weight: 700;
   margin: 0 0 6px 0;
+  line-height: 1.35;
 }
 
 .dossier-divider {
   height: 2px;
   background: #8c6e4e;
-  margin: 8px 0 12px 0;
+  margin: 6px 0 10px 0;
 }
 
-.role-display-desc {
-  font-size: 14px;
-  line-height: 1.55;
+.role-guide-goal-box {
+  background: rgba(140, 110, 78, 0.16);
+  border-left: 4px solid #c0392b;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.role-guide-goal-box .goal-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: #c0392b;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.role-guide-goal-box .goal-text {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #1a120b;
+  line-height: 1.4;
+}
+
+.role-guide-steps-title {
+  font-size: 11px;
+  font-weight: 900;
+  color: #7f5c35;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.role-guide-steps-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.role-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(140, 110, 78, 0.4);
+  border-radius: 8px;
+  padding: 8px 11px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+.role-step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #2b1f14;
+  color: #f1c40f;
+  font-weight: 900;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.role-step-title {
+  font-size: 13px;
+  font-weight: 900;
+  color: #1a120b;
+  margin-bottom: 2px;
+}
+
+.role-step-desc {
+  font-size: 12px;
   color: #3d2b1b;
+  line-height: 1.35;
+}
+
+.role-guide-crucial-box {
+  background: rgba(230, 126, 34, 0.16);
+  border: 1px dashed rgba(211, 84, 0, 0.55);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 6px;
+}
+
+.role-guide-crucial-box .crucial-text {
+  font-size: 12px;
+  font-weight: 800;
+  color: #8c3b00;
+  line-height: 1.4;
   margin: 0;
 }
 
@@ -2858,6 +2961,134 @@ body.deception-app {
   border-radius: 6px;
   pointer-events: none;
   letter-spacing: 2px;
+}
+
+/* Header & HUD Role Reminder Badges */
+.btn-my-role-badge,
+.btn-hud-role {
+  background: linear-gradient(135deg, rgba(241, 196, 15, 0.18), rgba(230, 126, 34, 0.18));
+  border: 1px solid rgba(241, 196, 15, 0.5) !important;
+  color: #f1c40f !important;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-my-role-badge:hover,
+.btn-hud-role:hover {
+  background: rgba(241, 196, 15, 0.3) !important;
+  border-color: #f1c40f !important;
+  color: #fff !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(241, 196, 15, 0.5);
+}
+
+/* Modal Cẩm Nang Vai Trò Dễ Hiểu */
+.role-guide-modal-card {
+  max-width: 620px;
+}
+
+.role-modal-guide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guide-modal-motto {
+  font-style: italic;
+  font-size: 14px;
+  color: var(--gold);
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.guide-sub-heading {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #ffeaa7;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.guide-modal-goal {
+  background: rgba(241, 196, 15, 0.1);
+  border-left: 4px solid var(--gold);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+.guide-modal-goal p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.guide-modal-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-step-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.modal-step-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #111;
+  font-weight: 900;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.modal-step-info b {
+  display: block;
+  font-size: 13.5px;
+  color: #fff;
+  margin-bottom: 3px;
+}
+
+.modal-step-info p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.guide-modal-crucial {
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px dashed rgba(231, 76, 60, 0.5);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.guide-modal-crucial p {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #ff7675;
+  line-height: 1.4;
 }
 
 /* =========================================================================

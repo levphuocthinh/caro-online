@@ -10,6 +10,7 @@ import {
   MEANS_CARDS,
   CLUE_CARDS
 } from '/js/games/deception/data/deceptionData.js';
+import { ROLE_GUIDES } from '/js/games/deception/data/deceptionRoleGuides.js';
 import {
   renderCardIconHtml,
   renderRoleIconHtml,
@@ -286,6 +287,15 @@ class DeceptionAppController {
     document.getElementById('btn-quick-guide')?.addEventListener('click', () => {
       this.openModal('modal-quick-guide');
     });
+
+    // Nút Cẩm nang Vai trò của bạn trên Header & Discussion HUD
+    document.getElementById('btn-hdr-my-role')?.addEventListener('click', () => {
+      this.openMyRoleGuideModal();
+    });
+
+    document.getElementById('btn-hud-my-role')?.addEventListener('click', () => {
+      this.openMyRoleGuideModal();
+    });
   }
 
   renderCurrentView() {
@@ -331,20 +341,26 @@ class DeceptionAppController {
   }
 
   /* =========================================================================
-     STAGE 2: ROLE REVEAL
+     STAGE 2: ROLE REVEAL & QUICK ACTION PLAYBOOK
      ========================================================================= */
 
   showRoleReveal() {
     const human = this.state.getHumanPlayer();
     const roleDef = ROLE_DEFINITIONS[human.role] || ROLE_DEFINITIONS.INVESTIGATOR;
+    const roleGuide = ROLE_GUIDES[human.role] || ROLE_GUIDES.INVESTIGATOR;
 
     const ico = document.getElementById('role-display-icon');
     const title = document.getElementById('role-display-title');
     const faction = document.getElementById('role-display-faction');
-    const desc = document.getElementById('role-display-desc');
+    const motto = document.getElementById('role-display-motto');
+    const goal = document.getElementById('role-display-goal');
+    const stepsGrid = document.getElementById('role-display-steps-grid');
+    const crucial = document.getElementById('role-display-crucial');
+    const goalTag = document.getElementById('lbl-role-goal-tag');
+    const stepsTag = document.getElementById('lbl-role-steps-tag');
 
     if (ico) ico.innerHTML = `<div class="role-reveal-icon-badge">${renderRoleIconHtml(roleDef.id, 'role-svg')}</div>`;
-    if (title) title.textContent = `${roleDef.name_vi} (${roleDef.name_en})`;
+    if (title) title.textContent = `${this.isVi ? roleDef.name_vi : roleDef.name_en} (${this.isVi ? roleDef.name_en : roleDef.name_vi})`;
     if (faction) {
       const isCrim = human.team === 'CRIMINAL';
       faction.className = `role-faction-pill ${isCrim ? 'pill-crim' : 'pill-pol'}`;
@@ -352,9 +368,99 @@ class DeceptionAppController {
         ? (this.isVi ? 'PHE TỘI PHẠM (CRIMINAL)' : 'CRIMINAL FACTION')
         : (this.isVi ? 'PHE ĐIỀU TRA (POLICE)' : 'INVESTIGATION FACTION');
     }
-    if (desc) desc.textContent = this.isVi ? roleDef.desc_vi : roleDef.desc_en;
+    if (motto) motto.textContent = this.isVi ? roleGuide.motto_vi : roleGuide.motto_en;
+    if (goalTag) goalTag.textContent = this.isVi ? 'MỤC TIÊU CỐT LÕI:' : 'CORE OBJECTIVE:';
+    if (goal) goal.textContent = this.isVi ? roleGuide.goal_vi : roleGuide.goal_en;
+    if (stepsTag) stepsTag.textContent = this.isVi ? 'CẨM NANG HÀNH ĐỘNG 3 BƯỚC:' : '3-STEP ACTION PLAYBOOK:';
 
+    if (stepsGrid) {
+      const steps = this.isVi ? roleGuide.steps_vi : roleGuide.steps_en;
+      stepsGrid.innerHTML = steps.map(s => `
+        <div class="role-step-item">
+          <div class="role-step-num">${s.num}</div>
+          <div class="role-step-body">
+            <div class="role-step-title">${s.title}</div>
+            <div class="role-step-desc">${s.desc}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    if (crucial) {
+      crucial.textContent = this.isVi ? roleGuide.crucial_vi : roleGuide.crucial_en;
+    }
+
+    this.updateRoleBadges();
     this.showView('view-role');
+  }
+
+  updateRoleBadges() {
+    const human = this.state.getHumanPlayer();
+    if (!human) return;
+    const roleDef = ROLE_DEFINITIONS[human.role] || ROLE_DEFINITIONS.INVESTIGATOR;
+    const roleGuide = ROLE_GUIDES[human.role] || ROLE_GUIDES.INVESTIGATOR;
+
+    const hdrRoleBtn = document.getElementById('btn-hdr-my-role');
+    const hdrIcon = document.getElementById('hdr-my-role-icon');
+    const hdrName = document.getElementById('hdr-my-role-name');
+
+    if (hdrRoleBtn) hdrRoleBtn.style.display = 'inline-flex';
+    if (hdrIcon) hdrIcon.textContent = roleGuide.icon;
+    if (hdrName) hdrName.textContent = this.isVi ? roleDef.name_vi : roleDef.name_en;
+
+    const hudRoleBtn = document.getElementById('btn-hud-my-role');
+    const hudIcon = document.getElementById('hud-my-role-icon');
+    const hudText = document.getElementById('hud-my-role-text');
+
+    if (hudRoleBtn) hudRoleBtn.style.display = 'inline-flex';
+    if (hudIcon) hudIcon.textContent = roleGuide.icon;
+    if (hudText) hudText.textContent = this.isVi ? roleDef.name_vi : roleDef.name_en;
+  }
+
+  openMyRoleGuideModal() {
+    const human = this.state.getHumanPlayer();
+    if (!human) return;
+    const roleDef = ROLE_DEFINITIONS[human.role] || ROLE_DEFINITIONS.INVESTIGATOR;
+    const roleGuide = ROLE_GUIDES[human.role] || ROLE_GUIDES.INVESTIGATOR;
+
+    const modalTitle = document.getElementById('guide-modal-title');
+    const modalContent = document.getElementById('guide-modal-content');
+
+    if (modalTitle) {
+      modalTitle.textContent = `${roleGuide.icon} ${this.isVi ? roleDef.name_vi : roleDef.name_en} (${roleDef.team === 'CRIMINAL' ? (this.isVi ? 'Phe Tội Phạm' : 'Criminal') : (this.isVi ? 'Phe Điều Tra' : 'Police')})`;
+    }
+
+    if (modalContent) {
+      const steps = this.isVi ? roleGuide.steps_vi : roleGuide.steps_en;
+      modalContent.innerHTML = `
+        <div class="guide-modal-motto">${this.isVi ? roleGuide.motto_vi : roleGuide.motto_en}</div>
+        
+        <div class="guide-modal-goal">
+          <div class="guide-sub-heading"><i class="fa-solid fa-bullseye"></i> ${this.isVi ? 'MỤC TIÊU CỐT LÕI:' : 'CORE OBJECTIVE:'}</div>
+          <p>${this.isVi ? roleGuide.goal_vi : roleGuide.goal_en}</p>
+        </div>
+
+        <div class="guide-sub-heading" style="margin-top: 6px;"><i class="fa-solid fa-list-check"></i> ${this.isVi ? '3 BƯỚC HÀNH ĐỘNG DỄ HIỂU:' : 'YOUR 3-STEP ACTION PLAYBOOK:'}</div>
+        <div class="guide-modal-steps">
+          ${steps.map(s => `
+            <div class="modal-step-card">
+              <div class="modal-step-badge">${s.num}</div>
+              <div class="modal-step-info">
+                <b>${s.title}</b>
+                <p>${s.desc}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="guide-modal-crucial" style="margin-top: 6px;">
+          <p>${this.isVi ? roleGuide.crucial_vi : roleGuide.crucial_en}</p>
+        </div>
+      `;
+    }
+
+    this.playAudio('click');
+    this.openModal('modal-my-role-guide');
   }
 
   /* =========================================================================
@@ -568,6 +674,7 @@ class DeceptionAppController {
   }
 
   renderInvestigationTable() {
+    this.updateRoleBadges();
     this.updateInvestigationTimeline();
     this.updateDiscussionHud();
     this.renderActiveSceneTiles();
@@ -1713,12 +1820,24 @@ class DeceptionAppController {
   renderRulesEncyclopedia() {
     const grid = document.getElementById('rules-roles-grid');
     if (!grid) return;
-    grid.innerHTML = Object.values(ROLE_DEFINITIONS).map(r => `
-      <div class="role-encyclo-item">
-        <strong>${r.icon} ${this.isVi ? r.name_vi : r.name_en}</strong>
-        <p>${this.isVi ? r.desc_vi : r.desc_en}</p>
-      </div>
-    `).join('');
+    grid.innerHTML = Object.values(ROLE_DEFINITIONS).map(r => {
+      const guide = ROLE_GUIDES[r.id];
+      const goal = guide ? (this.isVi ? guide.goal_vi : guide.goal_en) : '';
+      const crucial = guide ? (this.isVi ? guide.crucial_vi : guide.crucial_en) : '';
+      return `
+        <div class="role-encyclo-item">
+          <div class="role-encyclo-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <strong style="font-size: 14.5px;">${r.icon} ${this.isVi ? r.name_vi : r.name_en}</strong>
+            <span class="role-faction-pill ${r.team === 'CRIMINAL' ? 'pill-crim' : 'pill-pol'}" style="font-size: 10px; padding: 2px 7px;">
+              ${r.team === 'CRIMINAL' ? (this.isVi ? 'Tội Phạm' : 'Criminal') : (this.isVi ? 'Điều Tra' : 'Police')}
+            </span>
+          </div>
+          ${goal ? `<div style="font-size: 12.5px; font-weight: 800; color: #ffeaa7; margin-bottom: 5px;">🎯 ${this.isVi ? 'Mục tiêu' : 'Goal'}: ${goal}</div>` : ''}
+          <p style="font-size: 12.5px; line-height: 1.4; color: var(--text-muted); margin: 0 0 6px 0;">${this.isVi ? r.desc_vi : r.desc_en}</p>
+          ${crucial ? `<div style="font-size: 11.5px; font-weight: 800; color: #ff9f43; line-height: 1.35;">${crucial}</div>` : ''}
+        </div>
+      `;
+    }).join('');
   }
 }
 

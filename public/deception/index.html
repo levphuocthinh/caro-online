@@ -47,6 +47,11 @@
       </div>
 
       <div class="header-right">
+        <button type="button" class="btn-hdr-action btn-my-role-badge" id="btn-hdr-my-role" title="Bấm để xem lại cẩm nang vai trò của bạn" style="display: none;">
+          <span id="hdr-my-role-icon">🕵️</span>
+          <span id="hdr-my-role-name">Vai Trò</span>
+          <i class="fa-solid fa-circle-info" style="font-size: 11px; margin-left: 4px; color: #f1c40f;"></i>
+        </button>
         <button type="button" class="btn-hdr-action btn-gallery-action" id="btn-open-cutscene-gallery" title="Xem Rạp Chiếu 7 Hoạt Cảnh Hành Động Pixel Noir">
           <i class="fa-solid fa-clapperboard"></i>
           <span>Rạp Hoạt Cảnh</span>
@@ -166,8 +171,28 @@
                 <div class="dossier-header-conf">CỤC CẢNH SÁT HÌNH SỰ • BỘ CÔNG AN VIỆT NAM</div>
                 <div class="dossier-loc-tag" style="font-size: 11px; font-weight: 800; color: #a04000; margin-bottom: 6px;"><i class="fa-solid fa-location-dot"></i> HIỆN TRƯỜNG: <b>PHỐ HÀNG ĐẪY, HÀ NỘI</b></div>
                 <h2 class="role-display-title" id="role-display-title">Điều Tra Viên</h2>
+                <div class="role-display-motto" id="role-display-motto">Lưới trời lồng lộng — Phân tích vật chứng, vạch trần tội ác</div>
                 <div class="dossier-divider"></div>
-                <p class="role-display-desc" id="role-display-desc">Mô tả vai trò</p>
+
+                <!-- MỤC TIÊU VAI TRÒ -->
+                <div class="role-guide-goal-box" id="role-display-goal-box">
+                  <div class="goal-label"><i class="fa-solid fa-bullseye"></i> <span id="lbl-role-goal-tag">MỤC TIÊU CỐT LÕI:</span></div>
+                  <div class="goal-text" id="role-display-goal">Tìm ra ai là Kẻ Sát Nhân và đúng cặp Hung khí + Manh mối của hắn.</div>
+                </div>
+
+                <!-- CẨM NANG HÀNH ĐỘNG 3 BƯỚC -->
+                <div class="role-guide-steps-title">
+                  <i class="fa-solid fa-list-check"></i> <span id="lbl-role-steps-tag">CẨM NANG HÀNH ĐỘNG 3 BƯỚC:</span>
+                </div>
+                <div class="role-guide-steps-grid" id="role-display-steps-grid">
+                  <!-- Rendered dynamically -->
+                </div>
+
+                <!-- LƯU Ý SỐNG CÒN & MẸO -->
+                <div class="role-guide-crucial-box" id="role-display-crucial-box">
+                  <div class="crucial-text" id="role-display-crucial">⚠️ Lưu ý sống còn...</div>
+                </div>
+
                 <div class="dossier-rubber-stamp">PHÒNG TRỌNG ÁN</div>
               </div>
             </div>
@@ -316,6 +341,10 @@
           </div>
 
           <div class="discussion-hud-right">
+            <button type="button" class="btn-hud-guide btn-hud-role" id="btn-hud-my-role" title="Bấm để xem lại cẩm nang vai trò của bạn">
+              <span id="hud-my-role-icon">🕵️</span>
+              <span id="hud-my-role-text">Vai Trò</span>
+            </button>
             <button type="button" class="btn-hud-accuse" id="btn-hud-accuse" title="Sử dụng Phù hiệu để đập bàn phá án">
               <i class="fa-solid fa-gavel"></i>
               <span>🚨 PHÁ ÁN!</span>
@@ -796,6 +825,32 @@
 
       <div class="noir-modal-footer">
         <button type="button" class="btn-modal-cancel" data-close="modal-cutscene-gallery">Đóng Rạp Chiếu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 7: CẨM NANG VAI TRÒ DỄ HIỂU (MY ROLE GUIDE POPUP) -->
+  <div class="noir-modal-overlay" id="modal-my-role-guide">
+    <div class="noir-modal-card role-guide-modal-card">
+      <div class="noir-modal-header">
+        <div>
+          <span class="view-eyebrow text-gold"><i class="fa-solid fa-id-badge"></i> CẨM NANG VAI TRÒ</span>
+          <h3 class="modal-heading" id="guide-modal-title">Điều Tra Viên</h3>
+        </div>
+        <button type="button" class="btn-modal-close" data-close="modal-my-role-guide"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body-scroll">
+        <div class="role-modal-guide-content" id="guide-modal-content">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <div class="noir-modal-footer">
+        <button type="button" class="btn-noir-hero" data-close="modal-my-role-guide">
+          <i class="fa-solid fa-check"></i>
+          <span>Đã Nắm Rõ — Tiếp Tục Điều Tra!</span>
+        </button>
       </div>
     </div>
   </div>

@@ -296,4 +296,37 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     assert.equal(CLUE_GAME_ICONS['C176'], 'drama-masks', 'Theater mask should be drama masks');
     assert.equal(MEANS_GAME_ICONS['M060'], 'wolf-head', 'Rabid dog should be canine beast head');
   });
+
+  await t.test('Role Guides: 100% coverage for all 9 roles with core goals, 3-step action playbooks and crucial pro-tips', async () => {
+    const { ROLE_GUIDES } = await import('../public/js/games/deception/data/deceptionRoleGuides.js');
+    const { ROLE_DEFINITIONS } = await import('../public/js/games/deception/data/deceptionData.js');
+
+    const expectedRoleIds = Object.keys(ROLE_DEFINITIONS);
+    assert.equal(expectedRoleIds.length, 9, 'Must have exactly 9 official roles');
+
+    for (const roleId of expectedRoleIds) {
+      const guide = ROLE_GUIDES[roleId];
+      assert.ok(guide, `Guide must exist for role: ${roleId}`);
+      assert.ok(guide.goal_vi && guide.goal_vi.length > 5, `${roleId} must have Vietnamese goal`);
+      assert.ok(guide.goal_en && guide.goal_en.length > 5, `${roleId} must have English goal`);
+      assert.ok(guide.motto_vi && guide.motto_vi.length > 5, `${roleId} must have Vietnamese motto`);
+      assert.ok(guide.motto_en && guide.motto_en.length > 5, `${roleId} must have English motto`);
+      assert.ok(guide.crucial_vi && guide.crucial_vi.length > 5, `${roleId} must have Vietnamese crucial tip`);
+      assert.ok(guide.crucial_en && guide.crucial_en.length > 5, `${roleId} must have English crucial tip`);
+
+      assert.equal(guide.steps_vi.length, 3, `${roleId} must have exactly 3 action steps in Vietnamese`);
+      assert.equal(guide.steps_en.length, 3, `${roleId} must have exactly 3 action steps in English`);
+
+      guide.steps_vi.forEach((s, idx) => {
+        assert.equal(s.num, idx + 1);
+        assert.ok(s.title && s.title.length > 0);
+        assert.ok(s.desc && s.desc.length > 0);
+      });
+      guide.steps_en.forEach((s, idx) => {
+        assert.equal(s.num, idx + 1);
+        assert.ok(s.title && s.title.length > 0);
+        assert.ok(s.desc && s.desc.length > 0);
+      });
+    }
+  });
 });
