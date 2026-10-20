@@ -16,7 +16,7 @@ export class Deception3DManager {
     this.renderer = null;
     this.scene = null;
     this.camera = null;
-    this.clock = new THREE.Clock();
+    this.clock = (typeof THREE !== 'undefined' && THREE.Clock) ? new THREE.Clock() : null;
     this.currentAnimGroup = null;
     this.animFrameId = null;
     this.isPlaying = false;
@@ -103,8 +103,8 @@ export class Deception3DManager {
 
     if (overlay) overlay.classList.add('active');
 
-    if (!this.renderer || !this.scene) {
-      setTimeout(() => this.stopCutscene(true), 1800);
+    if (!this.renderer || !this.scene || !this.clock) {
+      setTimeout(() => this.stopCutscene(true), 1200);
       return;
     }
 
@@ -143,14 +143,16 @@ export class Deception3DManager {
     }
 
     this.isPlaying = true;
-    this.clock.start();
+    if (this.clock) {
+      try { this.clock.start(); } catch (_) {}
+    }
     let elapsed = 0;
     const duration = (config.durationMs || 2500) / 1000;
 
     // Vòng lặp WebGL 60FPS chỉ kích hoạt trong vài giây Cutscene
     this.renderer.setAnimationLoop(() => {
       if (!this.isPlaying) return;
-      const delta = this.clock.getDelta();
+      const delta = this.clock ? this.clock.getDelta() : 0.016;
       elapsed += delta;
       const progress = Math.min(1, elapsed / duration);
 
@@ -167,9 +169,11 @@ export class Deception3DManager {
   stopCutscene(callCallback = true) {
     this.isPlaying = false;
     if (this.renderer) {
-      this.renderer.setAnimationLoop(null); // 0% GPU khi đóng Cutscene!
+      try { this.renderer.setAnimationLoop(null); } catch (_) {} // 0% GPU khi đóng Cutscene!
     }
-    this.clock.stop();
+    if (this.clock) {
+      try { this.clock.stop(); } catch (_) {}
+    }
 
     const overlay = document.getElementById('cutscene-overlay');
     if (overlay) overlay.classList.remove('active');

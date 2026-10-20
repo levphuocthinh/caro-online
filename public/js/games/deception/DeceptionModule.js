@@ -25,7 +25,9 @@ export class DeceptionModule extends BaseGameModule {
 
   init() {
     super.init();
-    DeceptionUIBinder.bind(this);
+    try {
+      DeceptionUIBinder.bind(this);
+    } catch (_) {}
   }
 
   /**

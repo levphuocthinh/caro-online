@@ -25,7 +25,11 @@ class DeceptionAppController {
   }
 
   init() {
-    deception3D.init();
+    try {
+      deception3D.init();
+    } catch (err) {
+      console.warn('[DeceptionApp] 3D engine init warning:', err);
+    }
     this.bindDomEvents();
     this.renderLobbySeatsRing();
     this.updateHeaderInfo();
@@ -1229,14 +1233,23 @@ class DeceptionAppController {
       onComplete = options;
       options = {};
     }
-    deception3D.playCutscene({
-      type,
-      ...options
-    }, onComplete);
+    try {
+      deception3D.playCutscene({
+        type,
+        ...options
+      }, onComplete);
+    } catch (err) {
+      console.warn('[DeceptionApp] Cutscene fallback triggered:', err);
+      if (typeof onComplete === 'function') {
+        onComplete();
+      }
+    }
   }
 
   finishCutscene() {
-    deception3D.stopCutscene(true);
+    try {
+      deception3D.stopCutscene(true);
+    } catch (_) {}
   }
 
   renderDossierLogs() {
@@ -1266,9 +1279,16 @@ class DeceptionAppController {
   }
 }
 
-// Khởi chạy ứng dụng khi DOM tải xong
-document.addEventListener('DOMContentLoaded', () => {
+// Khởi chạy ứng dụng an toàn cho mọi trạng thái readyState
+function bootDeceptionApp() {
+  if (window.deceptionApp) return;
   const app = new DeceptionAppController();
   app.init();
   window.deceptionApp = app;
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootDeceptionApp);
+} else {
+  bootDeceptionApp();
+}
