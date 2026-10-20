@@ -335,8 +335,8 @@ class DeceptionAppController {
     document.querySelectorAll('#ingame-chat-quick-chips .btn-chat-chip').forEach(btn => {
       btn.addEventListener('click', () => {
         const text = btn.dataset.text;
-        if (!text || !this.socket) return;
-        this.socket.emit('deception:send_chat', { message: text });
+        if (!text) return;
+        this.sendChatMessage(text);
         this.playAudio('click');
       });
     });
@@ -397,8 +397,8 @@ class DeceptionAppController {
       e.preventDefault();
       const input = document.getElementById('input-ingame-chat');
       const text = (input?.value || '').trim();
-      if (!text || !this.socket) return;
-      this.socket.emit('deception:send_chat', { message: text });
+      if (!text) return;
+      this.sendChatMessage(text);
       input.value = '';
     });
 
@@ -882,7 +882,7 @@ class DeceptionAppController {
   renderChatMessageBubble(chatItem, container) {
     if (!container || !chatItem) return;
     const isSys = Boolean(chatItem.isSystem);
-    const isSelf = chatItem.senderId === this.myPlayerId;
+    const isSelf = chatItem.senderId === this.myPlayerId || chatItem.senderId === 'self_solo';
 
     const el = document.createElement('div');
     if (isSys) {
@@ -919,6 +919,126 @@ class DeceptionAppController {
     this.playAudio('click');
   }
 
+  sendChatMessage(text) {
+    text = (text || '').trim();
+    if (!text) return;
+
+    if (this.isOnlineMatch && this.socket && this.onlineRoom) {
+      this.socket.emit('deception:send_chat', { message: text });
+    } else {
+      this.sendSoloChatMessage(text);
+    }
+  }
+
+  sendSoloChatMessage(text) {
+    const human = this.state.getHumanPlayer() || { id: 'p1', displayName: 'Bạn', avatar: this.myAvatar || '🕵️' };
+    const myId = this.myPlayerId || human.id || 'self_solo';
+    const chatItem = {
+      id: `msg_solo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      senderId: myId,
+      senderName: human.displayName + (this.isVi ? ' (Bạn)' : ' (You)'),
+      avatar: this.myAvatar || human.avatar || '🕵️',
+      text: text,
+      isSystem: false,
+      timestamp: Date.now()
+    };
+    this.handleNewChat(chatItem);
+
+    // Phản hồi thông minh từ Bot AI
+    this.triggerBotChatResponse(text);
+  }
+
+  triggerBotChatResponse(playerMessage) {
+    if (this.isOnlineMatch) return; // Chỉ mô phỏng trong trận chơi đơn với Bot
+
+    const bots = (this.state.players || []).filter(p => !p.isHuman);
+    if (!bots.length) return;
+
+    const delay = 900 + Math.floor(Math.random() * 800);
+
+    setTimeout(() => {
+      const forensicBot = bots.find(p => p.role === 'FORENSIC_SCIENTIST');
+      const suspectBots = bots.filter(p => p.role !== 'FORENSIC_SCIENTIST');
+      const lower = (playerMessage || '').toLowerCase();
+
+      let responder = null;
+      let replyText = '';
+
+      if ((lower.includes('pháp y') || lower.includes('forensic') || lower.includes('gợi ý') || lower.includes('dấu vết') || lower.includes('chuyên gia')) && forensicBot) {
+        responder = forensicBot;
+        const hintsVi = [
+          'Hãy liên kết Địa điểm tử vong và Nguyên nhân cái chết, đó là cốt lõi của vụ án.',
+          'Các dấu vết hiện trường đã được cắm đạn rất cẩn thận, hãy phân tích logic đừng phỏng đoán cảm tính!',
+          'Một trong các nghi phạm đang giữ cặp Hung khí & Manh mối cực kỳ ăn khớp với hiện trường.',
+          'Đừng chỉ nhìn vào từng thẻ đơn lẻ, sự tương đồng giữa Hung khí và Manh mối mới là chìa khóa.'
+        ];
+        const hintsEn = [
+          'Focus on Location of Crime and Cause of Death, those are key to the case.',
+          'Bullet markers point to exact clues. Analyze logically!',
+          'One suspect holds a Means & Clue pair that matches the scene closely.',
+          'Observe the correlation between the weapon and scene evidence.'
+        ];
+        replyText = this.isVi
+          ? hintsVi[Math.floor(Math.random() * hintsVi.length)]
+          : hintsEn[Math.floor(Math.random() * hintsEn.length)];
+      } else {
+        responder = suspectBots[Math.floor(Math.random() * suspectBots.length)] || bots[0];
+        const isMurdererBot = responder.role === 'MURDERER';
+
+        if (lower.includes('nghi ngờ') || lower.includes('suspect') || lower.includes('nghi vấn')) {
+          if (isMurdererBot) {
+            replyText = this.isVi
+              ? 'Tôi hoàn toàn ngoại phạm! Các thẻ bài của tôi không hề liên quan đến dấu vết của Pháp y.'
+              : 'I have a solid alibi! My cards do not match the Forensic Scientist clues at all.';
+          } else {
+            const otherBot = suspectBots.find(b => b.id !== responder.id);
+            const otherName = otherBot ? otherBot.displayName : (this.isVi ? 'nghi phạm đối diện' : 'the other suspect');
+            replyText = this.isVi
+              ? `Tôi thấy các thẻ bài của ${otherName} có vẻ đáng ngờ hơn nhiều đấy!`
+              : `I think the cards on ${otherName}'s station look much more suspicious!`;
+          }
+        } else if (lower.includes('vô tội') || lower.includes('innocent')) {
+          replyText = this.isVi
+            ? 'Ai cũng nói mình vô tội cả, nhưng chứng cứ hiện trường không bao giờ nói dối!'
+            : 'Everyone claims to be innocent, but the crime scene never lies!';
+        } else if (lower.includes('phá án') || lower.includes('accuse')) {
+          replyText = this.isVi
+            ? 'Mỗi người chỉ có 1 Huy hiệu phá án duy nhất, hãy suy nghĩ thật kỹ trước khi đập bàn!'
+            : 'Each investigator has only 1 badge. Think carefully before accusing!';
+        } else {
+          const generalVi = [
+            'Tôi đang xâu chuỗi các manh mối trên bàn điều tra, có vẻ vụ án này khá phức tạp.',
+            'Hãy quan sát kỹ các thẻ bài màu xanh (Hung khí) và màu đỏ (Manh mối) xem cái nào khớp nhất.',
+            'Pháp Y đã chỉ điểm rất rõ ràng, thủ phạm không thể trốn thoát mãi được.',
+            'Nếu ai chắc chắn về cặp Thẻ bài thì hãy bấm Phá án để chốt hạ vụ án!'
+          ];
+          const generalEn = [
+            'I am piecing together the clues on the board, this case is quite intricate.',
+            'Inspect the blue (Means) and red (Clue) cards carefully for any exact match.',
+            'The Forensic Scientist provided clear leads, the killer cannot hide for long.',
+            'If anyone is confident in a pair of cards, raise your badge and accuse!'
+          ];
+          replyText = this.isVi
+            ? generalVi[Math.floor(Math.random() * generalVi.length)]
+            : generalEn[Math.floor(Math.random() * generalEn.length)];
+        }
+      }
+
+      if (responder && replyText) {
+        const botChatItem = {
+          id: `msg_bot_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          senderId: responder.id,
+          senderName: `${responder.displayName} (AI)`,
+          avatar: responder.avatar || '🤖',
+          text: replyText,
+          isSystem: false,
+          timestamp: Date.now()
+        };
+        this.handleNewChat(botChatItem);
+      }
+    }, delay);
+  }
+
   handleOnlineGameStarted(data) {
     console.log('[DeceptionApp] Online game started:', data);
     this.isOnlineMatch = true;
@@ -929,6 +1049,22 @@ class DeceptionAppController {
     this.state.round = data.publicState.round || 1;
     this.state.phase = data.publicState.phase || 'NIGHT_MURDER';
     this.state.activeSceneTiles = data.publicState.activeSceneTiles || [];
+
+    const inGameFeed = document.getElementById('ingame-chat-feed');
+    if (inGameFeed) {
+      inGameFeed.innerHTML = '';
+      this.handleNewChat({
+        id: `sys_online_start_${Date.now()}`,
+        senderId: 'system',
+        senderName: 'Hệ thống',
+        avatar: '📢',
+        text: this.isVi
+          ? `Vụ án trực tuyến phòng #${data.roomCode} đã bắt đầu! Toàn bộ điều tra viên hãy phối hợp thảo luận qua kênh đàm thoại.`
+          : `Online match in room #${data.roomCode} started! Detectives, coordinate and communicate via live chat.`,
+        isSystem: true,
+        timestamp: Date.now()
+      });
+    }
 
     this.state.players = data.publicState.players.map((p, idx) => {
       const isMe = p.socketId === this.myPlayerId || idx === data.yourPlayerIndex;
@@ -990,6 +1126,25 @@ class DeceptionAppController {
     this.playAudio('chime');
     this.state.startNewGame();
     this.updateHeaderInfo();
+
+    const inGameFeed = document.getElementById('ingame-chat-feed');
+    if (inGameFeed) {
+      inGameFeed.innerHTML = '';
+      this.handleNewChat({
+        id: `sys_start_${Date.now()}`,
+        senderId: 'system',
+        senderName: 'Hệ thống',
+        avatar: '📢',
+        text: this.isVi
+          ? 'Bàn điều tra vụ án đã được thiết lập. Hãy thảo luận, phân tích các đầu mối từ Pháp Y để tìm ra chân tướng sự việc!'
+          : 'Investigation board is ready. Discuss and analyze clues from Forensic Scientist to uncover the truth!',
+        isSystem: true,
+        timestamp: Date.now()
+      });
+    }
+
+    const hudChatBtn = document.getElementById('btn-toggle-ingame-chat');
+    if (hudChatBtn) hudChatBtn.style.display = 'inline-flex';
 
     // Hiển thị trực tiếp Hồ Sơ Tuyệt Mật (Confidential Dossier) không qua 3D
     this.showRoleReveal();
@@ -1827,19 +1982,19 @@ class DeceptionAppController {
       let criminalTagHtml = '';
       if (isMurderer) {
         if (isThisSuspectMurderer && isSelf) {
-          criminalTagHtml = `<span class="criminal-role-tag tag-self-murderer"><i class="fa-solid fa-skull"></i> ${this.isVi ? 'HUNG THỦ (BẠN)' : 'MURDERER (YOU)'}</span>`;
+          criminalTagHtml = `<span class="criminal-role-tag tag-self-murderer"><i class="fa-solid fa-skull"></i> ${this.isVi ? 'HUNG THỦ' : 'MURDERER'}</span>`;
         } else if (isThisSuspectAccomplice) {
-          criminalTagHtml = `<span class="criminal-role-tag tag-ally-accomplice" title="${this.isVi ? 'Đồng bọn của bạn' : 'Your accomplice'}"><i class="fa-solid fa-user-secret"></i> ${this.isVi ? 'ĐỒNG PHẠM CỦA BẠN' : 'YOUR ACCOMPLICE'}</span>`;
+          criminalTagHtml = `<span class="criminal-role-tag tag-ally-accomplice" title="${this.isVi ? 'Đồng bọn của bạn' : 'Your accomplice'}"><i class="fa-solid fa-user-secret"></i> ${this.isVi ? 'ĐỒNG PHẠM' : 'ACCOMPLICE'}</span>`;
         }
       } else if (isAccomplice) {
         if (isThisSuspectMurderer) {
-          criminalTagHtml = `<span class="criminal-role-tag tag-ally-murderer" title="${this.isVi ? 'Đồng bọn gây án của bạn' : 'Your partner in crime'}"><i class="fa-solid fa-skull-crossbones"></i> ${this.isVi ? 'HUNG THỦ (ĐỒNG BỌN)' : 'MURDERER (ALLY)'}</span>`;
+          criminalTagHtml = `<span class="criminal-role-tag tag-ally-murderer" title="${this.isVi ? 'Đồng bọn gây án của bạn' : 'Your partner in crime'}"><i class="fa-solid fa-skull-crossbones"></i> ${this.isVi ? 'HUNG THỦ' : 'MURDERER'}</span>`;
         } else if (isThisSuspectAccomplice && isSelf) {
-          criminalTagHtml = `<span class="criminal-role-tag tag-self-accomplice"><i class="fa-solid fa-mask"></i> ${this.isVi ? 'ĐỒNG PHẠM (BẠN)' : 'ACCOMPLICE (YOU)'}</span>`;
+          criminalTagHtml = `<span class="criminal-role-tag tag-self-accomplice"><i class="fa-solid fa-mask"></i> ${this.isVi ? 'ĐỒNG PHẠM' : 'ACCOMPLICE'}</span>`;
         }
       } else if (isForensic) {
         if (isThisSuspectMurderer) {
-          criminalTagHtml = `<span class="criminal-role-tag tag-forensic-target" title="${this.isVi ? 'Hung thủ gây án cần dẫn đường' : 'Target murderer'}"><i class="fa-solid fa-microscope"></i> ${this.isVi ? 'HUNG THỦ THẬT' : 'TRUE MURDERER'}</span>`;
+          criminalTagHtml = `<span class="criminal-role-tag tag-forensic-target" title="${this.isVi ? 'Hung thủ gây án cần dẫn đường' : 'Target murderer'}"><i class="fa-solid fa-microscope"></i> ${this.isVi ? 'HUNG THỦ' : 'MURDERER'}</span>`;
         }
       }
 
@@ -1872,17 +2027,19 @@ class DeceptionAppController {
                 const isSolutionMeans = canSeeCrimeSolution && (m.id === solMeansId);
                 return `
                   <div class="table-card-item card-blue ${isPinned ? 'is-pinned' : ''} ${isSolutionMeans ? 'is-crime-solution solution-means' : ''}" data-card-id="${m.id}" data-card-type="MEANS" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Hung khí này' : 'Click to select this Means')}">
-                    <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${m.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
-                      <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
                     ${isPinned ? `<span class="card-pin-indicator" title="Đã chọn nghi vấn">📌</span>` : ''}
                     <span class="card-type-tag tag-blue">${this.isVi ? 'HUNG KHÍ' : 'MEANS'}</span>
-                    <div class="card-icon-area">${renderCardIconHtml(m, 'card-svg')}</div>
+                    <div class="card-icon-area">
+                      ${renderCardIconHtml(m, 'card-svg')}
+                      <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${m.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                      </button>
+                    </div>
                     <div class="card-name-vi">${m.vi}</div>
                     <div class="card-name-en">${m.en}</div>
                     ${isSolutionMeans ? `
-                      <span class="crime-solution-banner banner-means" title="${this.isVi ? 'Hung khí gây án bí mật' : 'Secret murder means'}">
-                        <i class="fa-solid fa-skull"></i> ${isMurderer ? (this.isVi ? 'BẠN ĐÃ CHỌN' : 'CHOSEN BY YOU') : (this.isVi ? 'HUNG THỦ ĐÃ CHỌN' : 'CHOSEN BY KILLER')}
+                      <span class="crime-solution-banner banner-means" title="${this.isVi ? (isMurderer ? 'Hung khí bí mật bạn đã chọn' : 'Hung khí gây án của Hung thủ') : 'Secret murder means'}">
+                        <i class="fa-solid fa-skull"></i> ${this.isVi ? 'HUNG KHÍ' : 'MEANS'}
                       </span>
                     ` : ''}
                   </div>
@@ -1897,17 +2054,19 @@ class DeceptionAppController {
                 const isSolutionClue = canSeeCrimeSolution && (c.id === solClueId);
                 return `
                   <div class="table-card-item card-red ${isPinned ? 'is-pinned' : ''} ${isSolutionClue ? 'is-crime-solution solution-clue' : ''}" data-card-id="${c.id}" data-card-type="CLUE" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Manh mối này' : 'Click to select this Clue')}">
-                    <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${c.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
-                      <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
                     ${isPinned ? `<span class="card-pin-indicator" title="Đã chọn nghi vấn">📌</span>` : ''}
                     <span class="card-type-tag tag-red">${this.isVi ? 'MANH MỐI' : 'CLUE'}</span>
-                    <div class="card-icon-area">${renderCardIconHtml(c, 'card-svg')}</div>
+                    <div class="card-icon-area">
+                      ${renderCardIconHtml(c, 'card-svg')}
+                      <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${c.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                      </button>
+                    </div>
                     <div class="card-name-vi">${c.vi}</div>
                     <div class="card-name-en">${c.en}</div>
                     ${isSolutionClue ? `
-                      <span class="crime-solution-banner banner-clue" title="${this.isVi ? 'Manh mối hiện trường bí mật' : 'Secret crime clue'}">
-                        <i class="fa-solid fa-droplet"></i> ${isMurderer ? (this.isVi ? 'BẠN ĐÃ CHỌN' : 'CHOSEN BY YOU') : (this.isVi ? 'HUNG THỦ ĐÃ CHỌN' : 'CHOSEN BY KILLER')}
+                      <span class="crime-solution-banner banner-clue" title="${this.isVi ? (isMurderer ? 'Manh mối bí mật bạn đã chọn' : 'Manh mối gây án của Hung thủ') : 'Secret crime clue'}">
+                        <i class="fa-solid fa-droplet"></i> ${this.isVi ? 'MANH MỐI' : 'CLUE'}
                       </span>
                     ` : ''}
                   </div>
@@ -2092,6 +2251,18 @@ class DeceptionAppController {
     this.roundTimeLeft = 180; // 3 phút thảo luận tự do mới
     this.renderInvestigationTable();
     this.showView('view-investigation');
+
+    this.handleNewChat({
+      id: `sys_round_${this.state.round}_${Date.now()}`,
+      senderId: 'system',
+      senderName: 'Hệ thống',
+      avatar: '📢',
+      text: this.isVi
+        ? `🔔 VÒNG ĐIỀU TRA THỨ ${this.state.round} ĐÃ BẮT ĐẦU! Bằng chứng mới đã được cập nhật, hãy mở kênh đàm thoại để cùng phân tích.`
+        : `🔔 INVESTIGATION ROUND ${this.state.round} STARTED! New evidence updated, detectives may resume discussion.`,
+      isSystem: true,
+      timestamp: Date.now()
+    });
 
     if (human.role !== 'FORENSIC_SCIENTIST') {
       this.state.startPresentationPhase();
@@ -2397,6 +2568,20 @@ class DeceptionAppController {
           deceptionAudio.play('errorBuzzer');
           this.triggerScreenShake(200);
         }
+
+        const noticeText = this.isVi
+          ? `⚖️ [PHÁ ÁN] ${data.accuserName} đã chỉ định nghi phạm ${data.targetPlayer?.displayName || 'Nghi phạm'} với [${data.meansCard?.vi || 'Hung khí'} + ${data.clueCard?.vi || 'Manh mối'}]. Kết quả: ${data.isCorrect ? 'CHÍNH XÁC 🎉' : 'SAI LẦM ❌'}`
+          : `⚖️ [ACCUSATION] ${data.accuserName} accused ${data.targetPlayer?.displayName || 'Suspect'} with [${data.meansCard?.en || 'Means'} + ${data.clueCard?.en || 'Clue'}]. Result: ${data.isCorrect ? 'CORRECT 🎉' : 'FAILED ❌'}`;
+
+        this.handleNewChat({
+          id: `sys_acc_${Date.now()}`,
+          senderId: 'system',
+          senderName: 'Hệ thống',
+          avatar: '⚖️',
+          text: noticeText,
+          isSystem: true,
+          timestamp: Date.now()
+        });
       }
 
       // Sau thêm 1.8s nữa -> Ẩn overlay và gọi tiếp

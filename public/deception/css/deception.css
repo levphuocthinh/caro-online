@@ -1706,10 +1706,11 @@ body.deception-app {
   flex-direction: column;
   align-items: center;
   gap: 5px;
-  width: 76px;
-  min-width: 76px;
+  width: 82px;
+  min-width: 82px;
   flex-shrink: 0;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .police-badge-gold {
@@ -1897,15 +1898,15 @@ body.deception-app {
 
 .card-inspect-trigger-btn {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 19px;
-  height: 19px;
+  bottom: -3px;
+  right: -5px;
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 9px;
+  background: rgba(10, 20, 30, 0.95);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1913,19 +1914,22 @@ body.deception-app {
   padding: 0;
   transition: all 0.18s ease;
   z-index: 6;
-  opacity: 0.55;
+  opacity: 0.8;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
 }
 
 .table-card-item:hover .card-inspect-trigger-btn {
   opacity: 1;
+  border-color: #00d2d3;
+  color: #00d2d3;
 }
 
 .card-inspect-trigger-btn:hover {
-  background: #3498db;
-  border-color: #54a0ff;
-  color: #fff;
-  transform: scale(1.2);
-  box-shadow: 0 0 8px rgba(52, 152, 219, 0.8);
+  background: #0984e3;
+  border-color: #74b9ff;
+  color: #fff !important;
+  transform: scale(1.22);
+  box-shadow: 0 0 10px rgba(9, 132, 227, 0.9);
 }
 
 .card-type-tag {
@@ -1958,6 +1962,7 @@ body.deception-app {
 }
 
 .card-icon-area {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -3864,13 +3869,16 @@ body.deception-app {
 .criminal-role-tag {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 9.5px;
-  font-weight: 900;
-  letter-spacing: 0.6px;
+  justify-content: center;
+  gap: 3px;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
   text-transform: uppercase;
-  padding: 3px 7px;
-  border-radius: 5px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  max-width: 78px;
+  box-sizing: border-box;
   white-space: nowrap;
   line-height: 1.2;
 }
@@ -3951,13 +3959,13 @@ body.deception-app {
 .crime-solution-banner {
   position: absolute;
   bottom: 2px;
-  left: 3px;
-  right: 3px;
+  left: 2px;
+  right: 2px;
   font-size: 7.5px;
   font-weight: 900;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
   text-transform: uppercase;
-  padding: 2px 3px;
+  padding: 2px 2px;
   border-radius: 4px;
   white-space: nowrap;
   overflow: hidden;
