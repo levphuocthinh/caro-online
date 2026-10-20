@@ -9,6 +9,7 @@
  */
 
 import { ROLE_DEFINITIONS, EVENT_TILES, MEANS_CARDS, CLUE_CARDS } from './data/deceptionData.js';
+import { renderCardIconHtml, renderRoleIconHtml } from './data/deceptionIcons.js';
 import { GAME_PHASES } from './DeceptionState.js';
 import { deceptionCutscene } from './DeceptionCutscene.js';
 import { CaroModal } from '../../modules/modal.js';
@@ -1065,7 +1066,7 @@ export class DeceptionUIBinder {
                       data-owner-id="${s.id}"
                       title="${m.category} (${m.id})">
                       <span class="chip-top-line">
-                        <span class="chip-icon">${m.icon || '🧪'}</span>
+                        <span class="chip-icon">${renderCardIconHtml(m, 'chip-svg')}</span>
                         <span class="chip-title">${vi ? m.vi : m.en}</span>
                         ${isPinned ? '<span class="pin-dot">📌</span>' : ''}
                       </span>
@@ -1096,7 +1097,7 @@ export class DeceptionUIBinder {
                       data-owner-id="${s.id}"
                       title="${c.category} (${c.id})">
                       <span class="chip-top-line">
-                        <span class="chip-icon">${c.icon || '🔎'}</span>
+                        <span class="chip-icon">${renderCardIconHtml(c, 'chip-svg')}</span>
                         <span class="chip-title">${vi ? c.vi : c.en}</span>
                         ${isPinned ? '<span class="pin-dot">📌</span>' : ''}
                       </span>

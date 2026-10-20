@@ -16,6 +16,7 @@ import {
   CLUE_CARDS,
   getCardIcon
 } from './data/deceptionData.js';
+import { getCardGameIconKey } from './data/deceptionIcons.js';
 
 export const GAME_PHASES = {
   LOBBY: 'LOBBY',
@@ -312,12 +313,14 @@ export class DeceptionState {
       const pMeans = isForensic ? [] : shuffledMeans.slice(mCursor, mCursor + cardsPer).map(c => ({
         ...c,
         type: 'MEANS',
-        icon: getCardIcon(c.category)
+        icon: getCardIcon(c.category),
+        gameIcon: getCardGameIconKey(c)
       }));
       const pClues = isForensic ? [] : shuffledClues.slice(cCursor, cCursor + cardsPer).map(c => ({
         ...c,
         type: 'CLUE',
-        icon: getCardIcon(c.category)
+        icon: getCardIcon(c.category),
+        gameIcon: getCardGameIconKey(c)
       }));
 
       if (!isForensic) {

@@ -10,6 +10,12 @@ import {
   MEANS_CARDS,
   CLUE_CARDS
 } from '/js/games/deception/data/deceptionData.js';
+import {
+  renderCardIconHtml,
+  renderRoleIconHtml,
+  renderTileIconHtml,
+  getGameIconSvg
+} from '/js/games/deception/data/deceptionIcons.js';
 import { DeceptionState, GAME_PHASES } from '/js/games/deception/DeceptionState.js';
 import { deceptionPixelNoir } from '/js/games/deception/DeceptionPixelNoir.js';
 import { deceptionAudio } from '/js/games/deception/DeceptionAudio.js';
@@ -271,7 +277,7 @@ class DeceptionAppController {
     const faction = document.getElementById('role-display-faction');
     const desc = document.getElementById('role-display-desc');
 
-    if (ico) ico.textContent = roleDef.icon;
+    if (ico) ico.innerHTML = `<div class="role-reveal-icon-badge">${renderRoleIconHtml(roleDef.id, 'role-svg')}</div>`;
     if (title) title.textContent = `${roleDef.name_vi} (${roleDef.name_en})`;
     if (faction) {
       const isCrim = human.team === 'CRIMINAL';
@@ -337,7 +343,7 @@ class DeceptionAppController {
       meansGrid.innerHTML = murderer.meansCards.map(m => `
         <button type="button" class="evidence-chip chip-blue ${this.state.pendingSelection.meansCardId === m.id ? 'is-selected' : ''}" data-pick-means="${m.id}">
           <div class="evidence-chip-left">
-            <span class="evidence-chip-icon">${m.icon || '🧪'}</span>
+            <span class="evidence-chip-icon">${renderCardIconHtml(m, 'chip-svg')}</span>
             <div class="evidence-chip-text">
               <span class="evidence-chip-vi">${m.vi}</span>
               <span class="evidence-chip-en">${m.en}</span>
@@ -359,7 +365,7 @@ class DeceptionAppController {
       cluesGrid.innerHTML = murderer.clueCards.map(c => `
         <button type="button" class="evidence-chip chip-red ${this.state.pendingSelection.clueCardId === c.id ? 'is-selected' : ''}" data-pick-clue="${c.id}">
           <div class="evidence-chip-left">
-            <span class="evidence-chip-icon">${c.icon || '🔎'}</span>
+            <span class="evidence-chip-icon">${renderCardIconHtml(c, 'chip-svg')}</span>
             <div class="evidence-chip-text">
               <span class="evidence-chip-vi">${c.vi}</span>
               <span class="evidence-chip-en">${c.en}</span>
@@ -801,7 +807,7 @@ class DeceptionAppController {
       return `
         <div class="scene-tile-card ${colorClass}">
           <div class="tile-header">
-            <span class="tile-badge">${badgeName}</span>
+            <span class="tile-badge"><span class="tile-icon-area">${renderTileIconHtml(tile.id, 'tile-svg')}</span> ${badgeName}</span>
           </div>
           <div class="tile-title">
             <span class="tile-title-vi">${tile.name_vi}</span>
@@ -876,7 +882,7 @@ class DeceptionAppController {
               ${s.meansCards.map(m => `
                 <div class="table-card-item card-blue ${this.state.pinnedCardIds.has(m.id) ? 'is-pinned' : ''}" data-inspect-card="${m.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en}) - Nhấp để xem chi tiết / ghim">
                   <span class="card-type-tag tag-blue">${this.isVi ? 'HUNG KHÍ' : 'MEANS'}</span>
-                  <div class="card-icon-area">${m.icon || '🔪'}</div>
+                  <div class="card-icon-area">${renderCardIconHtml(m, 'card-svg')}</div>
                   <div class="card-name-vi">${m.vi}</div>
                   <div class="card-name-en">${m.en}</div>
                   <button type="button" class="card-pin-corner-btn ${this.state.pinnedCardIds.has(m.id) ? 'active' : ''}" data-pin-card="${m.id}" title="${this.state.pinnedCardIds.has(m.id) ? 'Đã ghim nghi vấn (nhấp để bỏ ghim)' : 'Ghim nghi vấn 📌'}">
@@ -891,7 +897,7 @@ class DeceptionAppController {
               ${s.clueCards.map(c => `
                 <div class="table-card-item card-red ${this.state.pinnedCardIds.has(c.id) ? 'is-pinned' : ''}" data-inspect-card="${c.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en}) - Nhấp để xem chi tiết / ghim">
                   <span class="card-type-tag tag-red">${this.isVi ? 'MANH MỐI' : 'CLUE'}</span>
-                  <div class="card-icon-area">${c.icon || '🩸'}</div>
+                  <div class="card-icon-area">${renderCardIconHtml(c, 'card-svg')}</div>
                   <div class="card-name-vi">${c.vi}</div>
                   <div class="card-name-en">${c.en}</div>
                   <button type="button" class="card-pin-corner-btn ${this.state.pinnedCardIds.has(c.id) ? 'active' : ''}" data-pin-card="${c.id}" title="${this.state.pinnedCardIds.has(c.id) ? 'Đã ghim nghi vấn (nhấp để bỏ ghim)' : 'Ghim nghi vấn 📌'}">
@@ -990,7 +996,7 @@ class DeceptionAppController {
             <span class="inspect-type-pill ${badgeClass}">${typeLabel}</span>
             <span class="inspect-owner-pill"><i class="fa-solid fa-user-shield"></i> ${oName}</span>
           </div>
-          <div class="inspect-card-icon">${card.icon || (type === 'MEANS' ? '🔪' : '🩸')}</div>
+          <div class="inspect-card-icon">${renderCardIconHtml(card, 'inspect-svg')}</div>
           <div class="inspect-card-title-vi">${card.vi}</div>
           <div class="inspect-card-title-en">${card.en}</div>
           <div class="inspect-card-divider"></div>
@@ -1224,7 +1230,7 @@ class DeceptionAppController {
     if (meansPicker) {
       meansPicker.innerHTML = activeTarget.meansCards.map(m => `
         <button type="button" class="accuse-card-btn ${this.state.pendingSelection.accuseMeansId === m.id ? 'active-blue' : ''}" data-sel-means="${m.id}">
-          <span>${m.icon || '🧪'}</span>
+          <span class="evidence-chip-icon">${renderCardIconHtml(m, 'chip-svg')}</span>
           <span style="font-weight: 800;">${m.vi}</span>
           <small style="opacity: 0.75; margin-left: 4px;">(${m.en})</small>
         </button>
@@ -1242,7 +1248,7 @@ class DeceptionAppController {
     if (cluesPicker) {
       cluesPicker.innerHTML = activeTarget.clueCards.map(c => `
         <button type="button" class="accuse-card-btn ${this.state.pendingSelection.accuseClueId === c.id ? 'active-red' : ''}" data-sel-clue="${c.id}">
-          <span>${c.icon || '🔎'}</span>
+          <span class="evidence-chip-icon">${renderCardIconHtml(c, 'chip-svg')}</span>
           <span style="font-weight: 800;">${c.vi}</span>
           <small style="opacity: 0.75; margin-left: 4px;">(${c.en})</small>
         </button>
@@ -1288,9 +1294,9 @@ class DeceptionAppController {
     if (castTargetAvatar) castTargetAvatar.textContent = data.targetPlayer?.avatar || '👤';
     if (castTargetName) castTargetName.textContent = data.targetPlayer?.displayName || 'Nghi phạm';
 
-    if (castMeansIcon) castMeansIcon.textContent = data.meansCard?.icon || '🔪';
+    if (castMeansIcon) castMeansIcon.innerHTML = `<span class="evidence-chip-icon">${renderCardIconHtml(data.meansCard, 'chip-svg')}</span>`;
     if (castMeansName) castMeansName.textContent = (data.meansCard?.vi || 'Hung khí') + (data.meansCard?.en ? ` (${data.meansCard.en})` : '');
-    if (castClueIcon) castClueIcon.textContent = data.clueCard?.icon || '🩸';
+    if (castClueIcon) castClueIcon.innerHTML = `<span class="evidence-chip-icon">${renderCardIconHtml(data.clueCard, 'chip-svg')}</span>`;
     if (castClueName) castClueName.textContent = (data.clueCard?.vi || 'Manh mối') + (data.clueCard?.en ? ` (${data.clueCard.en})` : '');
 
     if (suspensePulse) suspensePulse.style.display = 'inline-flex';
@@ -1455,8 +1461,8 @@ class DeceptionAppController {
     if (stamp) stamp.textContent = isPoliceWin ? 'SOLVED' : 'ESCAPED';
 
     if (dMur) dMur.textContent = murderer ? `${murderer.avatar} ${murderer.displayName}` : '—';
-    if (dMeans) dMeans.textContent = solMeans ? `🔪 ${solMeans.vi} (${solMeans.en})` : '—';
-    if (dClue) dClue.textContent = solClue ? `🩸 ${solClue.vi} (${solClue.en})` : '—';
+    if (dMeans) dMeans.innerHTML = solMeans ? `<span class="evidence-chip-icon">${renderCardIconHtml(solMeans, 'chip-svg')}</span> ${solMeans.vi} (${solMeans.en})` : '—';
+    if (dClue) dClue.innerHTML = solClue ? `<span class="evidence-chip-icon">${renderCardIconHtml(solClue, 'chip-svg')}</span> ${solClue.vi} (${solClue.en})` : '—';
 
     if (roster) {
       roster.innerHTML = this.state.players.map(p => {
@@ -1465,7 +1471,7 @@ class DeceptionAppController {
         const color = p.team === 'INVESTIGATION' ? '#2ed573' : '#ff4757';
         return `
           <div class="roster-chip" style="border-left: 3px solid ${color};">
-            <b>${p.avatar} ${p.displayName}:</b> <span style="color: ${color}; font-weight: 800;">${def.icon} ${this.isVi ? def.name_vi : def.name_en}</span>
+            <b>${p.avatar} ${p.displayName}:</b> <span style="color: ${color}; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;"><span class="tile-icon-area" style="width: 16px; height: 16px;">${renderRoleIconHtml(p.role, 'chip-svg')}</span> ${this.isVi ? def.name_vi : def.name_en}</span>
             ${isMurderer ? '<span style="color: var(--crimson); font-weight: 900; margin-left: 4px;">[HUNG THỦ]</span>' : ''}
           </div>
         `;
