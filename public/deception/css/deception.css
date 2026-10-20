@@ -38,12 +38,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
 body.deception-app {
   background-color: var(--bg-deep);
   color: var(--text-primary);
   font-family: var(--font-body);
   min-height: 100vh;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
   position: relative;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -303,12 +311,20 @@ body.deception-app {
 .noir-view {
   display: none;
   animation: fadeIn 0.3s ease;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .noir-view.active {
   display: flex;
   flex-direction: column;
   flex: 1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -351,6 +367,9 @@ body.deception-app {
   flex-direction: column;
   gap: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .lobby-card-header {
@@ -388,7 +407,10 @@ body.deception-app {
 .lobby-table-wrapper {
   display: flex;
   justify-content: center;
-  padding: 20px 0;
+  padding: 20px 0 52px 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .detective-round-table {
@@ -486,6 +508,10 @@ body.deception-app {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .cfg-group label {
@@ -505,6 +531,12 @@ body.deception-app {
   font-weight: 700;
   font-family: var(--font-body);
   outline: none;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .noir-ctrl-input:focus,
@@ -2864,6 +2896,14 @@ body.deception-app {
   transform: scale(1.03);
 }
 
+.lbl-switch-short {
+  display: none;
+}
+
+.lbl-switch-full {
+  display: inline;
+}
+
 .forensic-floating-banner {
   display: flex;
   justify-content: center;
@@ -4443,6 +4483,7 @@ body.deception-app {
   max-width: 1280px;
   margin: 0 auto;
   padding: 16px;
+  box-sizing: border-box;
 }
 
 .online-room-card {
@@ -4451,6 +4492,10 @@ body.deception-app {
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65), 0 0 24px rgba(241, 196, 15, 0.08);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .online-room-header {
@@ -4537,11 +4582,15 @@ body.deception-app {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: 22px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 @media (max-width: 960px) {
   .online-room-split {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -4550,6 +4599,10 @@ body.deception-app {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .profile-quick-editor {
@@ -4557,6 +4610,11 @@ body.deception-app {
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
   padding: 14px 16px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .quick-editor-title {
@@ -4581,6 +4639,10 @@ body.deception-app {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* Horizontal Avatar Choice Bar */
@@ -4591,6 +4653,11 @@ body.deception-app {
   padding: 4px 2px 8px 2px;
   scrollbar-width: thin;
   scrollbar-color: rgba(241, 196, 15, 0.3) transparent;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  flex-wrap: nowrap;
 }
 
 .avatar-chip-btn {
@@ -4675,6 +4742,11 @@ body.deception-app {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 14px;
   padding: 16px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .seats-roster-header {
@@ -4705,9 +4777,12 @@ body.deception-app {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px 0 28px 0;
+  padding: 16px 0 52px 0;
   position: relative;
   overflow: visible;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .online-round-table {
@@ -4923,6 +4998,10 @@ body.deception-app {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px;
   margin-top: 10px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .online-seat-card {
@@ -4935,6 +5014,10 @@ body.deception-app {
   gap: 12px;
   position: relative;
   transition: all 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .online-seat-card.is-self {
@@ -5756,15 +5839,46 @@ body.deception-app {
   }
 
   /* Solo Lobby Controls & Table */
+  .lobby-card {
+    padding: 14px 10px;
+    border-radius: 14px;
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .lobby-card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .lobby-card-header .view-title {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
   .lobby-table-wrapper {
-    padding: 12px 6px 20px 6px;
+    padding: 12px 6px 52px 6px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
   }
 
   .detective-round-table {
-    width: min(290px, calc(100vw - 64px));
-    height: 175px;
+    width: min(270px, calc(100vw - 88px));
+    max-width: 100%;
+    height: 170px;
     border-width: 6px;
     border-radius: 95px;
+    box-sizing: border-box;
+    margin: 0 auto;
   }
 
   .table-seats-ring {
@@ -5793,6 +5907,20 @@ body.deception-app {
     grid-template-columns: 1fr;
     gap: 10px;
     padding: 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .noir-ctrl-input,
+  .noir-ctrl-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
   }
 
   .btn-noir-hero {
@@ -5880,23 +6008,52 @@ body.deception-app {
     font-size: 12px;
   }
 
+  #view-online-room {
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
   .online-room-split {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: 16px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .online-col-seats {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   /* Profile Editor */
   .profile-quick-editor {
     padding: 12px 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .avatar-chips-bar {
     padding: 4px 0 8px 0;
     gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
   }
 
   .avatar-chip-btn {
+    flex-shrink: 0;
     width: 40px;
     height: 40px;
     font-size: 19px;
@@ -5904,28 +6061,49 @@ body.deception-app {
 
   .name-editor-row {
     gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .name-input-wrap {
+    min-width: 0;
   }
 
   .btn-save-online-name {
     padding: 10px 12px;
     min-height: 44px;
+    flex-shrink: 0;
   }
 
   /* Seats Roster */
   .seats-roster-box {
     padding: 12px 8px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .online-table-wrapper {
-    padding: 16px 4px 28px 4px;
+    padding: 16px 4px 52px 4px;
     overflow: visible;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
   }
 
   .online-round-table {
-    width: min(290px, calc(100vw - 64px));
-    height: 175px;
+    width: min(270px, calc(100vw - 88px));
+    max-width: 100%;
+    height: 170px;
     border-width: 6px;
     border-radius: 95px;
+    box-sizing: border-box;
+    margin: 0 auto;
   }
 
   .online-round-table .table-emblem {
@@ -5989,13 +6167,21 @@ body.deception-app {
   }
 
   .seats-cards-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .online-seat-card {
     padding: 10px 12px;
     gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .seat-avatar-wrap {
@@ -6152,14 +6338,28 @@ body.deception-app {
   }
 
   .table-switch-btn {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
+    max-width: 33.33%;
     justify-content: center;
     padding: 8px 4px;
-    font-size: 10.5px;
+    font-size: 11px;
     gap: 4px;
     white-space: nowrap;
     border-radius: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lbl-switch-full {
+    display: none !important;
+  }
+
+  .lbl-switch-short {
+    display: inline !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* Master Table in Mobile View */
