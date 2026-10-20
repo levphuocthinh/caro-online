@@ -113,23 +113,99 @@ body.deception-app {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 15px;
+  padding: 8px 16px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
   color: var(--text-primary);
   text-decoration: none;
   font-size: 13px;
   font-weight: 800;
+  cursor: pointer;
+  user-select: none;
   transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .btn-hub-return:hover {
-  background: rgba(0, 210, 211, 0.15);
-  border-color: rgba(0, 210, 211, 0.55);
+  background: rgba(0, 210, 211, 0.16);
+  border-color: #00d2d3;
   color: #00d2d3;
   transform: translateX(-3px);
-  box-shadow: 0 0 14px rgba(0, 210, 211, 0.35);
+  box-shadow: 0 0 16px rgba(0, 210, 211, 0.4);
+}
+
+.btn-hub-return:active {
+  transform: translateX(-1px) scale(0.97);
+}
+
+.btn-hub-return.btn-return-lobby-action {
+  background: rgba(241, 196, 15, 0.12);
+  border-color: rgba(241, 196, 15, 0.5);
+  color: #f1c40f;
+}
+
+.btn-hub-return.btn-return-lobby-action:hover {
+  background: rgba(241, 196, 15, 0.25);
+  border-color: #ffd32a;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(241, 196, 15, 0.5);
+}
+
+/* WebSocket Connection Status Badge in Header */
+.ws-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3.5px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  background: rgba(10, 15, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s ease;
+}
+
+.ws-status-badge .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ws-status-badge.status-connected {
+  border-color: rgba(46, 213, 115, 0.45);
+  color: #2ed573;
+}
+
+.ws-status-badge.status-connected .status-dot {
+  background: #2ed573;
+  box-shadow: 0 0 8px #2ed573;
+  animation: pulseGreenDot 2s infinite ease-in-out;
+}
+
+.ws-status-badge.status-disconnected {
+  border-color: rgba(255, 71, 87, 0.55);
+  color: #ff7675;
+}
+
+.ws-status-badge.status-disconnected .status-dot {
+  background: #ff4757;
+  box-shadow: 0 0 8px #ff4757;
+  animation: pulseRedDot 1.2s infinite ease-in-out;
+}
+
+@keyframes pulseGreenDot {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+@keyframes pulseRedDot {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
 }
 
 .noir-brand {
@@ -433,38 +509,83 @@ body.deception-app {
 }
 
 .btn-noir-hero {
-  padding: 14px 32px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #3742fa, #5352ed);
-  border: 1px solid #70a1ff;
+  padding: 13px 28px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1e3799 0%, #0984e3 100%);
+  border: 1.5px solid #74b9ff;
   color: #fff;
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 900;
   letter-spacing: 0.5px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  box-shadow: 0 8px 24px rgba(55, 66, 250, 0.4);
-  transition: all 0.22s ease;
+  box-shadow: 0 6px 20px rgba(9, 132, 227, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-decoration: none;
+  user-select: none;
+  box-sizing: border-box;
 }
 
 .btn-noir-hero:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(55, 66, 250, 0.6);
+  box-shadow: 0 10px 28px rgba(9, 132, 227, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: #a0d8ef;
+}
+
+.btn-noir-hero:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 10px rgba(9, 132, 227, 0.4);
+}
+
+.btn-noir-hero.btn-hero-gold {
+  background: linear-gradient(135deg, #d35400 0%, #f39c12 50%, #f1c40f 100%);
+  border: 1.5px solid #ffeaa7;
+  color: #1a0f00;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 22px rgba(243, 156, 18, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.btn-noir-hero.btn-hero-gold:hover {
+  border-color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(241, 196, 15, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: #000;
+}
+
+.btn-noir-hero.btn-hero-gold:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 10px rgba(243, 156, 18, 0.4);
 }
 
 .btn-noir-hero.btn-crimson {
-  background: linear-gradient(135deg, #ff4757, #c0392b);
-  border-color: #ff6b81;
-  box-shadow: 0 8px 24px var(--crimson-glow);
+  background: linear-gradient(135deg, #ff4757 0%, #c0392b 100%);
+  border: 1.5px solid #ff6b81;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-noir-hero.btn-crimson:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(255, 71, 87, 0.75);
+  border-color: #ffa4b2;
 }
 
 .btn-noir-hero.btn-secondary {
   background: rgba(255, 255, 255, 0.08);
-  border-color: var(--border-subtle);
-  box-shadow: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  color: #ecf0f1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.btn-noir-hero.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.65);
 }
 
 /* ==========================================================================
@@ -4008,13 +4129,16 @@ body.deception-app {
    ========================================================================== */
 .lobby-mode-switch {
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin: 14px 0 20px 0;
+  gap: 8px;
   padding: 6px;
-  background: rgba(12, 16, 23, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  background: rgba(10, 15, 24, 0.92);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  max-width: 660px;
+  margin: 0 auto 20px auto;
 }
 
 .btn-lobby-mode-tab {
@@ -4023,28 +4147,54 @@ body.deception-app {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 12px 20px;
+  gap: 8px;
+  padding: 12px 18px;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 9px;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
   color: #a4b0be;
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  user-select: none;
 }
 
 .btn-lobby-mode-tab:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
 }
 
 .btn-lobby-mode-tab.active {
-  background: linear-gradient(135deg, rgba(241, 196, 15, 0.18), rgba(230, 126, 34, 0.22));
-  border-color: rgba(241, 196, 15, 0.5);
+  background: linear-gradient(135deg, rgba(243, 156, 18, 0.25) 0%, rgba(211, 84, 0, 0.35) 100%);
+  border-color: #f1c40f;
   color: #f1c40f;
-  box-shadow: 0 4px 16px rgba(241, 196, 15, 0.2);
+  box-shadow: 0 4px 18px rgba(241, 196, 15, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: scale(1.02);
+}
+
+.mode-pill-badge {
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  padding: 2.5px 7px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  margin-left: 2px;
+}
+
+.mode-pill-badge.pill-solo {
+  background: rgba(46, 213, 115, 0.2);
+  border: 1px solid rgba(46, 213, 115, 0.45);
+  color: #2ed573;
+}
+
+.mode-pill-badge.pill-online {
+  background: rgba(0, 210, 211, 0.2);
+  border: 1px solid rgba(0, 210, 211, 0.45);
+  color: #00d2d3;
 }
 
 .lobby-panel {
@@ -4065,27 +4215,63 @@ body.deception-app {
 }
 
 .online-mode-card {
-  background: linear-gradient(165deg, rgba(21, 27, 38, 0.95), rgba(13, 17, 24, 0.95));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 22px;
+  background: linear-gradient(165deg, rgba(18, 24, 35, 0.95), rgba(10, 14, 20, 0.98));
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
 }
 
 .online-mode-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(241, 196, 15, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
 }
 
 .card-create-room {
-  border-top: 3px solid #f1c40f;
+  border-top: 3.5px solid #f1c40f;
+}
+
+.card-create-room:hover {
+  border-color: rgba(241, 196, 15, 0.6);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(241, 196, 15, 0.15);
 }
 
 .card-join-room {
-  border-top: 3px solid #00d2d3;
+  border-top: 3.5px solid #00d2d3;
+}
+
+.card-join-room:hover {
+  border-color: rgba(0, 210, 211, 0.6);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 210, 211, 0.15);
+}
+
+.btn-create-online {
+  background: linear-gradient(135deg, #d35400 0%, #f39c12 50%, #f1c40f 100%) !important;
+  color: #1a0f00 !important;
+  border: 1.5px solid #ffeaa7 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 6px 20px rgba(243, 156, 18, 0.45) !important;
+}
+
+.btn-create-online:hover {
+  box-shadow: 0 10px 28px rgba(241, 196, 15, 0.75) !important;
+  border-color: #fff !important;
+  color: #000 !important;
+}
+
+.btn-join-online {
+  background: linear-gradient(135deg, #0984e3 0%, #00cec9 100%) !important;
+  color: #fff !important;
+  border: 1.5px solid #81ecec !important;
+  box-shadow: 0 6px 20px rgba(0, 206, 201, 0.4) !important;
+}
+
+.btn-join-online:hover {
+  box-shadow: 0 10px 28px rgba(0, 206, 201, 0.7) !important;
+  border-color: #fff !important;
 }
 
 .online-card-header {
@@ -5637,6 +5823,18 @@ body.deception-app {
     max-width: 95vw;
     max-height: 90vh;
     padding: 16px 12px;
+  }
+
+  /* Game Over Dossier on Mobile */
+  .dossier-cta-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .dossier-cta-row .btn-noir-hero {
+    width: 100%;
+    justify-content: center;
   }
 }
 

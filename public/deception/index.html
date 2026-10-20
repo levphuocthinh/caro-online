@@ -28,10 +28,15 @@
     <!-- TOP HEADER -->
     <header class="noir-header">
       <div class="header-left">
-        <a href="/" class="btn-hub-return" title="Quay lại Cổng Game Hub">
+        <!-- Nút Back thông minh: Ở Sảnh chính thì hiện nút Về Cổng Game (/); Ở trong ván đấu thì hiện nút Quay Về Sảnh Game Deception -->
+        <a href="/" class="btn-hub-return" id="btn-header-back-hub" title="Quay lại Cổng Game Hub">
           <i class="fa-solid fa-arrow-left"></i>
           <span>Cổng Game</span>
         </a>
+        <button type="button" class="btn-hub-return btn-return-lobby-action" id="btn-header-back-lobby" title="Quay về Sảnh Chính Deception" style="display: none;">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Sảnh Game</span>
+        </button>
         <div class="noir-brand">
           <span class="noir-brand-badge">VIET NAM NOIR</span>
           <h1 class="noir-brand-title">DECEPTION</h1>
@@ -43,6 +48,10 @@
         <div class="case-file-tag">
           <i class="fa-solid fa-folder-open"></i>
           <span>HỒ SƠ TRỌNG ÁN: <b id="lbl-case-id">PHỐ HÀNG ĐẪY #VN-1997</b></span>
+        </div>
+        <div class="ws-status-badge status-connected" id="ws-connection-indicator" title="Trạng thái máy chủ đa người chơi">
+          <span class="status-dot"></span>
+          <span>Máy chủ: Trực tuyến</span>
         </div>
       </div>
 
@@ -90,10 +99,12 @@
             <button type="button" class="btn-lobby-mode-tab active" id="tab-btn-solo" data-mode="solo">
               <i class="fa-solid fa-robot"></i>
               <span>Chơi Với Máy (Bot AI)</span>
+              <span class="mode-pill-badge pill-solo">⚡ Chơi Ngay • 0s Chờ</span>
             </button>
             <button type="button" class="btn-lobby-mode-tab" id="tab-btn-online" data-mode="online">
               <i class="fa-solid fa-earth-americas"></i>
               <span>Phòng Chơi Online (Multiplayer)</span>
+              <span class="mode-pill-badge pill-online">🌐 WebSocket Live</span>
             </button>
           </div>
 
@@ -716,18 +727,18 @@
             </div>
 
             <div class="dossier-cta-row">
-              <button type="button" class="btn-noir-hero" id="btn-rematch-case">
+              <button type="button" class="btn-noir-hero btn-hero-gold" id="btn-return-lobby">
+                <i class="fa-solid fa-house-chimney"></i>
+                <span>VỀ SẢNH GAME DECEPTION</span>
+              </button>
+              <button type="button" class="btn-noir-hero btn-secondary" id="btn-rematch-case">
                 <i class="fa-solid fa-rotate-right"></i>
-                <span>MỞ VỤ ÁN MỚI</span>
+                <span>CHƠI LẠI VÁN MỚI</span>
               </button>
               <button type="button" class="btn-noir-hero btn-secondary" id="btn-replay-ending">
                 <i class="fa-solid fa-film"></i>
-                <span>XEM LẠI HOẠT CẢNH</span>
+                <span>XEM LẠI KẾT CỤC</span>
               </button>
-              <a href="/" class="btn-noir-hero btn-secondary">
-                <i class="fa-solid fa-house"></i>
-                <span>VỀ CỔNG GAME</span>
-              </a>
             </div>
           </div>
         </div>
@@ -1057,6 +1068,11 @@
 
   <!-- Socket.io Client Library for Real-Time Multiplayer & Live Chat -->
   <script src="/socket.io/socket.io.js"></script>
+  <script>
+    if (typeof io === 'undefined') {
+      document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\/script>');
+    }
+  </script>
   <!-- Application Entry Point -->
   <script type="module" src="js/DeceptionApp.js"></script>
 </body>

@@ -102,6 +102,55 @@ class DeceptionAppController {
     const target = document.getElementById(viewId);
     if (target) target.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Điều hướng thông minh: Khi ở Sảnh chính (view-lobby) mới hiện nút Về Cổng Game (/);
+    // Khi đang trong bất kỳ màn hình nào của ván đấu thì hiện nút "Sảnh Game" để quay lại Sảnh Deception
+    const btnBackHub = document.getElementById('btn-header-back-hub');
+    const btnBackLobby = document.getElementById('btn-header-back-lobby');
+    const isLobby = viewId === 'view-lobby';
+
+    if (btnBackHub) btnBackHub.style.display = isLobby ? 'inline-flex' : 'none';
+    if (btnBackLobby) btnBackLobby.style.display = isLobby ? 'none' : 'inline-flex';
+  }
+
+  handleHeaderBackToLobby() {
+    const activeView = document.querySelector('.noir-view.active')?.id;
+    const isMidGame = ['view-investigation', 'view-night', 'view-role', 'view-witness-reversal'].includes(activeView);
+
+    if (isMidGame) {
+      const confirmLeave = confirm(
+        this.isVi
+          ? '⚠️ Bạn có chắc muốn rời vụ án hiện tại để quay về Sảnh chính của Deception không?'
+          : '⚠️ Are you sure you want to abandon the current case and return to the Deception Lobby?'
+      );
+      if (!confirmLeave) return;
+    }
+
+    this.returnToGameLobby(false);
+  }
+
+  returnToGameLobby(withConfirm = false) {
+    if (withConfirm) {
+      const confirmLeave = confirm(
+        this.isVi
+          ? '⚠️ Bạn có chắc muốn rời vụ án hiện tại để quay về Sảnh chính của Deception không?'
+          : '⚠️ Are you sure you want to return to the Deception Lobby?'
+      );
+      if (!confirmLeave) return;
+    }
+
+    this.stopSpeakerTimer();
+    this.stopRoundTimer();
+    this.playAudio('click');
+
+    // Nếu đang trong phòng online, gửi socket rời phòng
+    if (this.isOnlineMatch && this.socket && this.onlineRoom) {
+      this.socket.emit('deception:leave_room');
+      this.onlineRoom = null;
+    }
+
+    this.isOnlineMatch = false;
+    this.showView('view-lobby');
   }
 
   openModal(modalId) {
@@ -219,6 +268,11 @@ class DeceptionAppController {
       this.playAudio('click');
     });
 
+    // Nút Header Quay Về Sảnh Game Deception
+    document.getElementById('btn-header-back-lobby')?.addEventListener('click', () => {
+      this.handleHeaderBackToLobby();
+    });
+
     // Chọn avatar trong form tạo phòng
     document.querySelectorAll('#create-avatar-picker .btn-avatar-choice').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -232,10 +286,21 @@ class DeceptionAppController {
     // Nút Tạo Phòng Online Mới (Chủ Phòng)
     document.getElementById('btn-create-online-room')?.addEventListener('click', () => {
       const name = (document.getElementById('online-create-name')?.value || '').trim() || 'Thám tử Trưởng';
-      if (!this.socket) {
-        this.showToast('Chưa kết nối máy chủ WebSocket! Vui lòng tải lại trang.');
+
+      if (!this.socket || !this.socket.connected) {
+        this.showToast('Đang kết nối lại máy chủ WebSocket... Vui lòng thử lại sau giây lát!');
+        this.initSocket();
+        if (this.socket) {
+          this.socket.once('connect', () => {
+            this.socket.emit('deception:create_room', {
+              playerName: name,
+              avatar: this.myAvatar
+            });
+          });
+        }
         return;
       }
+
       this.playAudio('click');
       this.socket.emit('deception:create_room', {
         playerName: name,
@@ -251,10 +316,22 @@ class DeceptionAppController {
         this.showToast('Vui lòng nhập mã phòng 6 ký tự (VD: DEC842)!');
         return;
       }
-      if (!this.socket) {
-        this.showToast('Chưa kết nối máy chủ WebSocket! Vui lòng tải lại trang.');
+
+      if (!this.socket || !this.socket.connected) {
+        this.showToast('Đang kết nối lại máy chủ WebSocket... Vui lòng thử lại sau giây lát!');
+        this.initSocket();
+        if (this.socket) {
+          this.socket.once('connect', () => {
+            this.socket.emit('deception:join_room', {
+              roomCode: code,
+              playerName: name,
+              avatar: this.myAvatar
+            });
+          });
+        }
         return;
       }
+
       this.playAudio('click');
       this.socket.emit('deception:join_room', {
         roomCode: code,
@@ -448,6 +525,12 @@ class DeceptionAppController {
       this.handleGlobalAccuseTrigger();
     });
 
+    // Nút Quay Về Sảnh Game Deception sau khi Game Over
+    document.getElementById('btn-return-lobby')?.addEventListener('click', () => {
+      this.playAudio('click');
+      this.returnToGameLobby(false);
+    });
+
     // Nút Chơi lại sau khi Game Over
     document.getElementById('btn-rematch-case')?.addEventListener('click', () => {
       this.startInvestigationGame();
@@ -629,44 +712,89 @@ class DeceptionAppController {
   }
 
   initSocket() {
-    if (typeof window.io === 'function') {
-      try {
-        this.socket = window.io();
+    if (this.socket && this.socket.connected) {
+      this.updateSocketStatus(true);
+      return;
+    }
 
-        this.socket.on('connect', () => {
-          this.myPlayerId = this.socket.id;
-          console.log('[DeceptionApp] Connected to WebSocket server:', this.socket.id);
-        });
+    if (typeof window.io !== 'function') {
+      console.warn('[DeceptionApp] window.io not ready, attempting fallback...');
+      const fallbackScript = document.createElement('script');
+      fallbackScript.src = 'https://cdn.socket.io/4.7.5/socket.io.min.js';
+      fallbackScript.onload = () => this.initSocket();
+      document.head.appendChild(fallbackScript);
+      return;
+    }
 
-        this.socket.on('deception:room_created', (data) => {
-          this.handleRoomCreated(data);
-        });
+    try {
+      const isHttp = window.location.protocol.startsWith('http');
+      const socketUrl = isHttp ? undefined : 'http://localhost:3000';
 
-        this.socket.on('deception:room_joined', (data) => {
-          this.handleRoomJoined(data);
-        });
+      this.socket = window.io(socketUrl, {
+        reconnection: true,
+        reconnectionAttempts: 15,
+        reconnectionDelay: 1000,
+        timeout: 10000
+      });
 
-        this.socket.on('deception:room_updated', (data) => {
-          this.handleRoomUpdated(data);
-        });
+      this.socket.on('connect', () => {
+        this.myPlayerId = this.socket.id;
+        console.log('[DeceptionApp] Connected to WebSocket server:', this.socket.id);
+        this.updateSocketStatus(true);
+      });
 
-        this.socket.on('deception:kicked', (data) => {
-          this.handleKicked(data);
-        });
+      this.socket.on('disconnect', (reason) => {
+        console.warn('[DeceptionApp] WebSocket disconnected:', reason);
+        this.updateSocketStatus(false);
+      });
 
-        this.socket.on('deception:new_chat', (chatItem) => {
-          this.handleNewChat(chatItem);
-        });
+      this.socket.on('connect_error', (err) => {
+        console.warn('[DeceptionApp] WebSocket connection error:', err);
+        this.updateSocketStatus(false);
+      });
 
-        this.socket.on('deception:game_started', (data) => {
-          this.handleOnlineGameStarted(data);
-        });
+      this.socket.on('deception:room_created', (data) => {
+        this.handleRoomCreated(data);
+      });
 
-        this.socket.on('deception:error', (data) => {
-          this.showToast(data.message || 'Lỗi thao tác phòng!');
-        });
-      } catch (err) {
-        console.warn('[DeceptionApp] Socket initialization warning:', err);
+      this.socket.on('deception:room_joined', (data) => {
+        this.handleRoomJoined(data);
+      });
+
+      this.socket.on('deception:room_updated', (data) => {
+        this.handleRoomUpdated(data);
+      });
+
+      this.socket.on('deception:kicked', (data) => {
+        this.handleKicked(data);
+      });
+
+      this.socket.on('deception:new_chat', (chatItem) => {
+        this.handleNewChat(chatItem);
+      });
+
+      this.socket.on('deception:game_started', (data) => {
+        this.handleOnlineGameStarted(data);
+      });
+
+      this.socket.on('deception:error', (data) => {
+        this.showToast(data.message || 'Lỗi thao tác phòng!');
+      });
+    } catch (err) {
+      console.warn('[DeceptionApp] Socket initialization warning:', err);
+      this.updateSocketStatus(false);
+    }
+  }
+
+  updateSocketStatus(isConnected) {
+    const badge = document.getElementById('ws-connection-indicator');
+    if (badge) {
+      if (isConnected) {
+        badge.className = 'ws-status-badge status-connected';
+        badge.innerHTML = `<span class="status-dot"></span> <span>Máy chủ: Trực tuyến</span>`;
+      } else {
+        badge.className = 'ws-status-badge status-disconnected';
+        badge.innerHTML = `<span class="status-dot"></span> <span>Mất kết nối máy chủ (Đang thử lại)</span>`;
       }
     }
   }
