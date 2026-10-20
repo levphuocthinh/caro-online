@@ -31,11 +31,37 @@ class DeceptionAppController {
     this.speakerTimerId = null; // backward compatibility
     this.soundEnabled = true;
 
-    // Audio Context cho âm thanh kịch tính Noir
-    this.audioCtx = null;
+    // Cache các phần tử DOM thường xuyên truy vấn để tối ưu hiệu năng
+    this.dom = {};
+  }
+
+  cacheDomElements() {
+    this.dom = {
+      countdownDigits: document.getElementById('round-countdown-digits'),
+      countdownBox: document.getElementById('round-countdown-box'),
+      lblRoundBadge: document.getElementById('lbl-round-badge'),
+      lblDiscussionGuidance: document.getElementById('lbl-discussion-guidance'),
+      lblBadgesCount: document.getElementById('lbl-badges-count'),
+      lblBulletsMarkedCount: document.getElementById('lbl-bullets-marked-count'),
+      lblLogsCount: document.getElementById('lbl-logs-count'),
+      lblCaseId: document.getElementById('lbl-case-id'),
+      lblRoomCode: document.getElementById('lbl-room-code'),
+      crimeSceneMasterTable: document.getElementById('crime-scene-master-table'),
+      forensicsTilesGrid: document.getElementById('forensics-tiles-grid'),
+      suspectsTopRow: document.getElementById('table-suspects-top'),
+      suspectsBottomRow: document.getElementById('table-suspects-bottom'),
+      secretIntelBar: document.getElementById('criminal-secret-intel-bar'),
+      narratorPhaseTitle: document.getElementById('narrator-phase-title'),
+      narratorInstructionText: document.getElementById('narrator-instruction-text'),
+      btnHdrMyRole: document.getElementById('btn-hdr-my-role'),
+      btnHudMyRole: document.getElementById('btn-hud-my-role'),
+      hdrMyRoleName: document.getElementById('hdr-my-role-name'),
+      hudMyRoleName: document.getElementById('hud-my-role-name')
+    };
   }
 
   init() {
+    this.cacheDomElements();
     try {
       deceptionPixelNoir.init();
     } catch (err) {
@@ -78,8 +104,8 @@ class DeceptionAppController {
   }
 
   updateHeaderInfo() {
-    const lblCase = document.getElementById('lbl-case-id');
-    const lblRoom = document.getElementById('lbl-room-code');
+    const lblCase = this.dom?.lblCaseId || document.getElementById('lbl-case-id');
+    const lblRoom = this.dom?.lblRoomCode || document.getElementById('lbl-room-code');
     if (lblCase) lblCase.textContent = `#${this.state.caseId}`;
     if (lblRoom) lblRoom.textContent = `#${this.state.roomCode}`;
   }
@@ -296,14 +322,104 @@ class DeceptionAppController {
     document.getElementById('btn-hud-my-role')?.addEventListener('click', () => {
       this.openMyRoleGuideModal();
     });
+
+    // Event delegation trên Bàn Phá Án Nghi Phạm (hiệu năng cao, 0 rò rỉ bộ nhớ)
+    const masterTable = document.getElementById('crime-scene-master-table');
+    if (masterTable) {
+      masterTable.addEventListener('click', (e) => {
+        // 1. Kính lúp phóng to xem chi tiết thẻ bài
+        const inspectBtn = e.target.closest('.card-inspect-trigger-btn');
+        if (inspectBtn) {
+          e.stopPropagation();
+          const cardId = inspectBtn.dataset.inspectCard;
+          const ownerName = inspectBtn.dataset.ownerName || '';
+          this.openCardInspectModal(cardId, ownerName);
+          return;
+        }
+
+        // 2. Nút Phá án từ trạm nghi phạm (1-click nếu đã ghim đủ cặp)
+        const accuseBtn = e.target.closest('[data-accuse-suspect]');
+        if (accuseBtn) {
+          e.stopPropagation();
+          const suspectId = accuseBtn.dataset.accuseSuspect;
+          const meansId = accuseBtn.dataset.meansId;
+          const clueId = accuseBtn.dataset.clueId;
+
+          if (meansId && clueId) {
+            this.stopSpeakerTimer();
+            this.stopRoundTimer();
+            this.triggerScreenShake(300);
+            this.executeAccusation(suspectId, meansId, clueId);
+            return;
+          }
+
+          this.stopSpeakerTimer();
+          this.openAccusationDialog(suspectId);
+          return;
+        }
+
+        // 3. Nhấp trực tiếp vào Thẻ bài để chọn / bỏ chọn ghim nghi vấn
+        const cardEl = e.target.closest('.table-card-item[data-card-id]');
+        if (cardEl) {
+          const cardId = cardEl.dataset.cardId;
+          const cardType = cardEl.dataset.cardType;
+          const ownerId = cardEl.dataset.ownerId;
+          const owner = this.state.getPlayerById(ownerId);
+          if (!owner) return;
+
+          if (this.state.pinnedCardIds.has(cardId)) {
+            this.state.pinnedCardIds.delete(cardId);
+            this.playAudio('click');
+          } else {
+            if (cardType === 'MEANS') {
+              owner.meansCards?.forEach(m => this.state.pinnedCardIds.delete(m.id));
+            } else {
+              owner.clueCards?.forEach(c => this.state.pinnedCardIds.delete(c.id));
+            }
+            this.state.pinnedCardIds.add(cardId);
+            this.playAudio('cardSlide');
+          }
+          this.renderAuthenticSuspectsTable();
+          return;
+        }
+      });
+    }
+
+    // Event delegation trên Bảng Pháp Y (Đặt đạn gỗ hiện trường)
+    const forensicsGrid = document.getElementById('forensics-tiles-grid');
+    if (forensicsGrid) {
+      forensicsGrid.addEventListener('click', (e) => {
+        const optBtn = e.target.closest('.tile-opt-btn');
+        if (!optBtn) return;
+
+        const human = this.state.getHumanPlayer();
+        const isHumanForensic = human.role === 'FORENSIC_SCIENTIST';
+        if (!isHumanForensic && !this.state.phase.includes('EVIDENCE')) return;
+
+        const tIdx = parseInt(optBtn.dataset.tileIdx, 10);
+        const optIdx = parseInt(optBtn.dataset.optIdx, 10);
+        this.state.placeBulletOnTile(tIdx, optIdx);
+        this.playAudio('bullet_drop');
+        this.renderActiveSceneTiles();
+      });
+    }
   }
 
   renderCurrentView() {
     this.updateHeaderInfo();
     this.renderLobbySeatsRing();
-    if (this.state.phase === GAME_PHASES.ROLE_CASTING) this.renderRoleRevealView();
-    if (this.state.phase === GAME_PHASES.NIGHT_CRIME_SELECTION || this.state.phase === GAME_PHASES.NIGHT_WITNESS_REVEAL) this.renderNightPhaseView();
-    if (this.state.phase.includes('ROUND_')) this.renderInvestigationTable();
+    if (this.state.phase === GAME_PHASES.ROLE_CASTING) {
+      this.showRoleReveal();
+    } else if (this.state.phase === GAME_PHASES.NIGHT_CRIME_SELECTION || this.state.phase === GAME_PHASES.NIGHT_WITNESS_REVEAL) {
+      const human = this.state.getHumanPlayer();
+      if (human && human.role === 'MURDERER') {
+        this.renderNightMurdererHand();
+      } else {
+        this.renderNightIntelContent();
+      }
+    } else if (this.state.phase.includes('ROUND_')) {
+      this.renderInvestigationTable();
+    }
   }
 
   /* =========================================================================
@@ -873,8 +989,8 @@ class DeceptionAppController {
   }
 
   updateCountdownDisplay() {
-    const digits = document.getElementById('round-countdown-digits');
-    const box = document.getElementById('round-countdown-box');
+    const digits = this.dom?.countdownDigits || document.getElementById('round-countdown-digits');
+    const box = this.dom?.countdownBox || document.getElementById('round-countdown-box');
     if (digits) {
       const mins = Math.floor(this.roundTimeLeft / 60);
       const secs = this.roundTimeLeft % 60;
@@ -1039,18 +1155,6 @@ class DeceptionAppController {
         </div>
       `;
     }).join('');
-
-    // Click đặt đạn (nếu là Pháp y)
-    grid.querySelectorAll('.tile-opt-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        if (!isHumanForensic && !this.state.phase.includes('EVIDENCE')) return;
-        const tIdx = parseInt(btn.dataset.tileIdx, 10);
-        const optIdx = parseInt(btn.dataset.optIdx, 10);
-        this.state.placeBulletOnTile(tIdx, optIdx);
-        this.playAudio('bullet_drop');
-        this.renderActiveSceneTiles();
-      });
-    });
   }
 
   renderAuthenticSuspectsTable() {
@@ -1223,66 +1327,6 @@ class DeceptionAppController {
 
     topContainer.innerHTML = topSuspects.map(renderSuspectBox).join('');
     bottomContainer.innerHTML = bottomSuspects.map(renderSuspectBox).join('');
-
-    // Nhấp vào thẻ bài để chọn / bỏ chọn ghim (Tự động gán 1 Hung khí + 1 Manh mối cho nghi phạm)
-    document.querySelectorAll('.table-card-item[data-card-id]').forEach(cardEl => {
-      cardEl.addEventListener('click', (e) => {
-        if (e.target.closest('.card-inspect-trigger-btn')) return;
-
-        const cardId = cardEl.dataset.cardId;
-        const cardType = cardEl.dataset.cardType;
-        const ownerId = cardEl.dataset.ownerId;
-        const owner = this.state.getPlayerById(ownerId);
-        if (!owner) return;
-
-        if (this.state.pinnedCardIds.has(cardId)) {
-          this.state.pinnedCardIds.delete(cardId);
-          this.playAudio('click');
-        } else {
-          if (cardType === 'MEANS') {
-            owner.meansCards.forEach(m => this.state.pinnedCardIds.delete(m.id));
-          } else {
-            owner.clueCards.forEach(c => this.state.pinnedCardIds.delete(c.id));
-          }
-          this.state.pinnedCardIds.add(cardId);
-          this.playAudio('cardSlide');
-        }
-        this.renderAuthenticSuspectsTable();
-      });
-    });
-
-    // Mở Modal phóng to chi tiết thẻ bài khi bấm nút kính lúp
-    document.querySelectorAll('.card-inspect-trigger-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const cardId = btn.dataset.inspectCard;
-        const ownerName = btn.dataset.ownerName || '';
-        this.openCardInspectModal(cardId, ownerName);
-      });
-    });
-
-    // Bấm nút Phá án từ trạm nghi phạm
-    document.querySelectorAll('[data-accuse-suspect]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const suspectId = btn.dataset.accuseSuspect;
-        const meansId = btn.dataset.meansId;
-        const clueId = btn.dataset.clueId;
-
-        // Nếu đã chọn đủ cặp 1 Hung khí + 1 Manh mối -> Phá án trực tiếp ngay lập tức!
-        if (meansId && clueId) {
-          this.stopSpeakerTimer();
-          this.stopRoundTimer();
-          this.triggerScreenShake(300);
-          this.executeAccusation(suspectId, meansId, clueId);
-          return;
-        }
-
-        // Nếu chưa chọn đủ cặp, mở popup chọn
-        this.stopSpeakerTimer();
-        this.openAccusationDialog(suspectId);
-      });
-    });
   }
 
   openCardInspectModal(cardId, ownerName = '') {
