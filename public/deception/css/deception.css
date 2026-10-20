@@ -5153,20 +5153,199 @@ body.deception-app {
   padding: 3px 8px;
 }
 
-/* Responsive Polish for Online Room & Lobby */
+/* ==========================================================================
+   MOBILE & TOUCH-OPTIMIZED RESPONSIVE OVERHAUL (360px – 768px)
+   ========================================================================== */
+
 @media (max-width: 768px) {
+  /* Prevent iOS Auto-Zoom on form inputs */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  body.deception-app {
+    overflow-x: hidden;
+  }
+
+  .deception-container {
+    padding: 8px 8px 70px 8px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+
+  /* Header Mobile Polish */
+  .noir-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .noir-brand-title {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+
+  .noir-brand-sub {
+    font-size: 8.5px;
+    letter-spacing: 1.5px;
+  }
+
+  .btn-hub-return {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-height: 40px;
+  }
+
+  .header-center {
+    display: none;
+  }
+
+  .header-right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .header-right .btn-hdr-action {
+    flex: 1;
+    justify-content: center;
+    min-height: 42px;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  /* Mode Switch Tabs */
+  .lobby-mode-switch {
+    margin: 10px 0 16px 0;
+    gap: 6px;
+    padding: 4px;
+  }
+
+  .btn-lobby-mode-tab {
+    padding: 10px 8px;
+    font-size: 12.5px;
+    gap: 6px;
+  }
+
+  /* Solo Lobby Controls & Table */
+  .lobby-table-wrapper {
+    padding: 10px 0;
+  }
+
+  .detective-round-table {
+    width: min(320px, 86vw);
+    height: min(200px, 50vw);
+    border-width: 6px;
+    border-radius: 110px;
+  }
+
+  .table-seats-ring {
+    inset: -18px;
+  }
+
+  .lobby-seat-node {
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+  }
+
+  .lobby-seat-label {
+    font-size: 8px;
+    bottom: -14px;
+  }
+
+  .lobby-controls-bar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .btn-noir-hero {
+    width: 100%;
+    min-height: 48px;
+    font-size: 14.5px;
+    padding: 12px 18px;
+    justify-content: center;
+  }
+
+  /* Online Mode Cards */
+  .online-lobby-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .online-mode-card {
+    padding: 16px 14px;
+  }
+
+  .avatar-quick-selector {
+    gap: 6px;
+  }
+
+  .btn-avatar-choice {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .online-perks-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  /* Online Waiting Room Screen */
   .online-room-card {
-    padding: 14px;
+    padding: 14px 10px;
+    border-radius: 12px;
   }
 
   .online-room-header {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+    padding-bottom: 12px;
+  }
+
+  .room-title-block .view-title {
+    font-size: 18px;
   }
 
   .room-meta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .room-code-badge-pill {
+    flex: 1;
+    min-width: 160px;
+    justify-content: space-between;
+    padding: 8px 12px;
+  }
+
+  .room-occupancy-pill {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .btn-leave-online {
+    padding: 8px 10px;
+    min-height: 40px;
   }
 
   .online-room-split {
@@ -5174,23 +5353,305 @@ body.deception-app {
     gap: 16px;
   }
 
+  /* Profile Editor */
+  .profile-quick-editor {
+    padding: 12px 10px;
+  }
+
+  .avatar-chips-bar {
+    padding: 4px 0 8px 0;
+    gap: 6px;
+  }
+
+  .avatar-chip-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+
+  .name-editor-row {
+    gap: 8px;
+  }
+
+  .btn-save-online-name {
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+
+  /* Seats Roster */
+  .seats-roster-box {
+    padding: 12px 10px;
+  }
+
   .seats-cards-grid {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 
+  .online-seat-card {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .seat-avatar-wrap {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .seat-name-text {
+    font-size: 13.5px;
+  }
+
+  .btn-kick-player {
+    min-height: 38px;
+    padding: 6px 10px;
+    font-size: 11.5px;
+  }
+
+  /* Ready & Host Action Controls */
+  .btn-action-ready {
+    width: 100%;
+    max-width: 100%;
+    min-height: 50px;
+    font-size: 16px;
+  }
+
+  .btn-host-start-game {
+    width: 100%;
+    min-height: 50px;
+    font-size: 16px;
+  }
+
+  .host-bot-management {
+    width: 100%;
+  }
+
+  .btn-host-btn {
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  /* Live Chat Panel */
   .live-chat-panel {
-    height: 380px;
+    height: 340px;
   }
 
+  .chat-quick-chips {
+    padding: 6px 8px;
+  }
+
+  .chat-input-bar {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .chat-text-input {
+    font-size: 16px !important;
+    padding: 10px;
+  }
+
+  .btn-send-message {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Role Reveal Dossier on Mobile */
+  .confidential-dossier-card {
+    max-width: 100%;
+    margin-bottom: 16px;
+    border-radius: 10px;
+  }
+
+  .dossier-folder-tab {
+    padding: 8px 12px;
+  }
+
+  .folder-label {
+    font-size: 11.5px;
+  }
+
+  .dossier-folder-body {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 12px;
+  }
+
+  .dossier-left-badge {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .role-icon-box {
+    font-size: 40px;
+  }
+
+  .police-seal-large {
+    font-size: 28px;
+  }
+
+  .dossier-right-info {
+    width: 100%;
+    text-align: left;
+  }
+
+  .role-display-title {
+    font-size: 22px;
+  }
+
+  .role-display-motto {
+    font-size: 12px;
+  }
+
+  .role-guide-goal-box {
+    padding: 8px 10px;
+  }
+
+  .role-guide-goal-box .goal-text {
+    font-size: 13px;
+  }
+
+  .role-step-item {
+    padding: 8px 10px;
+  }
+
+  .role-step-title {
+    font-size: 13px;
+  }
+
+  .role-step-desc {
+    font-size: 11.5px;
+  }
+
+  /* Free Discussion HUD & Table Switches */
+  .free-discussion-hud {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .discussion-hud-left {
+    width: 100%;
+  }
+
+  .discussion-hud-center {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .discussion-hud-right {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .discussion-hud-right .btn-hud-guide,
+  .discussion-hud-right .btn-hud-accuse {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    font-size: 12.5px;
+  }
+
+  /* Segmented Table Switch Navigation */
+  .table-switch-nav {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    justify-content: space-between;
+    padding: 4px;
+    border-radius: 20px;
+  }
+
+  .table-switch-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 6px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  /* Scene Tiles Grid */
+  .forensics-tiles-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .scene-tile-card {
+    padding: 10px;
+  }
+
+  /* In-Game Floating Live Chat Drawer (Mobile Bottom Sheet) */
   .ingame-chat-drawer {
     width: 100%;
     right: 0;
+    left: 0;
     bottom: 0;
-    border-radius: 16px 16px 0 0;
-    height: 60vh;
+    border-radius: 18px 18px 0 0;
+    height: 72vh;
+    max-height: 80vh;
     max-width: 100vw;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.9);
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .ingame-chat-drawer::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    margin: 8px auto 2px auto;
+  }
+
+  .ingame-chat-form input {
+    font-size: 16px !important;
+    padding: 10px;
+  }
+
+  .ingame-chat-form button {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Modals on Mobile */
+  .noir-modal-card {
+    max-width: 95vw;
+    max-height: 90vh;
+    padding: 16px 12px;
   }
 }
+
+/* Extra small mobile adjustments (<= 400px) */
+@media (max-width: 400px) {
+  .btn-lobby-mode-tab span {
+    font-size: 11.5px;
+  }
+
+  .room-title-block .view-title {
+    font-size: 16px;
+  }
+
+  .table-switch-btn span {
+    font-size: 10px;
+  }
+
+  .btn-action-ready,
+  .btn-host-start-game {
+    font-size: 14.5px;
+  }
+}
+
 
 
 
