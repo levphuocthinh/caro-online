@@ -110,9 +110,11 @@ class ChatManager {
 
     const cleanText = rawText.slice(0, this.MAX_TEXT_LENGTH);
     const now = Date.now();
+    const messageId = `msg_${now}_${Math.random().toString(36).slice(2, 9)}`;
 
     // Phát sóng sự kiện cho UI hiện tại
     io.to(room.id).emit('new_chat', {
+      id: messageId,
       senderId: socket.id,
       senderName: sender.senderName,
       senderSymbol: sender.senderSymbol,
@@ -123,6 +125,9 @@ class ChatManager {
 
     // Phát sóng sự kiện theo hợp đồng PROJECT.md
     io.to(room.id).emit('chat_message', {
+      id: messageId,
+      senderId: socket.id,
+      senderSymbol: sender.senderSymbol,
       sender: sender.senderName,
       text: cleanText,
       time: new Date(now).toLocaleTimeString()
@@ -156,9 +161,11 @@ class ChatManager {
     }
 
     const now = Date.now();
+    const reactionId = `react_${now}_${Math.random().toString(36).slice(2, 9)}`;
 
     // Phát sóng sự kiện cho UI hiện tại
     io.to(room.id).emit('new_chat', {
+      id: reactionId,
       senderId: socket.id,
       senderName: sender.senderName,
       senderSymbol: sender.senderSymbol,
@@ -169,6 +176,9 @@ class ChatManager {
 
     // Phát sóng sự kiện theo hợp đồng PROJECT.md
     io.to(room.id).emit('reaction_received', {
+      id: reactionId,
+      senderId: socket.id,
+      senderSymbol: sender.senderSymbol,
       sender: sender.senderName,
       emoji: rawEmoji
     });

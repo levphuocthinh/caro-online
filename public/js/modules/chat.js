@@ -14,6 +14,9 @@ export class CaroChat {
     this.chatBackdrop = document.getElementById('chat-drawer-backdrop');
     this.onSendMessage = null;
     this.onSendReaction = null;
+    this._seenMsgIds = new Set();
+    this._lastMsgKey = null;
+    this._lastMsgTime = 0;
   }
 
   init({ onSendMessage, onSendReaction }) {
@@ -103,13 +106,33 @@ export class CaroChat {
   }
 
   addMessage(data, currentSocketId = null) {
-    if (!this.chatMessages) return;
+    if (!this.chatMessages || !data) return;
+
+    if (!this._seenMsgIds) {
+      this._seenMsgIds = new Set();
+    }
+    if (data.id) {
+      if (this._seenMsgIds.has(data.id)) {
+        return;
+      }
+      this._seenMsgIds.add(data.id);
+      if (this._seenMsgIds.size > 200) {
+        const first = this._seenMsgIds.values().next().value;
+        this._seenMsgIds.delete(first);
+      }
+    }
 
     const { senderName, senderSymbol, text, emoji } = data;
-    const isMine = data.isMine || (currentSocketId && data.senderId === currentSocketId);
+    const cleanText = text ? String(text).trim() : '';
+    const cleanEmoji = emoji ? String(emoji).trim() : '';
+
+    const isMine = Boolean(
+      data.isMine === true ||
+      (currentSocketId && data.senderId && data.senderId === currentSocketId)
+    );
 
     // Chống lặp tin nhắn liên tiếp (Deduplication safeguard)
-    const msgKey = `${senderName || ''}|${senderSymbol || ''}|${text || ''}|${emoji || ''}|${isMine ? 'mine' : 'theirs'}`;
+    const msgKey = `${senderName || ''}|${cleanText}|${cleanEmoji}`;
     const now = Date.now();
     if (this._lastMsgKey === msgKey && (now - (this._lastMsgTime || 0)) < 800) {
       return;
@@ -120,7 +143,7 @@ export class CaroChat {
     const bubble = document.createElement('div');
     if (senderName === 'Hệ thống') {
       bubble.className = 'chat-bubble system';
-      bubble.textContent = text;
+      bubble.textContent = cleanText || text;
     } else {
       bubble.className = `chat-bubble ${isMine ? 'mine' : 'theirs'}`;
 
@@ -129,16 +152,16 @@ export class CaroChat {
       nameDiv.textContent = senderSymbol ? `${senderName} (${senderSymbol})` : senderName;
       bubble.appendChild(nameDiv);
 
-      if (emoji) {
+      if (cleanEmoji) {
         const emojiDiv = document.createElement('div');
         emojiDiv.style.fontSize = '26px';
-        emojiDiv.textContent = emoji;
+        emojiDiv.textContent = cleanEmoji;
         bubble.appendChild(emojiDiv);
       }
 
-      if (text) {
+      if (cleanText) {
         const textDiv = document.createElement('div');
-        textDiv.textContent = text;
+        textDiv.textContent = cleanText;
         bubble.appendChild(textDiv);
       }
     }
@@ -150,15 +173,16 @@ export class CaroChat {
 
     if (!this.isDrawerOpen() && !isMine && senderName !== 'Hệ thống') {
       this.showUnreadDot();
-      CaroModal.showToast(`💬 ${senderName}: ${text || emoji || ''}`);
+      CaroModal.showToast(`💬 ${senderName}: ${cleanText || cleanEmoji || ''}`);
     }
   }
 
-  showReaction(emoji, senderName = '') {
-    this.addMessage({ senderName: senderName || 'Đối thủ', emoji, isMine: false });
+  showReaction(emoji, senderName = '', isMine = false, senderSymbol = null) {
+    this.addMessage({ senderName: senderName || 'Đối thủ', senderSymbol, emoji, isMine });
   }
 
   clear() {
+    this._seenMsgIds?.clear();
     this._lastMsgKey = null;
     this._lastMsgTime = 0;
     if (this.chatMessages) {

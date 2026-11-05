@@ -301,15 +301,22 @@ function setupDomMock() {
     getElementById: () => null,
     querySelector: () => null,
     querySelectorAll: () => [],
-    createElement: (tag) => ({
-      tagName: tag.toUpperCase(),
-      className: '',
-      style: {},
-      setAttribute: () => {},
-      appendChild: () => {},
-      addEventListener: () => {},
-      remove: () => {}
-    }),
+    createElement: (tag) => {
+      const el = {
+        tagName: tag.toUpperCase(),
+        className: '',
+        style: {},
+        children: [],
+        setAttribute: (k, v) => { el[k] = v; },
+        appendChild: (child) => {
+          el.children.push(child);
+          return child;
+        },
+        addEventListener: () => {},
+        remove: () => {}
+      };
+      return el;
+    },
     addEventListener: () => {}
   };
 

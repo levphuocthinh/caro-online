@@ -14,8 +14,18 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
-// Phục vụ giao diện tĩnh
-app.use(express.static(path.join(__dirname, 'public')));
+// Phục vụ giao diện tĩnh với cấu hình ngăn cache mã nguồn cũ
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else if (filePath.endsWith('.js') || filePath.endsWith('.css')) {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    }
+  }
+}));
 
 // API thông tin mạng nội bộ
 app.get('/api/server-info', (req, res) => {

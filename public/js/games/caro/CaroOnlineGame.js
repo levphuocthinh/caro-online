@@ -18,6 +18,8 @@ export class CaroOnlineGame extends CaroBaseGame {
   }
 
   setupSocketEvents() {
+    if (this._socketEventsBound) return;
+    this._socketEventsBound = true;
     caroOnline.on('room_created', (data) => {
       caroChat.clear();
       this.state.gameMode = 'online';
@@ -136,6 +138,10 @@ export class CaroOnlineGame extends CaroBaseGame {
       CaroModal.close('modal-game-over');
       this.setupOnlineUI(data.roomState);
       CaroModal.showToast(i18n.getText('toast_rematch_started'));
+      caroChat.addMessage({
+        senderName: 'Hệ thống',
+        text: '🌸 Đã bắt đầu ván tái đấu mới! Hai bên đổi quân đi trước/sau.'
+      });
     });
 
     caroOnline.on('player_left', (data) => {
@@ -160,17 +166,12 @@ export class CaroOnlineGame extends CaroBaseGame {
     });
 
     caroOnline.on('new_chat', (data) => {
-      if (data && data.emoji && !data.text) {
-        const senderName = data.senderName || (data.senderSymbol ? `Người chơi (${data.senderSymbol})` : 'Đối thủ');
-        caroChat.showReaction(data.emoji, senderName);
-      } else {
-        caroChat.addMessage(data, caroOnline.getSocketId());
-      }
-    });
-
-    caroOnline.on('chat_reaction', (data) => {
-      const senderName = data.senderName || data.sender || '';
-      caroChat.showReaction(data.emoji, senderName);
+      const myId = caroOnline.getSocketId();
+      const isMine = Boolean(
+        (myId && data.senderId && data.senderId === myId) ||
+        (this.state.mySymbol && this.state.mySymbol !== 'SPECTATOR' && data.senderSymbol && data.senderSymbol === this.state.mySymbol)
+      );
+      caroChat.addMessage({ ...data, isMine }, myId);
     });
 
     caroOnline.on('error_message', (data) => {

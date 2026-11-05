@@ -131,4 +131,90 @@ describe('Tier 2: Chat & Reaction Stress & Boundaries', () => {
       teardownDomMock();
     }
   });
+
+  test('CaroChat partitions mine vs theirs accurately and formats sender symbol', async () => {
+    setupDomMock();
+    try {
+      const { CaroChat } = await import('../../public/js/modules/chat.js');
+      const chat = new CaroChat();
+      const mockContainer = {
+        children: [],
+        appendChild(node) { this.children.push(node); },
+        set innerHTML(val) { if (val === '') this.children = []; },
+        get innerHTML() { return this.children.length === 0 ? '' : 'content'; },
+        scrollTop: 0,
+        scrollHeight: 100
+      };
+      chat.chatMessages = mockContainer;
+
+      // Message from me
+      chat.addMessage({
+        id: 'msg_1',
+        senderName: 'Bé Miu Miu',
+        senderSymbol: 'O',
+        text: 'Xin chào!',
+        senderId: 'my_socket_id'
+      }, 'my_socket_id');
+
+      assertEqual(mockContainer.children.length, 1);
+      const myBubble = mockContainer.children[0];
+      assert(myBubble.className.includes('mine'), 'Bubble for self must have class "mine" (pink, right)');
+      assertEqual(myBubble.children[0].textContent, 'Bé Miu Miu (O)', 'Sender header must show name and symbol');
+
+      // Message from opponent
+      chat.addMessage({
+        id: 'msg_2',
+        senderName: 'Player 2',
+        senderSymbol: 'X',
+        text: 'Chào bạn nha!',
+        senderId: 'opponent_socket_id'
+      }, 'my_socket_id');
+
+      assertEqual(mockContainer.children.length, 2);
+      const oppBubble = mockContainer.children[1];
+      assert(oppBubble.className.includes('theirs'), 'Bubble for opponent must have class "theirs" (gray, left)');
+      assertEqual(oppBubble.children[0].textContent, 'Player 2 (X)', 'Opponent header must show name and symbol');
+
+      // Emoji reaction from me
+      chat.addMessage({
+        id: 'msg_3',
+        senderName: 'Bé Miu Miu',
+        senderSymbol: 'O',
+        emoji: '🌸',
+        senderId: 'my_socket_id'
+      }, 'my_socket_id');
+
+      assertEqual(mockContainer.children.length, 3);
+      const myReactBubble = mockContainer.children[2];
+      assert(myReactBubble.className.includes('mine'), 'Reaction from self must have class "mine" (pink, right)');
+      assertEqual(myReactBubble.children[0].textContent, 'Bé Miu Miu (O)');
+
+      // Emoji reaction from opponent
+      chat.addMessage({
+        id: 'msg_4',
+        senderName: 'Player 2',
+        senderSymbol: 'X',
+        emoji: '🐱',
+        senderId: 'opponent_socket_id'
+      }, 'my_socket_id');
+
+      assertEqual(mockContainer.children.length, 4);
+      const oppReactBubble = mockContainer.children[3];
+      assert(oppReactBubble.className.includes('theirs'), 'Reaction from opponent must have class "theirs" (gray, left)');
+      assertEqual(oppReactBubble.children[0].textContent, 'Player 2 (X)');
+
+      // Duplicate delivery of msg_1 via network echo is rejected by ID
+      chat.addMessage({
+        id: 'msg_1',
+        senderName: 'Bé Miu Miu',
+        senderSymbol: 'O',
+        text: 'Xin chào!',
+        senderId: 'my_socket_id'
+      }, 'my_socket_id');
+
+      assertEqual(mockContainer.children.length, 4, 'Duplicate msg_1 rejected by ID tracking');
+    } finally {
+      teardownDomMock();
+    }
+  });
 });
