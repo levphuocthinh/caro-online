@@ -1084,9 +1084,8 @@ class DeceptionAppController {
     const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
     if (!code) return '';
     try {
-      const url = new URL(window.location.href);
+      const url = new URL('/deception/', window.location.origin);
       url.searchParams.set('room', code);
-      url.hash = '';
       return url.toString();
     } catch {
       return `${window.location.origin}/deception/?room=${encodeURIComponent(code)}`;
@@ -1193,16 +1192,44 @@ class DeceptionAppController {
         joinCodeInput.style.boxShadow = '0 0 16px rgba(241, 196, 15, 0.4)';
       }
 
-      // 3. Khôi phục tên đã lưu nếu có
+      // 3. Khôi phục tên đã lưu hoặc khởi tạo tên mặc định
       this.restoreSavedPlayerName();
+      const joinNameInput = document.getElementById('online-join-name');
+      let playerName = (joinNameInput?.value || '').trim();
+      if (!playerName || playerName === 'Điều Tra Viên') {
+        try {
+          const saved = localStorage.getItem('deception_player_name');
+          if (saved) playerName = saved.trim();
+        } catch (_) {}
+      }
+      if (!playerName) {
+        playerName = 'Điều Tra Viên ' + Math.floor(Math.random() * 899 + 100);
+      }
+      if (joinNameInput) joinNameInput.value = playerName;
 
-      this.showToast(`🔍 Nhận được lời mời tham gia phòng #${roomParam}! Kiểm tra tên và bấm "VÀO PHÒNG NGAY".`, 5000);
+      this.showToast(`🔍 Nhận được link mời! Đang tự động kết nối vào bàn điều tra #${roomParam}...`, 4000);
 
-      setTimeout(() => {
-        document.querySelector('.card-join-room')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        const nameInput = document.getElementById('online-join-name');
-        nameInput?.focus();
-      }, 350);
+      // 4. Tự động kết nối và vào phòng ngay lập tức (không để người chơi đứng ngoài sảnh)
+      const doJoin = () => {
+        if (!this.socket) this.initSocket();
+        if (this.socket && this.socket.connected) {
+          this.socket.emit('deception:join_room', {
+            roomCode: roomParam,
+            playerName: playerName,
+            avatar: this.myAvatar
+          });
+        } else if (this.socket) {
+          this.socket.once('connect', () => {
+            this.socket.emit('deception:join_room', {
+              roomCode: roomParam,
+              playerName: playerName,
+              avatar: this.myAvatar
+            });
+          });
+        }
+      };
+
+      doJoin();
     } catch (e) {
       console.warn('[DeceptionApp] checkUrlForRoom warning:', e);
     }

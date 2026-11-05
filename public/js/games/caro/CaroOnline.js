@@ -93,15 +93,25 @@ export class CaroOnline {
 
   createRoom({ playerName, boardSize, rule, turnTime }) {
     this.connect();
-    if (this.socket) {
+    if (!this.socket) return;
+    if (this.socket.connected) {
       this.socket.emit('create_room', { playerName, boardSize, rule, turnTime, gameType: 'caro' });
+    } else {
+      this.socket.once('connect', () => {
+        this.socket.emit('create_room', { playerName, boardSize, rule, turnTime, gameType: 'caro' });
+      });
     }
   }
 
   joinRoom({ roomId, playerName }) {
     this.connect();
-    if (this.socket) {
+    if (!this.socket) return;
+    if (this.socket.connected) {
       this.socket.emit('join_room', { roomId, playerName });
+    } else {
+      this.socket.once('connect', () => {
+        this.socket.emit('join_room', { roomId, playerName });
+      });
     }
   }
 

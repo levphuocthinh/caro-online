@@ -100,17 +100,33 @@ export class GameManager {
 
   checkUrlForRoom() {
     const urlParams = new URLSearchParams(window.location.search);
-    const roomFromUrl = urlParams.get('room');
+    const roomFromUrl = urlParams.get('room') || urlParams.get('code');
     if (roomFromUrl) {
-      this.openCaroLobby();
+      const cleanRoom = roomFromUrl.trim().toUpperCase();
+      // Nếu là mã phòng Deception (bắt đầu bằng DEC), chuyển sang sảnh Deception
+      if (cleanRoom.startsWith('DEC')) {
+        window.location.href = `/deception/?room=${encodeURIComponent(cleanRoom)}`;
+        return;
+      }
+      this.openCaroLobby(false);
       const joinCodeInput = document.getElementById('join-room-code');
       const joinNameInput = document.getElementById('join-player-name');
-      if (joinCodeInput) joinCodeInput.value = roomFromUrl.toUpperCase();
-      if (joinNameInput && !joinNameInput.value) {
-        joinNameInput.value = 'Kỳ thủ ' + Math.floor(Math.random() * 899 + 100);
+      if (joinCodeInput) joinCodeInput.value = cleanRoom;
+      let guestName = (joinNameInput?.value || '').trim();
+      if (!guestName) {
+        try {
+          guestName = localStorage.getItem('caro_player_name') || '';
+        } catch (_) {}
       }
-      CaroModal.open('modal-join-room');
-      CaroModal.showToast(i18n.getText('toast_received_room_link', { roomId: roomFromUrl.toUpperCase() }));
+      if (!guestName) {
+        guestName = 'Kỳ thủ ' + Math.floor(Math.random() * 899 + 100);
+      }
+      if (joinNameInput) joinNameInput.value = guestName;
+
+      CaroModal.showToast(i18n.getText('toast_received_room_link', { roomId: cleanRoom }) || `Đang vào phòng #${cleanRoom}...`);
+
+      // Tự động vào phòng Caro ngay lập tức thay vì đứng ở sảnh
+      caroOnline.joinRoom({ roomId: cleanRoom, playerName: guestName });
     }
   }
 
@@ -165,7 +181,14 @@ export class GameManager {
     // 1. Đồng bộ URL ban đầu khi người dùng truy cập trang
     const initialHash = window.location.hash;
     const urlParams = new URLSearchParams(window.location.search);
-    const hasRoomParam = urlParams.has('room');
+    const hasRoomParam = urlParams.has('room') || urlParams.has('code');
+    const roomParam = (urlParams.get('room') || urlParams.get('code') || '').trim().toUpperCase();
+
+    // Nếu link có mã phòng Deception (bắt đầu bằng DEC), chuyển sang Deception ngay
+    if (roomParam.startsWith('DEC')) {
+      window.location.href = `/deception/?room=${encodeURIComponent(roomParam)}`;
+      return;
+    }
 
     if (hasRoomParam || initialHash === '#caro' || initialHash === '#lobby') {
       this.openCaroLobby(false);
