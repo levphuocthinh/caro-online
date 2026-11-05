@@ -34,6 +34,31 @@ describe('Feature 18: Bot AI Initialization & Difficulty Levels', () => {
     assertEqual(easyAI.difficulty, 'hard');
   });
 
+  test('AI findBestMove supports flexible signatures (2, 3, or 5 args) without returning NaN', async () => {
+    const AI = await getAIClass();
+    const ai = new AI('hard');
+    const board = Array(15).fill(null).map(() => Array(15).fill(null));
+    board[7][7] = 'X';
+
+    // 2-arg signature
+    const move2 = ai.findBestMove(board, 'O');
+    assertTruthy(move2, 'Must return a move object');
+    assert(!isNaN(move2.row), 'move.row must not be NaN');
+    assert(!isNaN(move2.col), 'move.col must not be NaN');
+    assert(move2.row >= 0 && move2.row < 15, 'row within board bounds');
+    assert(move2.col >= 0 && move2.col < 15, 'col within board bounds');
+
+    // 3-arg signature
+    const move3 = ai.findBestMove(board, 15, 'O');
+    assertTruthy(move3, 'Must return a move object');
+    assert(!isNaN(move3.row) && !isNaN(move3.col));
+
+    // 5-arg signature
+    const move5 = ai.findBestMove(board, 15, 'O', 'X', 'standard');
+    assertTruthy(move5, 'Must return a move object');
+    assert(!isNaN(move5.row) && !isNaN(move5.col));
+  });
+
   test('AI first move on empty 15x15 board chooses center (7, 7)', async () => {
     const AI = await getAIClass();
     const ai = new AI('hard');

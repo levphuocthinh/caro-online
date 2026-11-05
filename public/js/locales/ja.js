@@ -121,6 +121,8 @@ export const ja = {
   "tab_all_games": "すべてのゲーム",
   "tab_recent_games": "最近プレイ",
   "hub_back_btn": "ゲームハブ",
+  "caro_back_lobby_btn": "五目並べロビー",
+  "tip_back_lobby": "五目並べロビーに戻る",
   "tip_back_hub": "ゲームポータルに戻る",
   "tip_sound": "サウンド切替",
   "tip_theme": "ライト／ダークモード切替",

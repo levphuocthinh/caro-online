@@ -121,6 +121,8 @@ export const zh = {
   "tab_all_games": "全部游戏",
   "tab_recent_games": "最近游玩",
   "hub_back_btn": "游戏大厅",
+  "caro_back_lobby_btn": "五子棋大厅",
+  "tip_back_lobby": "返回五子棋大厅",
   "tip_back_hub": "返回游戏大厅",
   "tip_sound": "切换声音",
   "tip_theme": "切换亮色 / 暗色模式",

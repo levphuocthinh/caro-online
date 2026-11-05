@@ -121,6 +121,8 @@ export const en = {
   "tab_all_games": "All Games",
   "tab_recent_games": "Recently Played",
   "hub_back_btn": "Game Portal",
+  "caro_back_lobby_btn": "Caro Lobby",
+  "tip_back_lobby": "Return to Caro Lobby",
   "tip_back_hub": "Back to Game Portal",
   "tip_sound": "Toggle sound",
   "tip_theme": "Toggle Light / Dark mode",

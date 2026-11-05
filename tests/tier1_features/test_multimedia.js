@@ -33,6 +33,10 @@ describe('Feature 21: Procedural Web Audio Sound Synthesis', () => {
       sound.playChat();
       sound.playWin();
       sound.playLose();
+      sound.playWinSound();
+      sound.playLoseSound();
+      sound.playDrawSound();
+      sound.playMoveSound();
 
       // Test toggle mute
       const isMuted = sound.toggleMute();

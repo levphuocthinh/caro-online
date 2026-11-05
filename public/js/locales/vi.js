@@ -121,6 +121,8 @@ export const vi = {
   "tab_all_games": "Tất cả Game",
   "tab_recent_games": "Chơi gần đây",
   "hub_back_btn": "Cổng Game",
+  "caro_back_lobby_btn": "Sảnh Caro",
+  "tip_back_lobby": "Rời bàn cờ về Sảnh Caro",
   "tip_back_hub": "Quay về Cổng Game Tổng Hợp",
   "tip_sound": "Bật/Tắt âm thanh",
   "tip_theme": "Chuyển chế độ Sáng / Tối",

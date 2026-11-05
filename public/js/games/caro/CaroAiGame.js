@@ -69,9 +69,18 @@ export class CaroAiGame extends CaroBaseGame {
     setTimeout(() => {
       if (this.state.isGameOver) return;
       const aiSymbol = this.state.mySymbol === 'X' ? 'O' : 'X';
-      const move = this.aiEngine.findBestMove(caroBoard.data, aiSymbol);
+      const humanSymbol = this.state.mySymbol;
+      const size = caroBoard.size || 15;
+      const rule = this.state.rule || 'standard';
 
-      if (move) {
+      let move;
+      try {
+        move = this.aiEngine.findBestMove(caroBoard.data, size, aiSymbol, humanSymbol, rule);
+      } catch (err) {
+        console.error('[CaroAiGame] AI move calculation error:', err);
+      }
+
+      if (move && typeof move.row === 'number' && !isNaN(move.row) && typeof move.col === 'number' && !isNaN(move.col)) {
         caroBoard.placePiece(move.row, move.col, aiSymbol, false);
         const winResult = caroBoard.checkLocalWin(move.row, move.col, aiSymbol, this.state.rule);
         if (winResult.won) {

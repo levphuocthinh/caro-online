@@ -121,6 +121,8 @@ export const ko = {
   "tab_all_games": "모든 게임",
   "tab_recent_games": "최근 플레이",
   "hub_back_btn": "게임 허브",
+  "caro_back_lobby_btn": "오목 로비",
+  "tip_back_lobby": "오목 로비로 돌아가기",
   "tip_back_hub": "게임 포털로 돌아가기",
   "tip_sound": "사운드 켜기/끄기",
   "tip_theme": "라이트 / 다크 모드 전환",

@@ -13,6 +13,23 @@ export class CaroAI {
 
   // Tìm nước đi tốt nhất cho AI
   findBestMove(board, boardSize, aiSymbol, humanSymbol, rule = 'standard') {
+    if (!board || !Array.isArray(board) || board.length === 0) {
+      return { row: 7, col: 7 };
+    }
+
+    // Chuẩn hóa tham số linh hoạt (cho phép gọi 2, 3 hoặc 5 tham số)
+    if (typeof boardSize === 'string') {
+      rule = typeof aiSymbol === 'string' && ['standard', 'block2ends'].includes(aiSymbol) ? aiSymbol : 'standard';
+      aiSymbol = boardSize;
+      boardSize = board.length;
+      humanSymbol = aiSymbol === 'X' ? 'O' : 'X';
+    } else {
+      boardSize = Number(boardSize) || board.length;
+      if (!aiSymbol) aiSymbol = 'O';
+      if (!humanSymbol) humanSymbol = aiSymbol === 'X' ? 'O' : 'X';
+      if (!rule) rule = 'standard';
+    }
+
     let isEmpty = true;
     let piecesCount = 0;
     for (let r = 0; r < boardSize; r++) {

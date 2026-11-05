@@ -36,6 +36,9 @@ export class CaroModule extends BaseGameModule {
    */
   init() {
     super.init();
+    this.localGame.initElements?.();
+    this.aiGame.initElements?.();
+    this.onlineGame.initElements?.();
     CaroUIBinder.bind(this);
   }
 

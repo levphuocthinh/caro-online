@@ -291,6 +291,23 @@ export class SoundManager {
       osc.stop(t + 0.15);
     } catch (e) {}
   }
+
+  // Các hàm âm thanh kết thúc trận cờ Caro
+  playWinSound() {
+    this.playWin();
+  }
+
+  playLoseSound() {
+    this.playLose();
+  }
+
+  playDrawSound() {
+    if (typeof this.playCuteChime === 'function') {
+      this.playCuteChime();
+    } else {
+      this.playTurn();
+    }
+  }
 }
 
 export const soundManager = new SoundManager();

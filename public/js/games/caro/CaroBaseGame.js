@@ -31,24 +31,53 @@ export class CaroBaseGame {
     this.tagPlayerO = document.getElementById('tag-player-o');
   }
 
+  initElements() {
+    this.screenHub = document.getElementById('screen-hub');
+    this.screenLobby = document.getElementById('screen-lobby');
+    this.screenGame = document.getElementById('screen-game');
+    this.bannerText = document.getElementById('banner-text');
+    this.bannerIcon = document.getElementById('banner-icon');
+    this.roomCodeTag = document.getElementById('room-code-tag');
+    this.cardPlayerX = document.getElementById('card-player-x');
+    this.cardPlayerO = document.getElementById('card-player-o');
+    this.statusPlayerX = document.getElementById('status-player-x');
+    this.statusPlayerO = document.getElementById('status-player-o');
+    this.namePlayerX = document.getElementById('name-player-x');
+    this.namePlayerO = document.getElementById('name-player-o');
+    this.tagPlayerX = document.getElementById('tag-player-x');
+    this.tagPlayerO = document.getElementById('tag-player-o');
+  }
+
   // Chuyển đổi màn hình (Cổng Game Hub <-> Sảnh Caro <-> Bàn cờ)
   switchToScreen(screen, pushState = true) {
     CaroModal.closeAll();
     if (typeof document !== 'undefined') {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
-      const target = typeof screen === 'string' ? document.getElementById(screen) : screen;
+      const target = typeof screen === 'string' ? document.getElementById(screen) : (screen || document.getElementById('screen-hub'));
       if (target) {
         target.classList.add('active');
       }
 
       const isGame = target?.id === 'screen-game';
+      const isLobby = target?.id === 'screen-lobby';
       const isHub = target?.id === 'screen-hub';
 
       if (document.body) {
         document.body.classList.toggle('in-game', isGame);
         document.body.classList.toggle('in-hub', isHub);
         document.body.classList.remove('in-deception');
+      }
+
+      // Cập nhật các nút quay lại trên Header
+      const btnBackHub = document.getElementById('btn-back-to-hub');
+      const btnBackLobby = document.getElementById('btn-back-to-lobby');
+
+      if (btnBackHub) {
+        btnBackHub.style.display = isLobby ? 'inline-flex' : 'none';
+      }
+      if (btnBackLobby) {
+        btnBackLobby.style.display = isGame ? 'inline-flex' : 'none';
       }
     }
 
@@ -119,7 +148,11 @@ export class CaroBaseGame {
     const iconEl = document.getElementById('game-over-icon');
 
     if (winner === 'DRAW') {
-      soundManager.playDrawSound();
+      try {
+        if (typeof soundManager.playDrawSound === 'function') soundManager.playDrawSound();
+        else if (typeof soundManager.playCuteChime === 'function') soundManager.playCuteChime();
+        else if (typeof soundManager.playTurn === 'function') soundManager.playTurn();
+      } catch (_) {}
       if (titleEl) titleEl.textContent = i18n.getText('game_over_draw_title');
       if (descEl) descEl.textContent = i18n.getText('game_over_draw_desc');
       if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-handshake"></i>';
@@ -129,24 +162,36 @@ export class CaroBaseGame {
       const isSpectator = this.state.mySymbol === 'SPECTATOR';
 
       if (isSpectator) {
-        soundManager.playDrawSound();
+        try {
+          if (typeof soundManager.playDrawSound === 'function') soundManager.playDrawSound();
+          else if (typeof soundManager.playCuteChime === 'function') soundManager.playCuteChime();
+        } catch (_) {}
         if (titleEl) titleEl.textContent = i18n.getText('game_over_spec_title', { winner });
         if (descEl) descEl.textContent = reason || i18n.getText('game_over_spec_desc', { winner });
         if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-eye"></i>';
       } else if (isLocal) {
-        soundManager.playWinSound();
-        triggerConfetti();
+        try {
+          if (typeof soundManager.playWinSound === 'function') soundManager.playWinSound();
+          else if (typeof soundManager.playWin === 'function') soundManager.playWin();
+        } catch (_) {}
+        try { triggerConfetti(); } catch (_) {}
         if (titleEl) titleEl.textContent = winner === 'X' ? i18n.getText('game_over_local_x') : i18n.getText('game_over_local_o');
         if (descEl) descEl.textContent = reason || i18n.getText('game_over_local_desc');
         if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-trophy"></i>';
       } else if (isWinner) {
-        soundManager.playWinSound();
-        triggerConfetti();
+        try {
+          if (typeof soundManager.playWinSound === 'function') soundManager.playWinSound();
+          else if (typeof soundManager.playWin === 'function') soundManager.playWin();
+        } catch (_) {}
+        try { triggerConfetti(); } catch (_) {}
         if (titleEl) titleEl.textContent = i18n.getText('game_over_win_title');
         if (descEl) descEl.textContent = reason || i18n.getText('game_over_win_desc');
         if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-trophy"></i>';
       } else {
-        soundManager.playLoseSound();
+        try {
+          if (typeof soundManager.playLoseSound === 'function') soundManager.playLoseSound();
+          else if (typeof soundManager.playLose === 'function') soundManager.playLose();
+        } catch (_) {}
         if (titleEl) titleEl.textContent = i18n.getText('game_over_lose_title');
         if (descEl) descEl.textContent = reason || i18n.getText('game_over_lose_desc');
         if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-heart-crack"></i>';
@@ -167,7 +212,7 @@ export class CaroBaseGame {
     caroTimer.stop();
     this.state.reset();
     caroChat.clear();
-    this.switchToScreen(this.screenLobby, pushState);
+    this.switchToScreen('screen-lobby', pushState);
   }
 }
 

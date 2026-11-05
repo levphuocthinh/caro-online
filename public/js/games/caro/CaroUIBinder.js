@@ -166,10 +166,14 @@ export class CaroUIBinder {
     document.getElementById('btn-offer-draw')?.addEventListener('click', offerDraw);
     document.getElementById('btn-mobile-draw')?.addEventListener('click', offerDraw);
 
-    // 8. Nút Rời trận
+    // 8. Nút Rời trận & Điều hướng Sảnh / Cổng Game
     const leaveGame = () => caroModule.confirmLeaveGame();
     document.getElementById('btn-leave-game')?.addEventListener('click', leaveGame);
     document.getElementById('btn-mobile-leave')?.addEventListener('click', leaveGame);
+    document.getElementById('btn-back-to-lobby')?.addEventListener('click', leaveGame);
+    document.getElementById('btn-lobby-back-to-hub')?.addEventListener('click', () => {
+      caroModule.leaveToHub();
+    });
 
     // 9. Nút Modal Game Over
     document.getElementById('btn-game-over-lobby')?.addEventListener('click', () => {
