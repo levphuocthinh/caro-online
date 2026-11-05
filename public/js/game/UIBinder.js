@@ -152,7 +152,7 @@ export class UIBinder {
     this.bindHubConsole(manager);
 
     // 8. Khởi tạo sự kiện của riêng trò chơi cờ Caro
-    CaroUIBinder.bind(manager);
+    CaroUIBinder.bind(manager.caro || manager);
   }
 
   static bindHubConsole(manager) {

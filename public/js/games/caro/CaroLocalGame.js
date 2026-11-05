@@ -42,7 +42,7 @@ export class CaroLocalGame extends CaroBaseGame {
   }
 
   handleCellClick(r, c) {
-    if (this.state.isGameOver) return;
+    if (this.state.isGameOver || this.state.gameMode !== 'local') return;
     if (caroBoard.data[r][c] !== null) return;
 
     const player = this.state.currentTurn;

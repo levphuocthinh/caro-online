@@ -144,6 +144,21 @@ export class CaroChat {
       CaroModal.showToast(`💬 ${senderName}: ${text || emoji || ''}`);
     }
   }
+
+  showReaction(emoji, senderName = '') {
+    this.addMessage({ senderName: senderName || 'Đối thủ', emoji, isMine: false });
+  }
+
+  clear() {
+    if (this.chatMessages) {
+      this.chatMessages.innerHTML = '';
+    }
+    if (this.chatInput) {
+      this.chatInput.value = '';
+    }
+    this.hideUnreadDot();
+    this.closeDrawer();
+  }
 }
 
 export const caroChat = new CaroChat();

@@ -45,7 +45,7 @@ export class CaroAiGame extends CaroBaseGame {
   }
 
   handleCellClick(r, c) {
-    if (this.state.isGameOver) return;
+    if (this.state.isGameOver || this.state.gameMode !== 'ai') return;
     if (this.state.currentTurn !== this.state.mySymbol) return;
     if (caroBoard.data[r][c] !== null) return;
 

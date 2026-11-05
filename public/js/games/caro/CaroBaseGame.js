@@ -63,7 +63,7 @@ export class CaroBaseGame {
       const isLobby = target?.id === 'screen-lobby';
       const isHub = target?.id === 'screen-hub';
 
-      if (document.body) {
+      if (document.body && document.body.classList) {
         document.body.classList.toggle('in-game', isGame);
         document.body.classList.toggle('in-hub', isHub);
         document.body.classList.remove('in-deception');
@@ -209,9 +209,11 @@ export class CaroBaseGame {
   }
 
   backToLobby(pushState = true) {
-    caroTimer.stop();
+    try { caroTimer.stop(); } catch (_) {}
+    try { caroTimer.reset?.(); } catch (_) {}
     this.state.reset();
-    caroChat.clear();
+    try { caroBoard.clear(); } catch (_) {}
+    try { caroChat.clear(); } catch (_) {}
     this.switchToScreen('screen-lobby', pushState);
   }
 }

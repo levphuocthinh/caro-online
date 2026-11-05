@@ -83,6 +83,22 @@ export class CaroBoard {
     });
   }
 
+  // Dọn dẹp bàn cờ về trạng thái trống ban đầu
+  clear() {
+    this.data = Array(this.size).fill(null).map(() => Array(this.size).fill(null));
+    if (this.gridEl) {
+      const cells = this.gridEl.querySelectorAll('.caro-cell');
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.className = 'caro-cell';
+      });
+    }
+  }
+
+  reset() {
+    this.clear();
+  }
+
   // Kiểm tra thắng cuộc cục bộ (Offline & AI)
   checkLocalWin(r, c, player, rule = 'standard') {
     const directions = [

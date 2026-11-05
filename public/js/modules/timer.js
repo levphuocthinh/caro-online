@@ -41,6 +41,19 @@ export class CaroTimer {
     }
   }
 
+  reset() {
+    this.stop();
+    this.remaining = 0;
+    if (this.timerXEl) {
+      this.timerXEl.textContent = '--';
+      this.timerXEl.classList.remove('warning');
+    }
+    if (this.timerOEl) {
+      this.timerOEl.textContent = '--';
+      this.timerOEl.classList.remove('warning');
+    }
+  }
+
   updateDisplay(currentTurn) {
     const activeEl = currentTurn === 'X' ? this.timerXEl : this.timerOEl;
     const inactiveEl = currentTurn === 'X' ? this.timerOEl : this.timerXEl;

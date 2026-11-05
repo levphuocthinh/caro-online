@@ -195,6 +195,45 @@ describe('Feature 11 & 12: Spectator Safeguards & Board DOM Grid', () => {
       teardownDomMock();
     }
   });
+
+  test('Board, Chat, Timer, and BaseGame cleanup contracts on game exit / back to lobby', async () => {
+    setupDomMock();
+    try {
+      const { CaroBoard } = await import('../../public/js/modules/board.js');
+      const { CaroChat } = await import('../../public/js/modules/chat.js');
+      const { CaroTimer } = await import('../../public/js/modules/timer.js');
+      const { CaroState } = await import('../../public/js/games/caro/CaroState.js');
+      const { CaroBaseGame } = await import('../../public/js/games/caro/CaroBaseGame.js');
+
+      const board = new CaroBoard();
+      board.init(15, () => {});
+      board.placePiece(7, 7, 'X', true, false);
+      assertEqual(board.data[7][7], 'X');
+      board.clear();
+      assertEqual(board.data[7][7], null, 'board.clear() must reset cell data to null');
+
+      const chat = new CaroChat();
+      assert(typeof chat.clear === 'function', 'chat.clear must be a function');
+      assert(typeof chat.showReaction === 'function', 'chat.showReaction must be a function');
+      chat.clear();
+
+      const timer = new CaroTimer();
+      assert(typeof timer.reset === 'function', 'timer.reset must be a function');
+      timer.reset();
+
+      const state = new CaroState();
+      assertEqual(state.isGameOver, true, 'Default state isGameOver is true until match start');
+      state.isGameOver = false;
+      state.reset();
+      assertEqual(state.isGameOver, true, 'State reset sets isGameOver to true to guard against stray board clicks');
+
+      const baseGame = new CaroBaseGame(state);
+      baseGame.backToLobby(false);
+      assertEqual(state.isGameOver, true);
+    } finally {
+      teardownDomMock();
+    }
+  });
 });
 
 describe('Feature 13 & 16: Code Hygiene, Syntax & Stylesheet Integrity', () => {

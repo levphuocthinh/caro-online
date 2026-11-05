@@ -6,7 +6,7 @@ export class CaroState {
     this.gameMode = null; // 'online', 'ai', 'local'
     this.mySymbol = 'X';  // 'X', 'O', 'SPECTATOR'
     this.currentTurn = 'X';
-    this.isGameOver = false;
+    this.isGameOver = true;
     this.rule = 'standard'; // 'standard', 'block2ends'
     this.turnTime = 30;
   }
@@ -15,7 +15,7 @@ export class CaroState {
     this.gameMode = null;
     this.mySymbol = 'X';
     this.currentTurn = 'X';
-    this.isGameOver = false;
+    this.isGameOver = true;
   }
 }
 

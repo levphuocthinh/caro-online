@@ -147,6 +147,10 @@ export class GameManager {
     this.caro.confirmLeaveGame();
   }
 
+  leaveToHub() {
+    this.openHub();
+  }
+
   confirmLeaveToHub() {
     this.caro.confirmLeaveGame();
   }
