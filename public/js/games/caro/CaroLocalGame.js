@@ -29,6 +29,7 @@ export class CaroLocalGame extends CaroBaseGame {
     if (this.namePlayerO) this.namePlayerO.textContent = i18n.getText('player_rabbit_o');
     if (this.tagPlayerO) this.tagPlayerO.textContent = i18n.getText('tag_second');
 
+    caroChat.clear();
     caroBoard.init(15, (r, c) => this.handleCellClick(r, c));
     this.updateTurnDisplay();
     this.startTimer();

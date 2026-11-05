@@ -13,7 +13,9 @@ const {
   assertEqual,
   startTestServer,
   waitForEvent,
-  sleep
+  sleep,
+  setupDomMock,
+  teardownDomMock
 } = require('../harness');
 
 describe('Tier 2: Chat & Reaction Stress & Boundaries', () => {
@@ -92,6 +94,41 @@ describe('Tier 2: Chat & Reaction Stress & Boundaries', () => {
       assert(count >= 1, `Expected reactions to be broadcast, received ${count}`);
     } finally {
       await testServer.close();
+    }
+  });
+
+  test('CaroChat deduplication ignores rapid identical messages and clear() empties history', async () => {
+    setupDomMock();
+    try {
+      const { CaroChat } = await import('../../public/js/modules/chat.js');
+      const chat = new CaroChat();
+      const mockContainer = {
+        children: [],
+        appendChild(node) { this.children.push(node); },
+        set innerHTML(val) { if (val === '') this.children = []; },
+        get innerHTML() { return this.children.length === 0 ? '' : 'content'; },
+        scrollTop: 0,
+        scrollHeight: 100
+      };
+      chat.chatMessages = mockContainer;
+
+      // First message
+      chat.addMessage({ senderName: 'Bé Miu Miu', text: 'Hello', senderId: 'sock1' }, 'sock1');
+      assertEqual(mockContainer.children.length, 1, 'First message added');
+
+      // Duplicate message within 800ms
+      chat.addMessage({ senderName: 'Bé Miu Miu', text: 'Hello', senderId: 'sock1' }, 'sock1');
+      assertEqual(mockContainer.children.length, 1, 'Duplicate message ignored by deduplication');
+
+      // Different message
+      chat.addMessage({ senderName: 'Bé Miu Miu', text: 'Different', senderId: 'sock1' }, 'sock1');
+      assertEqual(mockContainer.children.length, 2, 'New unique message added');
+
+      // Clear
+      chat.clear();
+      assertEqual(mockContainer.children.length, 0, 'Clear emptied chat messages');
+    } finally {
+      teardownDomMock();
     }
   });
 });

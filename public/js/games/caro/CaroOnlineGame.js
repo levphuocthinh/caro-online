@@ -19,6 +19,7 @@ export class CaroOnlineGame extends CaroBaseGame {
 
   setupSocketEvents() {
     caroOnline.on('room_created', (data) => {
+      caroChat.clear();
       this.state.gameMode = 'online';
       this.state.mySymbol = data.yourSymbol;
       this.setupOnlineUI(data.roomState);
@@ -28,6 +29,7 @@ export class CaroOnlineGame extends CaroBaseGame {
     });
 
     caroOnline.on('room_joined', (data) => {
+      caroChat.clear();
       this.state.gameMode = 'online';
       this.state.mySymbol = data.yourSymbol;
       this.setupOnlineUI(data.roomState);
@@ -158,14 +160,12 @@ export class CaroOnlineGame extends CaroBaseGame {
     });
 
     caroOnline.on('new_chat', (data) => {
-      caroChat.addMessage(data, caroOnline.getSocketId());
-    });
-
-    caroOnline.on('chat_message', (data) => {
-      if (data && !data.senderName && data.sender) {
-        data.senderName = data.sender;
+      if (data && data.emoji && !data.text) {
+        const senderName = data.senderName || (data.senderSymbol ? `Người chơi (${data.senderSymbol})` : 'Đối thủ');
+        caroChat.showReaction(data.emoji, senderName);
+      } else {
+        caroChat.addMessage(data, caroOnline.getSocketId());
       }
-      caroChat.addMessage(data, caroOnline.getSocketId());
     });
 
     caroOnline.on('chat_reaction', (data) => {

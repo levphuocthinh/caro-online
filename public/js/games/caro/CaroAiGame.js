@@ -31,6 +31,7 @@ export class CaroAiGame extends CaroBaseGame {
     if (this.namePlayerO) this.namePlayerO.textContent = playerSymbol === 'O' ? i18n.getText('player_you_rabbit') : i18n.getText('player_bot_ai', { diff: difficulty });
     if (this.tagPlayerO) this.tagPlayerO.textContent = playerSymbol === 'O' ? i18n.getText('tag_you') : i18n.getText('tag_bot');
 
+    caroChat.clear();
     caroBoard.init(size, (r, c) => this.handleCellClick(r, c));
     this.updateTurnDisplay();
 

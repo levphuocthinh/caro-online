@@ -108,6 +108,15 @@ export class CaroChat {
     const { senderName, senderSymbol, text, emoji } = data;
     const isMine = data.isMine || (currentSocketId && data.senderId === currentSocketId);
 
+    // Chống lặp tin nhắn liên tiếp (Deduplication safeguard)
+    const msgKey = `${senderName || ''}|${senderSymbol || ''}|${text || ''}|${emoji || ''}|${isMine ? 'mine' : 'theirs'}`;
+    const now = Date.now();
+    if (this._lastMsgKey === msgKey && (now - (this._lastMsgTime || 0)) < 800) {
+      return;
+    }
+    this._lastMsgKey = msgKey;
+    this._lastMsgTime = now;
+
     const bubble = document.createElement('div');
     if (senderName === 'Hệ thống') {
       bubble.className = 'chat-bubble system';
@@ -150,6 +159,8 @@ export class CaroChat {
   }
 
   clear() {
+    this._lastMsgKey = null;
+    this._lastMsgTime = 0;
     if (this.chatMessages) {
       this.chatMessages.innerHTML = '';
     }

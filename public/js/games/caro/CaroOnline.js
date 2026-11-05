@@ -63,15 +63,7 @@ export class CaroOnline {
       this.trigger('rematch_started', data);
     });
     this.socket.on('player_left', (data) => this.trigger('player_left', data));
-    this.socket.on('new_chat', (data) => {
-      this.trigger('new_chat', data);
-      if (data && data.emoji && !data.text) {
-        this.trigger('chat_reaction', data);
-      } else {
-        this.trigger('chat_message', data);
-      }
-    });
-    this.socket.on('chat_message', (data) => this.trigger('chat_message', data));
+    this.socket.on('new_chat', (data) => this.trigger('new_chat', data));
     this.socket.on('reaction_received', (data) => this.trigger('chat_reaction', { emoji: data?.emoji, senderName: data?.sender }));
     this.socket.on('error_message', (data) => this.trigger('error_message', data));
     this.socket.on('disconnect', () => this.trigger('disconnect'));
