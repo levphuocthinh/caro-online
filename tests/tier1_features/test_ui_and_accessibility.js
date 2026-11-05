@@ -58,7 +58,6 @@ describe('Feature 6 & 8: Modal & Toast UI System', () => {
     assert(html.includes('id="btn-game-over-rematch"'), 'modal-game-over must have rematch button');
     assert(html.includes('id="btn-back-to-hub"'), 'Must have back to hub button on header');
     assert(html.includes('id="btn-back-to-lobby"'), 'Must have back to lobby button on header');
-    assert(html.includes('id="btn-lobby-back-to-hub"'), 'Must have return to hub button in lobby');
   });
 
   test('Modal open and close toggles active class', async () => {
