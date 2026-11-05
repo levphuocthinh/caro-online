@@ -938,10 +938,10 @@ export class DeceptionState {
       'event'
     );
 
-    const nextBrownIndex = this.sceneDeck.findIndex(t => t.color === 'BROWN');
     const pullNextBrown = () => {
-      if (nextBrownIndex >= 0) {
-        const [b] = this.sceneDeck.splice(nextBrownIndex, 1);
+      const idx = this.sceneDeck.findIndex(t => t.color === 'BROWN');
+      if (idx >= 0) {
+        const [b] = this.sceneDeck.splice(idx, 1);
         return b;
       }
       return null;
@@ -964,13 +964,12 @@ export class DeceptionState {
         }
         break;
       }
-      case 'EVENT_03': {
-        // Evidence Tampering: Bỏ 2 ô Nâu, chỉ rút bù 1 ô Nâu
-        const brownIndices = this.activeSceneTiles
-          .map((t, i) => (t.color === 'BROWN' ? i : -1))
-          .filter(i => i >= 0);
-        if (brownIndices.length >= 2) {
-          this.activeSceneTiles.splice(brownIndices[brownIndices.length - 1], 1);
+      case 'EVENT_02': {
+        // Forensic Breakthrough: Dời 1 viên đạn trên 1 ô hiện trường sang mục khác chính xác hơn
+        const brownTiles = this.activeSceneTiles.filter(t => t.color === 'BROWN' && t.selectedOptionIndex !== null);
+        if (brownTiles.length > 0 && isBotForensic) {
+          const target = brownTiles[0];
+          target.selectedOptionIndex = (target.selectedOptionIndex + 1) % 6;
         }
         const replacement = pullNextBrown();
         if (replacement && this.activeSceneTiles[fallbackTileIndex]) {
@@ -983,9 +982,50 @@ export class DeceptionState {
         }
         break;
       }
+      case 'EVENT_03': {
+        // Evidence Tampering: Bỏ 2 ô Nâu, chỉ rút bù 1 ô Nâu
+        const brownIndices = this.activeSceneTiles
+          .map((t, i) => (t.color === 'BROWN' ? i : -1))
+          .filter(i => i >= 0);
+        if (brownIndices.length >= 2) {
+          this.activeSceneTiles.splice(brownIndices[brownIndices.length - 1], 1);
+        }
+        const replacement = pullNextBrown();
+        const safeIdx = Math.min(fallbackTileIndex, this.activeSceneTiles.length - 1);
+        if (replacement && this.activeSceneTiles[safeIdx]) {
+          this.activeSceneTiles[safeIdx] = {
+            ...replacement,
+            selectedOptionIndex: isBotForensic ? this.computeSmartBulletOption(replacement) : null,
+            roundPlaced: this.round,
+            slotIndex: safeIdx
+          };
+        }
+        break;
+      }
       case 'EVENT_04': {
         // Witness Protection: Đảo chiều trình bày ngược kim đồng hồ
         this.reversePresentationOrder = true;
+        const replacement = pullNextBrown();
+        if (replacement && this.activeSceneTiles[fallbackTileIndex]) {
+          this.activeSceneTiles[fallbackTileIndex] = {
+            ...replacement,
+            selectedOptionIndex: isBotForensic ? this.computeSmartBulletOption(replacement) : null,
+            roundPlaced: this.round,
+            slotIndex: fallbackTileIndex
+          };
+        }
+        break;
+      }
+      case 'EVENT_05': {
+        // Internal Investigation: Mỗi điều tra viên ghim nghi vấn lên 1 lá bài của người bên phải
+        this.players.forEach((p, idx) => {
+          if (p.role !== 'FORENSIC_SCIENTIST') {
+            const rightNeighbor = this.players[(idx + 1) % this.players.length];
+            if (rightNeighbor && rightNeighbor.meansCards && rightNeighbor.meansCards.length > 0) {
+              p.suspicionFlagId = rightNeighbor.meansCards[0].id;
+            }
+          }
+        });
         const replacement = pullNextBrown();
         if (replacement && this.activeSceneTiles[fallbackTileIndex]) {
           this.activeSceneTiles[fallbackTileIndex] = {
@@ -1010,6 +1050,33 @@ export class DeceptionState {
               slotIndex: greenIdx
             };
           }
+        }
+        const replacement = pullNextBrown();
+        if (replacement && this.activeSceneTiles[fallbackTileIndex]) {
+          this.activeSceneTiles[fallbackTileIndex] = {
+            ...replacement,
+            selectedOptionIndex: isBotForensic ? this.computeSmartBulletOption(replacement) : null,
+            roundPlaced: this.round,
+            slotIndex: fallbackTileIndex
+          };
+        }
+        break;
+      }
+      case 'EVENT_07': {
+        // The Perfect Crime: Forensic Scientist peeks at top Scene deck
+        this.addLog(
+          'Tội ác Hoàn hảo: Pháp y đã kiểm tra đỉnh chồng bài Hiện Trường bí mật.',
+          'The Perfect Crime: Forensic Scientist peeked at the top of the Scene Deck.',
+          'event'
+        );
+        const replacement = pullNextBrown();
+        if (replacement && this.activeSceneTiles[fallbackTileIndex]) {
+          this.activeSceneTiles[fallbackTileIndex] = {
+            ...replacement,
+            selectedOptionIndex: isBotForensic ? this.computeSmartBulletOption(replacement) : null,
+            roundPlaced: this.round,
+            slotIndex: fallbackTileIndex
+          };
         }
         break;
       }

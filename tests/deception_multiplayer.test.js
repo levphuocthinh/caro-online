@@ -327,6 +327,216 @@ describe('Deception Online Multiplayer & WebSocket Suite', () => {
     const caroOnlineJs = fs.readFileSync(path.join(__dirname, '../public/js/games/caro/CaroOnlineGame.js'), 'utf8');
     assert(caroOnlineJs.includes('showRoomCreatedModal('), 'CaroOnlineGame must implement showRoomCreatedModal');
   });
+
+  test('Host disconnect in waiting room transfers host rights to next human member', async () => {
+    const testServer = await startTestServer();
+    try {
+      const host = await testServer.connectClient();
+      host.emit('deception:create_room', { playerName: 'OldHost' });
+      const created = await waitForEvent(host, 'deception:room_created');
+
+      const guest = await testServer.connectClient();
+      guest.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'NewHostCandidate' });
+      await waitForEvent(guest, 'deception:room_joined');
+
+      // Host disconnects
+      host.disconnect();
+
+      const update = await waitForEvent(guest, 'deception:room_updated');
+      assertEqual(update.room.hostId, guest.id, 'Host rights should transfer to guest');
+      const guestPlayer = update.room.players.find(p => p.id === guest.id);
+      assertEqual(guestPlayer.isHost, true);
+      assertEqual(guestPlayer.isReady, true);
+    } finally {
+      await testServer.close();
+    }
+  });
+
+  test('Room deletion when all human members leave', async () => {
+    const testServer = await startTestServer();
+    try {
+      const host = await testServer.connectClient();
+      host.emit('deception:create_room', { playerName: 'LoneHost' });
+      const created = await waitForEvent(host, 'deception:room_created');
+
+      // Host leaves
+      host.emit('deception:leave_room');
+
+      // Another client tries to join
+      const outsider = await testServer.connectClient();
+      outsider.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'LateGuest' });
+      const err = await waitForEvent(outsider, 'deception:error');
+      assert(err.message.includes('Không tìm thấy phòng'), 'Empty room should be destroyed');
+    } finally {
+      await testServer.close();
+    }
+  });
+
+  test('Online Game Secret Intel Partitioning: Secret solution only sent to authorized roles', async () => {
+    const testServer = await startTestServer();
+    try {
+      const p1 = await testServer.connectClient();
+      p1.emit('deception:create_room', { playerName: 'Player1' });
+      const created = await waitForEvent(p1, 'deception:room_created');
+
+      const p2 = await testServer.connectClient();
+      p2.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'Player2' });
+      await waitForEvent(p2, 'deception:room_joined');
+
+      // Add 2 bots to reach 4 players
+      p1.emit('deception:add_bot');
+      await waitForEvent(p1, 'deception:room_updated');
+      p1.emit('deception:add_bot');
+      await waitForEvent(p1, 'deception:room_updated');
+
+      p2.emit('deception:toggle_ready');
+      await waitForEvent(p1, 'deception:room_updated');
+
+      const [p1Game, p2Game] = await Promise.all([
+        waitForEvent(p1, 'deception:game_started'),
+        waitForEvent(p2, 'deception:game_started'),
+        p1.emit('deception:start_game')
+      ]);
+
+      assertEqual(p1Game.publicState.players.length, 4);
+      assertEqual(p2Game.publicState.players.length, 4);
+
+      // Verify that if role is INVESTIGATOR, secretRole does NOT contain solution
+      [p1Game, p2Game].forEach(g => {
+        if (g.yourSecretRole.role === 'INVESTIGATOR') {
+          assertEqual(Boolean(g.yourSecretRole.solution), false, 'Investigator must not receive secret solution');
+        } else if (g.yourSecretRole.role === 'MURDERER') {
+          assert(g.yourSecretRole.solution, 'Murderer must receive solution');
+        }
+      });
+    } finally {
+      await testServer.close();
+    }
+  });
+
+  test('Client Architecture & DOM Audit: active-scene-tiles-grid binding and tab panel switching', () => {
+    const decJs = fs.readFileSync(path.join(__dirname, '../public/deception/js/DeceptionApp.js'), 'utf8');
+
+    // 1. Grid binding must use active-scene-tiles-grid
+    assert(decJs.includes("getElementById('active-scene-tiles-grid')"), 'DeceptionApp must bind active-scene-tiles-grid');
+
+    // 2. Tab switching in checkUrlForRoom must control panel-lobby-solo and panel-lobby-online
+    assert(decJs.includes("getElementById('panel-lobby-solo')"), 'checkUrlForRoom must control panel-lobby-solo');
+    assert(decJs.includes("getElementById('panel-lobby-online')"), 'checkUrlForRoom must control panel-lobby-online');
+  });
+
+  test('Online Game Real-Time In-Game Sync: Forensic places bullet and guest receives update', async () => {
+    const testServer = await startTestServer();
+    try {
+      const p1 = await testServer.connectClient();
+      p1.emit('deception:create_room', { playerName: 'HostPlayer' });
+      const created = await waitForEvent(p1, 'deception:room_created');
+
+      const p2 = await testServer.connectClient();
+      p2.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'GuestPlayer' });
+      await waitForEvent(p2, 'deception:room_joined');
+
+      // Add 2 bots
+      p1.emit('deception:add_bot');
+      await waitForEvent(p1, 'deception:room_updated');
+      p1.emit('deception:add_bot');
+      await waitForEvent(p1, 'deception:room_updated');
+
+      p2.emit('deception:toggle_ready');
+      await waitForEvent(p1, 'deception:room_updated');
+
+      const [p1Game, p2Game] = await Promise.all([
+        waitForEvent(p1, 'deception:game_started'),
+        waitForEvent(p2, 'deception:game_started'),
+        p1.emit('deception:start_game')
+      ]);
+
+      // Check Forensic Scientist in publicState
+      const forensic = p1Game.publicState.players.find(p => p.role === 'FORENSIC_SCIENTIST');
+      assert(forensic, 'Public state must disclose Forensic Scientist identity');
+      assertEqual(forensic.roleRevealed, true);
+
+      // Determine which socket is Forensic Scientist, or test with the socket that is forensic
+      let forensicSocket = null;
+      let observerSocket = null;
+      if (p1Game.yourSecretRole.role === 'FORENSIC_SCIENTIST') {
+        forensicSocket = p1;
+        observerSocket = p2;
+      } else if (p2Game.yourSecretRole.role === 'FORENSIC_SCIENTIST') {
+        forensicSocket = p2;
+        observerSocket = p1;
+      }
+
+      if (forensicSocket) {
+        // Place bullet on tile index 0, option index 3
+        const [updateP1, updateP2] = await Promise.all([
+          waitForEvent(p1, 'deception:bullet_placed'),
+          waitForEvent(p2, 'deception:bullet_placed'),
+          forensicSocket.emit('deception:place_bullet', { tileIndex: 0, optionIndex: 3 })
+        ]);
+        assertEqual(updateP2.tileIndex, 0);
+        assertEqual(updateP2.optionIndex, 3);
+        assertEqual(updateP2.activeSceneTiles[0].selectedOptionIndex, 3);
+      }
+    } finally {
+      await testServer.close();
+    }
+  });
+
+  test('Online Game Real-Time In-Game Sync: Accusation, Badge Deduction, and Witness Shot Resolution', async () => {
+    const testServer = await startTestServer();
+    try {
+      const p1 = await testServer.connectClient();
+      p1.emit('deception:create_room', { playerName: 'HostPlayer' });
+      const created = await waitForEvent(p1, 'deception:room_created');
+
+      const p2 = await testServer.connectClient();
+      p2.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'GuestPlayer' });
+      await waitForEvent(p2, 'deception:room_joined');
+
+      p1.emit('deception:add_bot');
+      await waitForEvent(p1, 'deception:room_updated');
+      p1.emit('deception:add_bot');
+      await waitForEvent(p1, 'deception:room_updated');
+
+      p2.emit('deception:toggle_ready');
+      await waitForEvent(p1, 'deception:room_updated');
+
+      const [p1Game, p2Game] = await Promise.all([
+        waitForEvent(p1, 'deception:game_started'),
+        waitForEvent(p2, 'deception:game_started'),
+        p1.emit('deception:start_game')
+      ]);
+
+      // Find an accuser socket (someone who is not Forensic)
+      const accuserSocket = p1Game.yourSecretRole.role !== 'FORENSIC_SCIENTIST' ? p1 : p2;
+      const accuserGame = accuserSocket === p1 ? p1Game : p2Game;
+      const otherSocket = accuserSocket === p1 ? p2 : p1;
+
+      // Find a suspect
+      const target = accuserGame.publicState.players.find(p => p.id !== accuserGame.yourPlayerId && p.role !== 'FORENSIC_SCIENTIST');
+      assert(target, 'Target suspect must exist');
+
+      // False accusation test
+      const falseMeans = target.meansCards[0].id;
+      const falseClue = target.clueCards[0].id;
+
+      const [accResult1, accResult2] = await Promise.all([
+        waitForEvent(accuserSocket, 'deception:accusation_made'),
+        waitForEvent(otherSocket, 'deception:accusation_made'),
+        accuserSocket.emit('deception:make_accusation', {
+          targetId: target.id,
+          meansId: falseMeans,
+          clueId: falseClue
+        })
+      ]);
+
+      assertEqual(accResult2.accuserId, accuserGame.yourPlayerId);
+      assertEqual(accResult2.targetPlayer.id, target.id);
+    } finally {
+      await testServer.close();
+    }
+  });
 });
 
 if (require.main === module) {

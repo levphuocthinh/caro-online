@@ -380,6 +380,107 @@ class DeceptionSocketManager {
     socket.on('deception:leave_room', safeHandler(socket, 'deception:leave_room', () => {
       this.handleLeaveCurrentRoom(socket);
     }));
+
+    // 11. Đặt đạn gỗ hiện trường (Pháp y)
+    socket.on('deception:place_bullet', safeHandler(socket, 'deception:place_bullet', (data = {}) => {
+      const roomCode = this.playerRoomMap.get(socket.id);
+      if (!roomCode) return;
+      const room = this.rooms.get(roomCode);
+      if (!room || room.status !== 'PLAYING' || !room.gameState) return;
+
+      const playerIdx = room.players.findIndex(p => p.id === socket.id);
+      const gp = room.gameState.players[playerIdx];
+      if (!gp || gp.role !== 'FORENSIC_SCIENTIST') return;
+
+      const { tileIndex, optionIndex } = data;
+      const success = room.gameState.placeBulletOnTile(tileIndex, optionIndex);
+      if (success) {
+        this.io.to(roomCode).emit('deception:bullet_placed', {
+          tileIndex,
+          optionIndex,
+          activeSceneTiles: room.gameState.activeSceneTiles
+        });
+      }
+    }));
+
+    // 12. Cáo buộc / Đập bàn phá án trực tuyến
+    socket.on('deception:make_accusation', safeHandler(socket, 'deception:make_accusation', (data = {}) => {
+      const roomCode = this.playerRoomMap.get(socket.id);
+      if (!roomCode) return;
+      const room = this.rooms.get(roomCode);
+      if (!room || room.status !== 'PLAYING' || !room.gameState) return;
+
+      const { targetId, meansId, clueId } = data;
+      const playerIdx = room.players.findIndex(p => p.id === socket.id);
+      const accuserGp = room.gameState.players[playerIdx];
+      if (!accuserGp || !accuserGp.hasBadge) return;
+
+      const result = room.gameState.makeAccusation(accuserGp.id, targetId, meansId, clueId);
+      if (result && result.valid) {
+        const targetPlayer = room.gameState.getPlayerById(targetId);
+        const rp = room.players[playerIdx];
+        this.io.to(roomCode).emit('deception:accusation_made', {
+          accuserId: accuserGp.id,
+          accuserName: rp.displayName,
+          accuserAvatar: rp.avatar,
+          targetPlayer: { id: targetPlayer.id, displayName: targetPlayer.displayName, avatar: targetPlayer.avatar },
+          meansCard: result.meansCard,
+          clueCard: result.clueCard,
+          isCorrect: result.isCorrect,
+          phase: room.gameState.phase,
+          winnerTeam: room.gameState.winnerTeam,
+          winReasonKey: room.gameState.winReasonKey,
+          winReasonText: room.gameState.winReasonText
+        });
+      }
+    }));
+
+    // 13. Phát súng nhắm bắn Nhân chứng (Pha Witness Reversal)
+    socket.on('deception:witness_shot', safeHandler(socket, 'deception:witness_shot', (data = {}) => {
+      const roomCode = this.playerRoomMap.get(socket.id);
+      if (!roomCode) return;
+      const room = this.rooms.get(roomCode);
+      if (!room || room.status !== 'PLAYING' || !room.gameState) return;
+
+      const playerIdx = room.players.findIndex(p => p.id === socket.id);
+      const shooterGp = room.gameState.players[playerIdx];
+      if (!shooterGp || (shooterGp.role !== 'MURDERER' && shooterGp.role !== 'ACCOMPLICE')) return;
+
+      const { targetId } = data;
+      const shotRes = room.gameState.resolveWitnessShot(targetId);
+      if (shotRes) {
+        this.io.to(roomCode).emit('deception:witness_shot_resolved', {
+          targetId,
+          hitWitness: shotRes.hitWitness,
+          targetPlayer: { id: shotRes.target.id, displayName: shotRes.target.displayName },
+          winnerTeam: room.gameState.winnerTeam,
+          winReasonKey: room.gameState.winReasonKey,
+          winReasonText: room.gameState.winReasonText
+        });
+      }
+    }));
+
+    // 14. Đổi Thẻ Hiện Trường Nâu (Pháp y vòng 2/3)
+    socket.on('deception:swap_tile', safeHandler(socket, 'deception:swap_tile', (data = {}) => {
+      const roomCode = this.playerRoomMap.get(socket.id);
+      if (!roomCode) return;
+      const room = this.rooms.get(roomCode);
+      if (!room || room.status !== 'PLAYING' || !room.gameState) return;
+
+      const playerIdx = room.players.findIndex(p => p.id === socket.id);
+      const gp = room.gameState.players[playerIdx];
+      if (!gp || gp.role !== 'FORENSIC_SCIENTIST') return;
+
+      const { tileIndex } = data;
+      const success = room.gameState.replaceBrownSceneTile(tileIndex);
+      if (success) {
+        this.io.to(roomCode).emit('deception:tile_swapped', {
+          tileIndex,
+          activeSceneTiles: room.gameState.activeSceneTiles,
+          activeEventTile: room.gameState.activeEventTile
+        });
+      }
+    }));
   }
 
   /**
@@ -391,6 +492,17 @@ class DeceptionSocketManager {
     state.config.playerCount = room.players.length;
     state.config.playerName = room.players[0].displayName;
     state.startNewGame();
+    state.proceedToNightCrime();
+
+    // Đảm bảo solution luôn có Hung khí + Manh mối hợp lệ cho ván đấu
+    const murderer = state.getMurdererPlayer();
+    if (murderer && (!state.solution.meansCardId || !state.solution.clueCardId)) {
+      const defMeans = murderer.meansCards[0]?.id;
+      const defClue = murderer.clueCards[0]?.id;
+      if (defMeans && defClue) {
+        state.commitMurdererSelection(defMeans, defClue);
+      }
+    }
 
     // Map các socket id vào danh sách người chơi của game
     room.gameState = state;
@@ -404,6 +516,7 @@ class DeceptionSocketManager {
       activeSceneTiles: state.activeSceneTiles,
       players: state.players.map((gp, i) => {
         const rp = room.players[i] || {};
+        const isForensic = gp.role === 'FORENSIC_SCIENTIST';
         return {
           id: gp.id,
           seatIndex: i,
@@ -412,7 +525,8 @@ class DeceptionSocketManager {
           isHuman: !rp.isBot,
           isBot: Boolean(rp.isBot),
           socketId: rp.id,
-          roleRevealed: gp.isRoleRevealed,
+          role: isForensic ? 'FORENSIC_SCIENTIST' : 'UNKNOWN',
+          roleRevealed: isForensic,
           hasBadge: gp.hasBadge,
           meansCards: gp.meansCards,
           clueCards: gp.clueCards
@@ -433,7 +547,7 @@ class DeceptionSocketManager {
         };
 
         // Bổ sung thông tin mật chuẩn luật theo từng vai trò:
-        // - Hung thủ & Đồng phạm biết rõ nhau và biết cặp Hung khí + Manh mối
+        // - Hung thủ & Đồng phạm & Pháp Y biết rõ nhau và biết cặp Hung khí + Manh mối
         if (gp.role === 'MURDERER') {
           secretRole.solution = state.solution;
           const accomplice = state.players.find(p => p.role === 'ACCOMPLICE');
@@ -444,6 +558,15 @@ class DeceptionSocketManager {
             };
           }
         } else if (gp.role === 'ACCOMPLICE') {
+          secretRole.solution = state.solution;
+          const murderer = state.players.find(p => p.role === 'MURDERER');
+          if (murderer) {
+            secretRole.murderer = {
+              displayName: murderer.displayName,
+              avatar: murderer.avatar
+            };
+          }
+        } else if (gp.role === 'FORENSIC_SCIENTIST') {
           secretRole.solution = state.solution;
           const murderer = state.players.find(p => p.role === 'MURDERER');
           if (murderer) {

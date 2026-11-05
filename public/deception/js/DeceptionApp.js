@@ -57,7 +57,7 @@ class DeceptionAppController {
       lblCaseId: document.getElementById('lbl-case-id'),
       lblRoomCode: document.getElementById('lbl-room-code'),
       crimeSceneMasterTable: document.getElementById('crime-scene-master-table'),
-      forensicsTilesGrid: document.getElementById('forensics-tiles-grid'),
+      forensicsTilesGrid: document.getElementById('active-scene-tiles-grid'),
       suspectsTopRow: document.getElementById('table-suspects-top'),
       suspectsBottomRow: document.getElementById('table-suspects-bottom'),
       secretIntelBar: document.getElementById('criminal-secret-intel-bar'),
@@ -681,7 +681,7 @@ class DeceptionAppController {
     }
 
     // Event delegation trên Bảng Pháp Y (Đặt đạn gỗ hiện trường)
-    const forensicsGrid = document.getElementById('forensics-tiles-grid');
+    const forensicsGrid = document.getElementById('active-scene-tiles-grid') || document.getElementById('forensics-tiles-grid');
     if (forensicsGrid) {
       forensicsGrid.addEventListener('click', (e) => {
         const optBtn = e.target.closest('.tile-opt-btn');
@@ -689,13 +689,17 @@ class DeceptionAppController {
 
         const human = this.state.getHumanPlayer();
         const isHumanForensic = human.role === 'FORENSIC_SCIENTIST';
-        if (!isHumanForensic && !this.state.phase.includes('EVIDENCE')) return;
+        if (!isHumanForensic || !this.state.phase.includes('EVIDENCE')) return;
 
         const tIdx = parseInt(optBtn.dataset.tileIdx, 10);
         const optIdx = parseInt(optBtn.dataset.optIdx, 10);
         this.state.placeBulletOnTile(tIdx, optIdx);
         this.playAudio('bullet_drop');
         this.renderActiveSceneTiles();
+
+        if (this.isOnlineMatch && this.socket) {
+          this.socket.emit('deception:place_bullet', { tileIndex: tIdx, optionIndex: optIdx });
+        }
       });
     }
   }
@@ -836,6 +840,77 @@ class DeceptionAppController {
 
       this.socket.on('deception:game_started', (data) => {
         this.handleOnlineGameStarted(data);
+      });
+
+      this.socket.on('deception:bullet_placed', (data) => {
+        if (data && data.activeSceneTiles) {
+          this.state.activeSceneTiles = data.activeSceneTiles;
+          this.playAudio('bullet_drop');
+          this.renderActiveSceneTiles();
+          this.updateInvestigationTimeline();
+        }
+      });
+
+      this.socket.on('deception:tile_swapped', (data) => {
+        if (data && data.activeSceneTiles) {
+          this.state.activeSceneTiles = data.activeSceneTiles;
+          this.state.activeEventTile = data.activeEventTile || null;
+          this.playAudio('bullet_drop');
+          this.renderActiveSceneTiles();
+          this.updateInvestigationTimeline();
+        }
+      });
+
+      this.socket.on('deception:accusation_made', (data) => {
+        const accuser = this.state.getPlayerById(data.accuserId);
+        if (accuser) accuser.hasBadge = false;
+        this.state.phase = data.phase;
+        if (data.winnerTeam) {
+          this.state.winnerTeam = data.winnerTeam;
+          this.state.winReasonKey = data.winReasonKey;
+          this.state.winReasonText = data.winReasonText;
+        }
+
+        if (data.accuserId !== this.myPlayerId) {
+          this.showAccusationCastingModal({
+            accuserName: data.accuserName,
+            accuserAvatar: data.accuserAvatar,
+            targetPlayer: data.targetPlayer,
+            meansCard: data.meansCard,
+            clueCard: data.clueCard,
+            isCorrect: data.isCorrect
+          }, () => {
+            if (data.isCorrect) {
+              if (this.state.phase === GAME_PHASES.WITNESS_REVERSAL) {
+                this.showWitnessReversalView();
+              } else {
+                this.showGameOverView();
+              }
+            } else {
+              if (this.state.phase === GAME_PHASES.GAME_OVER) {
+                this.showGameOverView();
+              } else {
+                this.renderInvestigationTable();
+              }
+            }
+          });
+        }
+      });
+
+      this.socket.on('deception:witness_shot_resolved', (data) => {
+        this.state.phase = GAME_PHASES.GAME_OVER;
+        this.state.winnerTeam = data.winnerTeam;
+        this.state.winReasonKey = data.winReasonKey;
+        this.state.winReasonText = data.winReasonText;
+        this.playCutscene('WITNESS_REVERSAL', {
+          isSuccess: data.hitWitness,
+          title: this.isVi ? 'Phát Súng Định Mệnh' : 'The Final Shot',
+          subtitle: data.hitWitness
+            ? (this.isVi ? 'Nhân chứng bị hạ sát!' : 'Witness assassinated!')
+            : (this.isVi ? 'Cảnh sát bảo vệ thành công!' : 'Police protected the witness!')
+        }, () => {
+          this.showGameOverView();
+        });
       });
 
       this.socket.on('deception:error', (data) => {
@@ -1178,10 +1253,12 @@ class DeceptionAppController {
       // 1. Chuyển sang Tab Online trong Lobby
       const onlineTabBtn = document.getElementById('tab-btn-online');
       if (onlineTabBtn) {
-        document.querySelectorAll('.noir-tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.lobby-tab-content').forEach(p => p.classList.remove('active'));
+        document.getElementById('tab-btn-solo')?.classList.remove('active');
         onlineTabBtn.classList.add('active');
-        document.getElementById('tab-pane-online')?.classList.add('active');
+        const pSolo = document.getElementById('panel-lobby-solo');
+        const pOnline = document.getElementById('panel-lobby-online');
+        if (pSolo) pSolo.style.display = 'none';
+        if (pOnline) pOnline.style.display = 'block';
       }
 
       // 2. Điền mã phòng vào input
@@ -1554,6 +1631,7 @@ class DeceptionAppController {
 
     this.state.players = data.publicState.players.map((p, idx) => {
       const isMe = p.socketId === this.myPlayerId || idx === data.yourPlayerIndex;
+      const isForensic = p.role === 'FORENSIC_SCIENTIST' || p.roleRevealed;
       return {
         id: p.id,
         seatIndex: p.seatIndex !== undefined ? p.seatIndex : idx,
@@ -1561,12 +1639,12 @@ class DeceptionAppController {
         avatar: p.avatar,
         isHuman: isMe,
         isBot: Boolean(p.isBot),
-        role: isMe ? data.yourSecretRole.role : 'UNKNOWN',
-        team: isMe ? data.yourSecretRole.team : 'UNKNOWN',
+        role: isMe ? data.yourSecretRole.role : (isForensic ? 'FORENSIC_SCIENTIST' : 'UNKNOWN'),
+        team: isMe ? data.yourSecretRole.team : (isForensic ? 'INVESTIGATION' : 'UNKNOWN'),
         hasBadge: p.hasBadge !== false,
         meansCards: p.meansCards || [],
         clueCards: p.clueCards || [],
-        isRoleRevealed: false
+        isRoleRevealed: isForensic || (isMe && data.yourSecretRole.role === 'FORENSIC_SCIENTIST')
       };
     });
 
@@ -1880,7 +1958,7 @@ class DeceptionAppController {
   renderNightIntelContent() {
     const intelContent = document.getElementById('night-intel-content');
     const human = this.state.getHumanPlayer();
-    const murderer = this.state.getMurdererPlayer();
+    const murderer = this.state.getMurdererPlayer() || (this.onlineSecretIntel && this.onlineSecretIntel.murderer);
     const solMeans = this.state.findCardById(this.state.solution.meansCardId)?.card;
     const solClue = this.state.findCardById(this.state.solution.clueCardId)?.card;
 
@@ -1913,11 +1991,13 @@ class DeceptionAppController {
         </div>
       `;
     } else if (human.role === 'WITNESS') {
-      const suspects = this.state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
+      const suspects = (this.onlineSecretIntel && this.onlineSecretIntel.seenCulprits)
+        || this.state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
+      const culpritNames = suspects.map(s => s.displayName).join(' & ') || (this.isVi ? '2 kẻ tình nghi' : '2 suspects');
       intelContent.innerHTML = `
         <p style="font-size: 14.5px; line-height: 1.6;">
           👁️ <b>Bạn là Nhân chứng:</b> Bạn đã thấy 2 nghi phạm rời hiện trường:
-          <br><b style="color: var(--crimson); font-size: 16px;">${suspects.map(s => s.displayName).join(' & ')}</b>
+          <br><b style="color: var(--crimson); font-size: 16px;">${culpritNames}</b>
           <br><em style="color: var(--text-secondary);">(Nhưng không biết ai là hung thủ trực tiếp, ai là đồng phạm!)</em>
         </p>
       `;
@@ -2321,11 +2401,20 @@ class DeceptionAppController {
           </div>
         `;
         document.getElementById('btn-forensic-swap-brown')?.addEventListener('click', () => {
-          this.state.replaceBrownSceneTile(2);
+          const brownIdx = this.state.activeSceneTiles.findIndex((t, idx) => idx >= 2 && t.color === 'BROWN');
+          const targetIdx = brownIdx >= 0 ? brownIdx : 2;
+          this.state.replaceBrownSceneTile(targetIdx);
           this.playAudio('bullet_drop');
           this.renderActiveSceneTiles();
+          if (this.isOnlineMatch && this.socket) {
+            this.socket.emit('deception:swap_tile', { tileIndex: targetIdx });
+          }
         });
         document.getElementById('btn-forensic-confirm-swap')?.addEventListener('click', () => {
+          if (!this.state.areAllSceneTilesMarked()) {
+            alert(this.isVi ? 'Vui lòng đặt đạn lên Thẻ Hiện Trường mới trước khi bắt đầu tranh luận!' : 'Please place a bullet on the new Scene Tile before starting discussion!');
+            return;
+          }
           this.playAudio('gavel');
           this.state.startPresentationPhase();
           this.roundTimeLeft = 180;
@@ -3084,6 +3173,10 @@ class DeceptionAppController {
 
     if (!res.valid) return;
 
+    if (this.isOnlineMatch && this.socket) {
+      this.socket.emit('deception:make_accusation', { targetId, meansId, clueId });
+    }
+
     const targetPlayer = this.state.getPlayerById(targetId);
     const meansCard = this.state.findCardById(meansId)?.card;
     const clueCard = this.state.findCardById(clueId)?.card;
@@ -3173,10 +3266,16 @@ class DeceptionAppController {
   executeWitnessReversalShot(targetId) {
     this.playAudio('revolver');
     const res = this.state.resolveWitnessShot(targetId);
+    const isHit = Boolean(res && res.hitWitness);
+
+    if (this.isOnlineMatch && this.socket) {
+      this.socket.emit('deception:witness_shot', { targetId });
+    }
+
     this.playCutscene('WITNESS_REVERSAL', {
-      isSuccess: res.hitWitness,
+      isSuccess: isHit,
       title: this.isVi ? 'Phát Súng Định Mệnh' : 'The Final Shot',
-      subtitle: res.hitWitness
+      subtitle: isHit
         ? (this.isVi ? 'Nhân chứng bị hạ sát!' : 'Witness assassinated!')
         : (this.isVi ? 'Cảnh sát bảo vệ thành công!' : 'Police protected the witness!')
     }, () => {

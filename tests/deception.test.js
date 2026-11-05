@@ -372,4 +372,115 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
       assert.ok(top.suspect && top.meansCard && top.clueCard);
     }
   });
+
+  await t.test('Forensic Scientist manual bullet placement & validation', () => {
+    const game = new DeceptionState();
+    game.config.playerCount = 6;
+    game.config.preferredRole = 'FORENSIC_SCIENTIST';
+    game.startNewGame();
+    assert.equal(game.getHumanPlayer().role, 'FORENSIC_SCIENTIST');
+
+    game.proceedToNightCrime();
+    game.startRound1Evidence();
+
+    assert.equal(game.areAllSceneTilesMarked(), false, 'Tiles should start unmarked for Human Forensic');
+
+    // Place bullets on each of the 6 tiles
+    for (let i = 0; i < game.activeSceneTiles.length; i++) {
+      assert.equal(game.placeBulletOnTile(i, 2), true);
+      assert.equal(game.activeSceneTiles[i].selectedOptionIndex, 2);
+    }
+    assert.equal(game.areAllSceneTilesMarked(), true, 'All tiles should now be marked');
+
+    // Invalid tile index or option index
+    assert.equal(game.placeBulletOnTile(99, 2), false);
+    assert.equal(game.placeBulletOnTile(0, 9), false);
+  });
+
+  await t.test('All 7 Event Tiles execution & scene deck handling', () => {
+    for (const evt of EVENT_TILES) {
+      const game = new DeceptionState();
+      game.config.playerCount = 6;
+      game.config.includeEventTiles = true;
+      game.startNewGame();
+      game.proceedToNightCrime();
+      game.startRound1Evidence();
+      game.autoPlaceForensicBullets();
+
+      const initialCount = game.activeSceneTiles.length;
+      assert.equal(initialCount, 6);
+
+      // Force event tile execution
+      game.executeEventTile(evt, 2);
+
+      if (evt.id === 'EVENT_01') {
+        // Sudden twist adds an extra brown tile
+        assert.ok(game.activeSceneTiles.length >= initialCount, 'EVENT_01 should add an extra tile');
+      } else if (evt.id === 'EVENT_04') {
+        // Witness protection reverses presentation order
+        assert.equal(game.reversePresentationOrder, true, 'EVENT_04 should reverse presentation order');
+      } else if (evt.id === 'EVENT_06') {
+        // Location tile swapped
+        const greenTile = game.activeSceneTiles.find(t => t.color === 'GREEN');
+        assert.ok(greenTile, 'Location tile must exist');
+      }
+      assert.ok(game.caseLogs.length > 0, 'Event execution should log to case logs');
+    }
+  });
+
+  await t.test('3 Full Rounds without solving leads to Criminal Victory via Time Expired', () => {
+    const game = new DeceptionState();
+    game.config.playerCount = 6;
+    game.startNewGame();
+    game.proceedToNightCrime();
+    game.proceedAfterNightCrime();
+
+    // Round 1
+    game.startRound1Evidence();
+    game.startPresentationPhase();
+    assert.equal(game.round, 1);
+    game.advanceAfterPresentation();
+
+    // Round 2
+    assert.equal(game.round, 2);
+    game.startPresentationPhase();
+    game.advanceAfterPresentation();
+
+    // Round 3
+    assert.equal(game.round, 3);
+    game.startPresentationPhase();
+    game.advanceAfterPresentation();
+
+    // Game Over: Criminal Win
+    assert.equal(game.phase, GAME_PHASES.GAME_OVER);
+    assert.equal(game.winnerTeam, 'CRIMINAL');
+    assert.equal(game.winReasonKey, 'TIME_EXPIRED');
+  });
+
+  await t.test('Adversarial Edge Cases: Invalid Accusations and Non-existent Targets', () => {
+    const game = new DeceptionState();
+    game.config.playerCount = 6;
+    game.startNewGame();
+    game.proceedToNightCrime();
+
+    // Accuser with no badge (e.g. Forensic Scientist)
+    const forensic = game.getForensicPlayer();
+    const suspect = game.players.find(p => p.role !== 'FORENSIC_SCIENTIST');
+    const invRes = game.makeAccusation(forensic.id, suspect.id, suspect.meansCards[0].id, suspect.clueCards[0].id);
+    assert.equal(invRes.valid, false, 'Forensic cannot make accusations');
+
+    // Non-existent player ID
+    const noPlayerRes = game.makeAccusation('non_existent', suspect.id, suspect.meansCards[0].id, suspect.clueCards[0].id);
+    assert.equal(noPlayerRes.valid, false, 'Non-existent player cannot accuse');
+
+    // Non-existent card IDs
+    const detective = game.players.find(p => p.hasBadge && p.id !== suspect.id);
+    const badCardRes = game.makeAccusation(detective.id, suspect.id, 'CARD_FAKE_1', 'CARD_FAKE_2');
+    assert.equal(badCardRes.valid, false, 'Non-existent cards cannot form a valid accusation');
+
+    // Invalid witness shot target ID
+    const shotRes = game.resolveWitnessShot('non_existent_target');
+    assert.equal(shotRes, null, 'Shooting non-existent player should return null safely');
+  });
 });
+
