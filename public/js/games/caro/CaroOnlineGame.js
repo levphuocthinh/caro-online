@@ -27,7 +27,11 @@ export class CaroOnlineGame extends CaroBaseGame {
       this.setupOnlineUI(data.roomState);
       CaroModal.showToast(i18n.getText('toast_room_created', { roomId: data.roomId }));
       this.showRoomCreatedModal(data.roomId);
-      caroChat.addMessage({ senderName: i18n.getText('chat_system_sender'), text: i18n.getText('chat_room_ready', { roomId: data.roomId }) });
+      caroChat.addMessage({
+        senderName: i18n.getText('chat_system_sender'),
+        text: i18n.getText('chat_room_ready', { roomId: data.roomId }),
+        isSystem: true
+      });
     });
 
     caroOnline.on('room_joined', (data) => {
@@ -134,13 +138,15 @@ export class CaroOnlineGame extends CaroBaseGame {
     });
 
     caroOnline.on('rematch_started', (data) => {
+      this.state.gameMode = 'online';
       this.state.mySymbol = data.yourSymbol || caroOnline.mySymbol;
       CaroModal.close('modal-game-over');
       this.setupOnlineUI(data.roomState);
       CaroModal.showToast(i18n.getText('toast_rematch_started'));
       caroChat.addMessage({
-        senderName: 'Hệ thống',
-        text: '🌸 Đã bắt đầu ván tái đấu mới! Hai bên đổi quân đi trước/sau.'
+        senderName: i18n.getText('chat_system_sender'),
+        text: `🌸 ${i18n.getText('toast_rematch_started')}`,
+        isSystem: true
       });
     });
 
@@ -167,10 +173,12 @@ export class CaroOnlineGame extends CaroBaseGame {
 
     caroOnline.on('new_chat', (data) => {
       const myId = caroOnline.getSocketId();
-      const isMine = Boolean(
-        (myId && data.senderId && data.senderId === myId) ||
-        (this.state.mySymbol && this.state.mySymbol !== 'SPECTATOR' && data.senderSymbol && data.senderSymbol === this.state.mySymbol)
-      );
+      const isMine = (myId && data.senderId)
+        ? (myId === data.senderId)
+        : Boolean(
+            data.isMine ||
+            (this.state.mySymbol && this.state.mySymbol !== 'SPECTATOR' && data.senderSymbol && data.senderSymbol === this.state.mySymbol)
+          );
       caroChat.addMessage({ ...data, isMine }, myId);
     });
 

@@ -32,6 +32,8 @@ export class CaroUIBinder {
    * @param {Object} caroModule Thể hiện của CaroModule hoặc GameManager
    */
   static bind(caroModule) {
+    if (this._bound) return;
+    this._bound = true;
     // 1. Các nút chọn chế độ ở Sảnh chờ Caro
     document.getElementById('btn-open-create-room')?.addEventListener('click', () => CaroModal.open('modal-create-room'));
     document.getElementById('btn-open-join-room')?.addEventListener('click', () => CaroModal.open('modal-join-room'));

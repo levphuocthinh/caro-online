@@ -10,7 +10,7 @@ export class CaroOnline {
   }
 
   connect() {
-    if (this.socket && this.socket.connected) return;
+    if (this.socket) return;
 
     // Khởi tạo thư viện socket.io toàn cục
     if (typeof window !== 'undefined' && typeof window.io === 'function') {

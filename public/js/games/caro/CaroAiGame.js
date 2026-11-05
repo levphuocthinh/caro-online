@@ -36,8 +36,9 @@ export class CaroAiGame extends CaroBaseGame {
     this.updateTurnDisplay();
 
     caroChat.addMessage({
-      senderName: 'Hệ thống',
-      text: `Đấu với Bot AI cấp độ ${difficulty}. Chúc bạn may mắn!`
+      senderName: i18n.getText('chat_system_sender'),
+      text: `Đấu với Bot AI cấp độ ${difficulty}. Chúc bạn may mắn!`,
+      isSystem: true
     });
 
     if (this.state.mySymbol === 'O') {

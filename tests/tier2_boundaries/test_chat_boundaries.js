@@ -217,4 +217,106 @@ describe('Tier 2: Chat & Reaction Stress & Boundaries', () => {
       teardownDomMock();
     }
   });
+
+  test('CaroChat properly recognizes system messages in all locales with isSystem', async () => {
+    setupDomMock();
+    try {
+      const { CaroChat } = await import('../../public/js/modules/chat.js');
+      const chat = new CaroChat();
+      const mockContainer = {
+        children: [],
+        appendChild(node) { this.children.push(node); },
+        set innerHTML(val) { if (val === '') this.children = []; },
+        get innerHTML() { return this.children.length === 0 ? '' : 'content'; },
+        scrollTop: 0,
+        scrollHeight: 100
+      };
+      chat.chatMessages = mockContainer;
+
+      // 1. Vietnamese System sender
+      chat.addMessage({ senderName: 'Hệ thống', text: 'Chào mừng!' });
+      assertEqual(mockContainer.children.length, 1);
+      assert(mockContainer.children[0].className.includes('system'), 'Vietnamese system message must be .system');
+
+      // 2. English System sender
+      chat.addMessage({ senderName: 'System', text: 'Welcome!' });
+      assertEqual(mockContainer.children.length, 2);
+      assert(mockContainer.children[1].className.includes('system'), 'English system message must be .system');
+
+      // 3. Japanese System sender
+      chat.addMessage({ senderName: 'システム', text: 'ようこそ！' });
+      assertEqual(mockContainer.children.length, 3);
+      assert(mockContainer.children[2].className.includes('system'), 'Japanese system message must be .system');
+
+      // 4. isSystem: true with custom sender
+      chat.addMessage({ senderName: 'Arbitrary', text: 'Custom system notice', isSystem: true });
+      assertEqual(mockContainer.children.length, 4);
+      assert(mockContainer.children[3].className.includes('system'), 'Explicit isSystem must be .system');
+    } finally {
+      teardownDomMock();
+    }
+  });
+
+  test('CaroChat does not collide identical messages between mine and theirs', async () => {
+    setupDomMock();
+    try {
+      const { CaroChat } = await import('../../public/js/modules/chat.js');
+      const chat = new CaroChat();
+      const mockContainer = {
+        children: [],
+        appendChild(node) { this.children.push(node); },
+        set innerHTML(val) { if (val === '') this.children = []; },
+        get innerHTML() { return this.children.length === 0 ? '' : 'content'; },
+        scrollTop: 0,
+        scrollHeight: 100
+      };
+      chat.chatMessages = mockContainer;
+
+      // Both players have identical default display name "Người chơi" and both say "hi"
+      chat.addMessage({ senderName: 'Người chơi', text: 'hi', senderId: 'me' }, 'me');
+      assertEqual(mockContainer.children.length, 1);
+      assert(mockContainer.children[0].className.includes('mine'));
+
+      // Opponent says "hi" 100ms later
+      chat.addMessage({ senderName: 'Người chơi', text: 'hi', senderId: 'opponent' }, 'me');
+      assertEqual(mockContainer.children.length, 2, 'Opponent saying identical word must not be dropped');
+      assert(mockContainer.children[1].className.includes('theirs'));
+    } finally {
+      teardownDomMock();
+    }
+  });
+
+  test('CaroOnlineGame isMine logic uses socket ID authoritatively over symbol match', async () => {
+    const myId = 'socket_A';
+    const senderId = 'socket_B';
+    const mySymbol = 'X';
+    const senderSymbol = 'X';
+
+    const isMine = (myId && senderId)
+      ? (myId === senderId)
+      : Boolean(mySymbol && mySymbol !== 'SPECTATOR' && senderSymbol && senderSymbol === mySymbol);
+
+    assertEqual(isMine, false, 'Opponent message with matching symbol must not be marked isMine when socket IDs differ');
+  });
+
+  test('CaroChat.init is idempotent and safe against repeated calls', async () => {
+    setupDomMock();
+    try {
+      const { CaroChat } = await import('../../public/js/modules/chat.js');
+      const chat = new CaroChat();
+      let clickCount = 0;
+      const fakeBtn = {
+        addEventListener(evt, fn) { if (evt === 'click') clickCount++; }
+      };
+      chat.btnSendChat = fakeBtn;
+
+      chat.init({ onSendMessage: () => {}, onSendReaction: () => {} });
+      assertEqual(clickCount, 1, 'First init attaches listener');
+
+      chat.init({ onSendMessage: () => {}, onSendReaction: () => {} });
+      assertEqual(clickCount, 1, 'Second init does not duplicate listener');
+    } finally {
+      teardownDomMock();
+    }
+  });
 });

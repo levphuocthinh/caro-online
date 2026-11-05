@@ -23,6 +23,9 @@ export class CaroChat {
     this.onSendMessage = onSendMessage;
     this.onSendReaction = onSendReaction;
 
+    if (this._initialized) return;
+    this._initialized = true;
+
     if (this.btnSendChat) {
       this.btnSendChat.addEventListener('click', () => this.sendCurrentInput());
     }
@@ -126,13 +129,22 @@ export class CaroChat {
     const cleanText = text ? String(text).trim() : '';
     const cleanEmoji = emoji ? String(emoji).trim() : '';
 
-    const isMine = Boolean(
+    const isSystem = Boolean(
+      data.isSystem === true ||
+      senderName === 'Hệ thống' ||
+      senderName === 'System' ||
+      senderName === 'システム' ||
+      senderName === '系统' ||
+      senderName === '시스템'
+    );
+
+    const isMine = !isSystem && Boolean(
       data.isMine === true ||
       (currentSocketId && data.senderId && data.senderId === currentSocketId)
     );
 
-    // Chống lặp tin nhắn liên tiếp (Deduplication safeguard)
-    const msgKey = `${senderName || ''}|${cleanText}|${cleanEmoji}`;
+    // Chống lặp tin nhắn liên tiếp (Deduplication safeguard theo hướng và nội dung)
+    const msgKey = `${isMine ? 'mine' : (isSystem ? 'system' : 'theirs')}|${senderName || ''}|${cleanText}|${cleanEmoji}`;
     const now = Date.now();
     if (this._lastMsgKey === msgKey && (now - (this._lastMsgTime || 0)) < 800) {
       return;
@@ -141,7 +153,7 @@ export class CaroChat {
     this._lastMsgTime = now;
 
     const bubble = document.createElement('div');
-    if (senderName === 'Hệ thống') {
+    if (isSystem) {
       bubble.className = 'chat-bubble system';
       bubble.textContent = cleanText || text;
     } else {
@@ -171,7 +183,7 @@ export class CaroChat {
 
     soundManager.playChat();
 
-    if (!this.isDrawerOpen() && !isMine && senderName !== 'Hệ thống') {
+    if (!this.isDrawerOpen() && !isMine && !isSystem) {
       this.showUnreadDot();
       CaroModal.showToast(`💬 ${senderName}: ${cleanText || cleanEmoji || ''}`);
     }
