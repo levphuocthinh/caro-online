@@ -419,6 +419,7 @@ class DeceptionSocketManager {
       if (result && result.valid) {
         const targetPlayer = room.gameState.getPlayerById(targetId);
         const rp = room.players[playerIdx];
+        const isGameOver = room.gameState.phase === 'GAME_OVER';
         this.io.to(roomCode).emit('deception:accusation_made', {
           accuserId: accuserGp.id,
           accuserName: rp.displayName,
@@ -430,8 +431,52 @@ class DeceptionSocketManager {
           phase: room.gameState.phase,
           winnerTeam: room.gameState.winnerTeam,
           winReasonKey: room.gameState.winReasonKey,
-          winReasonText: room.gameState.winReasonText
+          winReasonText: room.gameState.winReasonText,
+          solution: isGameOver ? room.gameState.solution : undefined,
+          players: isGameOver ? room.gameState.players.map(p => ({
+            id: p.id,
+            role: p.role,
+            team: p.team,
+            displayName: p.displayName,
+            avatar: p.avatar
+          })) : undefined
         });
+
+        // Nếu bước vào WITNESS_REVERSAL và Hung thủ là Bot -> Server tự động giải quyết phát súng
+        if (room.gameState.phase === 'WITNESS_REVERSAL') {
+          const murderer = room.gameState.getMurdererPlayer();
+          const murdererIdx = room.gameState.players.indexOf(murderer);
+          const murdererRp = murdererIdx >= 0 ? room.players[murdererIdx] : null;
+          const isBotMurderer = murderer && (!murderer.isHuman || (murdererRp && murdererRp.isBot));
+
+          if (isBotMurderer) {
+            setTimeout(() => {
+              if (room.status !== 'PLAYING' || !room.gameState || room.gameState.phase !== 'WITNESS_REVERSAL') return;
+              const invTargets = room.gameState.players.filter(p => p.team === 'INVESTIGATION' && p.role !== 'FORENSIC_SCIENTIST');
+              if (invTargets.length === 0) return;
+              const botTarget = invTargets[Math.floor(Math.random() * invTargets.length)];
+              const shotRes = room.gameState.resolveWitnessShot(botTarget.id);
+              if (shotRes) {
+                this.io.to(roomCode).emit('deception:witness_shot_resolved', {
+                  targetId: botTarget.id,
+                  hitWitness: shotRes.hitWitness,
+                  targetPlayer: { id: shotRes.target.id, displayName: shotRes.target.displayName },
+                  winnerTeam: room.gameState.winnerTeam,
+                  winReasonKey: room.gameState.winReasonKey,
+                  winReasonText: room.gameState.winReasonText,
+                  solution: room.gameState.solution,
+                  players: room.gameState.players.map(p => ({
+                    id: p.id,
+                    role: p.role,
+                    team: p.team,
+                    displayName: p.displayName,
+                    avatar: p.avatar
+                  }))
+                });
+              }
+            }, 2000);
+          }
+        }
       }
     }));
 
@@ -455,7 +500,15 @@ class DeceptionSocketManager {
           targetPlayer: { id: shotRes.target.id, displayName: shotRes.target.displayName },
           winnerTeam: room.gameState.winnerTeam,
           winReasonKey: room.gameState.winReasonKey,
-          winReasonText: room.gameState.winReasonText
+          winReasonText: room.gameState.winReasonText,
+          solution: room.gameState.solution,
+          players: room.gameState.players.map(p => ({
+            id: p.id,
+            role: p.role,
+            team: p.team,
+            displayName: p.displayName,
+            avatar: p.avatar
+          }))
         });
       }
     }));
@@ -502,6 +555,13 @@ class DeceptionSocketManager {
       if (defMeans && defClue) {
         state.commitMurdererSelection(defMeans, defClue);
       }
+    }
+
+    state.proceedAfterNightCrime();
+    if (state.phase === 'NIGHT_WITNESS_REVEAL') {
+      state.startRound1Evidence();
+    } else if (state.phase !== 'ROUND_1_EVIDENCE') {
+      state.startRound1Evidence();
     }
 
     // Map các socket id vào danh sách người chơi của game

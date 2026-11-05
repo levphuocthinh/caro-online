@@ -1120,6 +1120,14 @@ export class DeceptionState {
    * Người chơi dùng Huy hiệu chỉ định Nghi phạm + 1 lá Phương thức + 1 lá Manh mối.
    */
   makeAccusation(accuserId, suspectId, meansId, clueId) {
+    if (
+      this.phase === GAME_PHASES.GAME_OVER ||
+      this.phase === GAME_PHASES.WITNESS_REVERSAL ||
+      this.phase === GAME_PHASES.ROLE_CASTING
+    ) {
+      return { valid: false };
+    }
+
     const accuser = this.getPlayerById(accuserId);
     const suspect = this.getPlayerById(suspectId);
     if (!accuser || !suspect || !accuser.hasBadge) {

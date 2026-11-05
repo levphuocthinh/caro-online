@@ -63,12 +63,15 @@ describe('Tier 4 Scenario: Deception Gameplay Simulation & Multi-Role Player Jou
     assertEqual(game.phase, GAME_PHASES.ROUND_2_EVIDENCE);
 
     // Forensic swaps brown tile index 2
-    const oldTileName = game.activeSceneTiles[2].name_vi;
     const swapped = game.replaceBrownSceneTile(2);
     assertEqual(swapped, true, 'Brown tile replacement must succeed');
 
-    // Mark the new tile
-    game.placeBulletOnTile(2, 4);
+    // Mark any newly introduced tile that doesn't have a bullet yet
+    game.activeSceneTiles.forEach((tile, idx) => {
+      if (tile.selectedOptionIndex === null || tile.selectedOptionIndex === undefined) {
+        game.placeBulletOnTile(idx, 4);
+      }
+    });
     assertEqual(game.areAllSceneTilesMarked(), true);
   });
 

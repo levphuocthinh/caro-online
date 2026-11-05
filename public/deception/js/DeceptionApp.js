@@ -40,6 +40,7 @@ class DeceptionAppController {
     this.isInGameChatOpen = false;
     this.isOnlineMatch = false;
     this.onlineSecretIntel = null;
+    this.roundTileSwapped = false;
 
     // Cache các phần tử DOM thường xuyên truy vấn để tối ưu hiệu năng
     this.dom = {};
@@ -66,7 +67,7 @@ class DeceptionAppController {
       btnHdrMyRole: document.getElementById('btn-hdr-my-role'),
       btnHudMyRole: document.getElementById('btn-hud-my-role'),
       hdrMyRoleName: document.getElementById('hdr-my-role-name'),
-      hudMyRoleName: document.getElementById('hud-my-role-name')
+      hudMyRoleName: document.getElementById('hud-my-role-text') || document.getElementById('hud-my-role-name')
     };
   }
 
@@ -684,6 +685,24 @@ class DeceptionAppController {
     const forensicsGrid = document.getElementById('active-scene-tiles-grid') || document.getElementById('forensics-tiles-grid');
     if (forensicsGrid) {
       forensicsGrid.addEventListener('click', (e) => {
+        const swapBtn = e.target.closest('.btn-swap-scene-tile');
+        if (swapBtn) {
+          if (this.roundTileSwapped) {
+            alert(this.isVi ? 'Bạn chỉ được đổi tối đa 1 Thẻ Hiện Trường trong mỗi vòng!' : 'You can only swap 1 Scene Tile per round!');
+            return;
+          }
+          const swapIdx = parseInt(swapBtn.dataset.swapIdx, 10);
+          if (!isNaN(swapIdx) && this.state.replaceBrownSceneTile(swapIdx)) {
+            this.roundTileSwapped = true;
+            this.playAudio('bullet_drop');
+            this.renderActiveSceneTiles();
+            if (this.isOnlineMatch && this.socket) {
+              this.socket.emit('deception:swap_tile', { tileIndex: swapIdx });
+            }
+          }
+          return;
+        }
+
         const optBtn = e.target.closest('.tile-opt-btn');
         if (!optBtn) return;
 
@@ -870,6 +889,19 @@ class DeceptionAppController {
           this.state.winReasonKey = data.winReasonKey;
           this.state.winReasonText = data.winReasonText;
         }
+        if (data.solution) {
+          this.state.solution = data.solution;
+        }
+        if (data.players) {
+          data.players.forEach(revealed => {
+            const localP = this.state.getPlayerById(revealed.id);
+            if (localP) {
+              localP.role = revealed.role;
+              localP.team = revealed.team;
+              localP.roleRevealed = true;
+            }
+          });
+        }
 
         if (data.accuserId !== this.myPlayerId) {
           this.showAccusationCastingModal({
@@ -902,6 +934,19 @@ class DeceptionAppController {
         this.state.winnerTeam = data.winnerTeam;
         this.state.winReasonKey = data.winReasonKey;
         this.state.winReasonText = data.winReasonText;
+        if (data.solution) {
+          this.state.solution = data.solution;
+        }
+        if (data.players) {
+          data.players.forEach(revealed => {
+            const localP = this.state.getPlayerById(revealed.id);
+            if (localP) {
+              localP.role = revealed.role;
+              localP.team = revealed.team;
+              localP.roleRevealed = true;
+            }
+          });
+        }
         this.playCutscene('WITNESS_REVERSAL', {
           isSuccess: data.hitWitness,
           title: this.isVi ? 'Phát Súng Định Mệnh' : 'The Final Shot',
@@ -1443,7 +1488,9 @@ class DeceptionAppController {
   renderChatMessageBubble(chatItem, container) {
     if (!container || !chatItem) return;
     const isSys = Boolean(chatItem.isSystem);
-    const isSelf = chatItem.senderId === this.myPlayerId || chatItem.senderId === 'self_solo';
+    const isSelf = chatItem.senderId === this.myPlayerId ||
+      chatItem.senderId === (this.socket ? this.socket.id : null) ||
+      chatItem.senderId === 'self_solo';
 
     const el = document.createElement('div');
     if (isSys) {
@@ -1959,8 +2006,10 @@ class DeceptionAppController {
     const intelContent = document.getElementById('night-intel-content');
     const human = this.state.getHumanPlayer();
     const murderer = this.state.getMurdererPlayer() || (this.onlineSecretIntel && this.onlineSecretIntel.murderer);
-    const solMeans = this.state.findCardById(this.state.solution.meansCardId)?.card;
-    const solClue = this.state.findCardById(this.state.solution.clueCardId)?.card;
+    const solMeansId = this.state.solution?.meansCardId;
+    const solClueId = this.state.solution?.clueCardId;
+    const solMeans = solMeansId ? this.state.findCardById(solMeansId)?.card : null;
+    const solClue = solClueId ? this.state.findCardById(solClueId)?.card : null;
 
     if (!intelContent) return;
 
@@ -2012,14 +2061,14 @@ class DeceptionAppController {
     const btn = document.getElementById('btn-night-proceed');
     if (btn) {
       btn.onclick = () => {
-        const mCard = this.state.findCardById(this.state.solution.meansCardId)?.card;
+        const mCard = solMeansId ? this.state.findCardById(solMeansId)?.card : null;
         const cat = mCard ? mCard.category : 'Severe Injury';
-        const cCard = this.state.findCardById(this.state.solution.clueCardId)?.card;
+        const cCard = solClueId ? this.state.findCardById(solClueId)?.card : null;
         deceptionPixelNoir.playNightCrime({
           category: cat,
           meansName: mCard ? mCard.vi : 'Hung Khí',
           clueName: cCard ? cCard.vi : 'Vật Chứng Hiện Trường',
-          murdererName: 'Kẻ Sát Nhân Trong Bóng Tối'
+          murdererName: murderer ? murderer.displayName : 'Kẻ Sát Nhân Trong Bóng Tối'
         }, () => {
           this.startInvestigationRound1();
         });
@@ -2236,7 +2285,7 @@ class DeceptionAppController {
               }, () => {
                 this.renderInvestigationTable();
                 if (botAttempt.accusationResult.isCorrect) {
-                  if (this.state.solution.witnessPlayerId) {
+                  if (this.state.solution?.witnessPlayerId) {
                     this.showWitnessReversalView();
                   } else {
                     this.showGameOverView();
@@ -2401,13 +2450,18 @@ class DeceptionAppController {
           </div>
         `;
         document.getElementById('btn-forensic-swap-brown')?.addEventListener('click', () => {
-          const brownIdx = this.state.activeSceneTiles.findIndex((t, idx) => idx >= 2 && t.color === 'BROWN');
-          const targetIdx = brownIdx >= 0 ? brownIdx : 2;
-          this.state.replaceBrownSceneTile(targetIdx);
-          this.playAudio('bullet_drop');
-          this.renderActiveSceneTiles();
-          if (this.isOnlineMatch && this.socket) {
-            this.socket.emit('deception:swap_tile', { tileIndex: targetIdx });
+          if (this.roundTileSwapped) {
+            alert(this.isVi ? 'Bạn chỉ được đổi tối đa 1 Thẻ Hiện Trường trong mỗi vòng!' : 'You can only swap 1 Scene Tile per round!');
+            return;
+          }
+          const targetIdx = roundNum === 3 ? Math.min(3, this.state.activeSceneTiles.length - 1) : 2;
+          if (this.state.replaceBrownSceneTile(targetIdx)) {
+            this.roundTileSwapped = true;
+            this.playAudio('bullet_drop');
+            this.renderActiveSceneTiles();
+            if (this.isOnlineMatch && this.socket) {
+              this.socket.emit('deception:swap_tile', { tileIndex: targetIdx });
+            }
           }
         });
         document.getElementById('btn-forensic-confirm-swap')?.addEventListener('click', () => {
@@ -2440,6 +2494,11 @@ class DeceptionAppController {
         <div class="scene-tile-card ${colorClass}">
           <div class="tile-header">
             <span class="tile-badge"><span class="tile-icon-area">${renderTileIconHtml(tile.id, 'tile-svg')}</span> ${badgeName}</span>
+            ${(isHumanForensic && (this.state.phase === GAME_PHASES.ROUND_2_EVIDENCE || this.state.phase === GAME_PHASES.ROUND_3_EVIDENCE) && tile.color === 'BROWN') ? `
+              <button type="button" class="btn-swap-scene-tile btn-noir-small" data-swap-idx="${tIdx}" title="${this.isVi ? 'Đổi thẻ này' : 'Swap this tile'}" style="font-size: 10px; padding: 2px 6px;">
+                <i class="fa-solid fa-arrows-rotate"></i> ${this.isVi ? 'Đổi' : 'Swap'}
+              </button>
+            ` : ''}
           </div>
           <div class="tile-title">
             <span class="tile-title-vi">${tile.name_vi}</span>
@@ -2515,21 +2574,28 @@ class DeceptionAppController {
             </div>
           </div>
         `;
-      } else if (isWitness && this.onlineSecretIntel && this.onlineSecretIntel.seenCulprits) {
-        secretIntelBar.style.display = 'block';
-        const culpritsList = this.onlineSecretIntel.seenCulprits.map(c => `<b>${c.avatar || '👤'} ${c.displayName}</b>`).join(' & ');
-        secretIntelBar.innerHTML = `
-          <div class="criminal-secret-dossier-pill" style="border-color: #00d2d3;">
-            <div class="dossier-pill-header">
-              <span class="pill-badge-crim" style="background: rgba(0, 210, 211, 0.2); color: #00d2d3; border-color: rgba(0, 210, 211, 0.4);">
-                <i class="fa-solid fa-eye"></i> TÌNH BÁO NHÂN CHỨNG (WITNESS INTEL)
-              </span>
-              <span class="pill-ally-info">
-                👁️ Bạn đã thấy 2 kẻ tà ác trong đêm: ${culpritsList} <i>(Bạn không biết ai là Hung thủ ai là Đồng phạm)</i>
-              </span>
+      } else if (isWitness) {
+        const witnessSuspects = (this.onlineSecretIntel && this.onlineSecretIntel.seenCulprits) ||
+          this.state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
+        if (witnessSuspects && witnessSuspects.length > 0) {
+          secretIntelBar.style.display = 'block';
+          const culpritsList = witnessSuspects.map(c => `<b>${c.avatar || '👤'} ${c.displayName}</b>`).join(' & ');
+          secretIntelBar.innerHTML = `
+            <div class="criminal-secret-dossier-pill" style="border-color: #00d2d3;">
+              <div class="dossier-pill-header">
+                <span class="pill-badge-crim" style="background: rgba(0, 210, 211, 0.2); color: #00d2d3; border-color: rgba(0, 210, 211, 0.4);">
+                  <i class="fa-solid fa-eye"></i> ${this.isVi ? 'TÌNH BÁO NHÂN CHỨNG' : 'WITNESS INTEL'}
+                </span>
+                <span class="pill-ally-info">
+                  👁️ ${this.isVi ? `Bạn đã thấy 2 kẻ tà ác trong đêm: ${culpritsList} <i>(Bạn không biết ai là Hung thủ ai là Đồng phạm)</i>` : `You saw 2 sinister figures fleeing: ${culpritsList} <i>(You do not know who is the Murderer and who is the Accomplice)</i>`}
+                </span>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          secretIntelBar.style.display = 'none';
+          secretIntelBar.innerHTML = '';
+        }
       } else {
         secretIntelBar.style.display = 'none';
         secretIntelBar.innerHTML = '';
@@ -2658,6 +2724,7 @@ class DeceptionAppController {
   }
 
   openCardInspectModal(cardId, ownerName = '') {
+    const human = this.state.getHumanPlayer();
     let card = null;
     let type = 'MEANS';
     let owner = null;
@@ -2708,7 +2775,7 @@ class DeceptionAppController {
           <div class="inspect-card-title-vi">${card.vi}</div>
           <div class="inspect-card-title-en">${card.en}</div>
           <div class="inspect-card-divider"></div>
-          ${(human && (human.role === 'MURDERER' || human.role === 'ACCOMPLICE' || human.role === 'FORENSIC_SCIENTIST') && (card.id === this.state.solution.meansCardId || card.id === this.state.solution.clueCardId)) ? `
+          ${(human && (human.role === 'MURDERER' || human.role === 'ACCOMPLICE' || human.role === 'FORENSIC_SCIENTIST') && this.state.solution && (card.id === this.state.solution.meansCardId || card.id === this.state.solution.clueCardId)) ? `
             <div class="inspect-crime-solution-stamp">
               <i class="fa-solid fa-skull-crossbones"></i> ${this.isVi ? 'VẬT CHỨNG TRONG KẾ HOẠCH GÂY ÁN BÍ MẬT' : 'CONFIDENTIAL: CRIME SOLUTION EVIDENCE'}
             </div>
@@ -2751,6 +2818,7 @@ class DeceptionAppController {
   advanceInvestigationRound() {
     this.stopRoundTimer();
     this.playAudio('click');
+    this.roundTileSwapped = false;
 
     if (this.state.round === 1) {
       const hasAlliesNight = this.state.players.some(
@@ -2795,7 +2863,7 @@ class DeceptionAppController {
         }, () => {
           this.renderInvestigationTable();
           if (botAccuse.accusationResult.isCorrect) {
-            if (this.state.solution.witnessPlayerId) {
+            if (this.state.solution?.witnessPlayerId) {
               this.showWitnessReversalView();
             } else {
               this.showGameOverView();
@@ -3254,10 +3322,12 @@ class DeceptionAppController {
         `;
       }
 
-      setTimeout(() => {
-        const botTargetId = this.state.witnessShotTargetId || targets[0]?.id;
-        this.executeWitnessReversalShot(botTargetId);
-      }, 2500);
+      if (!this.isOnlineMatch) {
+        setTimeout(() => {
+          const botTargetId = this.state.witnessShotTargetId || targets[0]?.id;
+          this.executeWitnessReversalShot(botTargetId);
+        }, 2500);
+      }
     }
 
     this.showView('view-witness-reversal');
@@ -3311,8 +3381,10 @@ class DeceptionAppController {
   renderGameOverDossier() {
     const isPoliceWin = this.state.winnerTeam === 'INVESTIGATION';
     const murderer = this.state.getMurdererPlayer();
-    const solMeans = this.state.findCardById(this.state.solution.meansCardId)?.card;
-    const solClue = this.state.findCardById(this.state.solution.clueCardId)?.card;
+    const solMeansId = this.state.solution?.meansCardId;
+    const solClueId = this.state.solution?.clueCardId;
+    const solMeans = solMeansId ? this.state.findCardById(solMeansId)?.card : null;
+    const solClue = solClueId ? this.state.findCardById(solClueId)?.card : null;
 
     const headline = document.getElementById('dossier-headline');
     const sub = document.getElementById('dossier-sub');
@@ -3326,7 +3398,13 @@ class DeceptionAppController {
       ? (this.isVi ? 'PHE CẢNH SÁT CHIẾN THẮNG!' : 'INVESTIGATION TEAM WINS!')
       : (this.isVi ? 'PHE TỘI PHẠM CHIẾN THẮNG!' : 'CRIMINAL FACTION WINS!');
 
-    if (sub) sub.textContent = this.isVi ? this.state.winReasonText.vi : this.state.winReasonText.en;
+    if (sub) {
+      const reasonObj = this.state.winReasonText;
+      const reason = typeof reasonObj === 'string'
+        ? reasonObj
+        : (this.isVi ? reasonObj?.vi : reasonObj?.en) || '';
+      sub.textContent = reason;
+    }
     if (stamp) stamp.textContent = isPoliceWin ? 'SOLVED' : 'ESCAPED';
 
     if (dMur) dMur.textContent = murderer ? `${murderer.avatar} ${murderer.displayName}` : '—';
