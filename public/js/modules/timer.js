@@ -5,16 +5,31 @@ export class CaroTimer {
   constructor() {
     this.interval = null;
     this.remaining = 0;
-    this.timerXEl = document.getElementById('timer-player-x');
-    this.timerOEl = document.getElementById('timer-player-o');
+    this.timerXEl = null;
+    this.timerOEl = null;
+  }
+
+  _getElements() {
+    if (!this.timerXEl && typeof document !== 'undefined') {
+      this.timerXEl = document.getElementById('timer-player-x');
+    }
+    if (!this.timerOEl && typeof document !== 'undefined') {
+      this.timerOEl = document.getElementById('timer-player-o');
+    }
   }
 
   start(turnTime, currentTurn, onTimeout) {
     this.stop();
+    this._getElements();
 
     if (!turnTime || turnTime <= 0) {
       if (this.timerXEl) this.timerXEl.textContent = '∞';
       if (this.timerOEl) this.timerOEl.textContent = '∞';
+      return;
+    }
+
+    if (currentTurn !== 'X' && currentTurn !== 'O') {
+      this.reset();
       return;
     }
 
@@ -44,6 +59,7 @@ export class CaroTimer {
   reset() {
     this.stop();
     this.remaining = 0;
+    this._getElements();
     if (this.timerXEl) {
       this.timerXEl.textContent = '--';
       this.timerXEl.classList.remove('warning');
@@ -55,8 +71,19 @@ export class CaroTimer {
   }
 
   updateDisplay(currentTurn) {
-    const activeEl = currentTurn === 'X' ? this.timerXEl : this.timerOEl;
-    const inactiveEl = currentTurn === 'X' ? this.timerOEl : this.timerXEl;
+    this._getElements();
+    const isX = currentTurn === 'X';
+    const isO = currentTurn === 'O';
+    const activeEl = isX ? this.timerXEl : (isO ? this.timerOEl : null);
+
+    if (this.timerXEl && !isX) {
+      this.timerXEl.textContent = '--';
+      this.timerXEl.classList.remove('warning');
+    }
+    if (this.timerOEl && !isO) {
+      this.timerOEl.textContent = '--';
+      this.timerOEl.classList.remove('warning');
+    }
 
     if (activeEl) {
       activeEl.textContent = `${this.remaining}s`;
@@ -65,11 +92,6 @@ export class CaroTimer {
       } else {
         activeEl.classList.remove('warning');
       }
-    }
-
-    if (inactiveEl) {
-      inactiveEl.textContent = '--';
-      inactiveEl.classList.remove('warning');
     }
   }
 }

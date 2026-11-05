@@ -81,7 +81,7 @@ export class CaroAiGame extends CaroBaseGame {
       }
 
       if (move && typeof move.row === 'number' && !isNaN(move.row) && typeof move.col === 'number' && !isNaN(move.col)) {
-        caroBoard.placePiece(move.row, move.col, aiSymbol, false);
+        caroBoard.placePiece(move.row, move.col, aiSymbol, true);
         const winResult = caroBoard.checkLocalWin(move.row, move.col, aiSymbol, this.state.rule);
         if (winResult.won) {
           this.endGame(aiSymbol, winResult.line);

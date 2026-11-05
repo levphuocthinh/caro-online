@@ -66,7 +66,7 @@ export class GameManager {
       },
       onSendReaction: (emoji) => {
         if (this.state.gameMode === 'online') {
-          caroOnline.sendChat({ emoji });
+          if (typeof caroOnline.sendReaction === 'function') { caroOnline.sendReaction(emoji); } else { caroOnline.sendChat({ emoji }); }
         } else {
           caroChat.addMessage({ senderName: 'Bạn', emoji, isMine: true });
         }

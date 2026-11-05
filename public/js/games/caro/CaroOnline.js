@@ -44,7 +44,9 @@ export class CaroOnline {
     });
 
     this.socket.on('spectator_joined', (data) => this.trigger('spectator_joined', data));
+    this.socket.on('spectator_left', (data) => this.trigger('spectator_left', data));
     this.socket.on('move_made', (data) => this.trigger('move_made', data));
+    this.socket.on('game_over', (data) => this.trigger('game_over', data));
     this.socket.on('player_surrendered', (data) => this.trigger('player_surrendered', data));
     this.socket.on('draw_offered', (data) => this.trigger('draw_offered', data));
     this.socket.on('draw_accepted', () => this.trigger('draw_accepted'));
@@ -52,25 +54,48 @@ export class CaroOnline {
     this.socket.on('game_over_timeout', (data) => this.trigger('game_over_timeout', data));
     this.socket.on('rematch_requested', () => this.trigger('rematch_requested'));
     this.socket.on('rematch_started', (data) => {
-      if (this.socket) {
+      if (this.socket && data && data.roomState) {
         if (data.roomState.playerXId === this.socket.id) this.mySymbol = 'X';
         else if (data.roomState.playerOId === this.socket.id) this.mySymbol = 'O';
+        else this.mySymbol = 'SPECTATOR';
+        data.yourSymbol = this.mySymbol;
       }
       this.trigger('rematch_started', data);
     });
     this.socket.on('player_left', (data) => this.trigger('player_left', data));
-    this.socket.on('new_chat', (data) => this.trigger('new_chat', data));
+    this.socket.on('new_chat', (data) => {
+      this.trigger('new_chat', data);
+      if (data && data.emoji && !data.text) {
+        this.trigger('chat_reaction', data);
+      } else {
+        this.trigger('chat_message', data);
+      }
+    });
+    this.socket.on('chat_message', (data) => this.trigger('chat_message', data));
+    this.socket.on('reaction_received', (data) => this.trigger('chat_reaction', { emoji: data?.emoji, senderName: data?.sender }));
     this.socket.on('error_message', (data) => this.trigger('error_message', data));
     this.socket.on('disconnect', () => this.trigger('disconnect'));
   }
 
   on(event, callback) {
-    this.handlers[event] = callback;
+    if (!this.handlers[event]) {
+      this.handlers[event] = [];
+    }
+    this.handlers[event].push(callback);
   }
 
   trigger(event, data) {
-    if (typeof this.handlers[event] === 'function') {
-      this.handlers[event](data);
+    const list = this.handlers[event];
+    if (Array.isArray(list)) {
+      list.forEach(fn => {
+        try {
+          if (typeof fn === 'function') fn(data);
+        } catch (err) {
+          console.error(`[CaroOnline] Error in handler for event "${event}":`, err);
+        }
+      });
+    } else if (typeof list === 'function') {
+      list(data);
     }
   }
 
@@ -131,6 +156,12 @@ export class CaroOnline {
   sendChat({ text, emoji }) {
     if (this.socket && this.socket.connected) {
       this.socket.emit('send_chat', { text, emoji });
+    }
+  }
+
+  sendReaction(emoji) {
+    if (this.socket && this.socket.connected) {
+      this.socket.emit('send_reaction', { emoji });
     }
   }
 

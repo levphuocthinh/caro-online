@@ -108,12 +108,14 @@ export class CaroBaseGame {
   }
 
   updateTurnDisplay() {
+    if (this.state.isGameOver) return;
     const isX = this.state.currentTurn === 'X';
-    if (this.cardPlayerX) this.cardPlayerX.classList.toggle('active', isX);
-    if (this.cardPlayerO) this.cardPlayerO.classList.toggle('active', !isX);
+    const isO = this.state.currentTurn === 'O';
+    if (this.cardPlayerX?.classList?.toggle) this.cardPlayerX.classList.toggle('active', isX);
+    if (this.cardPlayerO?.classList?.toggle) this.cardPlayerO.classList.toggle('active', isO);
 
     if (this.statusPlayerX) this.statusPlayerX.textContent = isX ? i18n.getText('turn_active') : i18n.getText('turn_waiting');
-    if (this.statusPlayerO) this.statusPlayerO.textContent = !isX ? i18n.getText('turn_active') : i18n.getText('turn_waiting');
+    if (this.statusPlayerO) this.statusPlayerO.textContent = isO ? i18n.getText('turn_active') : i18n.getText('turn_waiting');
 
     if (this.bannerText) {
       if (this.state.gameMode === 'local') {
@@ -139,6 +141,20 @@ export class CaroBaseGame {
     this.state.isGameOver = true;
     caroTimer.stop();
 
+    if (this.cardPlayerX?.classList?.remove) this.cardPlayerX.classList.remove('active');
+    if (this.cardPlayerO?.classList?.remove) this.cardPlayerO.classList.remove('active');
+
+    if (winner === 'X') {
+      if (this.statusPlayerX) this.statusPlayerX.textContent = 'Chiến thắng 🏆';
+      if (this.statusPlayerO) this.statusPlayerO.textContent = 'Thua cuộc';
+    } else if (winner === 'O') {
+      if (this.statusPlayerX) this.statusPlayerX.textContent = 'Thua cuộc';
+      if (this.statusPlayerO) this.statusPlayerO.textContent = 'Chiến thắng 🏆';
+    } else if (winner === 'DRAW') {
+      if (this.statusPlayerX) this.statusPlayerX.textContent = 'Hòa cờ 🤝';
+      if (this.statusPlayerO) this.statusPlayerO.textContent = 'Hòa cờ 🤝';
+    }
+
     if (winningLine && winningLine.length > 0) {
       caroBoard.highlightWinningCells(winningLine);
     }
@@ -148,13 +164,15 @@ export class CaroBaseGame {
     const iconEl = document.getElementById('game-over-icon');
 
     if (winner === 'DRAW') {
+      if (this.bannerText) this.bannerText.textContent = i18n.getText('game_over_draw_title');
+      if (this.bannerIcon) this.bannerIcon.innerHTML = '<i class="fa-solid fa-handshake"></i>';
       try {
         if (typeof soundManager.playDrawSound === 'function') soundManager.playDrawSound();
         else if (typeof soundManager.playCuteChime === 'function') soundManager.playCuteChime();
         else if (typeof soundManager.playTurn === 'function') soundManager.playTurn();
       } catch (_) {}
       if (titleEl) titleEl.textContent = i18n.getText('game_over_draw_title');
-      if (descEl) descEl.textContent = i18n.getText('game_over_draw_desc');
+      if (descEl) descEl.textContent = reason || i18n.getText('game_over_draw_desc');
       if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-handshake"></i>';
     } else {
       const isWinner = winner === this.state.mySymbol;
@@ -162,6 +180,8 @@ export class CaroBaseGame {
       const isSpectator = this.state.mySymbol === 'SPECTATOR';
 
       if (isSpectator) {
+        if (this.bannerText) this.bannerText.textContent = i18n.getText('game_over_spec_title', { winner });
+        if (this.bannerIcon) this.bannerIcon.innerHTML = '<i class="fa-solid fa-eye"></i>';
         try {
           if (typeof soundManager.playDrawSound === 'function') soundManager.playDrawSound();
           else if (typeof soundManager.playCuteChime === 'function') soundManager.playCuteChime();
@@ -170,6 +190,8 @@ export class CaroBaseGame {
         if (descEl) descEl.textContent = reason || i18n.getText('game_over_spec_desc', { winner });
         if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-eye"></i>';
       } else if (isLocal) {
+        if (this.bannerText) this.bannerText.textContent = winner === 'X' ? i18n.getText('game_over_local_x') : i18n.getText('game_over_local_o');
+        if (this.bannerIcon) this.bannerIcon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
         try {
           if (typeof soundManager.playWinSound === 'function') soundManager.playWinSound();
           else if (typeof soundManager.playWin === 'function') soundManager.playWin();
@@ -179,6 +201,8 @@ export class CaroBaseGame {
         if (descEl) descEl.textContent = reason || i18n.getText('game_over_local_desc');
         if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-trophy"></i>';
       } else if (isWinner) {
+        if (this.bannerText) this.bannerText.textContent = i18n.getText('game_over_win_title');
+        if (this.bannerIcon) this.bannerIcon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
         try {
           if (typeof soundManager.playWinSound === 'function') soundManager.playWinSound();
           else if (typeof soundManager.playWin === 'function') soundManager.playWin();
@@ -188,6 +212,8 @@ export class CaroBaseGame {
         if (descEl) descEl.textContent = reason || i18n.getText('game_over_win_desc');
         if (iconEl) iconEl.innerHTML = '<i class="fa-solid fa-trophy"></i>';
       } else {
+        if (this.bannerText) this.bannerText.textContent = i18n.getText('game_over_lose_title');
+        if (this.bannerIcon) this.bannerIcon.innerHTML = '<i class="fa-solid fa-heart-crack"></i>';
         try {
           if (typeof soundManager.playLoseSound === 'function') soundManager.playLoseSound();
           else if (typeof soundManager.playLose === 'function') soundManager.playLose();
@@ -214,6 +240,13 @@ export class CaroBaseGame {
     this.state.reset();
     try { caroBoard.clear(); } catch (_) {}
     try { caroChat.clear(); } catch (_) {}
+    try { CaroModal.closeAll(); } catch (_) {}
+    if (this.cardPlayerX) this.cardPlayerX.classList.remove('active');
+    if (this.cardPlayerO) this.cardPlayerO.classList.remove('active');
+    if (this.statusPlayerX) this.statusPlayerX.textContent = '';
+    if (this.statusPlayerO) this.statusPlayerO.textContent = '';
+    if (this.bannerText) this.bannerText.textContent = '';
+    if (this.bannerIcon) this.bannerIcon.innerHTML = '';
     this.switchToScreen('screen-lobby', pushState);
   }
 }

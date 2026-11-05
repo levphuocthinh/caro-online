@@ -112,7 +112,32 @@ class RoomManager {
       };
     }
 
-    // 3. Người chơi thứ 2 làm quân O (Bắt đầu trận)
+    // 3. Nếu vị trí X đang trống (ví dụ host đã thoát rồi vào lại hoặc người chơi mới thay thế X)
+    if (!room.players.X) {
+      room.players.X = {
+        id: socket.id,
+        name: playerName || 'Người chơi 1',
+        symbol: 'X',
+        ready: true
+      };
+      if (room.players.O && room.status !== 'finished') {
+        room.status = 'playing';
+        setTimeout(() => {
+          if (io && typeof io.to === 'function') {
+            io.to(cleanId).emit('game_started', {
+              roomState: sanitizeRoomState(room)
+            });
+          }
+        }, 50);
+      }
+      return {
+        roomId: cleanId,
+        roomState: sanitizeRoomState(room),
+        yourSymbol: 'X'
+      };
+    }
+
+    // 4. Người chơi thứ 2 làm quân O (Bắt đầu trận nếu X đã có)
     if (!room.players.O) {
       room.players.O = {
         id: socket.id,
@@ -199,11 +224,12 @@ class RoomManager {
         room.winner = winnerSymbol;
 
         if (io && typeof io.to === 'function') {
+          const winnerName = room.players[winnerSymbol]?.name || 'Đối thủ';
           io.to(rId).emit('player_left', {
             symbol: leavingSymbol,
             name: leavingName,
             winner: winnerSymbol,
-            message: `${leavingName} (${leavingSymbol}) đã thoát. ${room.players[winnerSymbol]?.name} thắng!`
+            message: `${leavingName} (${leavingSymbol}) đã thoát. ${winnerName} thắng!`
           });
         }
       } else {
@@ -217,8 +243,14 @@ class RoomManager {
         }
       }
 
-      if (isX) room.players.X = null;
-      if (isO) room.players.O = null;
+      if (isX) {
+        room.players.X = null;
+        room.rematchRequests.delete(socket.id);
+      }
+      if (isO) {
+        room.players.O = null;
+        room.rematchRequests.delete(socket.id);
+      }
     } else {
       const prevCount = room.spectators.length;
       room.spectators = room.spectators.filter(s => s.id !== socket.id);

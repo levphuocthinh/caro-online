@@ -73,6 +73,12 @@ class MatchManager {
         winningLine: winResult.line,
         moveCount: room.moveHistory.length
       });
+
+      io.to(room.id).emit('game_over', {
+        winner: playerSymbol,
+        winningLine: winResult.line,
+        reason: ''
+      });
     } else if (isBoardFull(room.board, room.boardSize)) {
       room.status = 'finished';
       room.winner = 'DRAW';
@@ -86,6 +92,12 @@ class MatchManager {
         winner: 'DRAW',
         winningLine: [],
         moveCount: room.moveHistory.length
+      });
+
+      io.to(room.id).emit('game_over', {
+        winner: 'DRAW',
+        winningLine: [],
+        reason: ''
       });
     } else {
       room.currentTurn = playerSymbol === 'X' ? 'O' : 'X';
@@ -127,6 +139,12 @@ class MatchManager {
       winner: winnerPlayer,
       winnerName: room.players[winnerPlayer] ? room.players[winnerPlayer].name : 'Đối thủ'
     });
+
+    io.to(room.id).emit('game_over', {
+      winner: winnerPlayer,
+      winningLine: [],
+      reason: `${room.players[timedOutPlayer]?.name || timedOutPlayer} đã hết thời gian suy nghĩ!`
+    });
   }
 
   /**
@@ -139,7 +157,12 @@ class MatchManager {
     if (room.players.X && room.players.X.id === socket.id) surrenderingPlayer = 'X';
     else if (room.players.O && room.players.O.id === socket.id) surrenderingPlayer = 'O';
 
-    if (!surrenderingPlayer) return;
+    if (!surrenderingPlayer) {
+      if (typeof socket.emit === 'function') {
+        socket.emit('error_message', { message: 'Bạn đang là khán giả, chỉ có thể xem!' });
+      }
+      return;
+    }
 
     const winner = surrenderingPlayer === 'X' ? 'O' : 'X';
     room.status = 'finished';
@@ -149,6 +172,12 @@ class MatchManager {
       surrenderedBy: surrenderingPlayer,
       winner,
       winnerName: room.players[winner]?.name
+    });
+
+    io.to(room.id).emit('game_over', {
+      winner,
+      winningLine: [],
+      reason: `${room.players[surrenderingPlayer]?.name || surrenderingPlayer} đã xin đầu hàng!`
     });
   }
 
@@ -162,7 +191,12 @@ class MatchManager {
     if (room.players.X && room.players.X.id === socket.id) senderSymbol = 'X';
     else if (room.players.O && room.players.O.id === socket.id) senderSymbol = 'O';
 
-    if (!senderSymbol) return;
+    if (!senderSymbol) {
+      if (typeof socket.emit === 'function') {
+        socket.emit('error_message', { message: 'Bạn đang là khán giả, chỉ có thể xem!' });
+      }
+      return;
+    }
 
     socket.to(room.id).emit('draw_offered', {
       fromPlayer: senderSymbol,
@@ -189,6 +223,11 @@ class MatchManager {
       room.status = 'finished';
       room.winner = 'DRAW';
       io.to(room.id).emit('draw_accepted');
+      io.to(room.id).emit('game_over', {
+        winner: 'DRAW',
+        winningLine: [],
+        reason: 'Hai bên đã đồng ý hòa cờ!'
+      });
     } else {
       socket.to(room.id).emit('draw_declined');
     }
@@ -204,6 +243,13 @@ class MatchManager {
     if (!isPlayer) {
       if (typeof socket.emit === 'function') {
         socket.emit('error_message', { message: 'Bạn đang là khán giả, chỉ có thể xem!' });
+      }
+      return;
+    }
+
+    if (!room.players.X || !room.players.O) {
+      if (typeof socket.emit === 'function') {
+        socket.emit('error_message', { message: 'Đối thủ đã rời phòng, không thể đấu lại!' });
       }
       return;
     }

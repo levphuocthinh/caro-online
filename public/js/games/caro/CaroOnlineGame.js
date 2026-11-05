@@ -14,24 +14,11 @@ import { CaroUIBinder } from './CaroUIBinder.js';
 export class CaroOnlineGame extends CaroBaseGame {
   constructor(state) {
     super(state);
-    this._spectatorLeftBound = false;
     this.setupSocketEvents();
-  }
-
-  ensureSpectatorSocket() {
-    if (caroOnline.socket && !this._spectatorLeftBound) {
-      this._spectatorLeftBound = true;
-      caroOnline.socket.on('spectator_left', (data) => {
-        if (data && data.count !== undefined) {
-          this.updateSpectatorCount(data.count);
-        }
-      });
-    }
   }
 
   setupSocketEvents() {
     caroOnline.on('room_created', (data) => {
-      this.ensureSpectatorSocket();
       this.state.gameMode = 'online';
       this.state.mySymbol = data.yourSymbol;
       this.setupOnlineUI(data.roomState);
@@ -41,7 +28,6 @@ export class CaroOnlineGame extends CaroBaseGame {
     });
 
     caroOnline.on('room_joined', (data) => {
-      this.ensureSpectatorSocket();
       this.state.gameMode = 'online';
       this.state.mySymbol = data.yourSymbol;
       this.setupOnlineUI(data.roomState);
@@ -53,9 +39,9 @@ export class CaroOnlineGame extends CaroBaseGame {
     });
 
     caroOnline.on('game_started', (data) => {
-      this.ensureSpectatorSocket();
       this.state.gameMode = 'online';
       this.state.mySymbol = caroOnline.mySymbol;
+      CaroModal.close('modal-room-created');
       this.setupOnlineUI(data.roomState);
       if (this.state.mySymbol === 'SPECTATOR') {
         CaroModal.showToast(i18n.getText('toast_spectating_start'));
@@ -65,9 +51,16 @@ export class CaroOnlineGame extends CaroBaseGame {
     });
 
     caroOnline.on('move_made', (data) => {
-      const { row, col, player, nextTurn } = data;
-      const isMine = player === this.state.mySymbol;
-      caroBoard.placePiece(row, col, player, isMine);
+      const { row, col, player, nextTurn, status, winner, winningLine } = data;
+      caroBoard.placePiece(row, col, player, true);
+
+      if (status === 'finished' || winner) {
+        this.state.isGameOver = true;
+        this.state.currentTurn = null;
+        caroTimer.stop();
+        this.endGame(winner, winningLine || []);
+        return;
+      }
 
       this.state.currentTurn = nextTurn;
       this.updateTurnDisplay();
@@ -78,16 +71,37 @@ export class CaroOnlineGame extends CaroBaseGame {
     });
 
     caroOnline.on('game_over', (data) => {
-      const { winner, winningLine, reason } = data;
-      this.endGame(winner, winningLine, reason);
+      if (this.state.isGameOver) return;
+      const { winner, winningLine, reason } = data || {};
+      this.endGame(winner, winningLine || [], reason || '');
     });
 
-    caroOnline.on('chat_message', (data) => {
-      caroChat.addMessage(data);
+    caroOnline.on('player_surrendered', (data) => {
+      if (this.state.isGameOver) return;
+      const winner = data.winner;
+      const isWinner = winner === this.state.mySymbol;
+      const isSpectator = this.state.mySymbol === 'SPECTATOR';
+      let reason = '';
+      if (isSpectator) {
+        reason = `${data.winnerName || winner} thắng do đối thủ đầu hàng!`;
+      } else {
+        reason = isWinner ? 'Đối thủ đã xin đầu hàng!' : 'Bạn đã xin đầu hàng!';
+      }
+      this.endGame(winner, [], reason);
     });
 
-    caroOnline.on('chat_reaction', (data) => {
-      caroChat.showReaction(data.emoji, data.senderName);
+    caroOnline.on('game_over_timeout', (data) => {
+      if (this.state.isGameOver) return;
+      const winner = data.winner;
+      const isWinner = winner === this.state.mySymbol;
+      const isSpectator = this.state.mySymbol === 'SPECTATOR';
+      let reason = '';
+      if (isSpectator) {
+        reason = `${data.winnerName || winner} thắng do đối thủ hết giờ!`;
+      } else {
+        reason = isWinner ? 'Đối thủ đã hết thời gian suy nghĩ!' : 'Bạn đã hết thời gian suy nghĩ!';
+      }
+      this.endGame(winner, [], reason);
     });
 
     caroOnline.on('draw_offered', () => {
@@ -99,11 +113,16 @@ export class CaroOnlineGame extends CaroBaseGame {
       }
     });
 
+    caroOnline.on('draw_accepted', () => {
+      if (this.state.isGameOver) return;
+      this.endGame('DRAW', [], 'Hai bên đã đồng ý hòa cờ!');
+    });
+
     caroOnline.on('draw_declined', () => {
       CaroModal.showToast(i18n.getText('toast_draw_declined'));
     });
 
-    caroOnline.on('rematch_requested', (data) => {
+    caroOnline.on('rematch_requested', () => {
       if (this.state.mySymbol === 'SPECTATOR') return;
       if (confirm(i18n.getText('confirm_rematch'))) {
         caroOnline.requestRematch();
@@ -111,17 +130,47 @@ export class CaroOnlineGame extends CaroBaseGame {
     });
 
     caroOnline.on('rematch_started', (data) => {
-      this.state.mySymbol = data.yourSymbol;
+      this.state.mySymbol = data.yourSymbol || caroOnline.mySymbol;
+      CaroModal.close('modal-game-over');
       this.setupOnlineUI(data.roomState);
       CaroModal.showToast(i18n.getText('toast_rematch_started'));
     });
 
     caroOnline.on('player_left', (data) => {
       if (!this.state.isGameOver && data.winner) {
-        this.endGame(data.winner, [], data.reason);
+        this.endGame(data.winner, [], data.message || data.reason || '');
       } else {
+        if (data && data.symbol === 'X') {
+          if (this.namePlayerX) this.namePlayerX.textContent = i18n.getText('turn_waiting');
+          if (this.statusPlayerX) this.statusPlayerX.textContent = i18n.getText('turn_waiting');
+        } else if (data && data.symbol === 'O') {
+          if (this.namePlayerO) this.namePlayerO.textContent = i18n.getText('turn_waiting');
+          if (this.statusPlayerO) this.statusPlayerO.textContent = i18n.getText('turn_waiting');
+        }
         CaroModal.showToast(data.message || 'Một người chơi đã rời phòng.');
       }
+    });
+
+    caroOnline.on('disconnect', () => {
+      if (this.state.gameMode === 'online' && !this.state.isGameOver) {
+        CaroModal.showToast('Mất kết nối với máy chủ!');
+      }
+    });
+
+    caroOnline.on('new_chat', (data) => {
+      caroChat.addMessage(data, caroOnline.getSocketId());
+    });
+
+    caroOnline.on('chat_message', (data) => {
+      if (data && !data.senderName && data.sender) {
+        data.senderName = data.sender;
+      }
+      caroChat.addMessage(data, caroOnline.getSocketId());
+    });
+
+    caroOnline.on('chat_reaction', (data) => {
+      const senderName = data.senderName || data.sender || '';
+      caroChat.showReaction(data.emoji, senderName);
     });
 
     caroOnline.on('error_message', (data) => {
@@ -173,15 +222,15 @@ export class CaroOnlineGame extends CaroBaseGame {
     if (this.namePlayerX) this.namePlayerX.textContent = pX ? pX.name : i18n.getText('turn_waiting');
     if (this.namePlayerO) this.namePlayerO.textContent = pO ? pO.name : i18n.getText('turn_waiting');
 
-    if (this.tagPlayerX) {
-      this.tagPlayerX.textContent = this.state.mySymbol === 'X' ? i18n.getText('tag_you') : i18n.getText('tag_opp_short');
-    }
-    if (this.tagPlayerO) {
-      this.tagPlayerO.textContent = this.state.mySymbol === 'O' ? i18n.getText('tag_you') : i18n.getText('tag_opp_short');
-    }
-
     const isSpectator = this.state.mySymbol === 'SPECTATOR';
     CaroUIBinder.updateSpectatorUI(isSpectator);
+
+    if (this.tagPlayerX) {
+      this.tagPlayerX.textContent = isSpectator ? i18n.getText('player_cat_x') : (this.state.mySymbol === 'X' ? i18n.getText('tag_you') : i18n.getText('tag_opp_short'));
+    }
+    if (this.tagPlayerO) {
+      this.tagPlayerO.textContent = isSpectator ? i18n.getText('player_rabbit_o') : (this.state.mySymbol === 'O' ? i18n.getText('tag_you') : i18n.getText('tag_opp_short'));
+    }
 
     caroBoard.init(roomState.boardSize, (r, c) => this.handleCellClick(r, c));
 
@@ -189,9 +238,13 @@ export class CaroOnlineGame extends CaroBaseGame {
       for (let r = 0; r < roomState.boardSize; r++) {
         for (let c = 0; c < roomState.boardSize; c++) {
           if (roomState.board[r][c] !== null) {
-            caroBoard.placePiece(r, c, roomState.board[r][c], false);
+            caroBoard.placePiece(r, c, roomState.board[r][c], false, false);
           }
         }
+      }
+      if (roomState.lastMove) {
+        const lm = roomState.lastMove;
+        caroBoard.placePiece(lm.row, lm.col, lm.player, true, false);
       }
     }
 
@@ -200,6 +253,9 @@ export class CaroOnlineGame extends CaroBaseGame {
 
     if (roomState.status === 'playing') {
       this.startTimer();
+    } else if (roomState.status === 'finished') {
+      caroTimer.stop();
+      this.endGame(roomState.winner, roomState.winningLine || []);
     } else {
       caroTimer.stop();
       if (this.bannerText) {
@@ -226,12 +282,23 @@ export class CaroOnlineGame extends CaroBaseGame {
 
   startTimer() {
     caroTimer.start(this.state.turnTime, this.state.currentTurn, () => {
-      // Hết giờ
+      if (this.state.isGameOver) return;
+      if (this.state.currentTurn === this.state.mySymbol) {
+        caroOnline.sendTimeout();
+      } else if (this.state.mySymbol !== 'SPECTATOR') {
+        // Dự phòng đối thủ bị treo hoặc ẩn trình duyệt không gửi timeout
+        setTimeout(() => {
+          if (!this.state.isGameOver && this.state.currentTurn && this.state.currentTurn !== this.state.mySymbol) {
+            caroOnline.sendTimeout();
+          }
+        }, 1500);
+      }
     });
   }
 
   backToLobby(pushState = true) {
     caroOnline.disconnect();
+    CaroModal.closeAll();
     super.backToLobby(pushState);
   }
 }
