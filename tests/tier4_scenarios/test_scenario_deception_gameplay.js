@@ -120,6 +120,10 @@ describe('Tier 4 Scenario: Deception Gameplay Simulation & Multi-Role Player Jou
     assert(roles.includes('WITNESS'), 'Witness must be included');
 
     game.proceedToNightCrime();
+    const murderer = game.getMurdererPlayer();
+    if (murderer && (!game.solution.meansCardId || !game.solution.clueCardId)) {
+      game.commitMurdererSelection(murderer.meansCards[0].id, murderer.clueCards[0].id);
+    }
     game.proceedAfterNightCrime();
     game.startRound1Evidence();
     game.autoPlaceForensicBullets();

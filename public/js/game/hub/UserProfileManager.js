@@ -45,6 +45,9 @@ export class UserProfileManager {
   static saveProfile(profile) {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(profile));
+      if (profile && profile.name) {
+        localStorage.setItem('caro_player_name', profile.name);
+      }
     } catch (_) {}
     this.renderDom(profile);
     this.syncRoomInputs(profile.name);

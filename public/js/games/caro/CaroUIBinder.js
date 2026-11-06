@@ -35,8 +35,29 @@ export class CaroUIBinder {
     if (this._bound) return;
     this._bound = true;
     // 1. Các nút chọn chế độ ở Sảnh chờ Caro
-    document.getElementById('btn-open-create-room')?.addEventListener('click', () => CaroModal.open('modal-create-room'));
-    document.getElementById('btn-open-join-room')?.addEventListener('click', () => CaroModal.open('modal-join-room'));
+    document.getElementById('btn-open-create-room')?.addEventListener('click', () => {
+      let savedName = '';
+      try {
+        savedName = localStorage.getItem('caro_player_name') || '';
+      } catch (_) {}
+      const createNameInput = document.getElementById('create-player-name');
+      if (savedName && createNameInput) {
+        createNameInput.value = savedName;
+      }
+      CaroModal.open('modal-create-room');
+    });
+
+    document.getElementById('btn-open-join-room')?.addEventListener('click', () => {
+      let savedName = '';
+      try {
+        savedName = localStorage.getItem('caro_player_name') || '';
+      } catch (_) {}
+      const joinNameInput = document.getElementById('join-player-name');
+      if (savedName && joinNameInput) {
+        joinNameInput.value = savedName;
+      }
+      CaroModal.open('modal-join-room');
+    });
     document.getElementById('btn-open-ai-setup')?.addEventListener('click', () => CaroModal.open('modal-ai-setup'));
     document.getElementById('btn-start-local')?.addEventListener('click', () => caroModule.localGame.start());
 
@@ -56,6 +77,10 @@ export class CaroUIBinder {
       const selectedRule = document.getElementById('create-rule')?.value || 'standard';
       const timeLimit = Number(document.getElementById('create-turn-time')?.value || 30);
 
+      try {
+        localStorage.setItem('caro_player_name', playerName);
+      } catch (_) {}
+
       CaroModal.close('modal-create-room');
       caroOnline.createRoom({ playerName, boardSize: size, rule: selectedRule, turnTime: timeLimit });
     });
@@ -64,7 +89,9 @@ export class CaroUIBinder {
     const joinNameInput = document.getElementById('join-player-name');
     const joinCodeInput = document.getElementById('join-room-code');
 
+    let joinSubmitting = false;
     const confirmJoin = () => {
+      if (joinSubmitting) return;
       if (document.activeElement) document.activeElement.blur();
       const playerName = joinNameInput?.value.trim() || 'Người chơi 2';
       const code = joinCodeInput?.value.trim().toUpperCase() || '';
@@ -74,12 +101,22 @@ export class CaroUIBinder {
         return;
       }
 
+      joinSubmitting = true;
+      setTimeout(() => { joinSubmitting = false; }, 800);
+
+      try {
+        localStorage.setItem('caro_player_name', playerName);
+      } catch (_) {}
+
       CaroModal.close('modal-join-room');
       caroOnline.joinRoom({ roomId: code, playerName });
     };
 
     document.getElementById('btn-confirm-join-room')?.addEventListener('click', confirmJoin);
     [joinNameInput, joinCodeInput].forEach(inp => {
+      inp?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') confirmJoin();
+      });
       inp?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') confirmJoin();
       });

@@ -103,6 +103,8 @@ export class GameManager {
     const roomFromUrl = urlParams.get('room') || urlParams.get('code');
     if (roomFromUrl) {
       const cleanRoom = roomFromUrl.trim().toUpperCase();
+      if (!cleanRoom) return;
+
       // Nếu là mã phòng Deception (bắt đầu bằng DEC), chuyển sang sảnh Deception
       if (cleanRoom.startsWith('DEC')) {
         window.location.href = `/deception/?room=${encodeURIComponent(cleanRoom)}`;
@@ -112,21 +114,35 @@ export class GameManager {
       const joinCodeInput = document.getElementById('join-room-code');
       const joinNameInput = document.getElementById('join-player-name');
       if (joinCodeInput) joinCodeInput.value = cleanRoom;
-      let guestName = (joinNameInput?.value || '').trim();
+      let guestName = '';
+      try {
+        guestName = localStorage.getItem('caro_player_name') || '';
+      } catch (_) {}
       if (!guestName) {
         try {
-          guestName = localStorage.getItem('caro_player_name') || '';
+          const profile = JSON.parse(localStorage.getItem('caro_user_profile') || '{}');
+          if (profile && profile.name) guestName = profile.name;
         } catch (_) {}
+      }
+      if (!guestName && joinNameInput?.value) {
+        guestName = joinNameInput.value.trim();
       }
       if (!guestName) {
         guestName = 'Kỳ thủ ' + Math.floor(Math.random() * 899 + 100);
       }
       if (joinNameInput) joinNameInput.value = guestName;
 
-      CaroModal.showToast(i18n.getText('toast_received_room_link', { roomId: cleanRoom }) || `Đang vào phòng #${cleanRoom}...`);
+      CaroModal.open('modal-join-room');
+      if (joinNameInput) {
+        setTimeout(() => {
+          try {
+            joinNameInput.focus();
+            joinNameInput.select();
+          } catch (_) {}
+        }, 50);
+      }
 
-      // Tự động vào phòng Caro ngay lập tức thay vì đứng ở sảnh
-      caroOnline.joinRoom({ roomId: cleanRoom, playerName: guestName });
+      CaroModal.showToast(i18n.getText('toast_received_room_link', { roomId: cleanRoom }) || `Đã nhận mã phòng #${cleanRoom}! Bấm "Vào Phòng Ngay" để chơi.`);
     }
   }
 
