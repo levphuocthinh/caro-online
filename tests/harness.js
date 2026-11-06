@@ -156,7 +156,8 @@ async function startTestServer() {
     });
   });
 
-  initSocketHandlers(io);
+  const socketController = initSocketHandlers(io);
+  server.socketController = socketController;
 
   await new Promise((resolve) => server.listen(0, resolve));
   const port = server.address().port;
@@ -206,7 +207,7 @@ async function startTestServer() {
     });
   }
 
-  return { app, server, io, port, url, createClient, connectClient, close };
+  return { app, server, io, socketController, port, url, createClient, connectClient, close };
 }
 
 /**

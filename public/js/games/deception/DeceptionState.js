@@ -276,7 +276,9 @@ export class DeceptionState {
     this.privateIntel = {
       labCheckedCardId: null,
       labCheckedResult: null,
-      insideManTargetId: null
+      labCheckUsed: false,
+      insideManTargetId: null,
+      insideManUsed: false
     };
     this.pendingSelection = {
       meansCardId: null,
@@ -835,7 +837,9 @@ export class DeceptionState {
   }
 
   performLabTechCheck(cardId) {
+    if (this.privateIntel && this.privateIntel.labCheckUsed) return false;
     const isMatch = cardId === this.solution.meansCardId || cardId === this.solution.clueCardId;
+    this.privateIntel.labCheckUsed = true;
     this.privateIntel.labCheckedCardId = cardId;
     this.privateIntel.labCheckedResult = isMatch;
     this.addLog(
@@ -847,8 +851,10 @@ export class DeceptionState {
   }
 
   performInsideManStrip(targetPlayerId) {
+    if (this.privateIntel && this.privateIntel.insideManUsed) return false;
     const target = this.getPlayerById(targetPlayerId);
     if (!target || !target.hasBadge) return false;
+    this.privateIntel.insideManUsed = true;
     target.hasBadge = false;
     this.privateIntel.insideManTargetId = targetPlayerId;
     this.addLog(

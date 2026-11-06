@@ -133,6 +133,51 @@ class DeceptionSocketManager {
       }
 
       if (room.status !== 'WAITING') {
+        const disconnectedIdx = room.players.findIndex(p =>
+          !p.isBot && (p.disconnected || (data.previousSocketId && p.id === data.previousSocketId) || (playerName && p.displayName.trim().toLowerCase() === playerName.trim().toLowerCase()))
+        );
+
+        if (disconnectedIdx !== -1 && room.gameState) {
+          if (room.cleanupTimer) {
+            clearTimeout(room.cleanupTimer);
+            room.cleanupTimer = null;
+          }
+
+          const targetPlayer = room.players[disconnectedIdx];
+          const oldId = targetPlayer.id;
+          targetPlayer.id = socket.id;
+          targetPlayer.disconnected = false;
+
+          const gp = room.gameState.players[disconnectedIdx];
+          if (gp) {
+            gp.id = socket.id;
+          }
+
+          this.playerRoomMap.set(socket.id, roomCode);
+          socket.join(roomCode);
+
+          socket.emit('deception:room_joined', {
+            roomCode,
+            yourPlayerId: socket.id,
+            room: this.serializeRoom(room)
+          });
+
+          const publicState = this.buildPublicState(room);
+          const secretRole = this.buildSecretRole(room.gameState, disconnectedIdx);
+
+          socket.emit('deception:game_started', {
+            roomCode: room.roomCode,
+            publicState,
+            yourPlayerIndex: disconnectedIdx,
+            yourPlayerId: socket.id,
+            yourSecretRole: secretRole
+          });
+
+          this.addSystemChat(room, `🔄 ${targetPlayer.displayName} đã kết nối lại vào bàn điều tra!`);
+          this.broadcastRoomUpdate(room);
+          return;
+        }
+
         socket.emit('deception:error', { message: 'Vụ án trong phòng này đã bắt đầu điều tra, không thể tham gia lúc này!' });
         return;
       }
@@ -340,7 +385,7 @@ class DeceptionSocketManager {
     }));
 
     // 9. Bắt đầu Vụ Án Trực Tuyến (Chủ phòng)
-    socket.on('deception:start_game', safeHandler(socket, 'deception:start_game', () => {
+    socket.on('deception:start_game', safeHandler(socket, 'deception:start_game', (data = {}) => {
       const roomCode = this.playerRoomMap.get(socket.id);
       if (!roomCode) return;
       const room = this.rooms.get(roomCode);
@@ -373,7 +418,7 @@ class DeceptionSocketManager {
       this.addSystemChat(room, '🚨 VỤ ÁN MẠNG ĐÃ BẮT ĐẦU! Toàn bộ thẻ bài và danh tính mật đang được phân phát bí mật...');
 
       // Khởi tạo ván chơi Deception trực tuyến
-      this.launchOnlineDeceptionMatch(room);
+      this.launchOnlineDeceptionMatch(room, data);
     }));
 
     // 10. Rời phòng tự nguyện
@@ -534,16 +579,176 @@ class DeceptionSocketManager {
         });
       }
     }));
+
+    // 15. Thám Tử Cố Vấn chứng minh 100% trong sạch
+    socket.on('deception:consulting_reveal', safeHandler(socket, 'deception:consulting_reveal', () => {
+      const roomCode = this.playerRoomMap.get(socket.id);
+      if (!roomCode) return;
+      const room = this.rooms.get(roomCode);
+      if (!room || room.status !== 'PLAYING' || !room.gameState) return;
+
+      const playerIdx = room.players.findIndex(p => p.id === socket.id);
+      const gp = room.gameState.players[playerIdx];
+      if (!gp || gp.role !== 'CONSULTING_DETECTIVE' || !gp.hasBadge) return;
+
+      const success = room.gameState.activateConsultingDetectiveReveal(gp.id);
+      if (success) {
+        const rp = room.players[playerIdx];
+        this.addSystemChat(room, `🔍 ${rp.displayName} đã kích hoạt năng lực Thám Tử Cố Vấn: Bỏ Huy Hiệu để chứng minh 100% trong sạch!`);
+        this.io.to(roomCode).emit('deception:consulting_revealed', {
+          playerId: gp.id,
+          displayName: rp.displayName
+        });
+      }
+    }));
+
+    // 16. Chuyển sang vòng điều tra tiếp theo (Pháp y hoặc Chủ phòng)
+    socket.on('deception:advance_round', safeHandler(socket, 'deception:advance_round', () => {
+      const roomCode = this.playerRoomMap.get(socket.id);
+      if (!roomCode) return;
+      const room = this.rooms.get(roomCode);
+      if (!room || room.status !== 'PLAYING' || !room.gameState) return;
+
+      const playerIdx = room.players.findIndex(p => p.id === socket.id);
+      const gp = room.gameState.players[playerIdx];
+      const isForensic = gp && gp.role === 'FORENSIC_SCIENTIST';
+      const isHost = room.hostId === socket.id;
+      if (!isForensic && !isHost) return;
+
+      const state = room.gameState;
+      if (state.round === 1) {
+        state.startRound2Evidence();
+      } else if (state.round === 2) {
+        state.startRound3Evidence();
+      } else {
+        state.finishGame(
+          'CRIMINAL',
+          'TIME_EXPIRED',
+          'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra đúng cặp Phương thức & Manh mối. Kẻ Sát Nhân đã cao chạy xa bay!',
+          'All 3 investigation rounds ended without a correct accusation. The Murderer escaped into the night!'
+        );
+      }
+
+      const isGameOver = state.phase === 'GAME_OVER';
+      this.io.to(roomCode).emit('deception:round_advanced', {
+        round: state.round,
+        phase: state.phase,
+        activeSceneTiles: state.activeSceneTiles,
+        isGameOver,
+        winnerTeam: isGameOver ? state.winnerTeam : undefined,
+        winReasonKey: isGameOver ? state.winReasonKey : undefined,
+        winReasonText: isGameOver ? state.winReasonText : undefined,
+        solution: isGameOver ? state.solution : undefined,
+        players: isGameOver ? state.players.map(p => ({
+          id: p.id,
+          role: p.role,
+          team: p.team,
+          displayName: p.displayName,
+          avatar: p.avatar
+        })) : undefined
+      });
+      this.broadcastRoomUpdate(room);
+    }));
+  }
+
+  /**
+   * Tạo publicState an toàn cho toàn bộ bàn chơi
+   */
+  buildPublicState(room) {
+    const state = room.gameState;
+    if (!state) return null;
+    return {
+      caseId: state.caseId,
+      roomCode: room.roomCode,
+      round: state.round,
+      phase: state.phase,
+      activeSceneTiles: state.activeSceneTiles,
+      players: state.players.map((gp, i) => {
+        const rp = room.players[i] || {};
+        const isForensic = gp.role === 'FORENSIC_SCIENTIST';
+        return {
+          id: gp.id,
+          seatIndex: i,
+          displayName: rp.displayName || gp.displayName,
+          avatar: rp.avatar || gp.avatar,
+          isHuman: !rp.isBot,
+          isBot: Boolean(rp.isBot),
+          socketId: rp.id,
+          role: (isForensic || gp.isRoleRevealed) ? gp.role : 'UNKNOWN',
+          roleRevealed: isForensic || Boolean(gp.isRoleRevealed),
+          hasBadge: gp.hasBadge,
+          meansCards: gp.meansCards,
+          clueCards: gp.clueCards
+        };
+      })
+    };
+  }
+
+  /**
+   * Xây dựng secretRole bí mật riêng tư theo đúng luật cho người chơi
+   */
+  buildSecretRole(state, playerIndex) {
+    const gp = state.players[playerIndex];
+    if (!gp) return null;
+
+    const secretRole = {
+      role: gp.role,
+      team: gp.team
+    };
+
+    if (gp.role === 'MURDERER') {
+      secretRole.solution = state.solution;
+      const accomplice = state.players.find(p => p.role === 'ACCOMPLICE' || p.role === 'INSIDE_MAN');
+      if (accomplice) {
+        secretRole.accomplice = {
+          displayName: accomplice.displayName,
+          avatar: accomplice.avatar
+        };
+      }
+    } else if (gp.role === 'ACCOMPLICE' || gp.role === 'INSIDE_MAN') {
+      secretRole.solution = state.solution;
+      const murderer = state.players.find(p => p.role === 'MURDERER');
+      if (murderer) {
+        secretRole.murderer = {
+          displayName: murderer.displayName,
+          avatar: murderer.avatar
+        };
+      }
+    } else if (gp.role === 'FORENSIC_SCIENTIST') {
+      secretRole.solution = state.solution;
+      const murderer = state.players.find(p => p.role === 'MURDERER');
+      if (murderer) {
+        secretRole.murderer = {
+          displayName: murderer.displayName,
+          avatar: murderer.avatar
+        };
+      }
+    } else if (gp.role === 'WITNESS') {
+      const culprits = state.players
+        .filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE' || p.role === 'INSIDE_MAN')
+        .map(p => ({ displayName: p.displayName, avatar: p.avatar }));
+      secretRole.seenCulprits = culprits;
+    } else if (gp.role === 'PROTECTIVE_DETAIL') {
+      const witness = state.players.find(p => p.role === 'WITNESS');
+      if (witness) {
+        secretRole.witness = { displayName: witness.displayName, avatar: witness.avatar };
+      }
+    }
+
+    return secretRole;
   }
 
   /**
    * Khởi chạy ván chơi trực tuyến và phát bí mật vai trò cho từng socket
    */
-  launchOnlineDeceptionMatch(room) {
+  launchOnlineDeceptionMatch(room, options = {}) {
     const { DeceptionState } = require('../../public/js/games/deception/DeceptionState');
     const state = new DeceptionState();
     state.config.playerCount = room.players.length;
     state.config.playerName = room.players[0].displayName;
+    if (options && options.preferredRole) {
+      state.config.preferredRole = options.preferredRole;
+    }
     state.startNewGame();
     state.proceedToNightCrime();
 
@@ -567,32 +772,7 @@ class DeceptionSocketManager {
     // Map các socket id vào danh sách người chơi của game
     room.gameState = state;
 
-    // Gửi sự kiện game_started cho cả phòng kèm danh sách thẻ công khai và bí mật vai trò riêng tư
-    const publicState = {
-      caseId: state.caseId,
-      roomCode: room.roomCode,
-      round: state.round,
-      phase: state.phase,
-      activeSceneTiles: state.activeSceneTiles,
-      players: state.players.map((gp, i) => {
-        const rp = room.players[i] || {};
-        const isForensic = gp.role === 'FORENSIC_SCIENTIST';
-        return {
-          id: gp.id,
-          seatIndex: i,
-          displayName: rp.displayName || gp.displayName,
-          avatar: rp.avatar || gp.avatar,
-          isHuman: !rp.isBot,
-          isBot: Boolean(rp.isBot),
-          socketId: rp.id,
-          role: isForensic ? 'FORENSIC_SCIENTIST' : 'UNKNOWN',
-          roleRevealed: isForensic,
-          hasBadge: gp.hasBadge,
-          meansCards: gp.meansCards,
-          clueCards: gp.clueCards
-        };
-      })
-    };
+    const publicState = this.buildPublicState(room);
 
     // Broadcast tới từng người chơi với thông tin bí mật riêng của họ
     room.players.forEach((rp, i) => {
@@ -601,48 +781,7 @@ class DeceptionSocketManager {
 
       const playerSocket = this.io.sockets.sockets.get(rp.id);
       if (playerSocket) {
-        const secretRole = {
-          role: gp.role,
-          team: gp.team
-        };
-
-        // Bổ sung thông tin mật chuẩn luật theo từng vai trò:
-        // - Hung thủ & Đồng phạm & Pháp Y biết rõ nhau và biết cặp Hung khí + Manh mối
-        if (gp.role === 'MURDERER') {
-          secretRole.solution = state.solution;
-          const accomplice = state.players.find(p => p.role === 'ACCOMPLICE');
-          if (accomplice) {
-            secretRole.accomplice = {
-              displayName: accomplice.displayName,
-              avatar: accomplice.avatar
-            };
-          }
-        } else if (gp.role === 'ACCOMPLICE') {
-          secretRole.solution = state.solution;
-          const murderer = state.players.find(p => p.role === 'MURDERER');
-          if (murderer) {
-            secretRole.murderer = {
-              displayName: murderer.displayName,
-              avatar: murderer.avatar
-            };
-          }
-        } else if (gp.role === 'FORENSIC_SCIENTIST') {
-          secretRole.solution = state.solution;
-          const murderer = state.players.find(p => p.role === 'MURDERER');
-          if (murderer) {
-            secretRole.murderer = {
-              displayName: murderer.displayName,
-              avatar: murderer.avatar
-            };
-          }
-        } else if (gp.role === 'WITNESS') {
-          // Nhân chứng nhìn thấy 2 kẻ tà ác (Hung thủ & Đồng phạm) nhưng không biết ai là ai
-          const culprits = state.players
-            .filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE')
-            .map(p => ({ displayName: p.displayName, avatar: p.avatar }));
-          secretRole.seenCulprits = culprits;
-        }
-
+        const secretRole = this.buildSecretRole(state, i);
         playerSocket.emit('deception:game_started', {
           roomCode: room.roomCode,
           publicState,
@@ -730,6 +869,21 @@ class DeceptionSocketManager {
       // Ván đang chơi -> Đánh dấu ngắt kết nối
       leavingPlayer.disconnected = true;
       this.addSystemChat(room, `⚠️ Cảnh báo: ${leavingPlayer.displayName} đã mất kết nối.`);
+
+      const remainingHumans = room.players.filter(p => !p.isBot && !p.disconnected);
+      if (remainingHumans.length === 0) {
+        if (room.cleanupTimer) clearTimeout(room.cleanupTimer);
+        room.cleanupTimer = setTimeout(() => {
+          const stillActive = room.players.filter(p => !p.isBot && !p.disconnected);
+          if (stillActive.length === 0) {
+            this.rooms.delete(roomCode);
+          }
+        }, 60000);
+        if (room.cleanupTimer && typeof room.cleanupTimer.unref === 'function') {
+          room.cleanupTimer.unref();
+        }
+      }
+
       this.broadcastRoomUpdate(room);
     }
   }

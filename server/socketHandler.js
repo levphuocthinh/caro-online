@@ -11,6 +11,7 @@ const { SocketController } = require('./socket/SocketController');
 function initSocketHandlers(io) {
   const controller = new SocketController(io);
   controller.init();
+  return controller;
 }
 
 module.exports = { initSocketHandlers };

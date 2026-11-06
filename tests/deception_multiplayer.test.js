@@ -537,6 +537,52 @@ describe('Deception Online Multiplayer & WebSocket Suite', () => {
       await testServer.close();
     }
   });
+
+  test('Online Consulting Detective: Discard badge and broadcast 100% innocence', async () => {
+    const testServer = await startTestServer();
+    try {
+      const p1 = await testServer.connectClient();
+      p1.emit('deception:create_room', { playerName: 'HostDetective' });
+      const created = await waitForEvent(p1, 'deception:room_created');
+
+      const p2 = await testServer.connectClient();
+      p2.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'GuestDetective' });
+      await waitForEvent(p2, 'deception:room_joined');
+
+      p1.emit('deception:add_bot');
+      await waitForEvent(p1, 'deception:room_updated');
+      p1.emit('deception:add_bot');
+      await waitForEvent(p1, 'deception:room_updated');
+
+      p2.emit('deception:toggle_ready');
+      await waitForEvent(p1, 'deception:room_updated');
+
+      const [p1Game, p2Game] = await Promise.all([
+        waitForEvent(p1, 'deception:game_started'),
+        waitForEvent(p2, 'deception:game_started'),
+        p1.emit('deception:start_game')
+      ]);
+
+      // Assign consulting detective role to p2's game state for testing
+      const room = testServer.server.socketController.deceptionSocketManager.rooms.get(created.roomCode);
+      const p2Idx = room.players.findIndex(p => p.id === p2.id);
+      room.gameState.players[p2Idx].role = 'CONSULTING_DETECTIVE';
+      room.gameState.players[p2Idx].hasBadge = true;
+
+      const [rev1, rev2] = await Promise.all([
+        waitForEvent(p1, 'deception:consulting_revealed'),
+        waitForEvent(p2, 'deception:consulting_revealed'),
+        p2.emit('deception:consulting_reveal')
+      ]);
+
+      assertEqual(rev1.playerId, room.gameState.players[p2Idx].id);
+      assertEqual(rev2.playerId, room.gameState.players[p2Idx].id);
+      assertEqual(room.gameState.players[p2Idx].hasBadge, false);
+      assertEqual(room.gameState.players[p2Idx].isRoleRevealed, true);
+    } finally {
+      await testServer.close();
+    }
+  });
 });
 
 if (require.main === module) {

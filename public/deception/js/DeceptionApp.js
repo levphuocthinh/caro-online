@@ -822,13 +822,23 @@ class DeceptionAppController {
       });
 
       this.socket.on('connect', () => {
+        const prevId = this.previousSocketId || this.myPlayerId;
         this.myPlayerId = this.socket.id;
         console.log('[DeceptionApp] Connected to WebSocket server:', this.socket.id);
         this.updateSocketStatus(true);
+        if (this.onlineRoom && this.onlineRoom.roomCode && (this.isOnlineMatch || this.onlineRoom.status === 'PLAYING')) {
+          this.socket.emit('deception:join_room', {
+            roomCode: this.onlineRoom.roomCode,
+            playerName: this.myPlayerName,
+            avatar: this.myAvatar,
+            previousSocketId: prevId
+          });
+        }
       });
 
       this.socket.on('disconnect', (reason) => {
         console.warn('[DeceptionApp] WebSocket disconnected:', reason);
+        this.previousSocketId = this.myPlayerId;
         this.updateSocketStatus(false);
       });
 
@@ -859,6 +869,36 @@ class DeceptionAppController {
 
       this.socket.on('deception:game_started', (data) => {
         this.handleOnlineGameStarted(data);
+      });
+
+      this.socket.on('deception:round_advanced', (data) => {
+        if (!data) return;
+        this.state.round = data.round;
+        this.state.phase = data.phase;
+        if (data.activeSceneTiles) {
+          this.state.activeSceneTiles = data.activeSceneTiles;
+        }
+        if (data.isGameOver) {
+          this.state.winnerTeam = data.winnerTeam;
+          this.state.winReasonKey = data.winReasonKey;
+          this.state.winReasonText = data.winReasonText;
+          if (data.solution) this.state.solution = data.solution;
+          if (data.players) {
+            data.players.forEach(revealed => {
+              const localP = this.state.getPlayerById(revealed.id);
+              if (localP) {
+                localP.role = revealed.role;
+                localP.team = revealed.team;
+                localP.roleRevealed = true;
+              }
+            });
+          }
+          this.showGameOverModal();
+        } else {
+          this.playAudio('gavel');
+          this.renderInvestigationTable();
+          this.updateInvestigationTimeline();
+        }
       });
 
       this.socket.on('deception:bullet_placed', (data) => {
@@ -956,6 +996,19 @@ class DeceptionAppController {
         }, () => {
           this.showGameOverView();
         });
+      });
+
+      this.socket.on('deception:consulting_revealed', (data) => {
+        const player = this.state.getPlayerById(data.playerId);
+        if (player) {
+          player.hasBadge = false;
+          player.isRoleRevealed = true;
+          player.role = 'CONSULTING_DETECTIVE';
+          player.team = 'INVESTIGATION';
+        }
+        this.playAudio('chime');
+        this.showToast(this.isVi ? `🔍 ${data.displayName} đã chứng minh 100% trong sạch!` : `🔍 ${data.displayName} proved 100% innocence!`);
+        this.renderInvestigationTable();
       });
 
       this.socket.on('deception:error', (data) => {
@@ -2013,7 +2066,7 @@ class DeceptionAppController {
 
     if (!intelContent) return;
 
-    if (human.role === 'ACCOMPLICE' || human.role === 'FORENSIC_SCIENTIST') {
+    if (human.role === 'ACCOMPLICE' || human.role === 'INSIDE_MAN' || human.role === 'FORENSIC_SCIENTIST') {
       intelContent.innerHTML = `
         <div style="font-size: 15px; margin-bottom: 12px;">
           <b>🕵️ Hung thủ:</b> ${murderer ? murderer.displayName : '—'}
@@ -2041,13 +2094,24 @@ class DeceptionAppController {
       `;
     } else if (human.role === 'WITNESS') {
       const suspects = (this.onlineSecretIntel && this.onlineSecretIntel.seenCulprits)
-        || this.state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
+        || this.state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE' || p.role === 'INSIDE_MAN');
       const culpritNames = suspects.map(s => s.displayName).join(' & ') || (this.isVi ? '2 kẻ tình nghi' : '2 suspects');
       intelContent.innerHTML = `
         <p style="font-size: 14.5px; line-height: 1.6;">
-          👁️ <b>Bạn là Nhân chứng:</b> Bạn đã thấy 2 nghi phạm rời hiện trường:
+          👁️ <b>${this.isVi ? 'Bạn là Nhân chứng:' : 'You are the Witness:'}</b> ${this.isVi ? 'Bạn đã thấy 2 nghi phạm rời hiện trường:' : 'You saw 2 suspects flee the scene:'}
           <br><b style="color: var(--crimson); font-size: 16px;">${culpritNames}</b>
-          <br><em style="color: var(--text-secondary);">(Nhưng không biết ai là hung thủ trực tiếp, ai là đồng phạm!)</em>
+          <br><em style="color: var(--text-secondary);">${this.isVi ? '(Nhưng không biết ai là hung thủ trực tiếp, ai là đồng phạm!)' : '(Unaware of which is the murderer and which is the accomplice!)'}</em>
+        </p>
+      `;
+    } else if (human.role === 'PROTECTIVE_DETAIL') {
+      const witness = (this.onlineSecretIntel && this.onlineSecretIntel.witness)
+        || this.state.players.find(p => p.role === 'WITNESS');
+      const witnessName = witness ? `${witness.avatar || ''} ${witness.displayName}` : (this.isVi ? 'Chưa xác định' : 'Unknown');
+      intelContent.innerHTML = `
+        <p style="font-size: 14.5px; line-height: 1.6;">
+          🛡️ <b>${this.isVi ? 'Bạn là Đặc Vụ Bảo Vệ:' : 'You are Protective Detail:'}</b> ${this.isVi ? 'Bạn biết rõ ai là Nhân Chứng của vụ án:' : 'You know the exact identity of the Witness:'}
+          <br><b style="color: #2ed573; font-size: 16px;">${witnessName}</b>
+          <br><em style="color: var(--text-secondary);">${this.isVi ? '(Nhiệm vụ: Hãy đóng giả làm Nhân chứng, thu hút hỏa lực của Kẻ Sát Nhân để Nhân chứng thật được an toàn!)' : '(Mission: Act like the Witness, draw the Murderer’s fire so the real Witness survives!)'}</em>
         </p>
       `;
     } else {
@@ -2233,6 +2297,9 @@ class DeceptionAppController {
         btnConsulting.onclick = () => {
           this.state.activateConsultingDetectiveReveal(human.id);
           this.playAudio('chime');
+          if (this.isOnlineMatch && this.socket) {
+            this.socket.emit('deception:consulting_reveal');
+          }
           this.renderInvestigationTable();
         };
       } else {
@@ -2820,6 +2887,10 @@ class DeceptionAppController {
     this.playAudio('click');
     this.roundTileSwapped = false;
 
+    if (this.isOnlineMatch && this.socket) {
+      this.socket.emit('deception:advance_round');
+    }
+
     if (this.state.round === 1) {
       const hasAlliesNight = this.state.players.some(
         p => p.role === 'LAB_TECHNICIAN' || p.role === 'INSIDE_MAN'
@@ -2966,11 +3037,16 @@ class DeceptionAppController {
             const cardId = btn.dataset.labCheck;
             const isMatch = this.state.performLabTechCheck(cardId);
             this.playAudio('chime');
+            alliesContent.querySelectorAll('[data-lab-check]').forEach(b => {
+              b.disabled = true;
+              b.style.pointerEvents = 'none';
+              b.style.opacity = b === btn ? '1' : '0.4';
+            });
             const resBox = document.getElementById('lab-check-result');
             if (resBox) {
               resBox.innerHTML = isMatch
-                ? `<span style="color: var(--green);">✅ MẪU DƯƠNG TÍNH! Lá bài này CHÍNH LÀ một phần của vụ án!</span>`
-                : `<span style="color: var(--crimson);">❌ MẪU ÂM TÍNH! Lá bài này KHÔNG liên quan đến vụ án.</span>`;
+                ? `<span style="color: var(--green);">${this.isVi ? '✅ MẪU DƯƠNG TÍNH! Lá bài này CHÍNH LÀ một phần của vụ án!' : '✅ POSITIVE! This card is part of the crime solution!'}</span>`
+                : `<span style="color: var(--crimson);">${this.isVi ? '❌ MẪU ÂM TÍNH! Lá bài này KHÔNG liên quan đến vụ án.' : '❌ NEGATIVE! This card is not part of the crime solution.'}</span>`;
             }
           });
         });
@@ -2978,7 +3054,7 @@ class DeceptionAppController {
         const targets = this.state.players.filter(p => p.hasBadge && p.id !== human.id && p.role !== 'FORENSIC_SCIENTIST');
         alliesContent.innerHTML = `
           <div style="font-size: 15px; margin-bottom: 12px;">
-            🕶️ <b>Bạn là Nội Gián:</b> Hãy chọn 1 Điều tra viên để bí mật đánh cắp Huy hiệu Phá án của họ:
+            🕶️ <b>${this.isVi ? 'Bạn là Nội Gián:' : 'You are Inside Man:'}</b> ${this.isVi ? 'Hãy chọn 1 Điều tra viên để bí mật đánh cắp Huy hiệu Phá án của họ:' : 'Select 1 Investigator to secretly strip their Police Badge:'}
           </div>
           <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
             ${targets.map(t => `
@@ -2995,16 +3071,21 @@ class DeceptionAppController {
             const tId = btn.dataset.stealTarget;
             this.state.performInsideManStrip(tId);
             this.playAudio('badge_loss');
+            alliesContent.querySelectorAll('[data-steal-target]').forEach(b => {
+              b.disabled = true;
+              b.style.pointerEvents = 'none';
+              b.style.opacity = b === btn ? '1' : '0.4';
+            });
             const resBox = document.getElementById('inside-steal-result');
             if (resBox) {
-              resBox.innerHTML = `<span style="color: var(--gold);">🕶️ Đã đánh cắp thành công Huy hiệu của ${this.state.getPlayerById(tId)?.displayName}!</span>`;
+              resBox.innerHTML = `<span style="color: var(--gold);">${this.isVi ? `🕶️ Đã đánh cắp thành công Huy hiệu của ${this.state.getPlayerById(tId)?.displayName}!` : `🕶️ Successfully stripped ${this.state.getPlayerById(tId)?.displayName}'s Police Badge!`}</span>`;
             }
           });
         });
       } else {
         alliesContent.innerHTML = `
           <p style="font-size: 14.5px; line-height: 1.6;">
-            Thành phố trong đêm... Kỹ thuật viên Phòng Lab và các đầu mối ngầm đang bí mật hành động.
+            ${this.isVi ? 'Thành phố trong đêm... Kỹ thuật viên Phòng Lab và các đầu mối ngầm đang bí mật hành động.' : 'Under cover of darkness, the Lab Technician and covert operatives act secretly.'}
           </p>
         `;
       }

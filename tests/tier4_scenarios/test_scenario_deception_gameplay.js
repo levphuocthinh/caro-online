@@ -129,6 +129,12 @@ describe('Tier 4 Scenario: Deception Gameplay Simulation & Multi-Role Player Jou
     game.autoPlaceForensicBullets();
     game.startPresentationPhase();
 
+    // Mark allies as human to test manual action execution
+    const labTechPlayer = game.players.find(p => p.role === 'LAB_TECHNICIAN');
+    if (labTechPlayer) labTechPlayer.isHuman = true;
+    const insideManPlayer = game.players.find(p => p.role === 'INSIDE_MAN');
+    if (insideManPlayer) insideManPlayer.isHuman = true;
+
     // Advance to Allies Night
     game.advanceAfterPresentation();
     assertEqual(game.phase, GAME_PHASES.ALLIES_NIGHT_PHASE);
