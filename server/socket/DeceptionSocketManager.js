@@ -20,6 +20,7 @@ class DeceptionSocketManager {
     this.io = io;
     this.rooms = new Map(); // roomCode -> Room Object
     this.playerRoomMap = new Map(); // socket.id -> roomCode
+    this.chatLimits = new Map(); // socket.id -> { timestamps: number[], lastWarning: number }
   }
 
   /**
@@ -134,7 +135,7 @@ class DeceptionSocketManager {
 
       if (room.status !== 'WAITING') {
         const disconnectedIdx = room.players.findIndex(p =>
-          !p.isBot && (p.disconnected || (data.previousSocketId && p.id === data.previousSocketId) || (playerName && p.displayName.trim().toLowerCase() === playerName.trim().toLowerCase()))
+          !p.isBot && p.disconnected && ((data.previousSocketId && p.id === data.previousSocketId) || (playerName && p.displayName.trim().toLowerCase() === playerName.trim().toLowerCase()))
         );
 
         if (disconnectedIdx !== -1 && room.gameState) {
@@ -367,6 +368,23 @@ class DeceptionSocketManager {
 
       const text = (data.message || '').trim();
       if (!text) return;
+
+      const now = Date.now();
+      let record = this.chatLimits.get(socket.id);
+      if (!record) {
+        record = { timestamps: [now], lastWarning: 0 };
+        this.chatLimits.set(socket.id, record);
+      } else {
+        record.timestamps = record.timestamps.filter(t => (now - t) < 1000);
+        if (record.timestamps.length >= 3) {
+          if (now - record.lastWarning >= 2000) {
+            record.lastWarning = now;
+            socket.emit('deception:error', { message: 'Bạn đang gửi tin nhắn quá nhanh!' });
+          }
+          return;
+        }
+        record.timestamps.push(now);
+      }
 
       const chatItem = {
         id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
@@ -828,6 +846,7 @@ class DeceptionSocketManager {
    * Xử lý khi một socket rời phòng hoặc ngắt kết nối
    */
   handleLeaveCurrentRoom(socket) {
+    if (this.chatLimits) this.chatLimits.delete(socket.id);
     const roomCode = this.playerRoomMap.get(socket.id);
     if (!roomCode) return;
 

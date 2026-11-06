@@ -547,3 +547,112 @@ test('QA Deep Audit 13: C3.03 Caro Online rapid join debouncing and idempotent s
   }
 });
 
+
+test('QA Deep Audit 14: D8.01 Reconnect rejection for active connected players & chat rate limiting enforcement', async () => {
+  const testServer = await startTestServer();
+  try {
+    const p1 = await testServer.connectClient();
+    p1.emit('deception:create_room', { playerName: 'ChiefHost' });
+    const created = await waitForEvent(p1, 'deception:room_created');
+
+    const p2 = await testServer.connectClient();
+    await Promise.all([
+      waitForEvent(p2, 'deception:room_joined'),
+      waitForEvent(p1, 'deception:room_updated'),
+      p2.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'ActiveAlice' })
+    ]);
+
+    // Add 2 bots so room has 4 players
+    p1.emit('deception:add_bot');
+    await waitForEvent(p1, 'deception:room_updated');
+    p1.emit('deception:add_bot');
+    await waitForEvent(p1, 'deception:room_updated');
+
+    // p2 toggles ready
+    p2.emit('deception:toggle_ready');
+    await waitForEvent(p1, 'deception:room_updated');
+
+    await Promise.all([
+      waitForEvent(p1, 'deception:game_started'),
+      waitForEvent(p2, 'deception:game_started'),
+      p1.emit('deception:start_game')
+    ]);
+
+    // 1. Attempt to hijack ActiveAlice's seat by a 3rd client while Alice is ACTIVE (not disconnected)
+    const p3 = await testServer.connectClient();
+    const [hijackErr] = await Promise.all([
+      waitForEvent(p3, 'deception:error'),
+      p3.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'ActiveAlice' })
+    ]);
+    assert.ok(hijackErr.message.includes('đang diễn ra') || hijackErr.message.includes('không thể tham gia'), 'Seat hijack denied for connected player');
+
+    // 2. Chat rate limiting test: sending 4 messages rapidly triggers deception:error
+    let rateLimitHit = false;
+    p2.on('deception:error', (err) => {
+      if (err.message && err.message.includes('quá nhanh')) {
+        rateLimitHit = true;
+      }
+    });
+
+    p2.emit('deception:send_chat', { message: 'Msg 1' });
+    p2.emit('deception:send_chat', { message: 'Msg 2' });
+    p2.emit('deception:send_chat', { message: 'Msg 3' });
+    p2.emit('deception:send_chat', { message: 'Msg 4' });
+
+    await new Promise(r => setTimeout(r, 200));
+    assert.strictEqual(rateLimitHit, true, 'Chat rate limiting enforced on burst spam');
+  } finally {
+    await testServer.close();
+  }
+});
+
+test('QA Deep Audit 15: D8.02 Online Accusation authoritative broadcast sync to accuser and non-accusers', async () => {
+  const testServer = await startTestServer();
+  try {
+    const p1 = await testServer.connectClient();
+    p1.emit('deception:create_room', { playerName: 'ChiefHost' });
+    const created = await waitForEvent(p1, 'deception:room_created');
+
+    const p2 = await testServer.connectClient();
+    await Promise.all([
+      waitForEvent(p2, 'deception:room_joined'),
+      waitForEvent(p1, 'deception:room_updated'),
+      p2.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'DetectiveDan' })
+    ]);
+
+    p1.emit('deception:add_bot');
+    await waitForEvent(p1, 'deception:room_updated');
+    p1.emit('deception:add_bot');
+    await waitForEvent(p1, 'deception:room_updated');
+
+    p2.emit('deception:toggle_ready');
+    await waitForEvent(p1, 'deception:room_updated');
+
+    await Promise.all([
+      waitForEvent(p1, 'deception:game_started'),
+      waitForEvent(p2, 'deception:game_started'),
+      p1.emit('deception:start_game')
+    ]);
+
+    const room = testServer.server.socketController.deceptionSocketManager.rooms.get(created.roomCode);
+    const murderer = room.gameState.getMurdererPlayer();
+    const solution = room.gameState.solution;
+
+    // Both p1 and p2 must receive deception:accusation_made with authoritative server evaluation
+    const [accuseBroadcastP1, accuseBroadcastP2] = await Promise.all([
+      waitForEvent(p1, 'deception:accusation_made'),
+      waitForEvent(p2, 'deception:accusation_made'),
+      p2.emit('deception:make_accusation', {
+        targetId: murderer.id,
+        meansId: solution.meansCardId,
+        clueId: solution.clueCardId
+      })
+    ]);
+
+    assert.strictEqual(accuseBroadcastP1.isCorrect, true);
+    assert.strictEqual(accuseBroadcastP2.isCorrect, true);
+    assert.strictEqual(accuseBroadcastP2.accuserId, room.gameState.players[1].id);
+  } finally {
+    await testServer.close();
+  }
+});

@@ -186,6 +186,9 @@ class DeceptionAppController {
     // Âm thanh
     document.getElementById('btn-toggle-sound')?.addEventListener('click', () => {
       this.soundEnabled = !this.soundEnabled;
+      if (typeof deceptionAudio !== 'undefined' && deceptionAudio) {
+        deceptionAudio.enabled = this.soundEnabled;
+      }
       const icon = document.getElementById('icon-sound');
       if (icon) {
         icon.className = this.soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
@@ -287,7 +290,11 @@ class DeceptionAppController {
     });
 
     // Nút Tạo Phòng Online Mới (Chủ Phòng)
+    let createRoomSubmitting = false;
     document.getElementById('btn-create-online-room')?.addEventListener('click', () => {
+      if (createRoomSubmitting) return;
+      createRoomSubmitting = true;
+      setTimeout(() => { createRoomSubmitting = false; }, 800);
       const name = (document.getElementById('online-create-name')?.value || '').trim() || 'Thám tử Trưởng';
 
       if (!this.socket || !this.socket.connected) {
@@ -313,7 +320,11 @@ class DeceptionAppController {
     });
 
     // Nút Vào Phòng Online Có Sẵn (Khách)
+    let joinRoomSubmitting = false;
     document.getElementById('btn-join-online-room')?.addEventListener('click', () => {
+      if (joinRoomSubmitting) return;
+      joinRoomSubmitting = true;
+      setTimeout(() => { joinRoomSubmitting = false; }, 800);
       const code = (document.getElementById('online-join-code')?.value || '').trim().toUpperCase();
       const name = (document.getElementById('online-join-name')?.value || '').trim() || 'Điều Tra Viên';
       if (!code) {
@@ -893,7 +904,7 @@ class DeceptionAppController {
               }
             });
           }
-          this.showGameOverModal();
+          this.showGameOverView();
         } else {
           this.playAudio('gavel');
           this.renderInvestigationTable();
@@ -943,30 +954,29 @@ class DeceptionAppController {
           });
         }
 
-        if (data.accuserId !== this.myPlayerId) {
-          this.showAccusationCastingModal({
-            accuserName: data.accuserName,
-            accuserAvatar: data.accuserAvatar,
-            targetPlayer: data.targetPlayer,
-            meansCard: data.meansCard,
-            clueCard: data.clueCard,
-            isCorrect: data.isCorrect
-          }, () => {
-            if (data.isCorrect) {
-              if (this.state.phase === GAME_PHASES.WITNESS_REVERSAL) {
-                this.showWitnessReversalView();
-              } else {
-                this.showGameOverView();
-              }
+        this.showAccusationCastingModal({
+          accuserName: data.accuserName,
+          accuserAvatar: data.accuserAvatar,
+          targetPlayer: data.targetPlayer,
+          meansCard: data.meansCard,
+          clueCard: data.clueCard,
+          isCorrect: data.isCorrect
+        }, () => {
+          if (data.isCorrect) {
+            if (this.state.phase === GAME_PHASES.WITNESS_REVERSAL) {
+              this.showWitnessReversalView();
             } else {
-              if (this.state.phase === GAME_PHASES.GAME_OVER) {
-                this.showGameOverView();
-              } else {
-                this.renderInvestigationTable();
-              }
+              this.showGameOverView();
             }
-          });
-        }
+          } else {
+            if (this.state.phase === GAME_PHASES.GAME_OVER) {
+              this.showGameOverView();
+            } else {
+              this.renderInvestigationTable();
+              this.startSpeakerTimer();
+            }
+          }
+        });
       });
 
       this.socket.on('deception:witness_shot_resolved', (data) => {
@@ -2288,8 +2298,27 @@ class DeceptionAppController {
     // Update Speaker HUD
     this.updateSpeakerHud();
 
-    // Consulting Detective button
+    // Accuse buttons disabled state
     const human = this.state.getHumanPlayer();
+    const canAccuse = Boolean(human && human.hasBadge && human.role !== 'FORENSIC_SCIENTIST');
+    const btnHudAccuse = document.getElementById('btn-hud-accuse');
+    const btnDockAccuse = document.getElementById('btn-dock-accuse');
+    [btnHudAccuse, btnDockAccuse].forEach(btn => {
+      if (!btn) return;
+      if (canAccuse) {
+        btn.classList.remove('btn-accuse-spent');
+        btn.removeAttribute('disabled');
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.classList.add('btn-accuse-spent');
+        btn.setAttribute('disabled', 'true');
+        btn.style.opacity = '0.4';
+        btn.style.cursor = 'not-allowed';
+      }
+    });
+
+    // Consulting Detective button
     const btnConsulting = document.getElementById('btn-dock-consulting');
     if (btnConsulting) {
       if (human.role === 'CONSULTING_DETECTIVE' && human.hasBadge && !human.isRoleRevealed) {
@@ -3318,13 +3347,18 @@ class DeceptionAppController {
 
   executeAccusation(targetId, meansId, clueId) {
     const human = this.state.getHumanPlayer();
+    if (!human || !human.hasBadge) return;
+
+    if (this.isOnlineMatch && this.socket) {
+      human.hasBadge = false;
+      this.renderInvestigationHud();
+      this.socket.emit('deception:make_accusation', { targetId, meansId, clueId });
+      return;
+    }
+
     const res = this.state.makeAccusation(human.id, targetId, meansId, clueId);
 
     if (!res.valid) return;
-
-    if (this.isOnlineMatch && this.socket) {
-      this.socket.emit('deception:make_accusation', { targetId, meansId, clueId });
-    }
 
     const targetPlayer = this.state.getPlayerById(targetId);
     const meansCard = this.state.findCardById(meansId)?.card;
@@ -3416,12 +3450,14 @@ class DeceptionAppController {
 
   executeWitnessReversalShot(targetId) {
     this.playAudio('revolver');
-    const res = this.state.resolveWitnessShot(targetId);
-    const isHit = Boolean(res && res.hitWitness);
 
     if (this.isOnlineMatch && this.socket) {
       this.socket.emit('deception:witness_shot', { targetId });
+      return;
     }
+
+    const res = this.state.resolveWitnessShot(targetId);
+    const isHit = Boolean(res && res.hitWitness);
 
     this.playCutscene('WITNESS_REVERSAL', {
       isSuccess: isHit,

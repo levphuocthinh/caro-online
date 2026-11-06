@@ -757,7 +757,7 @@ export class DeceptionState {
     if (speaker && top) {
       this.addLog(
         `[Vòng ${this.round}] ${speaker.displayName}: "Pháp y chỉ vào [${causeVi}], tôi thấy cặp [${top.meansCard.vi}] & [${top.clueCard.vi}] của ${top.suspect.displayName} rất đáng ngờ!"`,
-        `[Round ${this.round}] ${speaker.displayNameEn}: "Forensic marked [${causeEn}], so ${top.suspect.displayNameEn}'s [${top.meansCard.en}] & [${top.clueCard.en}] look very suspicious!"`,
+        `[Round ${this.round}] ${speaker.displayNameEn || speaker.displayName}: "Forensic marked [${causeEn}], so ${(top.suspect.displayNameEn || top.suspect.displayName)}'s [${top.meansCard.en}] & [${top.clueCard.en}] look very suspicious!"`,
         'speech'
       );
     }
@@ -859,7 +859,7 @@ export class DeceptionState {
     this.privateIntel.insideManTargetId = targetPlayerId;
     this.addLog(
       `Đêm Mở Rộng: Nội gián đã bí mật đánh cắp Huy hiệu Phá án của ${target.displayName}!`,
-      `Allies Night: The Inside Man secretly stripped ${target.displayNameEn}'s Police Badge!`,
+      `Allies Night: The Inside Man secretly stripped ${(target.displayNameEn || target.displayName)}'s Police Badge!`,
       'crime'
     );
     return true;
@@ -1115,7 +1115,7 @@ export class DeceptionState {
     player.isRoleRevealed = true;
     this.addLog(
       `🎩 ${player.displayName} đã nộp bỏ Huy hiệu để công khai danh tính [Thám tử Cố vấn] — chứng minh 100% thuộc phe Điều tra!`,
-      `🎩 ${player.displayNameEn} discarded their Badge to publicly reveal [Consulting Detective] — proving 100% innocence!`,
+      `🎩 ${(player.displayNameEn || player.displayName)} discarded their Badge to publicly reveal [Consulting Detective] — proving 100% innocence!`,
       'forensic'
     );
     return true;
@@ -1158,7 +1158,7 @@ export class DeceptionState {
     if (isCorrect) {
       this.addLog(
         `🚨 PHÁ ÁN CHÍNH XÁC! ${accuser.displayName} đã vạch trần Kẻ Sát Nhân ${suspect.displayName} với cặp bằng chứng [${meansCard.vi}] & [${clueCard.vi}]!`,
-        `🚨 CASE CRACKED! ${accuser.displayNameEn} exposed Murderer ${suspect.displayNameEn} with [${meansCard.en}] & [${clueCard.en}]!`,
+        `🚨 CASE CRACKED! ${(accuser.displayNameEn || accuser.displayName)} exposed Murderer ${(suspect.displayNameEn || suspect.displayName)} with [${meansCard.en}] & [${clueCard.en}]!`,
         'success'
       );
 
@@ -1187,7 +1187,7 @@ export class DeceptionState {
           'INVESTIGATION',
           'ARRESTED',
           `${accuser.displayName} đã bắt giữ thành công Kẻ Sát Nhân ${suspect.displayName} với cặp vật chứng [${meansCard.vi}] + [${clueCard.vi}]!`,
-          `${accuser.displayNameEn} successfully arrested Murderer ${suspect.displayNameEn} with [${meansCard.en}] + [${clueCard.en}]!`
+          `${(accuser.displayNameEn || accuser.displayName)} successfully arrested Murderer ${(suspect.displayNameEn || suspect.displayName)} with [${meansCard.en}] + [${clueCard.en}]!`
         );
       }
 
@@ -1196,7 +1196,7 @@ export class DeceptionState {
       // Cáo buộc SAI: Pháp y chỉ lắc đầu báo SAI, không tiết lộ sai ở đâu
       this.addLog(
         `❌ BÁC BỎ! ${accuser.displayName} cáo buộc ${suspect.displayName} dùng [${meansCard.vi}] + [${clueCard.vi}], nhưng Pháp y xác nhận: KHÔNG CHÍNH XÁC! (${accuser.displayName} mất Huy hiệu).`,
-        `❌ DISMISSED! ${accuser.displayNameEn} accused ${suspect.displayNameEn} of [${meansCard.en}] + [${clueCard.en}], but Forensic Scientist ruled: INCORRECT! (Badge lost).`,
+        `❌ DISMISSED! ${(accuser.displayNameEn || accuser.displayName)} accused ${(suspect.displayNameEn || suspect.displayName)} of [${meansCard.en}] + [${clueCard.en}], but Forensic Scientist ruled: INCORRECT! (Badge lost).`,
         'error'
       );
 
@@ -1230,14 +1230,14 @@ export class DeceptionState {
         'CRIMINAL',
         'WITNESS_ASSASSINATED',
         `💥 ÁM SÁT THÀNH CÔNG! Kẻ Sát Nhân đã bắn trúng Nhân chứng ${target.displayName}! Nhân chứng bị thủ tiêu, phe Tội phạm lật kèo giành chiến thắng!`,
-        `💥 WITNESS ELIMINATED! The Murderer shot Witness ${target.displayNameEn}! With the key witness silenced, the Criminals steal the victory!`
+        `💥 WITNESS ELIMINATED! The Murderer shot Witness ${(target.displayNameEn || target.displayName)}! With the key witness silenced, the Criminals steal the victory!`
       );
     } else {
       this.finishGame(
         'INVESTIGATION',
         'WITNESS_SURVIVED',
         `🛡️ BẢO VỆ NHÂN CHỨNG THÀNH CÔNG! Kẻ Sát Nhân bắn nhầm vào ${target.displayName} (${ROLE_DEFINITIONS[target.role]?.name_vi}). Nhân chứng an toàn ra tòa làm chứng, Phe Cảnh sát toàn thắng!`,
-        `🛡️ WITNESS PROTECTED! The Murderer shot ${target.displayNameEn} (${ROLE_DEFINITIONS[target.role]?.name_en}) instead of the Witness. The Investigation team triumphs!`
+        `🛡️ WITNESS PROTECTED! The Murderer shot ${(target.displayNameEn || target.displayName)} (${ROLE_DEFINITIONS[target.role]?.name_en}) instead of the Witness. The Investigation team triumphs!`
       );
     }
 

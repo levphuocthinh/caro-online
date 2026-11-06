@@ -568,6 +568,7 @@ describe('Deception Online Multiplayer & WebSocket Suite', () => {
       const p2Idx = room.players.findIndex(p => p.id === p2.id);
       room.gameState.players[p2Idx].role = 'CONSULTING_DETECTIVE';
       room.gameState.players[p2Idx].hasBadge = true;
+      room.gameState.players[p2Idx].isRoleRevealed = false;
 
       const [rev1, rev2] = await Promise.all([
         waitForEvent(p1, 'deception:consulting_revealed'),
