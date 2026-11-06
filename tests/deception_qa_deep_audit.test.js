@@ -432,3 +432,118 @@ test('QA Deep Audit 10: Caro Online 19x19 board configuration and win verificati
     await testServer.close();
   }
 });
+
+test('QA Deep Audit 11: D3.02 Forensic bullet placement constraints & single marker per tile', () => {
+  const game = new DeceptionState();
+  game.config.playerCount = 6;
+  game.config.preferredRole = 'FORENSIC_SCIENTIST';
+  game.startNewGame();
+  game.proceedToNightCrime();
+  game.proceedAfterNightCrime();
+  if (game.phase === GAME_PHASES.NIGHT_WITNESS_REVEAL) game.startRound1Evidence();
+  assert.equal(game.phase, GAME_PHASES.ROUND_1_EVIDENCE);
+
+  // Invalid tileIndex or optionIndex rejected
+  assert.equal(game.placeBulletOnTile(-1, 0), false);
+  assert.equal(game.placeBulletOnTile(99, 0), false);
+  assert.equal(game.placeBulletOnTile(0, -1), false);
+  assert.equal(game.placeBulletOnTile(0, 6), false);
+
+  // Valid placement on tile 0
+  assert.equal(game.placeBulletOnTile(0, 2), true);
+  assert.equal(game.activeSceneTiles[0].selectedOptionIndex, 2);
+
+  // Re-placing on the same tile updates the single marker (strictly 1 bullet per tile)
+  assert.equal(game.placeBulletOnTile(0, 4), true);
+  assert.equal(game.activeSceneTiles[0].selectedOptionIndex, 4);
+
+  // Not all marked yet
+  assert.equal(game.areAllSceneTilesMarked(), false);
+
+  // Mark remaining tiles 1..5
+  for (let i = 1; i < game.activeSceneTiles.length; i++) {
+    assert.equal(game.placeBulletOnTile(i, 1), true);
+  }
+  assert.equal(game.areAllSceneTilesMarked(), true);
+
+  // Advance to round 2
+  game.startPresentationPhase();
+  game.advanceAfterPresentation();
+  assert.equal(game.round, 2);
+  assert.equal(game.phase, GAME_PHASES.ROUND_2_EVIDENCE);
+
+  // Brown tile swap resets the target tile marker
+  const swapped = game.replaceBrownSceneTile(2);
+  assert.equal(swapped, true);
+  assert.equal(game.activeSceneTiles[2].selectedOptionIndex, null);
+  assert.equal(game.areAllSceneTilesMarked(), false);
+
+  // Placing bullet on new swapped tile restores full marking
+  assert.equal(game.placeBulletOnTile(2, 3), true);
+  assert.equal(game.areAllSceneTilesMarked(), true);
+});
+
+test('QA Deep Audit 12: D7.03 Online Deception Room member name change and real-time broadcast', async () => {
+  const testServer = await startTestServer();
+  try {
+    const p1 = await testServer.connectClient();
+    p1.emit('deception:create_room', { playerName: 'HostDetective' });
+    const created = await waitForEvent(p1, 'deception:room_created');
+
+    const p2 = await testServer.connectClient();
+    await Promise.all([
+      waitForEvent(p2, 'deception:room_joined'),
+      waitForEvent(p1, 'deception:room_updated'),
+      p2.emit('deception:join_room', { roomCode: created.roomCode, playerName: 'OldName' })
+    ]);
+
+    // Guest renames
+    const [p1Updated, p2Updated, p1Chat] = await Promise.all([
+      waitForEvent(p1, 'deception:room_updated'),
+      waitForEvent(p2, 'deception:room_updated'),
+      waitForEvent(p1, 'deception:new_chat'),
+      p2.emit('deception:change_name', { newName: 'KiemVuong007' })
+    ]);
+
+    const p2InRoom = p1Updated.room.players.find(p => p.id === p2.id);
+    assert.equal(p2InRoom.displayName, 'KiemVuong007');
+    assert.ok(p1Chat.text.includes('KiemVuong007'));
+  } finally {
+    await testServer.close();
+  }
+});
+
+test('QA Deep Audit 13: C3.03 Caro Online rapid join debouncing and idempotent socket handling', async () => {
+  const testServer = await startTestServer();
+  try {
+    const p1 = await testServer.connectClient();
+    p1.emit('create_room', { playerName: 'CaroHost', boardSize: 15, rule: 'standard' });
+    const created = await waitForEvent(p1, 'room_created');
+
+    const p2 = await testServer.connectClient();
+    // Rapid double join from p2 (debouncing / idempotent socket slot protection)
+    p2.emit('join_room', { roomId: created.roomId, playerName: 'FastClicker' });
+    p2.emit('join_room', { roomId: created.roomId, playerName: 'FastClicker' });
+
+    const [startP1, startP2] = await Promise.all([
+      waitForEvent(p1, 'game_started'),
+      waitForEvent(p2, 'game_started')
+    ]);
+
+    assert.equal(startP1.roomState.players.X.name, 'CaroHost');
+    assert.equal(startP1.roomState.players.O.name, 'FastClicker');
+    assert.equal(startP1.roomState.spectatorCount, 0, 'No extra spectators created by rapid double join');
+
+    // Normal play alternation
+    p1.emit('make_move', { row: 7, col: 7 });
+    const move1 = await waitForEvent(p2, 'move_made');
+    assert.equal(move1.player, 'X');
+
+    p2.emit('make_move', { row: 7, col: 8 });
+    const move2 = await waitForEvent(p1, 'move_made');
+    assert.equal(move2.player, 'O');
+  } finally {
+    await testServer.close();
+  }
+});
+
