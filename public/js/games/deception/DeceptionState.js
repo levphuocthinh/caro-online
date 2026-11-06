@@ -692,7 +692,13 @@ export class DeceptionState {
       for (const m of s.meansCards) {
         for (const c of s.clueCards) {
           const score = this.evaluateCardPairScore(m, c);
-          if (score > maxScore) {
+          const isBetterOrTieBreak = (score > maxScore) || (
+            score === maxScore && best && (
+              (this.pinnedCardIds && (this.pinnedCardIds.has(m.id) || this.pinnedCardIds.has(c.id))) ||
+              (m.id.charCodeAt(m.id.length - 1) % 2 === 0)
+            )
+          );
+          if (isBetterOrTieBreak) {
             maxScore = score;
             best = { suspect: s, meansCard: m, clueCard: c, score };
           }
@@ -751,7 +757,8 @@ export class DeceptionState {
     const eligibleBots = this.players.filter(p => !p.isHuman && p.role !== 'FORENSIC_SCIENTIST');
     if (eligibleBots.length === 0) return;
 
-    const speaker = eligibleBots[this.round % eligibleBots.length];
+    this.botDeductionCount = (this.botDeductionCount || 0) + 1;
+    const speaker = eligibleBots[(this.round + this.botDeductionCount) % eligibleBots.length];
     const top = this.findTopSuspectForBot(speaker.id);
 
     if (speaker && top) {

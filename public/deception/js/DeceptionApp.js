@@ -201,6 +201,17 @@ class DeceptionAppController {
       this.openModal('modal-rules');
     });
 
+    // Bấm vào bất kỳ ghế trống nào để thêm Bot AI (Chủ phòng)
+    document.addEventListener('click', (e) => {
+      const addBotSlot = e.target.closest('[data-action="add-bot"]');
+      if (addBotSlot) {
+        if (this.socket && this.onlineRoom && this.onlineRoom.hostId === this.myPlayerId) {
+          this.socket.emit('deception:add_bot');
+          this.playAudio('click');
+        }
+      }
+    });
+
     // Nhật ký vụ án
     document.getElementById('btn-toggle-dossier')?.addEventListener('click', () => {
       this.renderDossierLogs();
@@ -1763,7 +1774,14 @@ class DeceptionAppController {
     }
 
     this.updateHeaderInfo();
-    this.showRoleReveal();
+    if (this.state.phase.startsWith('ROUND_') || this.state.phase === 'INVESTIGATION') {
+      this.renderInvestigationTable();
+      this.showView('view-investigation');
+      this.roundTimeLeft = data.publicState.roundTimeLimit || 180;
+      this.startRoundTimer();
+    } else {
+      this.showRoleReveal();
+    }
 
     const hudChatBtn = document.getElementById('btn-toggle-ingame-chat');
     if (hudChatBtn) hudChatBtn.style.display = 'inline-flex';
@@ -2363,8 +2381,8 @@ class DeceptionAppController {
           this.state.generateBotRoundDeductions();
         }
 
-        // Cơ hội phá án của Bot Investigator (đặc biệt hữu ích khi Human là Pháp y hoặc Sát nhân)
-        if (this.roundTimeLeft === 90 || this.roundTimeLeft === 30) {
+        // Cơ hội phá án của Bot Investigator (chỉ dành cho Chơi Đơn)
+        if (!this.isOnlineMatch && (this.roundTimeLeft === 90 || this.roundTimeLeft === 30)) {
           const human = this.state.getHumanPlayer();
           if (human && (human.role === 'FORENSIC_SCIENTIST' || human.team === 'CRIMINAL')) {
             const botAttempt = this.state.triggerBotAccusationAttempt();
@@ -2400,7 +2418,9 @@ class DeceptionAppController {
         // Hết thời gian vòng thảo luận -> Chuyển sang cho Pháp Y đổi thẻ (hoặc Kẻ sát nhân trốn thoát nếu vòng 3)
         this.stopRoundTimer();
         this.playAudio('gavel');
-        this.advanceInvestigationRound();
+        if (!this.isOnlineMatch) {
+          this.advanceInvestigationRound();
+        }
       }
     }, 1000);
   }
@@ -2707,7 +2727,7 @@ class DeceptionAppController {
 
     const renderSuspectBox = (s) => {
       const isSelf = s.id === human.id;
-      const isSpeaker = currentSpeaker && currentSpeaker.id === s.id;
+      const isSpeaker = (this.state.phase.includes('PRESENTATION')) && currentSpeaker && currentSpeaker.id === s.id;
 
       const pinnedMeans = s.meansCards.find(m => this.state.pinnedCardIds.has(m.id));
       const pinnedClue = s.clueCards.find(c => this.state.pinnedCardIds.has(c.id));
