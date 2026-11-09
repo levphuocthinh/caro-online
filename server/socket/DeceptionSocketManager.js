@@ -301,8 +301,18 @@ class DeceptionSocketManager {
 
       if (room.hostId !== socket.id) return;
 
-      const botId = data.botId;
-      const botIdx = room.players.findIndex(p => p.id === botId && p.isBot);
+      let botIdx = -1;
+      if (data && data.botId) {
+        botIdx = room.players.findIndex(p => p.id === data.botId && p.isBot);
+      } else {
+        // Tìm bot cuối cùng trong danh sách nếu không truyền botId cụ thể
+        for (let i = room.players.length - 1; i >= 0; i--) {
+          if (room.players[i].isBot) {
+            botIdx = i;
+            break;
+          }
+        }
+      }
       if (botIdx !== -1) {
         const removed = room.players.splice(botIdx, 1)[0];
         this.addSystemChat(room, `Chủ phòng đã xóa Bot [${removed.displayName}] khỏi phòng.`);
@@ -557,7 +567,7 @@ class DeceptionSocketManager {
       const roomCode = this.playerRoomMap.get(socket.id);
       if (!roomCode) return;
       const room = this.rooms.get(roomCode);
-      if (!room || room.status !== 'PLAYING' || !room.gameState) return;
+      if (!room || room.status !== 'PLAYING' || !room.gameState || room.gameState.phase !== 'WITNESS_REVERSAL') return;
 
       const playerIdx = room.players.findIndex(p => p.id === socket.id);
       const shooterGp = room.gameState.players[playerIdx];
@@ -796,6 +806,14 @@ class DeceptionSocketManager {
       state.config.preferredRole = options.preferredRole;
     }
     state.startNewGame();
+    // Đồng bộ thông tin thực tế từ room.players vào state.players (tên, avatar, isHuman)
+    room.players.forEach((rp, i) => {
+      if (state.players[i]) {
+        state.players[i].displayName = rp.displayName;
+        state.players[i].avatar = rp.avatar;
+        state.players[i].isHuman = !rp.isBot;
+      }
+    });
     if (state.config.gameMode === 'BLITZ_2MIN') {
       state.maxRounds = 1;
     }

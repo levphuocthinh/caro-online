@@ -1396,6 +1396,7 @@ export class DeceptionState {
    * Thực thi phát súng cuối cùng của Kẻ Sát Nhân ở pha WITNESS_REVERSAL
    */
   resolveWitnessShot(targetPlayerId) {
+    if (this.phase !== GAME_PHASES.WITNESS_REVERSAL) return null;
     const target = this.getPlayerById(targetPlayerId);
     if (!target) return null;
 

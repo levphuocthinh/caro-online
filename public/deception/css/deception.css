@@ -5597,16 +5597,6 @@ body.deception-app {
     min-height: 44px;
   }
 }
-`;
-
-if (!content.includes(marker)) {
-  console.error('Marker not found in deception.css!');
-  process.exit(1);
-}
-
-content = content.replace(marker, cssToAdd);
-fs.writeFileSync(targetPath, content, 'utf8');
-console.log('Successfully updated deception.css!');
 
 
 /* 2-Column Split */
@@ -7296,11 +7286,23 @@ console.log('Successfully updated deception.css!');
   }
 
   .table-seat-kick-btn {
-    width: 17px;
-    height: 17px;
-    font-size: 9px;
-    top: -6px;
-    left: -6px;
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+    top: -8px;
+    left: -8px;
+    touch-action: manipulation;
+  }
+
+  .table-seat-kick-btn::after {
+    content: '';
+    position: absolute;
+    top: -11px;
+    left: -11px;
+    right: -11px;
+    bottom: -11px;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .seats-cards-grid {

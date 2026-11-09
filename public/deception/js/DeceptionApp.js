@@ -3823,7 +3823,14 @@ class DeceptionAppController {
     const grid = document.getElementById('reversal-targets-grid');
     const title = document.querySelector('#view-witness-reversal .view-title');
     const desc = document.querySelector('#view-witness-reversal .reversal-desc');
-    const targets = this.state.players.filter(p => p.team === 'INVESTIGATION' && p.role !== 'FORENSIC_SCIENTIST');
+    const myId = human ? human.id : null;
+    const targets = this.state.players.filter(p => {
+      if (p.id === myId) return false;
+      if (p.role === 'FORENSIC_SCIENTIST') return false;
+      if (p.role === 'ACCOMPLICE' || p.role === 'MURDERER') return false;
+      if (p.team === 'CRIMINAL') return false;
+      return true;
+    });
 
     if (isCriminal) {
       if (title) title.textContent = this.isVi ? '🎯 CƠ HỘI LẬT KÈO CUỐI CÙNG: CHỈ ĐIỂM ON-CALL ENGINEER!' : '🎯 LAST CHANCE REVERSAL: IDENTIFY THE ON-CALL ENGINEER!';
