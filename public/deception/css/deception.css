@@ -403,31 +403,279 @@ body.deception-app {
   color: #fff;
 }
 
-/* Circular Detective Table Preview */
+/* =========================================================================
+   AUTHENTIC IT WAR ROOM MEETING TABLE & DEV WORKSTATIONS (CHẨN THEO ẢNH MẪU)
+   ========================================================================= */
+
+/* Hero Banner in Lobby */
+.warroom-hero-banner-container {
+  width: 100%;
+  margin: 10px 0 20px 0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(243, 156, 18, 0.25);
+  border: 1px solid rgba(243, 156, 18, 0.4);
+  background: #0b0f19;
+}
+
+.warroom-hero-banner {
+  position: relative;
+  width: 100%;
+  max-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #040810;
+}
+
+.warroom-hero-image {
+  width: 100%;
+  height: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.warroom-hero-banner:hover .warroom-hero-image {
+  transform: scale(1.02);
+}
+
+.warroom-hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 18px;
+  background: linear-gradient(180deg, transparent 0%, rgba(5, 10, 20, 0.85) 60%, rgba(5, 10, 20, 0.98) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  z-index: 2;
+}
+
+.warroom-hero-badge-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+}
+
+.hero-chip.chip-incident {
+  background: rgba(231, 76, 60, 0.25);
+  border: 1px solid rgba(231, 76, 60, 0.65);
+  color: #ff7675;
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+}
+
+.hero-chip.chip-company {
+  background: rgba(243, 156, 18, 0.25);
+  border: 1px solid rgba(243, 156, 18, 0.65);
+  color: #f1c40f;
+}
+
+.hero-chip.chip-time {
+  background: rgba(0, 210, 211, 0.2);
+  border: 1px solid rgba(0, 210, 211, 0.55);
+  color: #00d2d3;
+}
+
+/* IT War Room Meeting Floor & Props */
 .lobby-table-wrapper {
+  position: relative;
   display: flex;
   justify-content: center;
-  padding: 20px 0 52px 0;
+  align-items: center;
+  padding: 34px 14px 62px 14px;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(20, 32, 52, 0.45) 0%, rgba(6, 10, 18, 0.88) 100%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 36px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 36px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  margin: 12px 0 24px 0;
+  overflow: visible;
 }
 
-.detective-round-table {
-  position: relative;
-  width: min(540px, 88vw);
-  height: min(290px, 52vw);
-  background: radial-gradient(ellipse at center, #19382b 0%, #0c2018 70%, #06120d 100%);
-  border: 10px solid #382315;
-  border-radius: 170px;
-  box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.45), 0 18px 45px rgba(0, 0, 0, 0.85), inset 0 0 50px rgba(0, 0, 0, 0.75);
+/* Office Ambient Props around Meeting Room */
+.office-prop {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(0, 210, 211, 0.25);
+  border-radius: 8px;
+  padding: 5px 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  z-index: 4;
+  user-select: none;
+  pointer-events: none;
+}
+
+.prop-icon-wrap {
+  font-size: 16px;
+  color: #00d2d3;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.prop-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.prop-title {
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #f1c40f;
+  letter-spacing: 0.5px;
+}
+
+.prop-detail {
+  font-size: 9px;
+  color: #94a3b8;
+}
+
+.prop-whiteboard {
+  top: 10px;
+  left: 14px;
+}
+
+.prop-server-rack {
+  top: 10px;
+  right: 14px;
+}
+
+.prop-server-rack .prop-icon-wrap {
+  color: #e74c3c;
+}
+
+.prop-coffee {
+  bottom: 12px;
+  left: 14px;
+}
+
+.prop-coffee .prop-icon-wrap {
+  color: #e67e22;
+}
+
+.prop-plant {
+  bottom: 12px;
+  right: 14px;
+}
+
+.prop-plant .prop-icon-wrap {
+  color: #2ecc71;
+}
+
+/* Server Rack Status LEDs */
+.rack-led-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.led-red {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff4757;
+  display: inline-block;
+  box-shadow: 0 0 6px #ff4757;
+}
+
+.led-amber {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffa502;
+  display: inline-block;
+  box-shadow: 0 0 6px #ffa502;
+}
+
+.led-green {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2ed573;
+  display: inline-block;
+  box-shadow: 0 0 6px #2ed573;
+}
+
+.blink {
+  animation: blinkSlow 1.4s ease-in-out infinite;
+}
+
+.blink-fast {
+  animation: blinkFast 0.8s ease-in-out infinite;
+}
+
+@keyframes blinkSlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes blinkFast {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+
+/* IT War Room Conference Meeting Desk */
+.detective-round-table {
+  position: relative;
+  width: min(540px, 88vw);
+  height: min(290px, 52vw);
+  background: 
+    radial-gradient(ellipse at center, #1e293b 0%, #0f172a 70%, #080d16 100%);
+  border: 7px solid #334155;
+  border-radius: 155px;
+  box-shadow: 
+    0 0 0 2px rgba(0, 210, 211, 0.45),
+    0 0 32px rgba(0, 210, 211, 0.18),
+    0 20px 48px rgba(0, 0, 0, 0.9),
+    inset 0 0 50px rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detective-round-table::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 140px;
+  border: 1px dashed rgba(0, 210, 211, 0.2);
+  pointer-events: none;
+}
+
 .table-felt {
   text-align: center;
+  z-index: 2;
 }
 
 .table-emblem {
@@ -435,17 +683,54 @@ body.deception-app {
   flex-direction: column;
   align-items: center;
   gap: 5px;
-  color: rgba(241, 196, 15, 0.35);
-  font-size: 32px;
-  text-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
+  color: #00d2d3;
+  font-size: 28px;
+  text-shadow: 0 0 15px rgba(0, 210, 211, 0.45);
 }
 
 .table-emblem span {
   font-family: var(--font-headline);
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: 1px;
-  color: rgba(241, 196, 15, 0.65);
+  letter-spacing: 1.2px;
+  color: #f1c40f;
+  text-shadow: 0 0 10px rgba(241, 196, 15, 0.35);
+}
+
+/* Central Incident Telemetry Strip */
+.warroom-telemetry-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.telemetry-item {
+  font-size: 10px;
+  font-family: monospace;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.telemetry-item.metric-alert {
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.5);
+  background: rgba(255, 107, 107, 0.15);
+  font-weight: 800;
+  animation: pulseAlert 1.6s infinite;
+}
+
+@keyframes pulseAlert {
+  0%, 100% { box-shadow: 0 0 0 rgba(255, 107, 107, 0); }
+  50% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.45); }
 }
 
 .table-seats-ring {
@@ -454,43 +739,139 @@ body.deception-app {
   pointer-events: none;
 }
 
+/* IT Engineer Workstation Seat Node */
 .lobby-seat-node {
   position: absolute;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: var(--bg-card);
-  border: 2px solid var(--border-subtle);
+  background: #111827;
+  border: 2px solid rgba(0, 210, 211, 0.35);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.8);
   transform: translate(-50%, -50%);
-  font-size: 18px;
+  font-size: 20px;
+  user-select: none;
+  pointer-events: auto;
+  z-index: 10;
 }
 
 .lobby-seat-node.is-human {
-  border-color: var(--cyan);
-  box-shadow: 0 0 12px var(--cyan-glow);
+  border-color: #00d2d3;
+  box-shadow: 0 0 16px rgba(0, 210, 211, 0.6);
 }
 
 .lobby-seat-node.is-forensic {
-  border-color: var(--purple);
+  border-color: #f1c40f;
+  box-shadow: 0 0 16px rgba(241, 196, 15, 0.5);
+}
+
+/* Ergonomic Office Chair Behind Seat */
+.workstation-chair {
+  position: absolute;
+  top: -6px;
+  width: 52px;
+  height: 24px;
+  border-radius: 12px 12px 4px 4px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Mini Workstation Desk & Laptop in front of Dev */
+.workstation-desk-pod {
+  position: absolute;
+  bottom: -8px;
+  width: 26px;
+  height: 14px;
+  border-radius: 3px;
+  background: #0f172a;
+  border: 1px solid rgba(0, 210, 211, 0.5);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.desk-laptop-icon {
+  font-size: 9px;
+  color: #00d2d3;
+}
+
+/* Dev Status Speech Bubble Overhead (Gather.town / Dev Story Style) */
+.dev-status-bubble {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(0, 210, 211, 0.5);
+  color: #f8fafc;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 9.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.75), 0 0 8px rgba(0, 210, 211, 0.25);
+  pointer-events: none;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: devBubbleFloat 3s ease-in-out infinite;
+}
+
+.dev-status-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px 4px 0 4px;
+  border-style: solid;
+  border-color: rgba(15, 23, 42, 0.94) transparent transparent transparent;
+}
+
+.dev-status-bubble .bubble-icon {
+  font-size: 11px;
+}
+
+.dev-status-bubble.bubble-empty {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(15, 23, 42, 0.75);
+}
+
+@keyframes devBubbleFloat {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-3.5px);
+  }
 }
 
 .lobby-seat-label {
   position: absolute;
-  top: 48px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
   font-size: 10px;
   font-weight: 800;
   white-space: nowrap;
-  background: rgba(0, 0, 0, 0.75);
-  padding: 1px 6px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 2px 7px;
   border-radius: 4px;
+  color: #fff;
+  z-index: 15;
 }
 
 /* Compact Controls Bar */
@@ -5224,31 +5605,52 @@ console.log('Successfully updated deception.css!');
   font-weight: 700;
 }
 
-/* Online Waiting Room Detective Round Table */
+/* Online Waiting Room IT War Room Meeting Desk */
 .online-table-wrapper {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px 0 52px 0;
-  position: relative;
+  padding: 34px 14px 62px 14px;
   overflow: visible;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(20, 32, 52, 0.45) 0%, rgba(6, 10, 18, 0.88) 100%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 36px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 36px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  margin: 10px 0 20px 0;
 }
 
 .online-round-table {
   position: relative;
-  width: min(500px, 92%);
-  height: 250px;
-  background: radial-gradient(ellipse at center, #19382b 0%, #0c2018 70%, #06120d 100%);
-  border: 9px solid #382315;
-  border-radius: 140px;
-  box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.5), 0 16px 40px rgba(0, 0, 0, 0.85), inset 0 0 45px rgba(0, 0, 0, 0.75);
+  width: min(520px, 92%);
+  height: 260px;
+  background: 
+    radial-gradient(ellipse at center, #1e293b 0%, #0f172a 70%, #080d16 100%);
+  border: 7px solid #334155;
+  border-radius: 145px;
+  box-shadow: 
+    0 0 0 2px rgba(0, 210, 211, 0.45),
+    0 0 32px rgba(0, 210, 211, 0.18),
+    0 18px 42px rgba(0, 0, 0, 0.9),
+    inset 0 0 45px rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
+}
+
+.online-round-table::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border-radius: 135px;
+  border: 1px dashed rgba(0, 210, 211, 0.2);
+  pointer-events: none;
 }
 
 .online-table-felt-status {
@@ -5292,15 +5694,15 @@ console.log('Successfully updated deception.css!');
 /* Online Table Seat Node */
 .online-table-seat-node {
   position: absolute;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: #151b26;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: #111827;
+  border: 2px solid rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.8);
   transform: translate(-50%, -50%);
   cursor: default;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
@@ -5426,7 +5828,7 @@ console.log('Successfully updated deception.css!');
 
 .online-table-seat-label {
   position: absolute;
-  top: 48px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -5443,6 +5845,7 @@ console.log('Successfully updated deception.css!');
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
   pointer-events: none;
+  z-index: 15;
 }
 
 .seats-cards-grid {
@@ -6591,6 +6994,39 @@ console.log('Successfully updated deception.css!');
   .online-table-seat-node {
     width: 36px;
     height: 36px;
+  }
+
+  .office-prop {
+    display: none !important;
+  }
+
+  .dev-status-bubble {
+    font-size: 8px;
+    padding: 1.5px 5px;
+    max-width: 80px;
+    bottom: calc(100% + 4px);
+  }
+
+  .dev-status-bubble .bubble-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .workstation-chair {
+    width: 40px;
+    height: 18px;
+    top: -4px;
+  }
+
+  .workstation-desk-pod {
+    width: 20px;
+    height: 10px;
+    bottom: -6px;
+  }
+
+  .desk-laptop-icon {
+    font-size: 7px;
   }
 
   .online-table-seat-node .table-seat-avatar {

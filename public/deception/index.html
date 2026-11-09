@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>WHO BROKE PROD? • Ai Đã Làm Sập Production? (FSOFT MEN GEN GAME)</title>
+  <title>WHO BROKE PROD? • Ai Đã Làm Sập Production? - IT Incident Investigation</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- Fonts: Playfair Display for Noir Titles, Be Vietnam Pro for Vietnamese UI, Nunito for Crisp Reading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +38,7 @@
           <span>Sảnh Game</span>
         </button>
         <div class="noir-brand">
-          <span class="noir-brand-badge">FSOFT MEN GEN GAME</span>
+          <span class="noir-brand-badge"><i class="fa-solid fa-triangle-exclamation"></i> SEV-1 WAR ROOM</span>
           <h1 class="noir-brand-title">WHO BROKE PROD?</h1>
           <span class="noir-brand-sub">AI ĐÃ LÀM SẬP PRODUCTION?</span>
         </div>
@@ -83,7 +83,7 @@
         <div class="lobby-card">
           <div class="lobby-card-header">
             <div>
-              <span class="view-eyebrow"><i class="fa-solid fa-terminal"></i> WAR ROOM KHẨN CẤP • FSOFT MEN GEN GAME (2 PHÚT/VÒNG)</span>
+              <span class="view-eyebrow"><i class="fa-solid fa-terminal"></i> WAR ROOM KHẨN CẤP • ĐIỀU TRA SỰ CỐ PRODUCTION (2 PHÚT/VÒNG)</span>
               <h2 class="view-title">War Room Điều Tra Sự Cố Production (4 – 9 Kỹ Sư)</h2>
             </div>
             <div class="room-share-badge">
@@ -91,6 +91,20 @@
               <button type="button" class="btn-copy-code" id="btn-copy-code" title="Sao chép mã bàn">
                 <i class="fa-solid fa-copy"></i>
               </button>
+            </div>
+          </div>
+
+          <!-- WAR ROOM HERO BANNER (CAT ENGINEERS INVESTIGATING PRODUCTION OUTAGE) -->
+          <div class="warroom-hero-banner-container">
+            <div class="warroom-hero-banner">
+              <img src="images/who-broke-prod-banner.jpg" alt="WHO BROKE PROD? - Ai Đã Làm Sập Production?" class="warroom-hero-image">
+              <div class="warroom-hero-overlay">
+                <div class="warroom-hero-badge-strip">
+                  <span class="hero-chip chip-incident"><i class="fa-solid fa-triangle-exclamation"></i> SEV-1 CRITICAL OUTAGE</span>
+                  <span class="hero-chip chip-company"><i class="fa-solid fa-shield-halved"></i> FPT INCIDENT RESPONSE</span>
+                  <span class="hero-chip chip-time"><i class="fa-solid fa-stopwatch"></i> 2 PHÚT / VÒNG ĐIỀU TRA</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -112,11 +126,46 @@
           <div class="lobby-panel active" id="panel-lobby-solo">
             <!-- Central Detective Table Layout Preview -->
             <div class="lobby-table-wrapper">
+              <!-- War Room Office Props -->
+              <div class="office-prop prop-whiteboard" title="Whiteboard kiến trúc & sơ đồ sự cố">
+                <div class="prop-icon-wrap"><i class="fa-solid fa-chalkboard"></i></div>
+                <div class="prop-info">
+                  <span class="prop-title">ARCH & LOGS</span>
+                  <span class="prop-detail">Incident #2026</span>
+                </div>
+              </div>
+              <div class="office-prop prop-server-rack" title="Cụm máy chủ Production">
+                <div class="prop-icon-wrap"><i class="fa-solid fa-server"></i></div>
+                <div class="prop-info">
+                  <span class="prop-title">PROD-CLUSTER</span>
+                  <span class="rack-led-bar"><span class="led-red blink"></span><span class="led-amber blink-fast"></span><span class="led-green"></span></span>
+                </div>
+              </div>
+              <div class="office-prop prop-coffee" title="Trạm cà phê FPT - Nạp năng lượng ứng cứu sự cố">
+                <div class="prop-icon-wrap"><i class="fa-solid fa-mug-hot"></i></div>
+                <div class="prop-info">
+                  <span class="prop-title">COFFEE BAR</span>
+                  <span class="prop-detail">Fix xuyên đêm ☕</span>
+                </div>
+              </div>
+              <div class="office-prop prop-plant" title="Cây xanh văn phòng">
+                <div class="prop-icon-wrap"><i class="fa-solid fa-seedling"></i></div>
+                <div class="prop-info">
+                  <span class="prop-title">TECH PARK</span>
+                  <span class="prop-detail">Office Plant 🪴</span>
+                </div>
+              </div>
+
               <div class="detective-round-table">
                 <div class="table-felt">
                   <div class="table-emblem">
-                    <i class="fa-solid fa-server"></i>
+                    <i class="fa-solid fa-network-wired"></i>
                     <span>FSOFT WAR ROOM • INCIDENT RESPONSE</span>
+                  </div>
+                  <div class="warroom-telemetry-strip">
+                    <span class="telemetry-item metric-alert"><i class="fa-solid fa-triangle-exclamation"></i> SEV-1: DOWN</span>
+                    <span class="telemetry-item"><i class="fa-solid fa-microchip"></i> CPU 99%</span>
+                    <span class="telemetry-item"><i class="fa-solid fa-memory"></i> RAM 98%</span>
                   </div>
                 </div>
                 <div class="table-seats-ring" id="lobby-seats-ring">
@@ -361,11 +410,46 @@
 
                 <!-- Central Detective Table Layout for Online Waiting Room -->
                 <div class="lobby-table-wrapper online-table-wrapper">
+                  <!-- War Room Office Props -->
+                  <div class="office-prop prop-whiteboard" title="Whiteboard kiến trúc & sơ đồ sự cố">
+                    <div class="prop-icon-wrap"><i class="fa-solid fa-chalkboard"></i></div>
+                    <div class="prop-info">
+                      <span class="prop-title">ARCH & LOGS</span>
+                      <span class="prop-detail">Incident #2026</span>
+                    </div>
+                  </div>
+                  <div class="office-prop prop-server-rack" title="Cụm máy chủ Production">
+                    <div class="prop-icon-wrap"><i class="fa-solid fa-server"></i></div>
+                    <div class="prop-info">
+                      <span class="prop-title">PROD-CLUSTER</span>
+                      <span class="rack-led-bar"><span class="led-red blink"></span><span class="led-amber blink-fast"></span><span class="led-green"></span></span>
+                    </div>
+                  </div>
+                  <div class="office-prop prop-coffee" title="Trạm cà phê FPT - Nạp năng lượng ứng cứu sự cố">
+                    <div class="prop-icon-wrap"><i class="fa-solid fa-mug-hot"></i></div>
+                    <div class="prop-info">
+                      <span class="prop-title">COFFEE BAR</span>
+                      <span class="prop-detail">Fix xuyên đêm ☕</span>
+                    </div>
+                  </div>
+                  <div class="office-prop prop-plant" title="Cây xanh văn phòng">
+                    <div class="prop-icon-wrap"><i class="fa-solid fa-seedling"></i></div>
+                    <div class="prop-info">
+                      <span class="prop-title">TECH PARK</span>
+                      <span class="prop-detail">Office Plant 🪴</span>
+                    </div>
+                  </div>
+
                   <div class="detective-round-table online-round-table">
                     <div class="table-felt">
                       <div class="table-emblem">
-                        <i class="fa-solid fa-fingerprint"></i>
+                        <i class="fa-solid fa-network-wired"></i>
                         <span>BÀN HỘI CHẨN TRỰC TUYẾN</span>
+                      </div>
+                      <div class="warroom-telemetry-strip">
+                        <span class="telemetry-item metric-alert"><i class="fa-solid fa-triangle-exclamation"></i> SEV-1: DOWN</span>
+                        <span class="telemetry-item"><i class="fa-solid fa-microchip"></i> CPU 99%</span>
+                        <span class="telemetry-item"><i class="fa-solid fa-memory"></i> RAM 98%</span>
                       </div>
                       <div class="online-table-felt-status">
                         <span class="felt-code-tag">Phòng: <b id="online-felt-room-code">DEC---</b></span>

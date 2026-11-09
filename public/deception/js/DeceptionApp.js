@@ -26,7 +26,7 @@ class DeceptionAppController {
     this.state = new DeceptionState();
     this.isVi = true;
     this.roundTimerId = null;
-    this.roundTimeLeft = 120; // 2 phút thảo luận tự do mỗi vòng (chuẩn MEN GEN GAME)
+    this.roundTimeLeft = 120; // 2 phút thảo luận tự do mỗi vòng (chuẩn điều tra sự cố IT)
     this.isTimerPaused = false;
     this.speakerTimerId = null; // backward compatibility
     this.soundEnabled = true;
@@ -1476,11 +1476,18 @@ class DeceptionAppController {
         const p = players[i];
         const isSelf = p.id === this.myPlayerId;
         const isReady = Boolean(p.isReady);
+        const activity = this.getDevActivity(p, i, true);
+        const animDelay = (i * 0.22).toFixed(2);
 
         nodesHtml += `
           <div class="online-table-seat-node ${isSelf ? 'is-self' : ''} ${p.isHost ? 'is-host' : ''} ${p.isBot ? 'is-bot' : ''} ${isReady ? 'is-ready' : 'is-waiting'}"
                style="left: ${rx.toFixed(2)}%; top: ${ry.toFixed(2)}%;"
                title="${this.escapeHtml(p.displayName)}${isSelf ? ' (Bạn)' : ''} - Ghế #${i + 1}">
+            <div class="dev-status-bubble" style="animation-delay: ${animDelay}s;">
+              <span class="bubble-icon">${activity.icon}</span>
+              <span class="bubble-text">${activity.text}</span>
+            </div>
+            <div class="workstation-chair"></div>
             <div class="table-seat-avatar">${p.avatar || '👤'}</div>
             ${p.isHost ? '<span class="seat-badge-crown" title="Chủ phòng">👑</span>' : ''}
             ${p.isBot ? '<span class="seat-badge-bot" title="Bot AI">🤖</span>' : ''}
@@ -1490,6 +1497,9 @@ class DeceptionAppController {
                 ✕
               </button>
             ` : ''}
+            <div class="workstation-desk-pod">
+              <i class="fa-solid fa-laptop-code desk-laptop-icon"></i>
+            </div>
             <span class="online-table-seat-label">${this.escapeHtml(p.displayName)}${isSelf ? ' (Bạn)' : ''}</span>
           </div>
         `;
@@ -1500,7 +1510,15 @@ class DeceptionAppController {
           <div class="online-table-seat-node is-empty ${isHost ? 'slot-can-add' : ''}"
                style="left: ${rx.toFixed(2)}%; top: ${ry.toFixed(2)}%;"
                ${isHost ? `data-action="add-bot" title="Nhấp để thêm nhanh Bot AI vào ghế #${slotIdx}"` : `title="Ghế #${slotIdx} đang trống"`}>
+            <div class="dev-status-bubble bubble-empty">
+              <span class="bubble-icon">🪑</span>
+              <span class="bubble-text">${isHost ? '+ Mời Bot AI' : 'Bàn trống'}</span>
+            </div>
+            <div class="workstation-chair chair-empty"></div>
             <div class="table-seat-avatar">${isHost ? '<i class="fa-solid fa-plus"></i>' : '<i class="fa-solid fa-chair"></i>'}</div>
+            <div class="workstation-desk-pod pod-empty">
+              <i class="fa-solid fa-laptop desk-laptop-icon"></i>
+            </div>
             <span class="online-table-seat-label">${isHost ? '+ Bot AI' : `Ghế #${slotIdx}`}</span>
           </div>
         `;
@@ -1830,8 +1848,53 @@ class DeceptionAppController {
   }
 
   /* =========================================================================
-     STAGE 1: LOBBY
+     STAGE 1: LOBBY & IT WAR ROOM WORKSTATIONS
      ========================================================================= */
+
+  getDevActivity(player, index, isOnline = false) {
+    if (player.isHuman || (isOnline && player.id === this.myPlayerId)) {
+      return { icon: '💻', text: this.isVi ? 'Đang soi log server...' : 'Analyzing server logs...' };
+    }
+    if (player.isHost) {
+      return { icon: '👑', text: this.isVi ? 'Chủ trì Incident Call' : 'Incident Lead' };
+    }
+    if (player.role === 'FORENSIC_SCIENTIST') {
+      return { icon: '🎯', text: this.isVi ? 'Tech Lead: Ghim thẻ chỉ dấu' : 'Tech Lead: Pinning clues' };
+    }
+    if (player.isBot) {
+      const botPoolVi = [
+        { icon: '🤖', text: 'AI: Crawl log lỗi Prod' },
+        { icon: '🔍', text: 'AI: Soi commit 2h sáng' },
+        { icon: '📊', text: 'AI: Phân tích metric CPU' },
+        { icon: '🐞', text: 'AI: Tìm stack trace' }
+      ];
+      return botPoolVi[index % botPoolVi.length];
+    }
+    const itActivitiesVi = [
+      { icon: '💻', text: 'Build dự án (mvn package)...' },
+      { icon: '📝', text: 'Review PR gấp: Cart.tsx' },
+      { icon: '🔍', text: 'Check git blame lúc 2h sáng' },
+      { icon: '☕', text: 'Uống cà phê ca đêm FPT' },
+      { icon: '⚠️', text: 'Phát hiện 502 Bad Gateway!' },
+      { icon: '📊', text: 'Soi APM Datadog & RAM' },
+      { icon: '⚡', text: 'Chuẩn bị rollback deploy' },
+      { icon: '🐞', text: 'Đặt breakpoint debug Prod' },
+      { icon: '🛡️', text: 'Kiểm tra token & IAM role' }
+    ];
+    const itActivitiesEn = [
+      { icon: '💻', text: 'Compiling project...' },
+      { icon: '📝', text: 'Reviewing PR: Cart.tsx' },
+      { icon: '🔍', text: 'Git blame 2 AM commit' },
+      { icon: '☕', text: 'Night shift coffee' },
+      { icon: '⚠️', text: '502 Bad Gateway detected!' },
+      { icon: '📊', text: 'Tracing Datadog APM' },
+      { icon: '⚡', text: 'Rollback deploy ready' },
+      { icon: '🐞', text: 'Debugging breakpoint' },
+      { icon: '🛡️', text: 'Verifying IAM permissions' }
+    ];
+    const pool = this.isVi ? itActivitiesVi : itActivitiesEn;
+    return pool[index % pool.length];
+  }
 
   renderLobbySeatsRing() {
     const ring = document.getElementById('lobby-seats-ring');
@@ -1842,12 +1905,22 @@ class DeceptionAppController {
       const angle = (i / count) * 2 * Math.PI - Math.PI / 2;
       const rx = 50 + 44 * Math.cos(angle);
       const ry = 50 + 44 * Math.sin(angle);
+      const activity = this.getDevActivity(p, i, false);
+      const animDelay = (i * 0.22).toFixed(2);
 
       return `
         <div class="lobby-seat-node ${p.isHuman ? 'is-human' : ''} ${p.role === 'FORENSIC_SCIENTIST' ? 'is-forensic' : ''}"
              style="left: ${rx}%; top: ${ry}%;">
-          <span>${p.avatar}</span>
-          <span class="lobby-seat-label">${p.isHuman ? (this.isVi ? 'BẠN' : 'YOU') : p.displayName}</span>
+          <div class="dev-status-bubble" style="animation-delay: ${animDelay}s;">
+            <span class="bubble-icon">${activity.icon}</span>
+            <span class="bubble-text">${activity.text}</span>
+          </div>
+          <div class="workstation-chair"></div>
+          <div class="table-seat-avatar">${p.avatar}</div>
+          <div class="workstation-desk-pod">
+            <i class="fa-solid fa-laptop-code desk-laptop-icon"></i>
+          </div>
+          <span class="lobby-seat-label">${p.isHuman ? (this.isVi ? 'BẠN' : 'YOU') : this.escapeHtml(p.displayName)}</span>
         </div>
       `;
     }).join('');
