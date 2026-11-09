@@ -691,6 +691,7 @@ body.deception-app {
   border: 1.5px solid rgba(255, 255, 255, 0.15);
   z-index: -1;
   pointer-events: none;
+  transition: all 0.25s ease;
 }
 
 /* Mini Workstation Desk & Laptop in front of Dev */
@@ -708,17 +709,19 @@ body.deception-app {
   justify-content: center;
   z-index: 2;
   pointer-events: none;
+  transition: all 0.25s ease;
 }
 
 .desk-laptop-icon {
   font-size: 9px;
   color: #00d2d3;
+  transition: transform 0.25s ease;
 }
 
 /* Dev Status Speech Bubble Overhead (Gather.town / Dev Story Style) */
 .dev-status-bubble {
   position: absolute;
-  bottom: calc(100% + 7px);
+  bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   background: rgba(15, 23, 42, 0.94);
@@ -736,6 +739,7 @@ body.deception-app {
   align-items: center;
   gap: 5px;
   animation: devBubbleFloat 3s ease-in-out infinite;
+  transition: all 0.25s ease;
 }
 
 .dev-status-bubble::after {
@@ -766,6 +770,290 @@ body.deception-app {
   50% {
     transform: translateX(-50%) translateY(-3.5px);
   }
+}
+
+/* =========================================================================
+   ANGLE-AWARE & POSITION-AWARE WORKSTATIONS & SPEECH BUBBLES
+   Ensures speech bubbles never enter the table interior or collide with telemetry
+   ========================================================================= */
+
+/* --- Top Half Seats: Bubble floats ABOVE, Desk pod faces DOWN (inward) --- */
+.seat-pos-top .dev-status-bubble,
+.dev-status-bubble.bubble-pos-top {
+  top: auto;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  animation: devBubbleFloat 3s ease-in-out infinite;
+}
+
+.seat-pos-top .dev-status-bubble::after,
+.dev-status-bubble.bubble-pos-top::after {
+  top: 100%;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0 5px;
+  border-color: rgba(15, 23, 42, 0.94) transparent transparent transparent;
+}
+
+.seat-pos-top .workstation-chair {
+  top: -6px;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 12px 12px 4px 4px;
+}
+
+.seat-pos-top .workstation-desk-pod {
+  bottom: -8px;
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.seat-pos-top .desk-laptop-icon {
+  transform: rotate(0deg);
+}
+
+.seat-pos-top .lobby-seat-label,
+.seat-pos-top .online-table-seat-label {
+  top: 50px;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Subtle corner angle adjustments for top corners */
+.seat-pos-top-left .workstation-desk-pod {
+  transform: translateX(-50%) rotate(22deg);
+}
+.seat-pos-top-left .workstation-chair {
+  transform: translateX(-50%) rotate(22deg);
+}
+.seat-pos-top-right .workstation-desk-pod {
+  transform: translateX(-50%) rotate(-22deg);
+}
+.seat-pos-top-right .workstation-chair {
+  transform: translateX(-50%) rotate(-22deg);
+}
+
+/* --- Bottom Half Seats: Bubble floats BELOW (outward), Desk pod faces UP (inward) --- */
+.seat-pos-bottom .dev-status-bubble,
+.dev-status-bubble.bubble-pos-bottom {
+  top: calc(100% + 8px);
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: devBubbleFloatBottom 3s ease-in-out infinite;
+}
+
+.seat-pos-bottom .dev-status-bubble::after,
+.dev-status-bubble.bubble-pos-bottom::after {
+  top: auto;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 5px 5px 5px;
+  border-color: transparent transparent rgba(15, 23, 42, 0.94) transparent;
+}
+
+.seat-pos-bottom .workstation-chair {
+  top: auto;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 4px 4px 12px 12px;
+}
+
+.seat-pos-bottom .workstation-desk-pod {
+  top: -8px;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.seat-pos-bottom .desk-laptop-icon {
+  transform: rotate(180deg);
+}
+
+/* Label on bottom seats sits cleanly on the inward side above the desk pod */
+.seat-pos-bottom .lobby-seat-label,
+.seat-pos-bottom .online-table-seat-label {
+  top: auto;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Subtle corner angle adjustments for bottom corners */
+.seat-pos-bottom-left .workstation-desk-pod {
+  transform: translateX(-50%) rotate(-22deg);
+}
+.seat-pos-bottom-left .workstation-chair {
+  transform: translateX(-50%) rotate(-22deg);
+}
+.seat-pos-bottom-right .workstation-desk-pod {
+  transform: translateX(-50%) rotate(22deg);
+}
+.seat-pos-bottom-right .workstation-chair {
+  transform: translateX(-50%) rotate(22deg);
+}
+
+/* --- Side Left Seats: Bubble floats OUTWARD to left, Desk pod faces RIGHT (inward) --- */
+.seat-pos-left .dev-status-bubble,
+.dev-status-bubble.bubble-pos-left {
+  right: calc(100% + 10px);
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  animation: devBubbleFloatLeft 3s ease-in-out infinite;
+}
+
+.seat-pos-left .dev-status-bubble::after,
+.dev-status-bubble.bubble-pos-left::after {
+  left: 100%;
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  border-width: 5px 0 5px 5px;
+  border-color: transparent transparent transparent rgba(15, 23, 42, 0.94);
+}
+
+.seat-pos-left .workstation-desk-pod {
+  left: auto;
+  right: -8px;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 24px;
+}
+
+.seat-pos-left .desk-laptop-icon {
+  transform: rotate(90deg);
+}
+
+.seat-pos-left .workstation-chair {
+  left: -6px;
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 48px;
+  border-radius: 12px 4px 4px 12px;
+}
+
+/* --- Side Right Seats: Bubble floats OUTWARD to right, Desk pod faces LEFT (inward) --- */
+.seat-pos-right .dev-status-bubble,
+.dev-status-bubble.bubble-pos-right {
+  left: calc(100% + 10px);
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  animation: devBubbleFloatRight 3s ease-in-out infinite;
+}
+
+.seat-pos-right .dev-status-bubble::after,
+.dev-status-bubble.bubble-pos-right::after {
+  right: 100%;
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  border-width: 5px 5px 5px 0;
+  border-color: transparent rgba(15, 23, 42, 0.94) transparent transparent;
+}
+
+.seat-pos-right .workstation-desk-pod {
+  left: -8px;
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 24px;
+}
+
+.seat-pos-right .desk-laptop-icon {
+  transform: rotate(-90deg);
+}
+
+.seat-pos-right .workstation-chair {
+  right: -6px;
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 48px;
+  border-radius: 4px 12px 12px 4px;
+}
+
+/* Floats animations */
+@keyframes devBubbleFloatBottom {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(3.5px);
+  }
+}
+
+@keyframes devBubbleFloatLeft {
+  0%, 100% {
+    transform: translateY(-50%) translateX(0);
+  }
+  50% {
+    transform: translateY(-50%) translateX(-3px);
+  }
+}
+
+@keyframes devBubbleFloatRight {
+  0%, 100% {
+    transform: translateY(-50%) translateX(0);
+  }
+  50% {
+    transform: translateY(-50%) translateX(3px);
+  }
+}
+
+/* Blitz Mode Badges & Tags */
+.badge-blitz-hud {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #e67e22 0%, #e74c3c 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+  animation: pulseBlitz 1.5s infinite;
+}
+
+@keyframes pulseBlitz {
+  0%, 100% { box-shadow: 0 0 8px rgba(231, 76, 60, 0.4); }
+  50% { box-shadow: 0 0 16px rgba(243, 156, 18, 0.7); }
+}
+
+.felt-mode-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #f39c12;
+  border: 1px solid rgba(243, 156, 18, 0.4);
+  background: rgba(243, 156, 18, 0.12);
 }
 
 .lobby-seat-label {
@@ -6918,6 +7206,28 @@ console.log('Successfully updated deception.css!');
     bottom: calc(100% + 4px);
   }
 
+  .seat-pos-bottom .dev-status-bubble,
+  .dev-status-bubble.bubble-pos-bottom {
+    top: calc(100% + 4px);
+    bottom: auto;
+  }
+
+  .seat-pos-left .dev-status-bubble,
+  .dev-status-bubble.bubble-pos-left {
+    right: calc(100% + 5px);
+    left: auto;
+    top: 50%;
+    bottom: auto;
+  }
+
+  .seat-pos-right .dev-status-bubble,
+  .dev-status-bubble.bubble-pos-right {
+    left: calc(100% + 5px);
+    right: auto;
+    top: 50%;
+    bottom: auto;
+  }
+
   .dev-status-bubble .bubble-text {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -6930,10 +7240,20 @@ console.log('Successfully updated deception.css!');
     top: -4px;
   }
 
+  .seat-pos-bottom .workstation-chair {
+    top: auto;
+    bottom: -4px;
+  }
+
   .workstation-desk-pod {
     width: 20px;
     height: 10px;
     bottom: -6px;
+  }
+
+  .seat-pos-bottom .workstation-desk-pod {
+    top: -6px;
+    bottom: auto;
   }
 
   .desk-laptop-icon {
@@ -6944,7 +7264,8 @@ console.log('Successfully updated deception.css!');
     font-size: 15px;
   }
 
-  .online-table-seat-label {
+  .online-table-seat-label,
+  .lobby-seat-label {
     top: 38px;
     left: 50%;
     transform: translateX(-50%);
@@ -6952,6 +7273,12 @@ console.log('Successfully updated deception.css!');
     font-size: 8px;
     max-width: 58px;
     padding: 1px 3px;
+  }
+
+  .seat-pos-bottom .online-table-seat-label,
+  .seat-pos-bottom .lobby-seat-label {
+    top: auto;
+    bottom: calc(100% + 4px);
   }
 
   .seat-badge-crown {

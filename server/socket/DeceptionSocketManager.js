@@ -63,7 +63,8 @@ class DeceptionSocketManager {
         seatIndex: p.seatIndex,
         disconnected: Boolean(p.disconnected)
       })),
-      chatMessages: room.chatMessages.slice(-50)
+      chatMessages: room.chatMessages.slice(-50),
+      gameMode: room.gameMode || 'BLITZ_2MIN'
     };
   }
 
@@ -97,6 +98,7 @@ class DeceptionSocketManager {
         createdAt: Date.now(),
         minPlayers: 4,
         maxPlayers: 9,
+        gameMode: data.gameMode || 'BLITZ_2MIN',
         players: [hostPlayer],
         chatMessages: [],
         gameState: null
@@ -642,7 +644,18 @@ class DeceptionSocketManager {
       if (!isForensic && !isHost) return;
 
       const state = room.gameState;
-      if (state.round === 1) {
+      if (state.maxRounds === 1 || state.round >= state.maxRounds) {
+        state.finishGame(
+          'CRIMINAL',
+          'TIME_EXPIRED',
+          state.maxRounds === 1
+            ? 'Hết 120s Tốc Chiến mà chưa tìm ra đúng Thủ phạm & Dấu vết. Thủ phạm đã cao chạy xa bay!'
+            : 'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra đúng cặp Phương thức & Manh mối. Kẻ Sát Nhân đã cao chạy xa bay!',
+          state.maxRounds === 1
+            ? '2-Minute Blitz ended without a correct accusation. The Murderer escaped into the night!'
+            : 'All 3 investigation rounds ended without a correct accusation. The Murderer escaped into the night!'
+        );
+      } else if (state.round === 1) {
         state.startRound2Evidence();
       } else if (state.round === 2) {
         state.startRound3Evidence();
@@ -689,6 +702,8 @@ class DeceptionSocketManager {
       caseId: state.caseId,
       roomCode: room.roomCode,
       round: state.round,
+      maxRounds: state.maxRounds,
+      gameMode: room.gameMode || (state && state.config && state.config.gameMode) || 'BLITZ_2MIN',
       phase: state.phase,
       activeSceneTiles: state.activeSceneTiles,
       latestAiLogReport: state.latestAiLogReport,
@@ -776,10 +791,14 @@ class DeceptionSocketManager {
     const state = new DeceptionState();
     state.config.playerCount = room.players.length;
     state.config.playerName = room.players[0].displayName;
+    state.config.gameMode = options.gameMode || room.gameMode || 'BLITZ_2MIN';
     if (options && options.preferredRole) {
       state.config.preferredRole = options.preferredRole;
     }
     state.startNewGame();
+    if (state.config.gameMode === 'BLITZ_2MIN') {
+      state.maxRounds = 1;
+    }
     state.proceedToNightCrime();
 
     // Đảm bảo solution luôn có Hung khí + Manh mối hợp lệ cho ván đấu
@@ -797,6 +816,11 @@ class DeceptionSocketManager {
       state.startRound1Evidence();
     } else if (state.phase !== 'ROUND_1_EVIDENCE') {
       state.startRound1Evidence();
+    }
+
+    if (state.config.gameMode === 'BLITZ_2MIN') {
+      state.autoPlaceForensicBullets();
+      state.startPresentationPhase();
     }
 
     // Map các socket id vào danh sách người chơi của game

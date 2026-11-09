@@ -102,7 +102,8 @@ export class DeceptionState {
       includeUndercoverAllies: true,
       includeEventTiles: true,
       presentationSeconds: 120,
-      playerName: 'Senior Dev'
+      playerName: 'Senior Dev',
+      gameMode: 'STANDARD_3ROUNDS' // 'BLITZ_2MIN' (1 Vòng 120s Chuẩn Cuộc Thi FPT) | 'STANDARD_3ROUNDS' (3 Vòng)
     };
 
     this.caseId = 'INC-' + Math.floor(Math.random() * 8999 + 1000);
@@ -305,6 +306,7 @@ export class DeceptionState {
 
     this.caseId = 'INC-' + Math.floor(Math.random() * 8999 + 1000);
     this.round = 1;
+    this.maxRounds = this.config.gameMode === 'BLITZ_2MIN' ? 1 : 3;
     this.winnerTeam = null;
     this.winReasonKey = '';
     this.winReasonText = '';
@@ -539,72 +541,178 @@ export class DeceptionState {
   }
 
   /**
-   * Thuật toán AI Pháp y thông minh: Đặt đạn gỗ khớp ngữ nghĩa với cặp bài của Kẻ Sát Nhân
+   * Thuật toán AI Tech Lead / Incident Commander thông minh: Đặt đạn gỗ khớp ngữ nghĩa chuẩn xác với cặp bài của Thủ Phạm
    */
-  computeSmartBulletOption(tile) {
-    const mFound = this.findCardById(this.solution.meansCardId);
-    const cFound = this.findCardById(this.solution.clueCardId);
-    const mCard = mFound?.card;
-    const cCard = cFound?.card;
+  computeSmartBulletOption(tile, customMeansCard = null, customClueCard = null) {
+    const mCard = customMeansCard || this.findCardById(this.solution?.meansCardId)?.card;
+    const cCard = customClueCard || this.findCardById(this.solution?.clueCardId)?.card;
     if (!mCard || !cCard) return 0;
 
     const mCat = (mCard.category || '').toLowerCase();
     const cCat = (cCard.category || '').toLowerCase();
+    const mText = `${mCard.vi || ''} ${mCard.en || ''}`.toLowerCase();
+    const cText = `${cCard.vi || ''} ${cCard.en || ''}`.toLowerCase();
+    const combined = `${mText} ${cText}`;
 
-    // 1. Ô Tím: Nguyên nhân Tử vong (tile_cause_01)
+    // 1. Ô TÍM: Root Cause (Nguyên nhân Gốc rễ - tile_cause_01)
     if (tile.id === 'tile_cause_01') {
-      if (mCat.includes('poison')) return 4;      // Poisoning / Trúng độc
-      if (mCat.includes('suffoc')) return 0;      // Suffocation / Ngạt thở
-      if (mCat.includes('blood')) return 2;       // Loss of Blood / Mất máu
-      if (mCat.includes('severe')) return 1;      // Severe Injury / Chấn thương nặng
-      if (mCat.includes('illness')) return 3;     // Illness / Bệnh lý
-      if (mCat.includes('accident')) return 5;    // Accident / Tai nạn
+      // Ưu tiên 1: Từ khóa IT trực diện trong thẻ Hành vi gây lỗi (Means)
+      if (/ram|memory|heap|oom|out of memory|rò rỉ bộ nhớ|leak memory/i.test(mText)) return 0; // Tràn RAM (OOM)
+      if (/cpu|spike|vòng lặp|loop|while|100%|treo|đệ quy|recursion/i.test(mText)) return 1; // Quá tải CPU
+      if (/database|đứt kết nối db|connection pool|cáp|cable|drop table|sql injection|query|postgres|mysql|mongo/i.test(mText)) return 2; // Đứt kết nối DB
+      if (/thư viện|dependency|package|npm|conflict|version|xung đột|node_modules|build/i.test(mText)) return 3; // Xung đột thư viện
+      if (/lỗi phân quyền|permission|root|auth|jwt|token|password|mật khẩu|api key|secret|hacker|bảo mật|lộ/i.test(mText)) return 4; // Lỗi phân quyền / Bảo mật
+      if (/ddos|botnet|flood|tấn công mạng|spam api|traffic/i.test(mText)) return 5; // DDoS / Tấn công mạng
+
+      // Ưu tiên 2: Phân loại danh mục chuẩn Deception
+      if (mCat.includes('poison')) return 4;      // Poisoning -> Lỗi phân quyền / Rò rỉ bảo mật
+      if (mCat.includes('suffoc')) return 0;      // Suffocation -> Tràn RAM (OOM)
+      if (mCat.includes('blood')) return 2;       // Loss of Blood -> Đứt kết nối DB
+      if (mCat.includes('severe')) return 1;      // Severe Injury -> Quá tải CPU (100% Spike)
+      if (mCat.includes('illness')) return 3;     // Illness -> Xung đột thư viện (Dependency)
+      if (mCat.includes('accident')) return 5;    // Accident -> DDoS / Tấn công mạng
       return 1;
     }
 
-    // 2. Ô Bản chất Vật chứng Để lại (tile_scene_04)
-    if (tile.id === 'tile_scene_04') {
-      if (cCat.includes('natural')) return 0;     // Tự nhiên
-      if (cCat.includes('artistic')) return 1;    // Nghệ thuật
-      if (cCat.includes('written')) return 2;     // Chữ viết / Văn bản
-      if (cCat.includes('synthetic')) return 3;   // Nhân tạo / Tổng hợp
-      if (cCat.includes('personal')) return 4;    // Đồ cá nhân
-      if (cCat.includes('unrelated')) return 5;   // Không liên quan
-      return 3;
+    // 2. Ô XANH LÁ: Môi trường / Tầng hệ thống bị sập (tile_loc_01 .. tile_loc_04)
+    if (tile.color === 'GREEN' || tile.type === 'LOCATION_OF_CRIME') {
+      if (tile.id === 'tile_loc_01') { // Core Infra: Database, API Gateway, Cloud K8s, Payment, Auth, Redis
+        if (/database|sql|postgres|mysql|mongo|bảng|table|migration|db/i.test(combined)) return 0; // Production Database
+        if (/api|gateway|endpoint|route|rest|cors|502|proxy/i.test(combined)) return 1; // API Gateway
+        if (/k8s|kubernetes|cloud|cluster|server|pod|docker|aws|ec2|vm/i.test(combined)) return 2; // Cloud Server / Cụm K8s
+        if (/payment|thanh toán|stripe|bank|billing|tiền|order|checkout/i.test(combined)) return 3; // Hệ thống Payment
+        if (/auth|login|jwt|token|password|mật khẩu|oauth|sso|quyền/i.test(combined)) return 4; // Cổng Auth / Login
+        if (/redis|cache|memcache|ttl|evict|session/i.test(combined)) return 5; // Cụm Redis Cache
+      } else if (tile.id === 'tile_loc_02') { // DevOps & Pipeline: CI/CD, Load Balancer, Kafka, S3, Billing, Elastic
+        if (/ci\/cd|pipeline|jenkins|gitlab|deploy|github actions|release|runner/i.test(combined)) return 0; // CI/CD Pipeline
+        if (/load balancer|cdn|cloudflare|nginx|traffic/i.test(combined)) return 1; // Load Balancer / CDN
+        if (/kafka|rabbitmq|queue|hàng đợi|message|broker/i.test(combined)) return 2; // Kafka / RabbitMQ
+        if (/s3|bucket|storage|blob|upload|file/i.test(combined)) return 3; // Cloud Storage S3
+        if (/billing|hóa đơn|invoice|cost|chi phí|tiền/i.test(combined)) return 4; // Hệ thống Hóa đơn
+        if (/elastic|search|kibana|index|tìm kiếm/i.test(combined)) return 5; // Elastic Search
+      } else if (tile.id === 'tile_loc_03') { // Apps & Portal: Mobile, Admin, Landing, VPN, AI Chatbot, Email/OTP
+        if (/mobile|ios|android|app|flutter|react native/i.test(combined)) return 0; // Mobile App
+        if (/admin|portal|dashboard|quản trị|cms/i.test(combined)) return 1; // Web Admin
+        if (/landing|trang chủ|home|customer|khách hàng/i.test(combined)) return 2; // Customer Landing
+        if (/vpn|intranet|nội bộ|wifi|firewall|mạng/i.test(combined)) return 3; // Internal VPN
+        if (/ai|llm|gpt|chatbot|bot|gemini|model/i.test(combined)) return 4; // AI Chatbot
+        if (/email|otp|sms|notification|mail|thông báo/i.test(combined)) return 5; // Email / OTP
+      } else if (tile.id === 'tile_loc_04') { // Lab & ODC: On-Prem, ODC Room, Demo Room, Staging, Backup, 3rd Party
+        if (/on-prem|server room|phần cứng|rack|ổ điện|ups/i.test(combined)) return 0; // On-Prem Server Room
+        if (/odc|f-ville|f-town|fsoft|bàn làm việc|văn phòng/i.test(combined)) return 1; // Phòng ODC
+        if (/demo|khách hàng|họp|meeting|thuyết trình/i.test(combined)) return 2; // Phòng Demo
+        if (/staging|uat|test|testcase|qa/i.test(combined)) return 3; // Staging / UAT
+        if (/backup|dự phòng|snapshot|restore/i.test(combined)) return 4; // Backup Dự phòng
+        if (/bên thứ 3|third-party|partner|đối tác|external/i.test(combined)) return 5; // API Đối tác
+      }
     }
 
-    // 3. Ô Thời lượng Gây án (tile_scene_03)
+    // 3. CÁC Ô NÂU ĐẶC BIỆT: Thông số sự cố IT
+    // tile_scene_01: Trạng thái Hệ thống
+    if (tile.id === 'tile_scene_01') {
+      if (/502|gateway|màn hình xanh|bsod/i.test(combined)) return 0;
+      if (/treo cứng|freeze|hang|không phản hồi|cpu|loop/i.test(combined)) return 1;
+      if (/mã hóa|encrypt|corrupt|biến dạng/i.test(combined)) return 2;
+      if (/microservice|rải rác|cụm/i.test(combined)) return 3;
+      if (/giao diện|api|backend/i.test(combined)) return 4;
+      if (/loading|spinner|quay|vô tận|timeout/i.test(combined)) return 5;
+    }
+
+    // tile_scene_02: Thời điểm Xảy ra Sự cố
+    if (tile.id === 'tile_scene_02') {
+      if (/thứ sáu|friday|chiều thứ 6/i.test(combined)) return 1; // Chiều thứ Sáu
+      if (/đêm|2h|khuya|midnight|release|go-live|rạng sáng/i.test(combined)) return 4; // Đêm Release Go-Live
+      if (/demo|khách hàng|pitch/i.test(combined)) return 3; // Ngay trước giờ Demo
+      if (/flash sale|peak|cao điểm|sale/i.test(combined)) return 0; // Giờ cao điểm
+      if (/bảo trì|maintenance/i.test(combined)) return 2; // Bảo trì định kỳ
+      if (/sáng|thứ hai|monday|standup/i.test(combined)) return 5; // Sáng thứ Hai
+    }
+
+    // tile_scene_03: Tốc độ Phát tán Lỗi
     if (tile.id === 'tile_scene_03') {
-      if (mCat.includes('poison') || mCat.includes('illness')) return 2; // Gradual (Từ từ / Ngấm dần)
-      if (mCat.includes('suffoc')) return 3;                             // Prolonged (Kéo dài)
-      if (mCat.includes('blood') || mCat.includes('severe')) return 1;   // Brief (Chớp nhoáng)
-      return 0;                                                          // Instantaneous (Tức thì)
+      if (/ngấm dần|leak|memory|ram|tăng dần/i.test(combined) || mCat.includes('poison') || mCat.includes('illness')) return 2; // Rò rỉ ngấm dần
+      if (/sập tức thì|instant|ngay lập tức|drop table|xóa nhầm/i.test(combined)) return 0; // Sập tức thì
+      if (/kéo dài|treo|hang/i.test(combined) || mCat.includes('suffoc')) return 3; // Treo hệ thống kéo dài
+      if (/chớp nhoáng|brief|nhanh/i.test(combined) || mCat.includes('blood') || mCat.includes('severe')) return 1; // Chớp nhoáng
+      if (/ủ bệnh|latent|ngầm/i.test(combined)) return 4;
+      return 5; // Chập chờn
     }
 
-    // 4. Ô Dấu vết tại Hiện trường (tile_scene_14)
+    // tile_scene_04: Bản chất Dấu vết Để lại
+    if (tile.id === 'tile_scene_04') {
+      if (/cà phê|trà sữa|nước|bánh|đồ ăn/i.test(cText) || cCat.includes('natural')) return 0; // Đồ ăn / Thức uống / Vật lý
+      if (/ui|giao diện|hình ảnh|ảnh|media/i.test(cText) || cCat.includes('artistic')) return 1; // Giao diện / Hình ảnh / Media
+      if (/log|văn bản|chat|slack|note|file .env/i.test(cText) || cCat.includes('written')) return 2; // Bản ghi Log / Văn bản / Chat
+      if (/cấu hình|config|hệ thống|mạng|server|token/i.test(cText) || cCat.includes('synthetic')) return 3; // File Cấu hình / Hệ thống / Mạng
+      if (/thiết bị|laptop|điện thoại|chuột|thẻ dev/i.test(cText) || cCat.includes('personal')) return 4; // Thiết bị / Đồ cá nhân của Dev
+      return 5; // Vật dụng giải trí / Ngoại cảnh
+    }
+
+    // tile_scene_09: Hiện trạng Bàn làm việc
+    if (tile.id === 'tile_scene_09') {
+      if (/note|giấy|post-it|mật khẩu dán/i.test(cText)) return 0; // Mảnh giấy Note dán chi chít
+      if (/nóng|khét|quạt|cháy|nhiệt/i.test(cText) || /nóng|khét/i.test(mText)) return 1; // Thiết bị nóng ran / Khét lẹt
+      if (/cà phê|trà sữa|nước|đổ|ly/i.test(cText)) return 2; // Vết cà phê / Trà sữa đổ loang
+      if (/bàn phím|màn hình|kẹt nút|chuột|vỡ|nứt/i.test(cText)) return 3; // Bàn phím kẹt nút
+      if (/dây mạng|cáp|bừa bộn/i.test(cText)) return 4; // Dây mạng & đồ đạc bừa bộn
+      return 5; // Gọn gàng sạch sẽ đáng ngờ
+    }
+
+    // tile_scene_13: Khung giờ Sập Hệ thống
+    if (tile.id === 'tile_scene_13') {
+      if (/2h|rạng sáng|02:|03:|04:|dawn/i.test(combined)) return 0; // 02:00 - 05:00 AM
+      if (/sáng|08:|09:|morning/i.test(combined)) return 1; // Buổi sáng
+      if (/trưa|12:|noon/i.test(combined)) return 2; // Buổi trưa
+      if (/chiều|15:|16:|afternoon/i.test(combined)) return 3; // Buổi chiều
+      if (/17:59|tan tầm|tối|evening/i.test(combined)) return 4; // Chập tối sát giờ tan tầm
+      if (/đêm|khuya|23:|00:|night/i.test(combined)) return 5; // Đêm khuya thanh vắng
+    }
+
+    // tile_scene_14: Dấu vết Giám định tại Chỗ
     if (tile.id === 'tile_scene_14') {
-      if (mCat.includes('blood')) return 3;       // Blood Stain (Vết máu)
-      if (mCat.includes('severe')) return 2;      // Bruise (Vết bầm / Va đập)
-      if (mCat.includes('poison') || mCat.includes('illness')) return 4; // Bodily Fluid (Dịch cơ thể)
-      if (cCat.includes('personal') || cCat.includes('written')) return 0; // Fingerprint (Dấu vân tay)
-      return 1;                                   // Footprint (Dấu chân)
+      if (/git|commit|blame|history|rebase|force push/i.test(cText) || /git|commit/i.test(mText)) return 5; // Dấu vết xóa / sửa Git History
+      if (/stack trace|dump|core dump|trace log/i.test(cText) || /trace/i.test(mText)) return 3; // Stack Trace đỏ lòm
+      if (/cà phê|nước|ẩm|đổ/i.test(cText)) return 4; // Vết nước / Cà phê đổ loang
+      if (/vân tay|gõ phím|bàn phím/i.test(cText)) return 0; // Dấu vân tay / Lịch sử gõ phím
+      if (/phòng server|dấu giày/i.test(cText)) return 1; // Dấu giày phòng Server
+      return 2; // Vết va đập phần cứng
     }
 
-    // 5. Ô Dấu hiệu trên Thi thể (tile_scene_06)
-    if (tile.id === 'tile_scene_06') {
-      if (mCat.includes('suffoc') || mCat.includes('severe')) return 0; // Head
-      if (mCat.includes('blood')) return 1;                             // Chest
-      if (mCat.includes('poison') || mCat.includes('illness')) return 5;// All-over
-      return 2;                                                         // Hand
+    // 4. Thuật toán chấm điểm token tổng quát cho mọi Thẻ Hiện Trường khác
+    if (tile.options_vi && tile.options_vi.length > 0) {
+      let bestOptIdx = -1;
+      let maxOptScore = 0;
+
+      for (let idx = 0; idx < tile.options_vi.length; idx++) {
+        const optVi = (tile.options_vi[idx] || '').toLowerCase();
+        const optEn = (tile.options_en ? tile.options_en[idx] : '').toLowerCase();
+        let optScore = 0;
+
+        // Tách các từ khóa có nghĩa (độ dài >= 3 ký tự)
+        const tokens = `${optVi} ${optEn}`.split(/[\s,()\/•-]+/).filter(t => t.length >= 3);
+        for (const token of tokens) {
+          if (mText.includes(token)) optScore += 3;
+          if (cText.includes(token)) optScore += 2;
+        }
+
+        if (optScore > maxOptScore) {
+          maxOptScore = optScore;
+          bestOptIdx = idx;
+        }
+      }
+
+      if (bestOptIdx !== -1 && maxOptScore > 0) {
+        return bestOptIdx;
+      }
     }
 
-    // Các ô khác: Băm nhất quán theo ID của cặp bài đáp án
+    // 5. Fallback nhất quán (Deterministic Hash) nếu không có từ khóa trùng khớp
     const seedStr = `${mCard.id}-${cCard.id}-${tile.id}`;
     let hash = 0;
     for (let i = 0; i < seedStr.length; i++) {
       hash = (hash * 31 + seedStr.charCodeAt(i)) % 997;
     }
-    return hash % 6;
+    return hash % (tile.options_vi?.length || 6);
   }
 
   /**
@@ -691,40 +799,35 @@ export class DeceptionState {
     const cCat = (clueCard.category || '').toLowerCase();
 
     for (const tile of this.activeSceneTiles) {
-      if (tile.selectedOptionIndex === null) continue;
+      if (tile.selectedOptionIndex === null || tile.selectedOptionIndex === undefined) continue;
       const optIdx = tile.selectedOptionIndex;
-      const optVi = (tile.options_vi[optIdx] || '').toLowerCase();
-      const optEn = (tile.options_en ? tile.options_en[optIdx] : '').toLowerCase();
+      const expectedOpt = this.computeSmartBulletOption(tile, meansCard, clueCard);
 
-      // 1. Khớp Nguyên nhân Tử vong (Ô Tím)
+      // Nếu đạn gỗ thực tế trên bàn khớp với option mà cặp bài này sinh ra:
+      if (optIdx === expectedOpt) {
+        if (tile.id === 'tile_cause_01') {
+          score += 5; // Khớp Root Cause là trọng yếu
+        } else if (tile.color === 'GREEN' || tile.type === 'LOCATION_OF_CRIME') {
+          score += 4; // Khớp Tầng hệ thống bị sập
+        } else {
+          score += 2; // Khớp Thông số sự cố Nâu
+        }
+      }
+
+      // Giữ nguyên tương thích logic cũ
       if (tile.id === 'tile_cause_01') {
-        if (optIdx === 4 && mCat.includes('poison')) score += 4;
-        if (optIdx === 0 && mCat.includes('suffoc')) score += 4;
-        if (optIdx === 2 && mCat.includes('blood')) score += 4;
-        if (optIdx === 1 && mCat.includes('severe')) score += 4;
-        if (optIdx === 3 && mCat.includes('illness')) score += 4;
-        if (optIdx === 5 && mCat.includes('accident')) score += 4;
+        if (optIdx === 4 && mCat.includes('poison')) score += 2;
+        if (optIdx === 0 && mCat.includes('suffoc')) score += 2;
+        if (optIdx === 2 && mCat.includes('blood')) score += 2;
+        if (optIdx === 1 && mCat.includes('severe')) score += 2;
+        if (optIdx === 3 && mCat.includes('illness')) score += 2;
+        if (optIdx === 5 && mCat.includes('accident')) score += 2;
       }
+    }
 
-      // 2. Khớp Địa điểm (Ô Xanh)
-      if (tile.color === 'GREEN') {
-        if (optVi.includes(meansCard.vi.toLowerCase()) || meansCard.vi.toLowerCase().includes(optVi)) score += 3;
-        if (optVi.includes(clueCard.vi.toLowerCase()) || clueCard.vi.toLowerCase().includes(optVi)) score += 3;
-      }
-
-      // 3. Khớp Bản chất Vật chứng (Ô Nâu 04)
-      if (tile.id === 'tile_scene_04') {
-        if (optIdx === 0 && cCat.includes('natural')) score += 2;
-        if (optIdx === 1 && cCat.includes('artistic')) score += 2;
-        if (optIdx === 2 && cCat.includes('written')) score += 2;
-        if (optIdx === 3 && cCat.includes('synthetic')) score += 2;
-        if (optIdx === 4 && cCat.includes('personal')) score += 2;
-      }
-
-      // 4. Nếu là cặp bài chuẩn của vụ án -> được cộng điểm tương quan
-      if (meansCard.id === this.solution.meansCardId && clueCard.id === this.solution.clueCardId) {
-        score += 3;
-      }
+    // Nếu là cặp bài chuẩn của vụ án -> được cộng điểm tương quan
+    if (meansCard.id === this.solution?.meansCardId && clueCard.id === this.solution?.clueCardId) {
+      score += 4;
     }
     return score;
   }
@@ -840,6 +943,21 @@ export class DeceptionState {
    * Kết thúc Vòng Trình bày hiện tại để chuyển sang Vòng tiếp theo (hoặc Đêm Mở rộng / Kết thúc)
    */
   advanceAfterPresentation() {
+    if (this.maxRounds === 1 || this.round >= this.maxRounds) {
+      // Hết thời gian War Room (Quá hạn SLA) mà Đội Ứng Phó chưa tìm ra đúng cặp Hành vi & Dấu vết -> Phe Gây Lỗi thắng!
+      this.finishGame(
+        'CRIMINAL',
+        'TIME_EXPIRED',
+        this.maxRounds === 1
+          ? 'Hết 120s Tốc Chiến (Quá hạn SLA Cuộc Thi FPT) mà Đội Ứng Phó chưa tìm ra đúng cặp Hành vi & Dấu vết Log. Thủ phạm đã kịp tẩu thoát!'
+          : 'Hết 3 vòng họp War Room (Quá hạn SLA) mà Đội Ứng Phó chưa tìm ra đúng cặp Hành vi & Dấu vết Log. Thủ phạm đã xóa sạch dấu vết và hạ cánh an toàn!',
+        this.maxRounds === 1
+          ? '2-Minute Blitz ended (FPT SLA Breached) without pinpointing the exact Trigger & Log Trace. The Culprit got away clean!'
+          : 'All 3 War Room rounds ended (SLA Breached) without pinpointing the exact Trigger & Log Trace. The Culprit got away clean!'
+      );
+      return;
+    }
+
     if (this.round === 1) {
       // Kiểm tra xem có Kỹ thuật viên Phòng Lab hoặc Nội gián trong bàn không
       const hasAlliesNight = this.players.some(

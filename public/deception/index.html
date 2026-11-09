@@ -181,6 +181,14 @@
               </div>
 
               <div class="cfg-group">
+                <label for="cfg-game-mode"><i class="fa-solid fa-stopwatch"></i> Chế độ / Thời lượng chơi:</label>
+                <select id="cfg-game-mode" class="noir-ctrl-select">
+                  <option value="BLITZ_2MIN" selected>⚡ Tốc Chiến 2 Phút (Chuẩn Cuộc Thi FPT - 1 Vòng Quyết Định 120s)</option>
+                  <option value="STANDARD_3ROUNDS">🕵️ Tiêu Chuẩn 3 Vòng (Điều Tra Chuyên Sâu)</option>
+                </select>
+              </div>
+
+              <div class="cfg-group">
                 <label for="cfg-preferred-role">Vai trò bạn muốn cầm:</label>
                 <select id="cfg-preferred-role" class="noir-ctrl-select">
                   <option value="RANDOM">🎲 Ngẫu Nhiên (Trải nghiệm chuẩn)</option>
@@ -236,6 +244,14 @@
                       <button type="button" class="btn-avatar-choice" data-avatar="🛡️">🛡️</button>
                       <button type="button" class="btn-avatar-choice" data-avatar="🎩">🎩</button>
                     </div>
+                  </div>
+
+                  <div class="cfg-group">
+                    <label for="online-create-mode"><i class="fa-solid fa-stopwatch"></i> Chế độ / Thời lượng trận đấu:</label>
+                    <select id="online-create-mode" class="noir-ctrl-select">
+                      <option value="BLITZ_2MIN" selected>⚡ Tốc Chiến 2 Phút (Chuẩn Cuộc Thi FPT - 1 Vòng 120s)</option>
+                      <option value="STANDARD_3ROUNDS">🕵️ Tiêu Chuẩn 3 Vòng (Điều Tra Chuyên Sâu)</option>
+                    </select>
                   </div>
 
                   <button type="button" class="btn-noir-hero btn-create-online" id="btn-create-online-room">
@@ -440,6 +456,7 @@
                       </div>
                       <div class="online-table-felt-status">
                         <span class="felt-code-tag">Phòng: <b id="online-felt-room-code">DEC---</b></span>
+                        <span class="felt-mode-tag" id="online-felt-mode-tag"><i class="fa-solid fa-bolt"></i> ⚡ Tốc Chiến 2 Phút</span>
                         <span class="felt-status-tag" id="online-felt-status-tag">Đang chờ thành viên...</span>
                       </div>
                     </div>
