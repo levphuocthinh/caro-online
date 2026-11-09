@@ -133,6 +133,239 @@ describe('FPT Audit & Deep Verification Suite', () => {
       await testServer.close();
     }
   });
+
+  test('FPT Audit 6: Header role button #btn-hdr-my-role is hidden in index.html, lobby, and online room', () => {
+    const htmlPath = path.join(__dirname, '../public/deception/index.html');
+    const html = fs.readFileSync(htmlPath, 'utf8');
+    assert(html.includes('id="btn-hdr-my-role"'), 'index.html must define btn-hdr-my-role');
+    assert(html.includes('id="btn-hdr-my-role" title="Bấm để xem lại cẩm nang vai trò của bạn" style="display: none;"'),
+      'btn-hdr-my-role must be hidden by default with style="display: none;"');
+
+    const appJsPath = path.join(__dirname, '../public/deception/js/DeceptionApp.js');
+    const appJs = fs.readFileSync(appJsPath, 'utf8');
+    assert(appJs.includes("viewId === 'view-investigation'"), 'btn-hdr-my-role must only be shown in view-investigation');
+    assert(appJs.includes("this.openSecretRoleModal(data.yourSecretRole)"), 'openSecretRoleModal must be called on game start');
+  });
+
+  test('FPT Audit 7: Human Tech Lead in online game starts in ROUND_1_EVIDENCE without auto bullets', async () => {
+    const testServer = await startTestServer();
+    try {
+      const host = await testServer.connectClient();
+      host.emit('deception:create_room', { playerName: 'HostLead' });
+      const created = await waitForEvent(host, 'deception:room_created');
+      const roomCode = created.roomCode;
+
+      // Add 3 bots so total = 4
+      for (let i = 0; i < 3; i++) {
+        host.emit('deception:add_bot');
+        await waitForEvent(host, 'deception:room_updated');
+      }
+
+      // Host starts game requesting Tech Lead role
+      host.emit('deception:start_game', { preferredRole: 'FORENSIC_SCIENTIST' });
+      const gameData = await waitForEvent(host, 'deception:game_started');
+
+      assertEqual(gameData.yourSecretRole.role, 'FORENSIC_SCIENTIST');
+      assertEqual(gameData.publicState.phase, 'ROUND_1_EVIDENCE');
+
+      // Verify all 6 scene tiles have NOT been auto-marked
+      const markedTiles = gameData.publicState.activeSceneTiles.filter(t => t.selectedOptionIndex !== null && t.selectedOptionIndex !== undefined);
+      assertEqual(markedTiles.length, 0, 'Human Tech Lead scene tiles must not be auto-marked');
+
+      // Manually place 6 bullets
+      for (let tIdx = 0; tIdx < 6; tIdx++) {
+        const [bulletEvt] = await Promise.all([
+          waitForEvent(host, 'deception:bullet_placed'),
+          host.emit('deception:place_bullet', { tileIndex: tIdx, optionIndex: 0 })
+        ]);
+        assertEqual(bulletEvt.tileIndex, tIdx);
+      }
+
+      // Confirm evidence & start presentation phase
+      const [presData] = await Promise.all([
+        waitForEvent(host, 'deception:presentation_started'),
+        host.emit('deception:confirm_evidence')
+      ]);
+      assertEqual(presData.phase, 'ROUND_1_PRESENTATION');
+    } finally {
+      await testServer.close();
+    }
+  });
+
+  test('FPT Audit 8: Bot in online room actively replies to human chat in real time', async () => {
+    const testServer = await startTestServer();
+    try {
+      const host = await testServer.connectClient();
+      host.emit('deception:create_room', { playerName: 'DevLead' });
+      await waitForEvent(host, 'deception:room_created');
+
+      for (let i = 0; i < 3; i++) {
+        host.emit('deception:add_bot');
+        await waitForEvent(host, 'deception:room_updated');
+      }
+
+      host.emit('deception:start_game');
+      await waitForEvent(host, 'deception:game_started');
+
+      // Host sends chat questioning clues
+      host.emit('deception:send_chat', { message: 'Tôi nghi ngờ manh mối này! Ai có ý kiến gì không?' });
+
+      // Host receives their own echo first
+      const firstChat = await waitForEvent(host, 'deception:new_chat');
+      assertEqual(firstChat.senderId, host.id);
+
+      // Now wait for an eligible Bot to respond
+      const botReply = await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Bot did not reply within 3500ms')), 3500);
+        host.on('deception:new_chat', (chatItem) => {
+          if (chatItem.senderId !== host.id && !chatItem.isSystem) {
+            clearTimeout(timeout);
+            resolve(chatItem);
+          }
+        });
+      });
+
+      assert(botReply.text.length > 5, 'Bot reply should contain meaningful response text');
+      assert(botReply.senderName.includes('(AI)'), 'Bot reply senderName must identify as AI');
+    } finally {
+      await testServer.close();
+    }
+  });
+
+  test('FPT Audit 9: Tech Lead bot strictly obeys taboo silence rule and NEVER sends chat', async () => {
+    const testServer = await startTestServer();
+    try {
+      const host = await testServer.connectClient();
+      host.emit('deception:create_room', { playerName: 'AgentX' });
+      const created = await waitForEvent(host, 'deception:room_created');
+      const roomCode = created.roomCode;
+
+      for (let i = 0; i < 3; i++) {
+        host.emit('deception:add_bot');
+        await waitForEvent(host, 'deception:room_updated');
+      }
+
+      // Host requests to NOT be Forensic Scientist
+      host.emit('deception:start_game', { preferredRole: 'INVESTIGATOR' });
+      const hostData = await waitForEvent(host, 'deception:game_started');
+
+      const deceptionMgr = testServer.server.socketController.deceptionSocketManager;
+      const room = deceptionMgr.rooms.get(roomCode);
+      const forensic = room.gameState.getForensicPlayer();
+      assert(forensic, 'Forensic player must exist');
+
+      // Tech Lead must be one of the bots
+      const forensicIdx = room.gameState.players.indexOf(forensic);
+      const forensicRp = room.players[forensicIdx];
+      assertEqual(forensicRp.isBot, true, 'Forensic player should be a bot for this test');
+
+      const chatSenders = [];
+      host.on('deception:new_chat', (msg) => {
+        if (!msg.isSystem && msg.senderId !== host.id) {
+          chatSenders.push(msg.senderId);
+        }
+      });
+
+      // Send a chat
+      host.emit('deception:send_chat', { message: 'Có ai có ý kiến gì về vụ án này không?' });
+      await sleep(1500);
+
+      // Verify none of the messages came from forensic bot
+      assert(!chatSenders.includes(forensicRp.id), 'Forensic Tech Lead bot must NEVER send chat messages');
+    } finally {
+      await testServer.close();
+    }
+  });
+
+  test('FPT Audit 10: Location tile auto-alignment on crime commit and intelligent AI markers for M027 and C049', () => {
+    const game = new DeceptionState();
+    game.config.playerCount = 5;
+    game.startNewGame();
+
+    const murderer = game.getMurdererPlayer();
+    assert(murderer, 'Murderer player must exist');
+
+    murderer.meansCards[0] = {
+      id: 'M027',
+      vi: 'Giới hạn Connection Pool xuống còn 1',
+      en: 'Max Connections Set to 1',
+      category: 'Suffocation'
+    };
+    murderer.clueCards[0] = {
+      id: 'C049',
+      vi: 'Đôi mắt đỏ ngầu sau 48 giờ trực chiến',
+      en: 'Bloodshot Eye Reflection',
+      category: 'Personal'
+    };
+
+    const greenIdx = game.activeSceneTiles.findIndex(t => t.color === 'GREEN' || t.type === 'LOCATION_OF_CRIME');
+    assert(greenIdx !== -1, 'Green tile must exist in active scene tiles');
+
+    const committed = game.commitMurdererSelection('M027', 'C049');
+    assertEqual(committed, true, 'Commit selection must succeed');
+
+    // 1. Green tile MUST be swapped to tile_loc_01 (Core Infra: Database)
+    const greenTile = game.activeSceneTiles[greenIdx];
+    assertEqual(greenTile.id, 'tile_loc_01', 'Green tile must align to tile_loc_01 (Core Infra / Database)');
+    assertEqual(game.computeSmartBulletOption(greenTile), 0, 'tile_loc_01 bullet must point to Option 0 (Production Database)');
+
+    // 2. Root Cause (tile_cause_01) must point to Option 2 (Đứt cáp / Mất kết nối DB)
+    const causeTile = game.activeSceneTiles.find(t => t.id === 'tile_cause_01');
+    assertEqual(game.computeSmartBulletOption(causeTile), 2, 'Root Cause must be Option 2 (Đứt cáp / Mất kết nối DB)');
+
+    // 3. Tile Scene 07 (Psychological Trigger) must point to Option 0 (Quá tải OT / Bức xúc tích tụ)
+    const sceneTile07 = {
+      id: 'tile_scene_07',
+      options_vi: [
+        'Quá tải OT / Bức xúc tích tụ',
+        'Thích thể hiện quyền Admin/Root',
+        'Chạy tiến độ / Săn thưởng nóng',
+        'Mải nhắn tin Crush / Xao nhãng',
+        'Tự ái khi bị chê trong Code Review',
+        'Muốn Refactor làm sạch hệ thống'
+      ]
+    };
+    assertEqual(game.computeSmartBulletOption(sceneTile07), 0, 'tile_scene_07 bullet must point to Option 0 (Quá tải OT / Bức xúc tích tụ)');
+
+    // 4. Other key brown tiles
+    const sceneTile06 = { id: 'tile_scene_06', options_vi: ['Core Engine', 'Tầng Database', 'Tầng Giao diện', 'Network', 'Module', 'Toàn bộ'] };
+    assertEqual(game.computeSmartBulletOption(sceneTile06), 1, 'tile_scene_06 must point to Database');
+
+    const sceneTile19 = { id: 'tile_scene_19', options_vi: ['Sếp', 'Lead', 'Anh em Dev / Ops trực chiến', 'Intern', 'Bench', 'Cựu trào'] };
+    assertEqual(game.computeSmartBulletOption(sceneTile19), 2, 'tile_scene_19 must point to Anh em Dev / Ops trực chiến');
+
+    const sceneTile20 = { id: 'tile_scene_20', options_vi: ['Intern', 'Gen-Z', 'Senior', 'Guru', 'Chuyên trị Backend / Hạ tầng', 'Frontend'] };
+    assertEqual(game.computeSmartBulletOption(sceneTile20), 4, 'tile_scene_20 must point to Chuyên trị Backend / Hạ tầng');
+  });
+
+  test('FPT Audit 11: All 21 brown scene tiles and 4 green tiles compute semantic forensic markers accurately', () => {
+    const game = new DeceptionState();
+    game.config.playerCount = 4;
+    game.startNewGame();
+
+    const mCI = { id: 'M_TEST_CI', vi: 'Đường ống CI/CD bị kẹt runner', en: 'CI/CD runner stuck', category: 'Accident' };
+    const cLog = { id: 'C_TEST_LOG', vi: 'Bản ghi log Jenkins báo lỗi', en: 'Jenkins build log red', category: 'Written' };
+
+    // Test green tile matching score for CI/CD
+    const bestGreenId = game.scoreLocationTileMatching({ id: 'tile_loc_02', options_vi: ['CI/CD Pipeline'] }, mCI, cLog);
+    assert(bestGreenId > 0, 'tile_loc_02 should score high for CI/CD crime');
+
+    // Test ALL 21 brown tiles produce valid options (0 to 5) without throw
+    for (let i = 1; i <= 21; i++) {
+      const tileId = `tile_scene_${String(i).padStart(2, '0')}`;
+      const mockTile = { id: tileId, options_vi: ['Opt0', 'Opt1', 'Opt2', 'Opt3', 'Opt4', 'Opt5'] };
+      const opt = game.computeSmartBulletOption(mockTile, mCI, cLog);
+      assert(typeof opt === 'number' && opt >= 0 && opt <= 5, `${tileId} must return valid option between 0 and 5`);
+    }
+
+    // Test all 4 green tiles produce valid options (0 to 5)
+    for (let i = 1; i <= 4; i++) {
+      const locId = `tile_loc_${String(i).padStart(2, '0')}`;
+      const mockTile = { id: locId, color: 'GREEN', options_vi: ['Opt0', 'Opt1', 'Opt2', 'Opt3', 'Opt4', 'Opt5'] };
+      const opt = game.computeSmartBulletOption(mockTile, mCI, cLog);
+      assert(typeof opt === 'number' && opt >= 0 && opt <= 5, `${locId} must return valid option between 0 and 5`);
+    }
+  });
 });
 
 if (require.main === module) {

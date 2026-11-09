@@ -500,12 +500,166 @@ export class DeceptionState {
     this.solution.meansCardId = validMeans.id;
     this.solution.clueCardId = validClue.id;
 
+    // Tự động căn chỉnh Thẻ Xanh Lá (Tầng hệ thống bị sập) khớp nhất với domain của vụ án
+    this.alignLocationTileWithCrime(validMeans, validClue);
+
     this.addLog(
       '🌙 Đêm Deployment: Thủ phạm (The Culprit) đã bí mật kích hoạt 1 Hành vi gây lỗi và để lại 1 Dấu vết Log làm sập Production!',
       '🌙 Deployment Night: The Culprit secretly triggered 1 Action and left behind 1 Log Trace, crashing Production!',
       'crime'
     );
     return true;
+  }
+
+  /**
+   * Căn chỉnh Thẻ Xanh Lá (Tầng hệ thống bị sập) với phạm vi của lỗi gây sập
+   * Nếu thẻ xanh lá hiện tại không khớp bằng một thẻ khác trong unusedLocationTiles,
+   * hoán đổi sang thẻ xanh lá phù hợp nhất (tile_loc_01..04).
+   */
+  alignLocationTileWithCrime(meansCard, clueCard) {
+    if (!this.activeSceneTiles || this.activeSceneTiles.length === 0) return;
+    const greenIdx = this.activeSceneTiles.findIndex(
+      t => t.color === 'GREEN' || t.type === 'LOCATION_OF_CRIME'
+    );
+    if (greenIdx === -1) return;
+
+    const currentGreen = this.activeSceneTiles[greenIdx];
+
+    // Đảm bảo có danh sách các Thẻ Xanh Lá chưa sử dụng
+    let unused = this.unusedLocationTiles || [];
+    if (!unused || unused.length === 0) {
+      unused = SCENE_TILES.filter(
+        t => (t.color === 'GREEN' || t.type === 'LOCATION_OF_CRIME') && t.id !== currentGreen.id
+      ).map(t => JSON.parse(JSON.stringify(t)));
+      this.unusedLocationTiles = unused;
+    }
+
+    const allCandidates = [currentGreen, ...unused];
+    let bestCandidate = currentGreen;
+    let bestScore = this.scoreLocationTileMatching(currentGreen, meansCard, clueCard);
+
+    for (const candidate of unused) {
+      const score = this.scoreLocationTileMatching(candidate, meansCard, clueCard);
+      // Chỉ ưu tiên đổi sang thẻ khác nếu candidate có điểm số cao hơn hẳn thẻ hiện tại
+      if (score > bestScore) {
+        bestScore = score;
+        bestCandidate = candidate;
+      }
+    }
+
+    if (bestCandidate.id !== currentGreen.id) {
+      const newGreen = {
+        ...JSON.parse(JSON.stringify(bestCandidate)),
+        selectedOptionIndex: null,
+        roundPlaced: currentGreen.roundPlaced || 1,
+        slotIndex: greenIdx
+      };
+      this.activeSceneTiles[greenIdx] = newGreen;
+      this.unusedLocationTiles = allCandidates.filter(t => t.id !== bestCandidate.id);
+    }
+  }
+
+  /**
+   * Đánh giá độ phù hợp của 1 Thẻ Xanh Lá (Location) đối với cặp bài Means + Clue
+   */
+  scoreLocationTileMatching(tile, meansCard, clueCard) {
+    if (!tile || !meansCard || !clueCard) return 0;
+    const mText = `${meansCard.vi || ''} ${meansCard.en || ''}`.toLowerCase();
+    const cText = `${clueCard.vi || ''} ${clueCard.en || ''}`.toLowerCase();
+
+    const tileOptionMatchers = {
+      tile_loc_01: [
+        // 0: Production Database
+        /database|connection pool|connections|\bdb\b|\bsql\b|postgres|mysql|mongo|bảng|table|migration|deadlock|pool|query|\borm\b|rò rỉ kết nối|drop table|truncate|dump db|chọc db|redis db|update|select|insert|delete|index/i,
+        // 1: API Gateway
+        /api gateway|gateway|reverse proxy|endpoint|route|cors|\b502\b|proxy|rest api|ingress|rate limit|spam api|bắn spam|bắn webhook|choke gateway/i,
+        // 2: Cloud Server / Cụm K8s
+        /\bk8s\b|kubernetes|cloud|cluster|server|pod|docker|aws|\bec2\b|\bvm\b|container|node|\bcpu\b|\bram\b|memory|\boom\b|out of memory|quá tải cpu|treo cứng|kernel|đào coin|miner|vòng lặp|while\(true\)|sleep\(|try-catch|đệ quy|stack overflow|auto-scaling|zone/i,
+        // 3: Hệ thống Payment
+        /payment|thanh toán|stripe|bank|ngân hàng|ví điện tử|momo|vnpay|transaction|giao dịch|thẻ tín dụng|billing|order|checkout|nạp tiền|hoàn tiền/i,
+        // 4: Cổng Auth / Login
+        /auth|login|\bjwt\b|token|password|mật khẩu|oauth|\bsso\b|đăng nhập|xác thực|credential|quyền|chmod|root|secret|public repo|hacker|lộ aws|backdoor|phân quyền/i,
+        // 5: Cụm Redis Cache
+        /redis|cache|memcache|\bttl\b|evict|session|bộ nhớ đệm|in-memory|xóa cache|tràn cache|rò rỉ cache/i
+      ],
+      tile_loc_02: [
+        // 0: CI/CD Pipeline
+        /ci\/cd|pipeline|jenkins|gitlab|deploy|github actions|release|runner|build|npm build|merge|push|force push|branch|commit|\bgit\b|rebase|pull request|package-lock|yarn\.lock|lockfile/i,
+        // 1: Load Balancer / CDN
+        /load balancer|\bcdn\b|cloudflare|nginx|traffic|traffics|ddos|botnet|flood|chịu tải|băng thông|sập mạng|reverse proxy|dns|tên miền|\bdomain\b|\bip\b|chuyển hướng|routing|\bssl\b|\btls\b|chứng chỉ/i,
+        // 2: Kafka / RabbitMQ
+        /kafka|rabbitmq|queue|hàng đợi|message broker|event bus|pub\/sub|consumer|producer|topic|lag kafka|tràn queue/i,
+        // 3: Kho lưu trữ Cloud S3
+        /\bs3\b|bucket|storage|blob|upload|file storage|cloud storage|lưu trữ file|tải lên|dung lượng|ổ cứng|ảnh|media|s3 bucket/i,
+        // 4: Hệ thống Hóa đơn & Billing
+        /billing|hóa đơn|invoice|cost|chi phí|tiền bạc|tính cước|charge|pricing|hóa đơn aws|thâm hụt|vượt ngân sách/i,
+        // 5: Máy chủ Tìm kiếm (Elastic)
+        /elastic|elasticsearch|search|kibana|index|tìm kiếm|fulltext|lucenes|reindex|truy vấn search/i
+      ],
+      tile_loc_03: [
+        // 0: Ứng dụng Mobile
+        /mobile|\bios\b|android|\bapp\b|\bapps\b|flutter|react native|smartphone|chplay|appstore|điện thoại|crash app|build apk|ipa/i,
+        // 1: Trang Quản trị Web Admin
+        /admin|portal|dashboard|quản trị|\bcms\b|bảng điều khiển|backoffice|bảng tin|phân quyền nhân viên|trang nội bộ|excel|báo cáo|export|report|phân trang/i,
+        // 2: Trang chủ Khách hàng
+        /landing|trang chủ|\bhome\b|customer|khách hàng|frontend|giao diện web|\bui\b|\bux\b|trình duyệt|browser|html|\bcss\b|\bweb\b|\bfe\b|\bxss\b|giao diện/i,
+        // 3: Mạng nội bộ VPN / Intranet
+        /\bvpn\b|intranet|nội bộ|wifi|firewall|mạng nội bộ|\blan\b|ip nội bộ|rớt wifi|ngắt kết nối vpn/i,
+        // 4: Hệ thống AI / LLM Service
+        /\b(ai|llm|gpt|chatbot|bot|gemini|openai)\b|trí tuệ nhân tạo|prompt|hallucination|cháy token llm/i,
+        // 5: Cổng Gửi Email / OTP
+        /email|\botp\b|\bsms\b|notification|\bmail\b|thông báo|gửi mail|mã xác nhận|smtp|spam mail|cháy quota mail/i
+      ],
+      tile_loc_04: [
+        // 0: Phòng Server Vật lý (On-Prem)
+        /on-prem|server room|phần cứng|rack|ổ điện|\bups\b|máy chủ vật lý|dây cáp|nóng ran|khét|cúp điện|phòng server|quạt|\bhú\b|silicon|cháy tủ/i,
+        // 1: Phòng dự án ODC
+        /\bodc\b|f-ville|f-town|fsoft|bàn làm việc|văn phòng|open space|khu dự án|bàn phím|chuột|màn hình/i,
+        // 2: Phòng họp Demo Khách hàng
+        /demo.*khách hàng|khách hàng.*demo|thuyết trình|slide|máy chiếu|onsite|pitch/i,
+        // 3: Môi trường Staging / UAT
+        /staging|\buat\b|\bqa\b|\bqc\b|tester|testcase|kiểm thử|unit test|môi trường test/i,
+        // 4: Hệ thống Backup Dự phòng
+        /backup|dự phòng|snapshot|restore|phục hồi|mất dữ liệu|sao lưu|hỏng bản backup/i,
+        // 5: API Đối tác Bên thứ 3
+        /bên thứ 3|third-party|third party|partner|đối tác|external api|script ngoài|nhúng script|dịch vụ ngoài|api đối tác|cổng thứ 3/i
+      ]
+    };
+
+    const matchers = tileOptionMatchers[tile.id];
+    let maxScore = 0;
+
+    if (matchers) {
+      for (let i = 0; i < matchers.length; i++) {
+        let optScore = 0;
+        const re = matchers[i];
+        if (re.test(mText)) optScore += 10;
+        if (re.test(cText)) optScore += 5;
+        if (optScore > maxScore) maxScore = optScore;
+      }
+    }
+
+    if (tile.options_vi) {
+      const stopWords = new Set(['cho', 'của', 'với', 'các', 'một', 'như', 'đang', 'khi', 'vào', 'lên', 'the', 'and', 'for', 'with', 'from', 'into']);
+      const shortTechTokens = new Set(['ot', 'db', 'ui', 'fe', 'qa', 'qc', 's3', 'vm', 'pm', 'ai', 'ip', 'os', 'ci', 'cd', 'k8']);
+      for (let idx = 0; idx < tile.options_vi.length; idx++) {
+        const optVi = (tile.options_vi[idx] || '').toLowerCase();
+        const optEn = (tile.options_en ? tile.options_en[idx] : '').toLowerCase();
+        const tokens = `${optVi} ${optEn}`
+          .split(/[\s,()\/•-]+/)
+          .filter(t => (t.length >= 3 || shortTechTokens.has(t)) && !stopWords.has(t));
+        let tokenScore = 0;
+        for (const token of tokens) {
+          if (mText.includes(token)) tokenScore += 4;
+          if (cText.includes(token)) tokenScore += 2;
+        }
+        if (tokenScore > maxScore) {
+          maxScore = tokenScore;
+        }
+      }
+    }
+
+    return maxScore;
   }
 
   /**
@@ -557,16 +711,16 @@ export class DeceptionState {
     // 1. Ô TÍM: Root Cause (Nguyên nhân Gốc rễ - tile_cause_01)
     if (tile.id === 'tile_cause_01') {
       // Ưu tiên 1: Từ khóa IT trực diện trong thẻ Hành vi gây lỗi (Means)
-      if (/ram|memory|heap|oom|out of memory|rò rỉ bộ nhớ|leak memory/i.test(mText)) return 0; // Tràn RAM (OOM)
-      if (/cpu|spike|vòng lặp|loop|while|100%|treo|đệ quy|recursion/i.test(mText)) return 1; // Quá tải CPU
-      if (/database|đứt kết nối db|connection pool|cáp|cable|drop table|sql injection|query|postgres|mysql|mongo/i.test(mText)) return 2; // Đứt kết nối DB
-      if (/thư viện|dependency|package|npm|conflict|version|xung đột|node_modules|build/i.test(mText)) return 3; // Xung đột thư viện
-      if (/lỗi phân quyền|permission|root|auth|jwt|token|password|mật khẩu|api key|secret|hacker|bảo mật|lộ/i.test(mText)) return 4; // Lỗi phân quyền / Bảo mật
-      if (/ddos|botnet|flood|tấn công mạng|spam api|traffic/i.test(mText)) return 5; // DDoS / Tấn công mạng
+      if (/\b(ram|oom|memory|heap)\b|out of memory|rò rỉ bộ nhớ|leak memory|bộ nhớ|lưu rác/i.test(mText)) return 0; // Tràn RAM (OOM)
+      if (/database|đứt kết nối|kết nối db|connection pool|max connection|\bcáp\b|cable|drop table|\bsql\b|query|postgres|mysql|mongo|bảng|table|deadlock|cơ sở dữ liệu|\b(update|insert|delete)\b.*(where|bảng)/i.test(mText)) return 2; // Đứt kết nối DB
+      if (/\b(cpu|spike|treo|hang)\b|vòng lặp|\bloop\b|while\(true\)|100%|treo cứng|đệ quy|recursion|đào coin|miner|crypto|tính toán/i.test(mText)) return 1; // Quá tải CPU
+      if (/thư viện|dependency|package|\bnpm\b|conflict|version|xung đột|node_modules|build|\bpip\b|typosquatting|package-lock|yarn\.lock/i.test(mText)) return 3; // Xung đột thư viện
+      if (/lỗi phân quyền|permission|root|auth|\bjwt\b|token|password|mật khẩu|api key|secret|hacker|bảo mật|chmod|\badmin\b|backdoor|\bxss\b|public repo|lộ aws/i.test(mText)) return 4; // Lỗi phân quyền / Bảo mật
+      if (/ddos|botnet|flood|tấn công mạng|spam api|traffic|bắn spam|webhook/i.test(mText)) return 5; // DDoS / Tấn công mạng
 
       // Ưu tiên 2: Phân loại danh mục chuẩn Deception
       if (mCat.includes('poison')) return 4;      // Poisoning -> Lỗi phân quyền / Rò rỉ bảo mật
-      if (mCat.includes('suffoc')) return 0;      // Suffocation -> Tràn RAM (OOM)
+      if (mCat.includes('suffoc')) return (/\b(leak|ram|memory|oom)\b/i.test(mText) ? 0 : 1); // Suffocation -> Tràn RAM hoặc Treo cứng
       if (mCat.includes('blood')) return 2;       // Loss of Blood -> Đứt kết nối DB
       if (mCat.includes('severe')) return 1;      // Severe Injury -> Quá tải CPU (100% Spike)
       if (mCat.includes('illness')) return 3;     // Illness -> Xung đột thư viện (Dependency)
@@ -577,119 +731,289 @@ export class DeceptionState {
     // 2. Ô XANH LÁ: Môi trường / Tầng hệ thống bị sập (tile_loc_01 .. tile_loc_04)
     if (tile.color === 'GREEN' || tile.type === 'LOCATION_OF_CRIME') {
       if (tile.id === 'tile_loc_01') { // Core Infra: Database, API Gateway, Cloud K8s, Payment, Auth, Redis
-        if (/database|sql|postgres|mysql|mongo|bảng|table|migration|db/i.test(combined)) return 0; // Production Database
-        if (/api|gateway|endpoint|route|rest|cors|502|proxy/i.test(combined)) return 1; // API Gateway
-        if (/k8s|kubernetes|cloud|cluster|server|pod|docker|aws|ec2|vm/i.test(combined)) return 2; // Cloud Server / Cụm K8s
-        if (/payment|thanh toán|stripe|bank|billing|tiền|order|checkout/i.test(combined)) return 3; // Hệ thống Payment
-        if (/auth|login|jwt|token|password|mật khẩu|oauth|sso|quyền/i.test(combined)) return 4; // Cổng Auth / Login
-        if (/redis|cache|memcache|ttl|evict|session/i.test(combined)) return 5; // Cụm Redis Cache
+        if (/database|connection pool|connections|\bdb\b|\bsql\b|postgres|mysql|mongo|bảng|table|migration|deadlock|pool|query|\borm\b|rò rỉ kết nối|drop table|truncate|dump db|update|select|insert|delete/i.test(combined)) return 0; // Production Database
+        if (/api gateway|gateway|reverse proxy|endpoint|route|cors|\b502\b|proxy|rest api|ingress|rate limit|spam api|bắn spam|webhook/i.test(combined)) return 1; // API Gateway
+        if (/\bk8s\b|kubernetes|cloud|cluster|server|pod|docker|aws|\bec2\b|\bvm\b|container|node|\bcpu\b|\bram\b|memory|\boom\b|treo cứng|kernel|đào coin|vòng lặp|while\(true\)|sleep\(|try-catch|đệ quy/i.test(combined)) return 2; // Cloud Server / Cụm K8s
+        if (/payment|thanh toán|stripe|bank|ngân hàng|ví điện tử|momo|vnpay|transaction|giao dịch|thẻ tín dụng|billing|order|checkout|nạp tiền/i.test(combined)) return 3; // Hệ thống Payment
+        if (/auth|login|\bjwt\b|token|password|mật khẩu|oauth|\bsso\b|đăng nhập|xác thực|credential|quyền|chmod|root|secret|public repo|hacker|lộ aws|backdoor/i.test(combined)) return 4; // Cổng Auth / Login
+        if (/redis|cache|memcache|\bttl\b|evict|session|bộ nhớ đệm|in-memory/i.test(combined)) return 5; // Cụm Redis Cache
+        return 0;
       } else if (tile.id === 'tile_loc_02') { // DevOps & Pipeline: CI/CD, Load Balancer, Kafka, S3, Billing, Elastic
-        if (/ci\/cd|pipeline|jenkins|gitlab|deploy|github actions|release|runner/i.test(combined)) return 0; // CI/CD Pipeline
-        if (/load balancer|cdn|cloudflare|nginx|traffic/i.test(combined)) return 1; // Load Balancer / CDN
-        if (/kafka|rabbitmq|queue|hàng đợi|message|broker/i.test(combined)) return 2; // Kafka / RabbitMQ
-        if (/s3|bucket|storage|blob|upload|file/i.test(combined)) return 3; // Cloud Storage S3
-        if (/billing|hóa đơn|invoice|cost|chi phí|tiền/i.test(combined)) return 4; // Hệ thống Hóa đơn
-        if (/elastic|search|kibana|index|tìm kiếm/i.test(combined)) return 5; // Elastic Search
+        if (/ci\/cd|pipeline|jenkins|gitlab|deploy|github actions|release|runner|build|npm build|merge|push|force push|branch|commit|\bgit\b|rebase|package-lock|yarn\.lock|lockfile/i.test(combined)) return 0; // CI/CD Pipeline
+        if (/load balancer|\bcdn\b|cloudflare|nginx|traffic|traffics|ddos|botnet|flood|chịu tải|băng thông|sập mạng|dns|tên miền|\bdomain\b|\bip\b|chuyển hướng|routing|\bssl\b|\btls\b|chứng chỉ/i.test(combined)) return 1; // Load Balancer / CDN
+        if (/kafka|rabbitmq|queue|hàng đợi|message broker|event bus|pub\/sub|consumer|producer|topic/i.test(combined)) return 2; // Kafka / RabbitMQ
+        if (/\bs3\b|bucket|storage|blob|upload|file storage|cloud storage|lưu trữ file|tải lên|dung lượng|ổ cứng|ảnh|media/i.test(combined)) return 3; // Cloud Storage S3
+        if (/billing|hóa đơn|invoice|cost|chi phí|tiền bạc|tính cước|charge|pricing|thâm hụt/i.test(combined)) return 4; // Hệ thống Hóa đơn
+        if (/elastic|elasticsearch|search|kibana|index|tìm kiếm|fulltext|lucenes/i.test(combined)) return 5; // Elastic Search
+        return 0;
       } else if (tile.id === 'tile_loc_03') { // Apps & Portal: Mobile, Admin, Landing, VPN, AI Chatbot, Email/OTP
-        if (/mobile|ios|android|app|flutter|react native/i.test(combined)) return 0; // Mobile App
-        if (/admin|portal|dashboard|quản trị|cms/i.test(combined)) return 1; // Web Admin
-        if (/landing|trang chủ|home|customer|khách hàng/i.test(combined)) return 2; // Customer Landing
-        if (/vpn|intranet|nội bộ|wifi|firewall|mạng/i.test(combined)) return 3; // Internal VPN
-        if (/ai|llm|gpt|chatbot|bot|gemini|model/i.test(combined)) return 4; // AI Chatbot
-        if (/email|otp|sms|notification|mail|thông báo/i.test(combined)) return 5; // Email / OTP
+        if (/mobile|\bios\b|android|\bapp\b|\bapps\b|flutter|react native|smartphone|chplay|appstore|điện thoại/i.test(combined)) return 0; // Mobile App
+        if (/admin|portal|dashboard|quản trị|\bcms\b|bảng điều khiển|backoffice|bảng tin|excel|báo cáo|export|report|phân trang/i.test(combined)) return 1; // Web Admin
+        if (/landing|trang chủ|\bhome\b|customer|khách hàng|frontend|giao diện web|\bui\b|\bux\b|trình duyệt|browser|html|\bcss\b|\bweb\b|\bfe\b|\bxss\b/i.test(combined)) return 2; // Customer Landing
+        if (/\bvpn\b|intranet|nội bộ|wifi|firewall|mạng nội bộ|\blan\b|ip nội bộ/i.test(combined)) return 3; // Internal VPN
+        if (/\b(ai|llm|gpt|chatbot|bot|gemini|openai)\b|trí tuệ nhân tạo|prompt/i.test(combined)) return 4; // AI Chatbot
+        if (/email|\botp\b|\bsms\b|notification|\bmail\b|thông báo|gửi mail|mã xác nhận|smtp/i.test(combined)) return 5; // Email / OTP
+        return 2;
       } else if (tile.id === 'tile_loc_04') { // Lab & ODC: On-Prem, ODC Room, Demo Room, Staging, Backup, 3rd Party
-        if (/on-prem|server room|phần cứng|rack|ổ điện|ups/i.test(combined)) return 0; // On-Prem Server Room
-        if (/odc|f-ville|f-town|fsoft|bàn làm việc|văn phòng/i.test(combined)) return 1; // Phòng ODC
-        if (/demo|khách hàng|họp|meeting|thuyết trình/i.test(combined)) return 2; // Phòng Demo
-        if (/staging|uat|test|testcase|qa/i.test(combined)) return 3; // Staging / UAT
-        if (/backup|dự phòng|snapshot|restore/i.test(combined)) return 4; // Backup Dự phòng
-        if (/bên thứ 3|third-party|partner|đối tác|external/i.test(combined)) return 5; // API Đối tác
+        if (/on-prem|server room|phần cứng|rack|ổ điện|\bups\b|máy chủ vật lý|dây cáp|nóng ran|khét|cúp điện|phòng server|quạt|\bhú\b|silicon/i.test(combined)) return 0; // On-Prem Server Room
+        if (/\bodc\b|f-ville|f-town|fsoft|bàn làm việc|văn phòng|open space|khu dự án|bàn phím|chuột/i.test(combined)) return 1; // Phòng ODC
+        if (/demo.*khách hàng|khách hàng.*demo|thuyết trình|slide|máy chiếu|onsite|pitch/i.test(combined)) return 2; // Phòng Demo
+        if (/staging|\buat\b|\bqa\b|\bqc\b|tester|testcase|kiểm thử|unit test/i.test(combined)) return 3; // Staging / UAT
+        if (/backup|dự phòng|snapshot|restore|phục hồi|mất dữ liệu|sao lưu/i.test(combined)) return 4; // Backup Dự phòng
+        if (/bên thứ 3|third-party|third party|partner|đối tác|external|script ngoài|nhúng script|dịch vụ ngoài/i.test(combined)) return 5; // API Đối tác
+        return 0;
       }
     }
 
-    // 3. CÁC Ô NÂU ĐẶC BIỆT: Thông số sự cố IT
-    // tile_scene_01: Trạng thái Hệ thống
+    // 3. CÁC Ô NÂU: Thông số sự cố IT (tile_scene_01 đến tile_scene_21)
+
+    // tile_scene_01: Trạng thái Hệ thống Hiện tại
     if (tile.id === 'tile_scene_01') {
-      if (/502|gateway|màn hình xanh|bsod/i.test(combined)) return 0;
-      if (/treo cứng|freeze|hang|không phản hồi|cpu|loop/i.test(combined)) return 1;
-      if (/mã hóa|encrypt|corrupt|biến dạng/i.test(combined)) return 2;
-      if (/microservice|rải rác|cụm/i.test(combined)) return 3;
-      if (/giao diện|api|backend/i.test(combined)) return 4;
-      if (/loading|spinner|quay|vô tận|timeout/i.test(combined)) return 5;
+      if (/502|gateway|màn hình xanh|bsod|bad gateway|crash/i.test(combined)) return 0; // Màn hình xanh / Lỗi 502 Bad Gateway
+      if (/treo cứng|freeze|hang|không phản hồi|cpu|loop|vòng lặp|100%/i.test(combined)) return 1; // Treo cứng 100% không phản hồi
+      if (/mã hóa|encrypt|corrupt|biến dạng|hỏng dữ liệu|loạn font/i.test(combined)) return 2; // Dữ liệu bị mã hóa / Biến dạng
+      if (/microservice|rải rác|cụm|từng phần|một vài service/i.test(combined)) return 3; // Chết rải rác từng cụm Microservice
+      if (/giao diện|api|backend|frontend vẫn chạy|api chết/i.test(combined)) return 4; // Giao diện vẫn lên nhưng API chết
+      if (/loading|spinner|quay|vô tận|timeout|chờ mãi/i.test(combined)) return 5; // Xoay vòng Loading vô tận
+      return 1;
     }
 
     // tile_scene_02: Thời điểm Xảy ra Sự cố
     if (tile.id === 'tile_scene_02') {
-      if (/thứ sáu|friday|chiều thứ 6/i.test(combined)) return 1; // Chiều thứ Sáu
-      if (/đêm|2h|khuya|midnight|release|go-live|rạng sáng/i.test(combined)) return 4; // Đêm Release Go-Live
-      if (/demo|khách hàng|pitch/i.test(combined)) return 3; // Ngay trước giờ Demo
-      if (/flash sale|peak|cao điểm|sale/i.test(combined)) return 0; // Giờ cao điểm
-      if (/bảo trì|maintenance/i.test(combined)) return 2; // Bảo trì định kỳ
-      if (/sáng|thứ hai|monday|standup/i.test(combined)) return 5; // Sáng thứ Hai
+      if (/flash sale|peak|cao điểm|đông khách|11\.11|12\.12/i.test(combined)) return 0; // Giờ cao điểm
+      if (/thứ sáu|friday|chiều thứ 6|cuối tuần|sắp về|tan sở|\b17h\b|\b16h\b/i.test(combined)) return 1; // Chiều thứ Sáu
+      if (/bảo trì|maintenance|nâng cấp định kỳ|bảo dưỡng/i.test(combined)) return 2; // Bảo trì định kỳ
+      if (/demo|thuyết trình|sắp trình chiếu|pitch/i.test(combined)) return 3; // Ngay trước giờ Demo
+      if (/đêm|\b2h\b|khuya|midnight|release|go-live|rạng sáng|\b0h\b|nửa đêm|trực đêm/i.test(combined)) return 4; // Đêm Release Go-Live
+      if (/sáng|thứ hai|monday|standup|đầu tuần|đầu ca/i.test(combined)) return 5; // Sáng thứ Hai
+      return 4;
     }
 
     // tile_scene_03: Tốc độ Phát tán Lỗi
     if (tile.id === 'tile_scene_03') {
-      if (/ngấm dần|leak|memory|ram|tăng dần/i.test(combined) || mCat.includes('poison') || mCat.includes('illness')) return 2; // Rò rỉ ngấm dần
-      if (/sập tức thì|instant|ngay lập tức|drop table|xóa nhầm/i.test(combined)) return 0; // Sập tức thì
-      if (/kéo dài|treo|hang/i.test(combined) || mCat.includes('suffoc')) return 3; // Treo hệ thống kéo dài
-      if (/chớp nhoáng|brief|nhanh/i.test(combined) || mCat.includes('blood') || mCat.includes('severe')) return 1; // Chớp nhoáng
-      if (/ủ bệnh|latent|ngầm/i.test(combined)) return 4;
-      return 5; // Chập chờn
+      if (/ngấm dần|leak|memory|ram|tăng dần|tích tụ|tràn bộ nhớ/i.test(combined) || mCat.includes('poison') || mCat.includes('illness')) return 2; // Rò rỉ ngấm dần
+      if (/sập tức thì|instant|ngay lập tức|drop table|bấm nút|chết ngay|chmod 777/i.test(combined)) return 0; // Sập tức thì
+      if (/kéo dài|treo|hang|nghẽn|dài dẳng|đình trệ/i.test(combined) || mCat.includes('suffoc')) return 3; // Treo hệ thống kéo dài
+      if (/chớp nhoáng|brief|nhanh|vài giây|spike|đột ngột/i.test(combined) || mCat.includes('blood') || mCat.includes('severe')) return 1; // Chớp nhoáng
+      if (/ủ bệnh|latent|ngầm|vài ngày|âm thầm|cronjob|hẹn giờ/i.test(combined)) return 4; // Lỗi ngầm ủ bệnh
+      if (/chập chờn|flaky|lúc được lúc mất|không ổn định/i.test(combined)) return 5; // Chập chờn
+      return 3;
     }
 
     // tile_scene_04: Bản chất Dấu vết Để lại
     if (tile.id === 'tile_scene_04') {
-      if (/cà phê|trà sữa|nước|bánh|đồ ăn/i.test(cText) || cCat.includes('natural')) return 0; // Đồ ăn / Thức uống / Vật lý
-      if (/ui|giao diện|hình ảnh|ảnh|media/i.test(cText) || cCat.includes('artistic')) return 1; // Giao diện / Hình ảnh / Media
-      if (/log|văn bản|chat|slack|note|file .env/i.test(cText) || cCat.includes('written')) return 2; // Bản ghi Log / Văn bản / Chat
-      if (/cấu hình|config|hệ thống|mạng|server|token/i.test(cText) || cCat.includes('synthetic')) return 3; // File Cấu hình / Hệ thống / Mạng
-      if (/thiết bị|laptop|điện thoại|chuột|thẻ dev/i.test(cText) || cCat.includes('personal')) return 4; // Thiết bị / Đồ cá nhân của Dev
-      return 5; // Vật dụng giải trí / Ngoại cảnh
+      if (/cà phê|trà sữa|nước|bánh|đồ ăn|pizza|mì tôm|snack|lon nước|ly|cốc|\bđổ\b/i.test(cText) || cCat.includes('natural')) return 0; // Đồ ăn / Thức uống / Vật lý
+      if (/\b(ui|ux|fe)\b|giao diện|hình ảnh|ảnh|media|screenshot|màn hình|font|icon|video/i.test(cText) || cCat.includes('artistic')) return 1; // Giao diện / Hình ảnh / Media
+      if (/log|văn bản|slack|note|file \.env|tin nhắn|giấy|blame|ticket|jira|email/i.test(cText) || cCat.includes('written')) return 2; // Bản ghi Log / Văn bản / Chat
+      if (/cấu hình|config|hệ thống|mạng|server|token|yaml|json|xml|env|\bip\b|\bdns\b|\bport\b|firewall/i.test(cText) || cCat.includes('synthetic')) return 3; // File Cấu hình / Hệ thống / Mạng
+      if (/thiết bị|laptop|điện thoại|chuột|bàn phím|thẻ dev|mắt|tai nghe|ba lô|kính/i.test(cText) || cCat.includes('personal')) return 4; // Thiết bị / Đồ cá nhân của Dev
+      if (/giải trí|bi lắc|\bgame\b|ps5|boardgame|đồ chơi|bóng|dép|thú bông/i.test(cText)) return 5; // Vật dụng giải trí / Ngoại cảnh
+      return 2;
+    }
+
+    // tile_scene_05: Ấn tượng Chung về Bug
+    if (tile.id === 'tile_scene_05') {
+      if (/kinh điển|phổ biến|rookie|cơ bản|newbie|ngớ ngẩn|quên|sơ đẳng|hardcode|typo|null pointer/i.test(combined)) return 0; // Lỗi kinh điển phổ biến
+      if (/dị|sáng tạo|bất ngờ|quái đản|bizarre|lạ lùng|hiếm gặp|độc lạ|hack/i.test(combined)) return 1; // Bug cực dị / Sáng tạo bất ngờ
+      if (/đáng ngờ|xóa log|cover-up|giấu|bí mật|che đậy|xóa vết|phi tang|backdoor|lén lút|gian lận/i.test(combined)) return 2; // Đáng ngờ / Có mùi xóa log
+      if (/tàn khốc|brutal|wipeout|xóa sạch|drop|mất sạch|cháy rụi|hủy diệt|đứt cáp|sập nguồn/i.test(combined)) return 3; // Phá hủy tàn khốc
+      if (/ác mộng|kinh hoàng|nightmare|thảm họa|catastrophic|chết chóc|toang|khóc thét|kinh hãi/i.test(combined)) return 4; // Ác mộng kinh hoàng
+      if (/bí ẩn|tiền lệ|unseen|stackoverflow|chưa từng thấy|không dấu vết|ma quái|khó hiểu/i.test(combined)) return 5; // Bí ẩn chưa từng có tiền lệ
+      return 0;
+    }
+
+    // tile_scene_06: Phạm vi Ảnh hưởng trên Hệ thống
+    if (tile.id === 'tile_scene_06') {
+      if (/database|db|lưu trữ|storage|s3|bảng|sql|postgres|mysql|mongo|dữ liệu|data|connection pool/i.test(combined)) return 1; // Tầng Database / Lưu trữ
+      if (/giao diện|client|frontend|ui|app|mobile|web|trình duyệt|màn hình|người dùng/i.test(combined)) return 2; // Tầng Giao diện / Client
+      if (/network|api|pipeline|đường truyền|mạng|gateway|traffic|kết nối|băng thông|route|dns/i.test(combined)) return 3; // Luồng Network / API
+      if (/phân hệ|cục bộ|module|tính năng|chức năng|nhỏ|một phần|plugin|tool/i.test(combined)) return 4; // Một phân hệ cục bộ
+      if (/toàn bộ|toàn hệ thống|100%|full|sập hoàn toàn|tất cả|cháy|chết hết|sập nguồn|chmod 777/i.test(combined)) return 5; // Toàn bộ Hệ thống
+      if (/core|engine|master|node chính|hạt nhân|hạ tầng chính|k8s master|điều khiển/i.test(combined)) return 0; // Core Engine / Master Node
+      return 1;
+    }
+
+    // tile_scene_07: Động cơ / Nguyên nhân Tâm lý
+    if (tile.id === 'tile_scene_07') {
+      if (/quá tải|\bot\b|burnout|bức xúc|mệt mỏi|kiệt sức|trực chiến|48 giờ|48h|đỏ ngầu|thiếu ngủ|mất ngủ|thức trắng|áp lực|căng thẳng|stress|tăng ca|overtime/i.test(combined)) return 0; // Quá tải OT / Bức xúc tích tụ
+      if (/\badmin\b|\broot\b|\bchmod\b|\bsudo\b|thể hiện quyền|khoe|sức mạnh|quyền lực|toàn quyền|chứng tỏ/i.test(combined)) return 1; // Thích thể hiện quyền Admin/Root
+      if (/tiến độ|thưởng|bonus|\bkpi\b|vội vàng|gấp|chạy deadline|săn thưởng|tiền thưởng|cho kịp|ép tiến độ/i.test(combined)) return 2; // Chạy tiến độ / Săn thưởng nóng
+      if (/crush|nhắn tin crush|tán gái|người yêu|mải nhắn tin|mất tập trung|tán tỉnh|hẹn hò/i.test(combined)) return 3; // Mải nhắn tin Crush / Xao nhãng
+      if (/tự ái|code review|chê|cãi nhau|bảo thủ|cái tôi|\bego\b|bị chê|phê bình|khó chịu|tranh cãi/i.test(combined)) return 4; // Tự ái khi bị chê trong Code Review
+      if (/refactor|làm sạch|dọn dẹp|viết lại|tối ưu|heroic|ngứa mắt|sửa lại|clean code|chuẩn hóa/i.test(combined)) return 5; // Muốn 'Refactor làm sạch' hệ thống
+      return 0;
+    }
+
+    // tile_scene_08: Phong cách Code của Thủ phạm
+    if (tile.id === 'tile_scene_08') {
+      if (/máy em|works on my machine|tự tin|chủ quan|chạy ngon|máy tao|không test|cần gì test/i.test(combined)) return 0; // Tự tin 'Chạy ngon trên máy em'
+      if (/lách luật|shortcut|bỏ qua test|bỏ unit test|không test|lười test|bỏ qua kiểm tra|bỏ qua bước|skip test/i.test(combined)) return 1; // Hay lách luật / Bỏ qua Unit Test
+      if (/force push|push -f|nóng vội|cho lẹ|nhanh chóng|vội vàng|đè code|xung đột git/i.test(combined)) return 2; // Nóng vội Force Push cho lẹ
+      if (/100 file|gom commit|commit khủng|commit bừa|quá nhiều file|1 commit|hàng trăm file/i.test(combined)) return 3; // Tham gom 100 file vào 1 Commit
+      if (/cồng kềnh|over-engineer|kiến trúc|áp đặt|phức tạp|quá đà|vẽ vời|nhiều tầng|design pattern/i.test(combined)) return 4; // Áp đặt kiến trúc cồng kềnh
+      if (/sửa trên live|sửa trực tiếp|cowboy|ssh|nano trên server|sửa thẳng|hotfix trực tiếp|sửa live/i.test(combined)) return 5; // Đam mê sửa code thẳng trên Live
+      return 1;
     }
 
     // tile_scene_09: Hiện trạng Bàn làm việc
     if (tile.id === 'tile_scene_09') {
-      if (/note|giấy|post-it|mật khẩu dán/i.test(cText)) return 0; // Mảnh giấy Note dán chi chít
-      if (/nóng|khét|quạt|cháy|nhiệt/i.test(cText) || /nóng|khét/i.test(mText)) return 1; // Thiết bị nóng ran / Khét lẹt
-      if (/cà phê|trà sữa|nước|đổ|ly/i.test(cText)) return 2; // Vết cà phê / Trà sữa đổ loang
-      if (/bàn phím|màn hình|kẹt nút|chuột|vỡ|nứt/i.test(cText)) return 3; // Bàn phím kẹt nút
-      if (/dây mạng|cáp|bừa bộn/i.test(cText)) return 4; // Dây mạng & đồ đạc bừa bộn
-      return 5; // Gọn gàng sạch sẽ đáng ngờ
+      if (/note|giấy|post-it|mật khẩu dán|dán|nhãn|sổ tay|bút ghi/i.test(cText)) return 0; // Mảnh giấy Note dán chi chít
+      if (/nóng ran|khét|quạt hú|cháy|nhiệt|bốc khói|nóng rực|quạt server|tản nhiệt/i.test(cText) || /nóng|khét/i.test(mText)) return 1; // Thiết bị nóng ran / Khét lẹt
+      if (/cà phê|trà sữa|nước|đổ|ly|cốc|vết nước|loang|vết ố/i.test(cText)) return 2; // Vết cà phê / Trà sữa đổ loang
+      if (/bàn phím|màn hình|kẹt nút|chuột|vỡ|nứt|keycap|gõ mạnh|liệt phím|hỏng nút/i.test(cText)) return 3; // Bàn phím kẹt nút
+      if (/dây mạng|cáp|bừa bộn|lộn xộn|dây cáp|rối|rác|vương vãi/i.test(cText)) return 4; // Dây mạng & đồ đạc bừa bộn
+      if (/gọn gàng|sạch sẽ|đáng ngờ|ngăn nắp|khóa máy|trống trơn|lau chùi/i.test(cText)) return 5; // Gọn gàng sạch sẽ đáng ngờ
+      return 5;
+    }
+
+    // tile_scene_10: Hoạt động Đang diễn ra lúc Sập
+    if (tile.id === 'tile_scene_10') {
+      if (/bi lắc|\bgame\b|ps5|foosball|giải trí|bắn súng/i.test(combined)) return 0; // Đang giải lao chơi Bi lắc / Game
+      if (/nghỉ ngơi|ngủ|\bnap\b|chợp mắt|ngủ gục|ngủ trưa|đắp chăn/i.test(combined)) return 1; // Đang nghỉ ngơi / Ngủ trưa
+      if (/retro|standup|sprint|all-hands|meeting|họp sprint|họp retro/i.test(combined)) return 2; // Đang họp Sprint Retro / Standup
+      if (/thanh toán|checkout|mở cổng thanh toán|flash sale|khách nạp tiền|chốt đơn/i.test(combined)) return 3; // Đang mở cổng thanh toán / Sale
+      if (/đoàn khách|thăm odc|onsite visit|tiếp khách hàng|tham quan odc/i.test(combined)) return 4; // Đang đón đoàn Khách hàng thăm ODC
+      if (/trà sữa|pizza|liên hoan|ăn mừng|party|tiệc/i.test(combined)) return 5; // Đang liên hoan Trà sữa / Pizza
+      return 2;
+    }
+
+    // tile_scene_11: Tín hiệu Phát hiện Đầu tiên
+    if (tile.id === 'tile_scene_11') {
+      if (/pagerduty|\bsiren\b|hú chuông|còi báo động/i.test(combined)) return 0; // Chuông PagerDuty kêu bất ngờ
+      if (/tiếng quạt|server hú|tiếng rít|quạt tản nhiệt|quạt hú/i.test(combined)) return 1; // Tiếng quạt Server hú kéo dài
+      if (/mùi khét|khét lẹt|khét|bốc mùi|cháy rụi|mùi nhựa|mùi silicon/i.test(combined)) return 2; // Mùi khét lẹt từ tủ máy chủ
+      if (/dashboard|đỏ rực|grafana|màn hình giám sát|đỏ lòm|cảnh báo đỏ/i.test(combined)) return 3; // Nhìn thấy Dashboard đỏ rực
+      if (/thao tác gõ phím|panicked|hốt hoảng|cuống cuồng nhập|la hét/i.test(combined)) return 4; // Thao tác gõ phím bất thường
+      if (/im lặng tuyệt đối|\balert sập\b|mất tín hiệu|không báo gì|tê liệt hoàn toàn|chết lặng/i.test(combined)) return 5; // Im lặng tuyệt đối
+      return 3;
+    }
+
+    // tile_scene_12: Mối quan hệ trong Dự án
+    if (tile.id === 'tile_scene_12') {
+      if (/anh em ruột thịt|cùng cảnh ot|chiến hữu|đồng cam|overtime buddy/i.test(combined)) return 0; // Anh em ruột thịt cùng cảnh OT
+      if (/bạn thân|chí cốt|tri kỷ|thân thiết|cạ cứng/i.test(combined)) return 1; // Bạn thân chí cốt
+      if (/chung squad|đồng nghiệp|cùng team|cùng squad|ngồi cạnh|chung nhóm/i.test(combined)) return 2; // Đồng nghiệp chung Squad
+      if (/\bsếp\b|đệ ruột|đệ tử|cấp trên|cấp dưới|\blead\b|junior|quản lý/i.test(combined)) return 3; // Cấp trên - Cấp dưới
+      if (/cặp đôi|người yêu|hẹn hò|công sở|yêu đương|tình cảm/i.test(combined)) return 4; // Cặp đôi công sở
+      if (/người mới|onboard|fresher|khác bộ phận|cross-team|mới vào|newbie/i.test(combined)) return 5; // Người mới onboard
+      return 2;
     }
 
     // tile_scene_13: Khung giờ Sập Hệ thống
     if (tile.id === 'tile_scene_13') {
-      if (/2h|rạng sáng|02:|03:|04:|dawn/i.test(combined)) return 0; // 02:00 - 05:00 AM
-      if (/sáng|08:|09:|morning/i.test(combined)) return 1; // Buổi sáng
-      if (/trưa|12:|noon/i.test(combined)) return 2; // Buổi trưa
-      if (/chiều|15:|16:|afternoon/i.test(combined)) return 3; // Buổi chiều
-      if (/17:59|tan tầm|tối|evening/i.test(combined)) return 4; // Chập tối sát giờ tan tầm
-      if (/đêm|khuya|23:|00:|night/i.test(combined)) return 5; // Đêm khuya thanh vắng
+      if (/(?<!\d)(02:|03:|04:|05:|2h|3h|4h|5h)\b|rạng sáng|dawn|nửa đêm về sáng/i.test(combined)) return 0; // Rạng sáng (02:00 - 05:00 AM)
+      if (/(?<!\d)(08:|09:|10:|8h|9h|10h)\b|buổi sáng|morning|đầu ca|sáng sớm/i.test(combined)) return 1; // Buổi sáng đầu ca
+      if (/(?<!\d)(11:|12:|13:|11h|12h|13h)\b|buổi trưa|noon|nghỉ trưa|ăn trưa/i.test(combined)) return 2; // Buổi trưa nghỉ ngơi
+      if (/(?<!\d)(14:|15:|16:|14h|15h|16h)\b|buổi chiều|afternoon/i.test(combined)) return 3; // Buổi chiều cao điểm
+      if (/(?<!\d)(17:|18:|19:|17h|18h|19h|17:59)\b|tan tầm|chập tối|sắp về|giờ về/i.test(combined)) return 4; // Chập tối sát giờ tan tầm
+      if (/(?<!\d)(22:|23:|00:|01:|22h|23h|0h|1h)\b|đêm khuya|night|nửa đêm|midnight/i.test(combined)) return 5; // Đêm khuya thanh vắng
+      return 4;
     }
 
     // tile_scene_14: Dấu vết Giám định tại Chỗ
     if (tile.id === 'tile_scene_14') {
-      if (/git|commit|blame|history|rebase|force push/i.test(cText) || /git|commit/i.test(mText)) return 5; // Dấu vết xóa / sửa Git History
-      if (/stack trace|dump|core dump|trace log/i.test(cText) || /trace/i.test(mText)) return 3; // Stack Trace đỏ lòm
-      if (/cà phê|nước|ẩm|đổ/i.test(cText)) return 4; // Vết nước / Cà phê đổ loang
-      if (/vân tay|gõ phím|bàn phím/i.test(cText)) return 0; // Dấu vân tay / Lịch sử gõ phím
+      if (/\bgit\b|\bcommit\b|blame|history|rebase|force push/i.test(cText) || /\bgit\b|\bcommit\b/i.test(mText)) return 5; // Dấu vết xóa / sửa Git History
+      if (/stack trace|dump|core dump|trace log|đỏ lòm/i.test(cText) || /trace/i.test(mText)) return 3; // Stack Trace đỏ lòm
+      if (/cà phê đổ|nước đổ|ẩm ướt|loang lổ|đổ nước/i.test(cText)) return 4; // Vết nước / Cà phê đổ loang
+      if (/vân tay|dấu gõ phím|bàn phím/i.test(cText)) return 0; // Dấu vân tay / Lịch sử gõ phím
       if (/phòng server|dấu giày/i.test(cText)) return 1; // Dấu giày phòng Server
       return 2; // Vết va đập phần cứng
     }
 
-    // 4. Thuật toán chấm điểm token tổng quát cho mọi Thẻ Hiện Trường khác
+    // tile_scene_15: Sự cố Phát sinh Kèm theo
+    if (tile.id === 'tile_scene_15') {
+      if (/\bups\b|mất điện|nguồn điện|cúp điện|sập nguồn|ắc quy|máy phát/i.test(combined)) return 0; // Mất điện nguồn dự phòng UPS
+      if (/báo động nhiệt|bốc khói|quá nhiệt|nóng quá|cháy nổ|nhiệt độ tăng|nóng ran/i.test(combined)) return 1; // Báo động nhiệt / Bốc khói
+      if (/tranh cãi|nảy lửa|slack|nhóm chat|chửi nhau|đổ lỗi|tranh luận/i.test(combined)) return 2; // Tranh cãi nảy lửa trên nhóm chat
+      if (/mất backup|bản backup|sao lưu|mất dữ liệu|không khôi phục được|hỏng backup/i.test(combined)) return 3; // Mất luôn bản Backup quý giá
+      if (/tiếng hét|thất thanh|\b(pm|lead)\b.*(hét|la|kêu)|la hét|hốt hoảng|hoảng loạn/i.test(combined)) return 4; // Tiếng hét thất thanh của PM
+      if (/không có biểu hiện|bình thường|yên ắng|không kèm theo|chỉ có vậy/i.test(combined)) return 5; // Không có biểu hiện phụ
+      return 2;
+    }
+
+    // tile_scene_16: Quy mô Hệ thống Bị nạn
+    if (tile.id === 'tile_scene_16') {
+      if (/monolith|khổng lồ|đồ sộ|nguyên khối|triệu dòng code|cũ kĩ to lớn/i.test(combined)) return 0; // Monolith khổng lồ
+      if (/microservice|mỏng nhẹ|nhỏ gọn|service độc lập|container/i.test(combined)) return 1; // Microservice mỏng nhẹ
+      if (/nhiều tầng|multi-tier|3-tier|phức tạp|n-tier|phân tầng/i.test(combined)) return 2; // Kiến trúc nhiều tầng
+      if (/tool nhỏ|\bmvp\b|mới dựng|nội bộ|thử nghiệm|prototype|script nhỏ/i.test(combined)) return 3; // Tool nhỏ / MVP
+      if (/legacy|chắp vá|cũ kỹ|nhiều năm|vá víu|code cổ/i.test(combined)) return 4; // Hệ thống Legacy chắp vá
+      if (/cân đối|cloud-native|chuẩn|\bk8s\b|hiện đại|tiêu chuẩn/i.test(combined)) return 5; // Cân đối / Cloud-Native
+      return 5;
+    }
+
+    // tile_scene_17: Tình trạng Codebase
+    if (tile.id === 'tile_scene_17') {
+      if (/clean code|gọn gàng|ngăn nắp|format|chuẩn mực|đẹp đẽ|rõ ràng/i.test(combined)) return 0; // Clean Code gọn gàng
+      if (/spaghetti|xộc xệch|rối rắm|lộn xộn|mì tôm|chắp vá|bẩn/i.test(combined)) return 1; // Spaghetti Code xộc xệch
+      if (/sang xịn mịn|kiến trúc|enterprise|over-engineered|xịn sò|công phu/i.test(combined)) return 2; // Kiến trúc sang xịn mịn
+      if (/cũ kỹ|nhiều năm tuổi|outdated|deprecated|lỗi thời|cổ lỗ sĩ|từ thời/i.test(combined)) return 3; // Code cũ kỹ nhiều năm tuổi
+      if (/kỳ dị|hack não|esoteric|cú pháp lạ|dị hợm|khó hiểu|độc chiêu|macro/i.test(combined)) return 4; // Cú pháp kỳ dị / Hack não
+      if (/trống trơn|không document|no docs|không comment|thiếu tài liệu|tù mù/i.test(combined)) return 5; // Trống trơn không một dòng Document
+      return 1;
+    }
+
+    // tile_scene_18: Biểu cảm của PM / Khách hàng
+    if (tile.id === 'tile_scene_18') {
+      if (/bình thản|tính năng mới|tưởng feature|không sao|ung dung|bình tĩnh/i.test(combined)) return 0; // Bình thản
+      if (/vật lộn|rollback|quay lui|tìm cách khôi phục|hoàn tác|quay lại bản cũ/i.test(combined)) return 1; // Vật lộn tìm cách Rollback
+      if (/\bsla\b|hoảng sợ|tụt dốc|đền hợp đồng|phạt hợp đồng|uptime|mất tiền/i.test(combined)) return 2; // Hoảng sợ nhìn SLA tụt dốc
+      if (/đau khổ|ôm đầu|tuyệt vọng|khóc|bất lực|than trời/i.test(combined)) return 3; // Đau khổ ôm đầu
+      if (/đứng hình|mất 5 giây|speechless|đơ người|chết lặng|sửng sốt|há hốc/i.test(combined)) return 4; // Đứng hình mất 5 giây
+      if (/tức giận|triệu tập war room|nổi giận|triệu tập|gắt gỏng|mắng mỏ|khẩn cấp/i.test(combined)) return 5; // Tức giận triệu tập War Room
+      return 5;
+    }
+
+    // tile_scene_19: Đối tượng Chịu ảnh hưởng Chính
+    if (tile.id === 'tile_scene_19') {
+      if (/sếp lớn|giám đốc|c-level|director|\bbod\b|lãnh đạo|trưởng ban/i.test(combined)) return 0; // Sếp lớn / Giám đốc
+      if (/chuyên gia|tech lead|architect|lead dev|kiến trúc sư|trưởng nhóm kỹ thuật/i.test(combined)) return 1; // Chuyên gia / Tech Lead
+      if (/anh em dev|ops trực chiến|\b(dev|developer|qa|qc|tester|ot)\b|lập trình viên|anh em|trực chiến/i.test(combined)) return 2; // Anh em Dev / Ops trực chiến
+      if (/thực tập sinh|intern|fresher|học việc|tập sự|mới vào nghề/i.test(combined)) return 3; // Thực tập sinh / Fresher
+      if (/chờ dự án|\bbench\b|ngồi không|rảnh rỗi|đang chờ|nhân sự ngoài/i.test(combined)) return 4; // Nhân sự đang chờ dự án
+      if (/cựu trào|bàn giao|sắp nghỉ|người cũ|chuẩn bị bàn giao|nghỉ việc/i.test(combined)) return 5; // Cựu trào sắp bàn giao
+      return 2;
+    }
+
+    // tile_scene_20: Đặc điểm Nhân sự Liên quan
+    if (tile.id === 'tile_scene_20') {
+      if (/tập sự|intern|rookie|fresher|mới tinh|ngây thơ|chưa kinh nghiệm/i.test(combined)) return 0; // Mới tập sự (Intern)
+      if (/gen-z|gen z|tiktok|nhanh nhảu|trẻ trung|\btrẻ\b/i.test(combined)) return 1; // Dev trẻ Gen-Z
+      if (/senior|dày dạn|nhiều kinh nghiệm|kinh nghiệm|lâu năm|cứng tay/i.test(combined)) return 2; // Senior dày dạn
+      if (/lão làng|guru|veteran|huyền thoại|kỳ cựu|đại thụ|sư phụ/i.test(combined)) return 3; // Lão làng công nghệ
+      if (/backend|hạ tầng|infra|devops|database|sysadmin|hệ thống|server|\bk8s\b|cloud|connection pool|\bdb\b/i.test(combined)) return 4; // Chuyên trị Backend / Hạ tầng
+      if (/giao diện|fullstack|frontend|\b(ui|ux|fe|web|css)\b|html/i.test(combined)) return 5; // Chuyên trị Giao diện / Fullstack
+      return 4;
+    }
+
+    // tile_scene_21: Bầu không khí Phòng họp
+    if (tile.id === 'tile_scene_21') {
+      if (/quang đãng|bình tĩnh|yên ắng|thư thái|không khí nhẹ nhàng|trật tự/i.test(combined)) return 0; // Quang đãng / Bình tĩnh
+      if (/bão tin nhắn|réo dồn dập|\bping\b|slack nổ tung|chuông kêu liên tục/i.test(combined)) return 1; // Bão tin nhắn réo dồn dập
+      if (/căng thẳng|khô khốc|ngột ngạt|im phăng phắc|căng như dây đàn/i.test(combined)) return 2; // Căng thẳng khô khốc
+      if (/mồ hôi|toát mồ hôi|lạnh ngắt|run rẩy|lo sợ|ướt đẫm/i.test(combined)) return 3; // Toát mồ hôi lạnh
+      if (/điều hòa|16 độ|lạnh buốt|\brét\b|máy lạnh|đóng băng/i.test(combined)) return 4; // Lạnh buốt điều hòa 16 độ
+      if (/nóng như chảo lửa|chảo lửa|nóng bức|hầm hập|như thiêu|sôi sục|nóng ran|khét/i.test(combined)) return 5; // Nóng như chảo lửa
+      return 2;
+    }
+
+    // 4. Thuật toán chấm điểm token tổng quát nâng cao cho mọi Thẻ Hiện Trường khác
     if (tile.options_vi && tile.options_vi.length > 0) {
       let bestOptIdx = -1;
       let maxOptScore = 0;
+
+      const stopWords = new Set(['cho', 'của', 'với', 'các', 'một', 'như', 'đang', 'khi', 'vào', 'lên', 'the', 'and', 'for', 'with', 'from', 'into']);
+      const shortTechTokens = new Set(['ot', 'db', 'ui', 'fe', 'qa', 'qc', 's3', 'vm', 'pm', 'ai', 'ip', 'os', 'ci', 'cd', 'k8']);
 
       for (let idx = 0; idx < tile.options_vi.length; idx++) {
         const optVi = (tile.options_vi[idx] || '').toLowerCase();
         const optEn = (tile.options_en ? tile.options_en[idx] : '').toLowerCase();
         let optScore = 0;
 
-        // Tách các từ khóa có nghĩa (độ dài >= 3 ký tự)
-        const tokens = `${optVi} ${optEn}`.split(/[\s,()\/•-]+/).filter(t => t.length >= 3);
+        const tokens = `${optVi} ${optEn}`
+          .split(/[\s,()\/•-]+/)
+          .filter(t => (t.length >= 3 || shortTechTokens.has(t)) && !stopWords.has(t));
+
         for (const token of tokens) {
           if (mText.includes(token)) optScore += 3;
           if (cText.includes(token)) optScore += 2;

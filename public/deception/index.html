@@ -112,7 +112,7 @@
           <!-- TAB 1: SOLO PLAY WITH AI BOTS -->
           <div class="lobby-panel active" id="panel-lobby-solo">
             <!-- Central Detective Table Layout Preview -->
-            <div class="lobby-table-wrapper">
+            <div class="lobby-table-wrapper interactive-warroom-scene" id="interactive-warroom-scene">
               <!-- War Room Office Props -->
               <div class="office-prop prop-whiteboard" title="Whiteboard kiến trúc & sơ đồ sự cố">
                 <div class="prop-icon-wrap"><i class="fa-solid fa-chalkboard"></i></div>
@@ -273,13 +273,27 @@
 
                 <div class="online-card-form">
                   <div class="cfg-group">
-                    <label for="online-join-code">Nhập mã phòng (6 ký tự):</label>
-                    <input type="text" id="online-join-code" class="noir-ctrl-input input-room-code" placeholder="VD: DEC842" maxlength="8" style="text-transform: uppercase;">
+                    <label for="online-join-code">Nhập mã phòng (6 ký tự) hoặc dán link:</label>
+                    <input type="text" id="online-join-code" class="noir-ctrl-input input-room-code" placeholder="VD: DEC842 hoặc dán link" maxlength="64" style="text-transform: uppercase;">
                   </div>
 
                   <div class="cfg-group">
                     <label for="online-join-name">Tên hiển thị của bạn:</label>
                     <input type="text" id="online-join-name" class="noir-ctrl-input" value="Điều Tra Viên" maxlength="18">
+                  </div>
+
+                  <div class="cfg-group">
+                    <label>Chọn biểu tượng đại diện (Avatar):</label>
+                    <div class="avatar-quick-selector" id="join-avatar-picker">
+                      <button type="button" class="btn-avatar-choice active" data-avatar="🕵️">🕵️</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🔬">🔬</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="💻">💻</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🎭">🎭</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🧪">🧪</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🕶️">🕶️</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🛡️">🛡️</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="🎩">🎩</button>
+                    </div>
                   </div>
 
                   <button type="button" class="btn-noir-hero btn-join-online" id="btn-join-online-room">
@@ -412,7 +426,7 @@
                 </div>
 
                 <!-- Central Detective Table Layout for Online Waiting Room -->
-                <div class="lobby-table-wrapper online-table-wrapper">
+                <div class="lobby-table-wrapper online-table-wrapper interactive-warroom-scene" id="online-interactive-warroom-scene">
                   <!-- War Room Office Props -->
                   <div class="office-prop prop-whiteboard" title="Whiteboard kiến trúc & sơ đồ sự cố">
                     <div class="prop-icon-wrap"><i class="fa-solid fa-chalkboard"></i></div>

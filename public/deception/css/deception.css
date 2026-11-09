@@ -409,12 +409,13 @@ body.deception-app {
 
 
 /* IT War Room Meeting Floor & Props */
+.interactive-warroom-scene,
 .lobby-table-wrapper {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 34px 14px 62px 14px;
+  padding: 38px 16px 66px 16px;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -646,7 +647,7 @@ body.deception-app {
 
 .table-seats-ring {
   position: absolute;
-  inset: -25px;
+  inset: -28px;
   pointer-events: none;
 }
 
@@ -721,9 +722,6 @@ body.deception-app {
 /* Dev Status Speech Bubble Overhead (Gather.town / Dev Story Style) */
 .dev-status-bubble {
   position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
   background: rgba(15, 23, 42, 0.94);
   border: 1px solid rgba(0, 210, 211, 0.5);
   color: #f8fafc;
@@ -738,19 +736,20 @@ body.deception-app {
   display: flex;
   align-items: center;
   gap: 5px;
-  animation: devBubbleFloat 3s ease-in-out infinite;
+  max-width: 160px;
   transition: all 0.25s ease;
+}
+
+.dev-status-bubble .bubble-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dev-status-bubble::after {
   content: '';
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 4px 4px 0 4px;
   border-style: solid;
-  border-color: rgba(15, 23, 42, 0.94) transparent transparent transparent;
 }
 
 .dev-status-bubble .bubble-icon {
@@ -763,15 +762,6 @@ body.deception-app {
   background: rgba(15, 23, 42, 0.75);
 }
 
-@keyframes devBubbleFloat {
-  0%, 100% {
-    transform: translateX(-50%) translateY(0);
-  }
-  50% {
-    transform: translateX(-50%) translateY(-3.5px);
-  }
-}
-
 /* =========================================================================
    ANGLE-AWARE & POSITION-AWARE WORKSTATIONS & SPEECH BUBBLES
    Ensures speech bubbles never enter the table interior or collide with telemetry
@@ -781,10 +771,11 @@ body.deception-app {
 .seat-pos-top .dev-status-bubble,
 .dev-status-bubble.bubble-pos-top {
   top: auto;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 10px);
   left: 50%;
+  right: auto;
   transform: translateX(-50%);
-  animation: devBubbleFloat 3s ease-in-out infinite;
+  animation: devBubbleFloatTop 3s ease-in-out infinite;
 }
 
 .seat-pos-top .dev-status-bubble::after,
@@ -792,6 +783,7 @@ body.deception-app {
   top: 100%;
   bottom: auto;
   left: 50%;
+  right: auto;
   transform: translateX(-50%);
   border-width: 5px 5px 0 5px;
   border-color: rgba(15, 23, 42, 0.94) transparent transparent transparent;
@@ -801,6 +793,7 @@ body.deception-app {
   top: -6px;
   bottom: auto;
   left: 50%;
+  right: auto;
   transform: translateX(-50%);
   border-radius: 12px 12px 4px 4px;
 }
@@ -809,6 +802,7 @@ body.deception-app {
   bottom: -8px;
   top: auto;
   left: 50%;
+  right: auto;
   transform: translateX(-50%);
 }
 
@@ -818,7 +812,7 @@ body.deception-app {
 
 .seat-pos-top .lobby-seat-label,
 .seat-pos-top .online-table-seat-label {
-  top: 50px;
+  top: 60px;
   bottom: auto;
   left: 50%;
   transform: translateX(-50%);
@@ -841,9 +835,10 @@ body.deception-app {
 /* --- Bottom Half Seats: Bubble floats BELOW (outward), Desk pod faces UP (inward) --- */
 .seat-pos-bottom .dev-status-bubble,
 .dev-status-bubble.bubble-pos-bottom {
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   bottom: auto;
   left: 50%;
+  right: auto;
   transform: translateX(-50%);
   animation: devBubbleFloatBottom 3s ease-in-out infinite;
 }
@@ -853,6 +848,7 @@ body.deception-app {
   top: auto;
   bottom: 100%;
   left: 50%;
+  right: auto;
   transform: translateX(-50%);
   border-width: 0 5px 5px 5px;
   border-color: transparent transparent rgba(15, 23, 42, 0.94) transparent;
@@ -862,6 +858,7 @@ body.deception-app {
   top: auto;
   bottom: -6px;
   left: 50%;
+  right: auto;
   transform: translateX(-50%);
   border-radius: 4px 4px 12px 12px;
 }
@@ -870,6 +867,7 @@ body.deception-app {
   top: -8px;
   bottom: auto;
   left: 50%;
+  right: auto;
   transform: translateX(-50%);
 }
 
@@ -881,7 +879,7 @@ body.deception-app {
 .seat-pos-bottom .lobby-seat-label,
 .seat-pos-bottom .online-table-seat-label {
   top: auto;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 12px);
   left: 50%;
   transform: translateX(-50%);
 }
@@ -903,7 +901,7 @@ body.deception-app {
 /* --- Side Left Seats: Bubble floats OUTWARD to left, Desk pod faces RIGHT (inward) --- */
 .seat-pos-left .dev-status-bubble,
 .dev-status-bubble.bubble-pos-left {
-  right: calc(100% + 10px);
+  right: calc(100% + 12px);
   left: auto;
   top: 50%;
   bottom: auto;
@@ -947,10 +945,18 @@ body.deception-app {
   border-radius: 12px 4px 4px 12px;
 }
 
+.seat-pos-left .lobby-seat-label,
+.seat-pos-left .online-table-seat-label {
+  top: 52px;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 /* --- Side Right Seats: Bubble floats OUTWARD to right, Desk pod faces LEFT (inward) --- */
 .seat-pos-right .dev-status-bubble,
 .dev-status-bubble.bubble-pos-right {
-  left: calc(100% + 10px);
+  left: calc(100% + 12px);
   right: auto;
   top: 50%;
   bottom: auto;
@@ -994,7 +1000,24 @@ body.deception-app {
   border-radius: 4px 12px 12px 4px;
 }
 
+.seat-pos-right .lobby-seat-label,
+.seat-pos-right .online-table-seat-label {
+  top: 52px;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 /* Floats animations */
+@keyframes devBubbleFloatTop {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-3.5px);
+  }
+}
+
 @keyframes devBubbleFloatBottom {
   0%, 100% {
     transform: translateX(-50%) translateY(0);
@@ -5614,6 +5637,9 @@ body.deception-app {
   .online-room-split {
     grid-template-columns: minmax(0, 1fr);
   }
+  .office-prop {
+    display: none !important;
+  }
 }
 
 /* Left Column: Seats & Profile */
@@ -5800,7 +5826,7 @@ body.deception-app {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 34px 14px 62px 14px;
+  padding: 38px 16px 66px 16px;
   overflow: visible;
   width: 100%;
   max-width: 100%;
@@ -5816,12 +5842,12 @@ body.deception-app {
 
 .online-round-table {
   position: relative;
-  width: min(520px, 92%);
-  height: 260px;
+  width: min(540px, 92%);
+  height: 290px;
   background: 
     radial-gradient(ellipse at center, #1e293b 0%, #0f172a 70%, #080d16 100%);
   border: 7px solid #334155;
-  border-radius: 145px;
+  border-radius: 155px;
   box-shadow: 
     0 0 0 2px rgba(0, 210, 211, 0.45),
     0 0 32px rgba(0, 210, 211, 0.18),
@@ -5837,17 +5863,20 @@ body.deception-app {
   content: '';
   position: absolute;
   inset: 10px;
-  border-radius: 135px;
+  border-radius: 140px;
   border: 1px dashed rgba(0, 210, 211, 0.2);
   pointer-events: none;
 }
 
 .online-table-felt-status {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 8px;
   margin-top: 6px;
+  flex-wrap: wrap;
+  max-width: 90%;
 }
 
 .felt-code-tag {
@@ -6890,7 +6919,7 @@ body.deception-app {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .lobby-card-header {
@@ -6906,27 +6935,29 @@ body.deception-app {
     line-height: 1.25;
   }
 
+  .interactive-warroom-scene,
   .lobby-table-wrapper {
-    padding: 12px 6px 52px 6px;
+    padding: 32px 8px 60px 8px;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
+    overflow: visible;
   }
 
   .detective-round-table {
-    width: min(270px, calc(100vw - 88px));
+    width: min(320px, calc(100vw - 32px));
     max-width: 100%;
-    height: 170px;
-    border-width: 6px;
-    border-radius: 95px;
+    height: 200px;
+    border-width: 5px;
+    border-radius: 105px;
     box-sizing: border-box;
     margin: 0 auto;
   }
 
   .table-seats-ring {
-    inset: -16px;
+    inset: -18px;
   }
 
   .lobby-seat-node {
@@ -6936,7 +6967,7 @@ body.deception-app {
   }
 
   .lobby-seat-label {
-    top: 38px;
+    top: 44px;
     bottom: auto;
     left: 50%;
     transform: translateX(-50%);
@@ -7138,11 +7169,11 @@ body.deception-app {
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .online-table-wrapper {
-    padding: 16px 4px 52px 4px;
+    padding: 24px 8px 56px 8px;
     overflow: visible;
     width: 100%;
     max-width: 100%;
@@ -7152,11 +7183,11 @@ body.deception-app {
   }
 
   .online-round-table {
-    width: min(270px, calc(100vw - 88px));
+    width: min(320px, calc(100vw - 32px));
     max-width: 100%;
-    height: 170px;
-    border-width: 6px;
-    border-radius: 95px;
+    height: 200px;
+    border-width: 5px;
+    border-radius: 105px;
     box-sizing: border-box;
     margin: 0 auto;
   }
@@ -7190,32 +7221,45 @@ body.deception-app {
   }
 
   .dev-status-bubble {
-    font-size: 8px;
-    padding: 1.5px 5px;
-    max-width: 80px;
-    bottom: calc(100% + 4px);
+    font-size: 8.5px;
+    padding: 2px 6px;
+    max-width: 100px;
+  }
+
+  .seat-pos-top .dev-status-bubble,
+  .dev-status-bubble.bubble-pos-top {
+    bottom: calc(100% + 6px);
+    top: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
   }
 
   .seat-pos-bottom .dev-status-bubble,
   .dev-status-bubble.bubble-pos-bottom {
-    top: calc(100% + 4px);
+    top: calc(100% + 6px);
     bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
   }
 
   .seat-pos-left .dev-status-bubble,
   .dev-status-bubble.bubble-pos-left {
-    right: calc(100% + 5px);
+    right: calc(100% + 8px);
     left: auto;
     top: 50%;
     bottom: auto;
+    transform: translateY(-50%);
   }
 
   .seat-pos-right .dev-status-bubble,
   .dev-status-bubble.bubble-pos-right {
-    left: calc(100% + 5px);
+    left: calc(100% + 8px);
     right: auto;
     top: 50%;
     bottom: auto;
+    transform: translateY(-50%);
   }
 
   .dev-status-bubble .bubble-text {
@@ -7256,19 +7300,19 @@ body.deception-app {
 
   .online-table-seat-label,
   .lobby-seat-label {
-    top: 38px;
+    top: 44px;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
     font-size: 8px;
-    max-width: 58px;
-    padding: 1px 3px;
+    max-width: 60px;
+    padding: 1px 4px;
   }
 
   .seat-pos-bottom .online-table-seat-label,
   .seat-pos-bottom .lobby-seat-label {
     top: auto;
-    bottom: calc(100% + 4px);
+    bottom: calc(100% + 8px);
   }
 
   .seat-badge-crown {
@@ -7834,6 +7878,16 @@ body.deception-app {
     min-height: 44px;
     justify-content: center;
     text-align: center;
+    box-sizing: border-box;
+  }
+
+  .noir-modal-footer .btn-modal-cancel {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    padding: 10px 16px;
+    display: inline-flex;
+    align-items: center;
   }
 
   .accuse-suspects-picker {

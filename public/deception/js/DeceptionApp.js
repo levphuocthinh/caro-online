@@ -114,6 +114,23 @@ class DeceptionAppController {
 
     if (btnBackHub) btnBackHub.style.display = isLobby ? 'inline-flex' : 'none';
     if (btnBackLobby) btnBackLobby.style.display = isLobby ? 'none' : 'inline-flex';
+
+    // Nút vai trò trên thanh Header chỉ hiển thị DUY NHẤT khi đang ở view-investigation trong trận đấu
+    // Tuyệt đối ẩn khi ở Sảnh chính (view-lobby), phòng chờ (view-online-room) hoặc trước khi trận đấu bắt đầu
+    const btnHdrMyRole = document.getElementById('btn-hdr-my-role');
+    if (btnHdrMyRole) {
+      if (viewId === 'view-investigation') {
+        const human = this.state?.getHumanPlayer();
+        const role = human?.role || this.onlineSecretIntel?.role;
+        if (role) {
+          btnHdrMyRole.style.display = 'inline-flex';
+        } else {
+          btnHdrMyRole.style.display = 'none';
+        }
+      } else {
+        btnHdrMyRole.style.display = 'none';
+      }
+    }
   }
 
   handleHeaderBackToLobby() {
@@ -153,6 +170,12 @@ class DeceptionAppController {
     }
 
     this.isOnlineMatch = false;
+    this.onlineSecretIntel = null;
+
+    // Đảm bảo ẩn hoàn toàn nút vai trò trên Header khi trở về Sảnh
+    const btnHdrMyRole = document.getElementById('btn-hdr-my-role');
+    if (btnHdrMyRole) btnHdrMyRole.style.display = 'none';
+
     this.showView('view-lobby');
   }
 
@@ -236,11 +259,7 @@ class DeceptionAppController {
 
     // Sao chép mã phòng
     document.getElementById('btn-copy-code')?.addEventListener('click', () => {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(this.state.roomCode).catch(() => {});
-      }
-      this.playAudio('chime');
-      alert(this.isVi ? `Đã sao chép mã bàn #${this.state.roomCode}` : `Copied room code #${this.state.roomCode}`);
+      this.copyToClipboard(this.state.roomCode, this.isVi ? `Đã sao chép mã bàn #${this.state.roomCode}` : `Copied room code #${this.state.roomCode}`);
     });
 
     // Thay đổi cấu hình Lobby
@@ -265,6 +284,14 @@ class DeceptionAppController {
     document.getElementById('cfg-preferred-role')?.addEventListener('change', (e) => {
       this.state.config.preferredRole = e.target.value || 'RANDOM';
       this.playAudio('click');
+    });
+
+    // Enter key trên input tên ở Sảnh Chơi Solo
+    document.getElementById('cfg-player-name')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('btn-start-investigation')?.click();
+      }
     });
 
     // Nút BẮT ĐẦU VỤ ÁN MỚI VỚI BOT
@@ -301,14 +328,24 @@ class DeceptionAppController {
       this.handleHeaderBackToLobby();
     });
 
-    // Chọn avatar trong form tạo phòng
-    document.querySelectorAll('#create-avatar-picker .btn-avatar-choice').forEach(btn => {
+    // Chọn avatar trong form Tạo Phòng & Vào Phòng Online
+    document.querySelectorAll('.avatar-quick-selector .btn-avatar-choice').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('#create-avatar-picker .btn-avatar-choice').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.myAvatar = btn.dataset.avatar || '🕵️';
+        const chosen = btn.dataset.avatar || '🕵️';
+        this.myAvatar = chosen;
+        document.querySelectorAll('.avatar-quick-selector .btn-avatar-choice').forEach(b => {
+          b.classList.toggle('active', b.dataset.avatar === chosen);
+        });
         this.playAudio('click');
       });
+    });
+
+    // Enter key trên input tên ở form Tạo Phòng Online
+    document.getElementById('online-create-name')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('btn-create-online-room')?.click();
+      }
     });
 
     // Nút Tạo Phòng Online Mới (Chủ Phòng)
@@ -344,13 +381,30 @@ class DeceptionAppController {
       });
     });
 
+    // Enter key trên input mã phòng & tên ở form Vào Phòng Online
+    ['online-join-code', 'online-join-name'].forEach(id => {
+      document.getElementById(id)?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.getElementById('btn-join-online-room')?.click();
+        }
+      });
+    });
+
     // Nút Vào Phòng Online Có Sẵn (Khách)
     let joinRoomSubmitting = false;
     document.getElementById('btn-join-online-room')?.addEventListener('click', () => {
       if (joinRoomSubmitting) return;
       joinRoomSubmitting = true;
       setTimeout(() => { joinRoomSubmitting = false; }, 800);
-      const code = (document.getElementById('online-join-code')?.value || '').trim().toUpperCase();
+      let rawCode = (document.getElementById('online-join-code')?.value || '').trim();
+      let code = rawCode;
+      const match = rawCode.match(/(?:room=|code=|^#?)([A-Za-z0-9]{4,8})/i);
+      if (match) {
+        code = match[1].toUpperCase();
+      } else {
+        code = rawCode.replace(/^[#]/, '').replace(/[-_\s]/g, '').trim().toUpperCase();
+      }
       const name = (document.getElementById('online-join-name')?.value || '').trim() || 'Điều Tra Viên';
       if (!code) {
         this.showToast('Vui lòng nhập mã phòng 6 ký tự (VD: DEC842)!');
@@ -958,6 +1012,15 @@ class DeceptionAppController {
         }
       });
 
+      this.socket.on('deception:presentation_started', (data) => {
+        if (!data) return;
+        this.state.phase = data.phase || 'ROUND_1_PRESENTATION';
+        this.roundTimeLeft = data.roundTime || 120;
+        this.playAudio('gavel');
+        this.renderInvestigationTable();
+        this.startRoundTimer();
+      });
+
       this.socket.on('deception:tile_swapped', (data) => {
         if (data && data.activeSceneTiles) {
           this.state.activeSceneTiles = data.activeSceneTiles;
@@ -1155,10 +1218,15 @@ class DeceptionAppController {
     if (myNameInput && me && document.activeElement !== myNameInput) {
       myNameInput.value = me.displayName;
     }
-    const myAvatarEl = document.getElementById('my-active-avatar');
-    if (myAvatarEl && me) {
-      myAvatarEl.textContent = me.avatar || '🕵️';
-      this.myAvatar = me.avatar || '🕵️';
+    if (me && me.avatar) {
+      this.myAvatar = me.avatar;
+      document.querySelectorAll('#online-avatar-picker .avatar-chip-btn').forEach(c => {
+        if (c.dataset.emoji === me.avatar) {
+          c.classList.add('active');
+        } else {
+          c.classList.remove('active');
+        }
+      });
     }
 
     const hostWrap = document.getElementById('wrap-host-controls');
@@ -1478,10 +1546,11 @@ class DeceptionAppController {
     let nodesHtml = '';
 
     for (let i = 0; i < totalSlots; i++) {
-      const angle = (i / totalSlots) * 2 * Math.PI - Math.PI / 2;
-      const rx = 50 + 44 * Math.cos(angle);
-      const ry = 50 + 44 * Math.sin(angle);
-      const { posClass, bubblePosClass } = this.getSeatPositionClasses(angle);
+      const slot = this.getConferenceSeatSlot(i, totalSlots);
+      const rx = slot.rx;
+      const ry = slot.ry;
+      const posClass = slot.posClass;
+      const bubblePosClass = slot.bubblePosClass;
 
       if (i < totalPlayers) {
         const p = players[i];
@@ -1617,6 +1686,7 @@ class DeceptionAppController {
 
     if (!chatItem.isSystem) {
       this.playAudio('click');
+      this.showSpeakerBubbleSnippet(chatItem.senderId, chatItem.text);
     }
   }
 
@@ -1709,9 +1779,20 @@ class DeceptionAppController {
 
   showSpeakerBubbleSnippet(speakerId, text) {
     if (!speakerId || !text) return;
-    const seatEl = document.querySelector(`.lobby-seat-node[data-player-id="${speakerId}"], .online-table-seat-node[data-player-id="${speakerId}"]`);
+    const seatEl = document.querySelector(`.lobby-seat-node[data-player-id="${speakerId}"], .online-table-seat-node[data-player-id="${speakerId}"], .suspect-station-box[data-player-id="${speakerId}"]`);
     if (!seatEl) return;
-    const bubbleText = seatEl.querySelector('.bubble-text');
+    let bubbleText = seatEl.querySelector('.bubble-text');
+    if (!bubbleText && seatEl.classList.contains('suspect-station-box')) {
+      let bEl = seatEl.querySelector('.suspect-chat-bubble');
+      if (!bEl) {
+        bEl = document.createElement('div');
+        bEl.className = 'dev-status-bubble bubble-pos-top suspect-chat-bubble';
+        bEl.style.cssText = 'position: absolute; top: -32px; left: 50%; transform: translateX(-50%); z-index: 100; pointer-events: none; white-space: nowrap; font-size: 11px; padding: 4px 8px; border-radius: 8px; background: rgba(15, 23, 42, 0.95); border: 1px solid #ffd32a; box-shadow: 0 4px 12px rgba(0,0,0,0.6);';
+        seatEl.style.position = 'relative';
+        seatEl.appendChild(bEl);
+      }
+      bubbleText = bEl;
+    }
     if (!bubbleText) return;
 
     const originalText = bubbleText.textContent;
@@ -1719,12 +1800,17 @@ class DeceptionAppController {
     bubbleText.textContent = `💬 ${shortText}`;
     bubbleText.style.fontWeight = 'bold';
     bubbleText.style.color = '#ffd32a';
+    bubbleText.style.display = 'block';
 
     setTimeout(() => {
       if (bubbleText) {
-        bubbleText.textContent = originalText;
-        bubbleText.style.fontWeight = '';
-        bubbleText.style.color = '';
+        if (seatEl.classList.contains('suspect-station-box')) {
+          bubbleText.remove();
+        } else {
+          bubbleText.textContent = originalText;
+          bubbleText.style.fontWeight = '';
+          bubbleText.style.color = '';
+        }
       }
     }, 4500);
   }
@@ -2028,29 +2114,34 @@ class DeceptionAppController {
     }
 
     this.updateHeaderInfo();
-    if (this.state.phase.startsWith('ROUND_') || this.state.phase === 'INVESTIGATION') {
-      this.renderInvestigationTable();
-      this.showView('view-investigation');
+    this.renderInvestigationTable();
+    this.showView('view-investigation');
+
+    if (this.state.phase.includes('PRESENTATION') || this.state.phase === 'INVESTIGATION') {
       this.roundTimeLeft = data.publicState.roundTimeLimit || 120;
       this.startRoundTimer();
-
-      if (this.state.round === 1) {
-        const solMeansId = this.state.solution?.meansCardId;
-        const solClueId = this.state.solution?.clueCardId;
-        const solMeans = solMeansId ? this.state.findCardById(solMeansId)?.card : null;
-        const solClue = solClueId ? this.state.findCardById(solClueId)?.card : null;
-        const fallbackCategories = ['Loss of Blood', 'Poisoning', 'Severe Injury', 'Suffocation'];
-        const caseNum = parseInt(String(this.state.caseId || '0').replace(/\D/g, ''), 10) || 0;
-        const cat = solMeans ? solMeans.category : fallbackCategories[caseNum % fallbackCategories.length];
-        deceptionPixelNoir.playNightCrime({
-          category: cat,
-          meansName: solMeans ? (this.isVi ? solMeans.vi : solMeans.en) : '',
-          clueName: solClue ? (this.isVi ? solClue.vi : solClue.en) : ''
-        });
-      }
     } else {
-      this.showRoleReveal();
+      // Đang ở pha đặt đạn ROUND_1_EVIDENCE (Tech Lead là con người) -> Chưa chạy đồng hồ đếm ngược
+      this.stopRoundTimer();
     }
+
+    if (this.state.round === 1) {
+      const solMeansId = this.state.solution?.meansCardId;
+      const solClueId = this.state.solution?.clueCardId;
+      const solMeans = solMeansId ? this.state.findCardById(solMeansId)?.card : null;
+      const solClue = solClueId ? this.state.findCardById(solClueId)?.card : null;
+      const fallbackCategories = ['Loss of Blood', 'Poisoning', 'Severe Injury', 'Suffocation'];
+      const caseNum = parseInt(String(this.state.caseId || '0').replace(/\D/g, ''), 10) || 0;
+      const cat = solMeans ? solMeans.category : fallbackCategories[caseNum % fallbackCategories.length];
+      deceptionPixelNoir.playNightCrime({
+        category: cat,
+        meansName: solMeans ? (this.isVi ? solMeans.vi : solMeans.en) : '',
+        clueName: solClue ? (this.isVi ? solClue.vi : solClue.en) : ''
+      });
+    }
+
+    // Luôn mở Modal Vai Trò Bí Mật hiển thị danh tính, cẩm nang mục tiêu và tình báo đồng đội (Hung thủ/Đồng phạm/Nhân chứng/Pháp y)
+    this.openSecretRoleModal(data.yourSecretRole);
 
     const hudChatBtn = document.getElementById('btn-toggle-ingame-chat');
     if (hudChatBtn) hudChatBtn.style.display = 'inline-flex';
@@ -2062,6 +2153,71 @@ class DeceptionAppController {
      STAGE 1: LOBBY & IT WAR ROOM WORKSTATIONS
      ========================================================================= */
 
+  getConferenceSeatSlot(index, totalCount) {
+    const n = Math.max(4, Math.min(9, totalCount || 6));
+    const idx = index % n;
+
+    // Slot maps for n = 4, 5, 6, 7, 8, 9:
+    // rx, ry are percentages of table-seats-ring.
+    // Workstations sit along the perimeter rim, bubbles float outward away from table felt and telemetry.
+    const slotMaps = {
+      4: [
+        { rx: 50, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 95, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 50, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+      ],
+      5: [
+        { rx: 34, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 66, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 95, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 50, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+      ],
+      6: [
+        { rx: 34, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 66, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 95, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 66, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 34, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+      ],
+      7: [
+        { rx: 32, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 68, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 95, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 95, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 68, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 32, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+      ],
+      8: [
+        { rx: 28, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 50, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 72, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 95, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 72, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 50, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 28, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+      ],
+      9: [
+        { rx: 28, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 50, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 72, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 95, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 95, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 72, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 50, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 28, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+      ]
+    };
+
+    const slots = slotMaps[n] || slotMaps[6];
+    return slots[idx] || slots[0];
+  }
+
   getSeatPositionClasses(angle) {
     const sin = Math.sin(angle);
     const cos = Math.cos(angle);
@@ -2069,10 +2225,10 @@ class DeceptionAppController {
     let posClass = 'seat-pos-top';
     let bubblePosClass = 'bubble-pos-top';
 
-    if (sin > 0.3) {
+    if (sin > 0.5) {
       posClass = 'seat-pos-bottom';
       bubblePosClass = 'bubble-pos-bottom';
-    } else if (sin < -0.3) {
+    } else if (sin < -0.5) {
       posClass = 'seat-pos-top';
       bubblePosClass = 'bubble-pos-top';
     } else {
@@ -2139,10 +2295,11 @@ class DeceptionAppController {
 
     const count = this.state.players.length;
     ring.innerHTML = this.state.players.map((p, i) => {
-      const angle = (i / count) * 2 * Math.PI - Math.PI / 2;
-      const rx = 50 + 44 * Math.cos(angle);
-      const ry = 50 + 44 * Math.sin(angle);
-      const { posClass, bubblePosClass } = this.getSeatPositionClasses(angle);
+      const slot = this.getConferenceSeatSlot(i, count);
+      const rx = slot.rx;
+      const ry = slot.ry;
+      const posClass = slot.posClass;
+      const bubblePosClass = slot.bubblePosClass;
       const activity = this.getDevActivity(p, i, false);
       const animDelay = (i * 0.22).toFixed(2);
 
@@ -2250,15 +2407,23 @@ class DeceptionAppController {
 
   updateRoleBadges() {
     const human = this.state.getHumanPlayer();
-    if (!human) return;
-    const roleDef = ROLE_DEFINITIONS[human.role] || ROLE_DEFINITIONS.INVESTIGATOR;
-    const roleGuide = ROLE_GUIDES[human.role] || ROLE_GUIDES.INVESTIGATOR;
+    const role = human?.role || this.onlineSecretIntel?.role;
+    if (!role) return;
+    const roleDef = ROLE_DEFINITIONS[role] || ROLE_DEFINITIONS.INVESTIGATOR;
+    const roleGuide = ROLE_GUIDES[role] || ROLE_GUIDES.INVESTIGATOR;
 
     const hdrRoleBtn = document.getElementById('btn-hdr-my-role');
     const hdrIcon = document.getElementById('hdr-my-role-icon');
     const hdrName = document.getElementById('hdr-my-role-name');
 
-    if (hdrRoleBtn) hdrRoleBtn.style.display = 'inline-flex';
+    const activeView = document.querySelector('.noir-view.active')?.id;
+    if (hdrRoleBtn) {
+      if (activeView === 'view-investigation') {
+        hdrRoleBtn.style.display = 'inline-flex';
+      } else {
+        hdrRoleBtn.style.display = 'none';
+      }
+    }
     if (hdrIcon) hdrIcon.textContent = roleGuide.icon;
     if (hdrName) hdrName.textContent = this.isVi ? roleDef.name_vi : roleDef.name_en;
 
@@ -2271,22 +2436,158 @@ class DeceptionAppController {
     if (hudText) hudText.textContent = this.isVi ? roleDef.name_vi : roleDef.name_en;
   }
 
-  openMyRoleGuideModal() {
+  openSecretRoleModal(secretRole = null) {
     const human = this.state.getHumanPlayer();
-    if (!human) return;
-    const roleDef = ROLE_DEFINITIONS[human.role] || ROLE_DEFINITIONS.INVESTIGATOR;
-    const roleGuide = ROLE_GUIDES[human.role] || ROLE_GUIDES.INVESTIGATOR;
+    const intel = secretRole || this.onlineSecretIntel;
+    const role = intel?.role || human?.role || 'INVESTIGATOR';
+    const team = intel?.team || human?.team || 'INVESTIGATION';
+
+    const roleDef = ROLE_DEFINITIONS[role] || ROLE_DEFINITIONS.INVESTIGATOR;
+    const roleGuide = ROLE_GUIDES[role] || ROLE_GUIDES.INVESTIGATOR;
 
     const modalTitle = document.getElementById('guide-modal-title');
     const modalContent = document.getElementById('guide-modal-content');
 
     if (modalTitle) {
-      modalTitle.textContent = `${roleGuide.icon} ${this.isVi ? roleDef.name_vi : roleDef.name_en} (${roleDef.team === 'CRIMINAL' ? (this.isVi ? 'Phe Tội Phạm' : 'Criminal') : (this.isVi ? 'Phe Điều Tra' : 'Police')})`;
+      modalTitle.textContent = `${roleGuide.icon} ${this.isVi ? roleDef.name_vi : roleDef.name_en} (${team === 'CRIMINAL' ? (this.isVi ? 'Phe Tội Phạm' : 'Criminal') : (this.isVi ? 'Phe Điều Tra' : 'Police')})`;
     }
 
     if (modalContent) {
       const steps = this.isVi ? roleGuide.steps_vi : roleGuide.steps_en;
+
+      // Trích xuất manh mối và thông tin mật đặc thù từng vai trò
+      const solMeansId = intel?.solution?.meansCardId || this.state.solution?.meansCardId;
+      const solClueId = intel?.solution?.clueCardId || this.state.solution?.clueCardId;
+      const solMeans = solMeansId ? this.state.findCardById(solMeansId)?.card : null;
+      const solClue = solClueId ? this.state.findCardById(solClueId)?.card : null;
+
+      let secretIntelHtml = '';
+
+      if (role === 'MURDERER') {
+        const accomplice = intel?.accomplice;
+        secretIntelHtml = `
+          <div class="modal-secret-intel-box box-murderer" style="margin-bottom: 14px; padding: 12px; background: rgba(231, 76, 60, 0.15); border: 1px solid rgba(231, 76, 60, 0.4); border-radius: 8px;">
+            <div style="font-weight: 800; color: #e74c3c; margin-bottom: 6px; font-size: 14px;">
+              <i class="fa-solid fa-skull"></i> ${this.isVi ? 'HỒ SƠ GÂY ÁN CỦA BẠN (CẶP LỖI CẦN CHE GIẤU):' : 'YOUR INCIDENT SOLUTION (HIDE THESE):'}
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+              <div class="evidence-chip chip-blue" style="cursor: default;">
+                <span class="evidence-chip-icon">${solMeans ? renderCardIconHtml(solMeans, 'chip-svg') : '💻'}</span>
+                <div class="evidence-chip-text">
+                  <span class="evidence-chip-vi">${solMeans ? solMeans.vi : (solMeansId || '—')}</span>
+                  <span class="evidence-chip-en">${solMeans ? solMeans.en : ''}</span>
+                </div>
+              </div>
+              <div class="evidence-chip chip-red" style="cursor: default;">
+                <span class="evidence-chip-icon">${solClue ? renderCardIconHtml(solClue, 'chip-svg') : '📋'}</span>
+                <div class="evidence-chip-text">
+                  <span class="evidence-chip-vi">${solClue ? solClue.vi : (solClueId || '—')}</span>
+                  <span class="evidence-chip-en">${solClue ? solClue.en : ''}</span>
+                </div>
+              </div>
+            </div>
+            ${accomplice ? `
+              <div style="margin-top: 8px; font-size: 13px; color: #f1c40f;">
+                <b>🤝 ${this.isVi ? 'Đồng phạm (Accomplice) hỗ trợ bạn:' : 'Your Accomplice partner:'}</b> ${accomplice.avatar || '👤'} ${accomplice.displayName}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      } else if (role === 'ACCOMPLICE' || role === 'INSIDE_MAN') {
+        const murderer = intel?.murderer;
+        secretIntelHtml = `
+          <div class="modal-secret-intel-box box-accomplice" style="margin-bottom: 14px; padding: 12px; background: rgba(230, 126, 34, 0.15); border: 1px solid rgba(230, 126, 34, 0.4); border-radius: 8px;">
+            <div style="font-weight: 800; color: #e67e22; margin-bottom: 6px; font-size: 14px;">
+              <i class="fa-solid fa-user-ninja"></i> ${this.isVi ? 'TÌNH BÁO ĐỒNG PHẠM (THỦ PHẠM & CẶP LỖI):' : 'ACCOMPLICE INTEL (CULPRIT & SOLUTION):'}
+            </div>
+            ${murderer ? `
+              <div style="margin-bottom: 6px; font-size: 13px; color: #f1c40f;">
+                <b>💣 ${this.isVi ? 'Thủ phạm (The Culprit) bạn cần bảo vệ:' : 'The Culprit you must protect:'}</b> ${murderer.avatar || '👤'} ${murderer.displayName}
+              </div>
+            ` : ''}
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+              <div class="evidence-chip chip-blue" style="cursor: default;">
+                <span class="evidence-chip-icon">${solMeans ? renderCardIconHtml(solMeans, 'chip-svg') : '💻'}</span>
+                <div class="evidence-chip-text">
+                  <span class="evidence-chip-vi">${solMeans ? solMeans.vi : (solMeansId || '—')}</span>
+                  <span class="evidence-chip-en">${solMeans ? solMeans.en : ''}</span>
+                </div>
+              </div>
+              <div class="evidence-chip chip-red" style="cursor: default;">
+                <span class="evidence-chip-icon">${solClue ? renderCardIconHtml(solClue, 'chip-svg') : '📋'}</span>
+                <div class="evidence-chip-text">
+                  <span class="evidence-chip-vi">${solClue ? solClue.vi : (solClueId || '—')}</span>
+                  <span class="evidence-chip-en">${solClue ? solClue.en : ''}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (role === 'FORENSIC_SCIENTIST') {
+        const murderer = intel?.murderer;
+        secretIntelHtml = `
+          <div class="modal-secret-intel-box box-forensic" style="margin-bottom: 14px; padding: 12px; background: rgba(52, 152, 219, 0.15); border: 1px solid rgba(52, 152, 219, 0.4); border-radius: 8px;">
+            <div style="font-weight: 800; color: #3498db; margin-bottom: 6px; font-size: 14px;">
+              <i class="fa-solid fa-microscope"></i> ${this.isVi ? 'DỮ LIỆU TECH LEAD / GIÁM ĐỊNH PHÁP Y:' : 'TECH LEAD INCIDENT SOLUTION:'}
+            </div>
+            ${murderer ? `
+              <div style="margin-bottom: 6px; font-size: 13px; color: #f1c40f;">
+                <b>👤 ${this.isVi ? 'Thủ phạm gây lỗi (The Culprit):' : 'Incident Culprit:'}</b> ${murderer.avatar || '👤'} ${murderer.displayName}
+              </div>
+            ` : ''}
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+              <div class="evidence-chip chip-blue" style="cursor: default;">
+                <span class="evidence-chip-icon">${solMeans ? renderCardIconHtml(solMeans, 'chip-svg') : '💻'}</span>
+                <div class="evidence-chip-text">
+                  <span class="evidence-chip-vi">${solMeans ? solMeans.vi : (solMeansId || '—')}</span>
+                  <span class="evidence-chip-en">${solMeans ? solMeans.en : ''}</span>
+                </div>
+              </div>
+              <div class="evidence-chip chip-red" style="cursor: default;">
+                <span class="evidence-chip-icon">${solClue ? renderCardIconHtml(solClue, 'chip-svg') : '📋'}</span>
+                <div class="evidence-chip-text">
+                  <span class="evidence-chip-vi">${solClue ? solClue.vi : (solClueId || '—')}</span>
+                  <span class="evidence-chip-en">${solClue ? solClue.en : ''}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (role === 'WITNESS') {
+        const culprits = (intel && intel.seenCulprits)
+          || this.state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE' || p.role === 'INSIDE_MAN');
+        const culpritNames = culprits.map(c => `${c.avatar || '👤'} ${c.displayName}`).join(' & ') || (this.isVi ? '2 kẻ tình nghi' : '2 suspects');
+        secretIntelHtml = `
+          <div class="modal-secret-intel-box box-witness" style="margin-bottom: 14px; padding: 12px; background: rgba(155, 89, 182, 0.15); border: 1px solid rgba(155, 89, 182, 0.4); border-radius: 8px;">
+            <div style="font-weight: 800; color: #9b59b6; margin-bottom: 6px; font-size: 14px;">
+              <i class="fa-solid fa-eye"></i> ${this.isVi ? 'TÌNH BÁO ON-CALL (NHÂN CHỨNG):' : 'ON-CALL WITNESS INTEL:'}
+            </div>
+            <div style="font-size: 13px; line-height: 1.5; color: #ecf0f1;">
+              ${this.isVi ? 'Bạn phát hiện 2 tài khoản truy cập hệ thống ngay trước lúc Prod sập:' : 'You saw 2 accounts access the system right before crash:'}
+              <div style="margin-top: 4px; font-weight: bold; font-size: 15px; color: #e74c3c;">${culpritNames}</div>
+              <small style="display: block; margin-top: 4px; color: #bdc3c7;">
+                ${this.isVi ? '⚠️ Bạn biết họ là phe tội phạm nhưng không biết ai là Thủ phạm chính và ai là Đồng phạm. Đừng để lộ thân phận kẻo bị bắn lật kèo!' : '⚠️ You know they are criminals, but not who is Murderer vs Accomplice. Keep your identity safe!'}
+              </small>
+            </div>
+          </div>
+        `;
+      } else if (role === 'PROTECTIVE_DETAIL') {
+        const witness = intel?.witness;
+        secretIntelHtml = `
+          <div class="modal-secret-intel-box box-protective" style="margin-bottom: 14px; padding: 12px; background: rgba(46, 204, 113, 0.15); border: 1px solid rgba(46, 204, 113, 0.4); border-radius: 8px;">
+            <div style="font-weight: 800; color: #2ecc71; margin-bottom: 6px; font-size: 14px;">
+              <i class="fa-solid fa-shield"></i> ${this.isVi ? 'TÌNH BÁO BẢO VỆ NHÂN CHỨNG:' : 'PROTECTIVE DETAIL INTEL:'}
+            </div>
+            <div style="font-size: 13px; color: #ecf0f1;">
+              ${this.isVi ? 'Nhân chứng (On-Call Engineer) bạn cần che chắn là:' : 'The Witness (On-Call Engineer) you must shield is:'}
+              <b style="color: #2ecc71; font-size: 14px; display: block; margin-top: 4px;">${witness ? `${witness.avatar || '👤'} ${witness.displayName}` : '—'}</b>
+            </div>
+          </div>
+        `;
+      }
+
       modalContent.innerHTML = `
+        ${secretIntelHtml}
         <div class="guide-modal-motto">${this.isVi ? roleGuide.motto_vi : roleGuide.motto_en}</div>
         
         <div class="guide-modal-goal">
@@ -2313,8 +2614,12 @@ class DeceptionAppController {
       `;
     }
 
-    this.playAudio('click');
+    this.playAudio('chime');
     this.openModal('modal-my-role-guide');
+  }
+
+  openMyRoleGuideModal() {
+    this.openSecretRoleModal(this.onlineSecretIntel);
   }
 
   /* =========================================================================
@@ -2948,6 +3253,9 @@ class DeceptionAppController {
           this.roundTimeLeft = 120;
           this.renderInvestigationTable();
           this.startRoundTimer();
+          if (this.isOnlineMatch && this.socket) {
+            this.socket.emit('deception:confirm_evidence');
+          }
         });
       } else if (isHumanForensic && (this.state.phase === GAME_PHASES.ROUND_2_EVIDENCE || this.state.phase === GAME_PHASES.ROUND_3_EVIDENCE)) {
         const roundNum = this.state.round;
@@ -2986,6 +3294,9 @@ class DeceptionAppController {
           this.roundTimeLeft = 120;
           this.renderInvestigationTable();
           this.startRoundTimer();
+          if (this.isOnlineMatch && this.socket) {
+            this.socket.emit('deception:confirm_evidence');
+          }
         });
       } else {
         actionsSlot.innerHTML = '';
@@ -3152,7 +3463,7 @@ class DeceptionAppController {
       }
 
       return `
-        <div class="suspect-station-box ${isSelf ? 'is-self' : ''} ${isSpeaker ? 'is-speaker' : ''} ${isReadyToAccuse ? 'has-ready-pair' : ''}" data-station-id="${s.id}">
+        <div class="suspect-station-box ${isSelf ? 'is-self' : ''} ${isSpeaker ? 'is-speaker' : ''} ${isReadyToAccuse ? 'has-ready-pair' : ''}" data-station-id="${s.id}" data-player-id="${s.id}">
           <div class="suspect-station-badge-col">
             <div class="police-badge-gold ${s.hasBadge ? 'badge-active' : 'badge-spent'}" title="${s.hasBadge ? 'Huy hiệu phá án còn hiệu lực' : 'Đã sử dụng huy hiệu'}">
               <i class="fa-solid fa-shield-halved"></i>

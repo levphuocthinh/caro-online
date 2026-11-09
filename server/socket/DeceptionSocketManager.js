@@ -120,7 +120,7 @@ class DeceptionSocketManager {
 
     // 2. Tham gia phòng có sẵn
     socket.on('deception:join_room', safeHandler(socket, 'deception:join_room', (data = {}) => {
-      const roomCode = ((data.roomCode || '').trim()).toUpperCase();
+      const roomCode = ((data.roomCode || '').trim()).replace(/^[#]/, '').replace(/[-_\s]/g, '').toUpperCase();
       const playerName = (data.playerName || '').trim() || 'Điều tra viên';
       const avatar = data.avatar || DETECTIVE_AVATARS[Math.floor(Math.random() * DETECTIVE_AVATARS.length)];
 
@@ -230,14 +230,24 @@ class DeceptionSocketManager {
 
       const newName = (data.newName || '').trim();
       const oldName = player.displayName;
-      if (newName && newName.length >= 1) {
+      const oldAvatar = player.avatar;
+      let nameChanged = false;
+      let avatarChanged = false;
+
+      if (newName && newName.length >= 1 && newName !== oldName) {
         player.displayName = newName.slice(0, 20);
+        nameChanged = true;
       }
-      if (data.avatar) {
+      if (data.avatar && data.avatar !== oldAvatar) {
         player.avatar = data.avatar;
+        avatarChanged = true;
       }
 
-      this.addSystemChat(room, `${oldName} đã đổi tên thành [${player.displayName}].`);
+      if (nameChanged) {
+        this.addSystemChat(room, `${oldName} đã đổi tên thành [${player.displayName}].`);
+      } else if (avatarChanged) {
+        this.addSystemChat(room, `${player.displayName} đã đổi biểu tượng avatar thành ${player.avatar}.`);
+      }
       this.broadcastRoomUpdate(room);
     }));
 
@@ -412,6 +422,9 @@ class DeceptionSocketManager {
       if (room.chatMessages.length > 80) room.chatMessages.shift();
 
       this.io.to(roomCode).emit('deception:new_chat', chatItem);
+
+      // Kích hoạt phản hồi ngữ cảnh thông minh từ Bot AI
+      this.handleBotChatReaction(room, player, text);
     }));
 
     // 9. Bắt đầu Vụ Án Trực Tuyến (Chủ phòng)
@@ -700,6 +713,28 @@ class DeceptionSocketManager {
       });
       this.broadcastRoomUpdate(room);
     }));
+
+    // 17. Xác nhận hoàn tất đạn hiện trường & Bắt đầu thảo luận (Pháp y con người)
+    socket.on('deception:confirm_evidence', safeHandler(socket, 'deception:confirm_evidence', () => {
+      const roomCode = this.playerRoomMap.get(socket.id);
+      if (!roomCode) return;
+      const room = this.rooms.get(roomCode);
+      if (!room || room.status !== 'PLAYING' || !room.gameState) return;
+
+      const playerIdx = room.players.findIndex(p => p.id === socket.id);
+      const gp = room.gameState.players[playerIdx];
+      if (!gp || gp.role !== 'FORENSIC_SCIENTIST') return;
+
+      if (!room.gameState.areAllSceneTilesMarked()) return;
+
+      room.gameState.startPresentationPhase();
+      this.io.to(roomCode).emit('deception:presentation_started', {
+        phase: room.gameState.phase,
+        round: room.gameState.round,
+        roundTime: 120
+      });
+      this.addSystemChat(room, '📢 Tech Lead đã hoàn tất ghim 6 viên đạn hiện trường! Bắt đầu 120s tranh luận đối chứng.');
+    }));
   }
 
   /**
@@ -836,9 +871,16 @@ class DeceptionSocketManager {
       state.startRound1Evidence();
     }
 
-    if (state.config.gameMode === 'BLITZ_2MIN') {
+    const forensic = state.getForensicPlayer();
+    const isBotForensic = forensic && !forensic.isHuman;
+
+    if (isBotForensic) {
+      // Bot Tech Lead tự động đặt đạn thông minh và bắt đầu vòng đàm thoại
       state.autoPlaceForensicBullets();
       state.startPresentationPhase();
+    } else {
+      // Pháp y / Tech Lead là người chơi thật -> Giữ nguyên pha ROUND_1_EVIDENCE để người chơi tự tay click đặt 6 viên đạn!
+      state.phase = 'ROUND_1_EVIDENCE';
     }
 
     // Map các socket id vào danh sách người chơi của game
@@ -865,6 +907,9 @@ class DeceptionSocketManager {
     });
 
     this.broadcastRoomUpdate(room);
+
+    // Bắt đầu chu trình thảo luận định kỳ cho Bot trong phòng online
+    this.startBotDiscussionLoop(room);
   }
 
   /**
@@ -923,6 +968,8 @@ class DeceptionSocketManager {
       // Nếu không còn người thật nào trong phòng -> Xoá phòng
       const remainingHumans = room.players.filter(p => !p.isBot);
       if (remainingHumans.length === 0) {
+        if (room._botChatInterval) clearInterval(room._botChatInterval);
+        if (room._botChatTimeout) clearTimeout(room._botChatTimeout);
         this.rooms.delete(roomCode);
         return;
       }
@@ -949,6 +996,8 @@ class DeceptionSocketManager {
         room.cleanupTimer = setTimeout(() => {
           const stillActive = room.players.filter(p => !p.isBot && !p.disconnected);
           if (stillActive.length === 0) {
+            if (room._botChatInterval) clearInterval(room._botChatInterval);
+            if (room._botChatTimeout) clearTimeout(room._botChatTimeout);
             this.rooms.delete(roomCode);
           }
         }, 60000);
@@ -958,6 +1007,241 @@ class DeceptionSocketManager {
       }
 
       this.broadcastRoomUpdate(room);
+    }
+  }
+
+  /**
+   * Khởi động chu trình đàm thoại định kỳ cho Bot trong phòng online
+   */
+  startBotDiscussionLoop(room) {
+    if (!room) return;
+    if (room._botChatInterval) {
+      clearInterval(room._botChatInterval);
+      room._botChatInterval = null;
+    }
+
+    const bots = (room.players || []).filter(p => p.isBot);
+    if (!bots.length) return;
+
+    room._botChatInterval = setInterval(() => {
+      if (!this.rooms.has(room.roomCode) || room.status !== 'PLAYING' || !room.gameState) {
+        if (room._botChatInterval) clearInterval(room._botChatInterval);
+        room._botChatInterval = null;
+        return;
+      }
+
+      const state = room.gameState;
+      if (state.phase === 'GAME_OVER') {
+        if (room._botChatInterval) clearInterval(room._botChatInterval);
+        room._botChatInterval = null;
+        return;
+      }
+
+      // Chỉ trò chuyện khi đang ở vòng tranh luận (PRESENTATION / INVESTIGATION)
+      if (!state.phase.includes('PRESENTATION') && !state.phase.includes('INVESTIGATION')) {
+        return;
+      }
+
+      // Tech Lead bot tuyệt đối im lặng
+      const forensic = state.getForensicPlayer();
+      const forensicIdx = state.players.indexOf(forensic);
+      const forensicRp = forensicIdx >= 0 ? room.players[forensicIdx] : null;
+      const forensicBotId = (forensicRp && forensicRp.isBot) ? forensicRp.id : null;
+
+      const eligibleBots = bots.filter(b => b.id !== forensicBotId && state.getPlayerById(b.id)?.role !== 'FORENSIC_SCIENTIST');
+      if (!eligibleBots.length) return;
+
+      const speaker = eligibleBots[Math.floor(Math.random() * eligibleBots.length)];
+      const sIdx = room.players.indexOf(speaker);
+      const sGp = sIdx >= 0 ? state.players[sIdx] : null;
+      const role = sGp ? sGp.role : 'INVESTIGATOR';
+
+      const causeTile = state.activeSceneTiles?.find(t => t.id === 'tile_cause_01');
+      const layerTile = state.activeSceneTiles?.find(t => t.color === 'GREEN' || t.type === 'LOCATION_OF_CRIME');
+      const causeText = causeTile && causeTile.selectedOptionIndex !== null && causeTile.selectedOptionIndex !== undefined
+        ? (causeTile.options_vi ? causeTile.options_vi[causeTile.selectedOptionIndex] : 'chưa rõ')
+        : 'chưa rõ';
+      const layerText = layerTile && layerTile.selectedOptionIndex !== null && layerTile.selectedOptionIndex !== undefined
+        ? (layerTile.options_vi ? layerTile.options_vi[layerTile.selectedOptionIndex] : 'Hạ tầng hệ thống')
+        : 'Hạ tầng hệ thống';
+
+      let msg = '';
+      if (role === 'MURDERER') {
+        const others = state.players.filter(p => p.id !== sGp.id && p.role !== 'FORENSIC_SCIENTIST' && p.role !== 'ACCOMPLICE');
+        const innocent = others.length ? others[Math.floor(Math.random() * others.length)] : null;
+        const targetName = innocent ? innocent.displayName : 'đồng nghiệp khác';
+        const defs = [
+          `Tôi thấy marker '${causeText}' của Tech Lead không hề liên quan đến service của tôi. Anh em nên soi kỹ bàn của ${targetName}!`,
+          `Mọi người đừng đoán mò, nhìn kỹ thông số tầng [${layerText}] xem, module của tôi không chạy trên tầng đó!`,
+          `Log của tôi hoàn toàn bình thường, hãy kiểm tra các dấu vết trên bàn của ${targetName} xem!`
+        ];
+        msg = defs[Math.floor(Math.random() * defs.length)];
+      } else if (role === 'ACCOMPLICE') {
+        const murderer = state.players.find(p => p.role === 'MURDERER');
+        const mName = murderer ? murderer.displayName : 'bác ấy';
+        const accs = [
+          `Tôi đồng ý với ${mName}, nguyên nhân gốc '${causeText}' có thể đến từ một service phụ trợ khác.`,
+          `Đừng vội đập bàn phá án anh em ơi, đối chiếu thật kỹ các thẻ trước khi chốt đơn!`
+        ];
+        msg = accs[Math.floor(Math.random() * accs.length)];
+      } else if (role === 'WITNESS') {
+        const culprits = state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
+        const names = culprits.map(c => c.displayName).join(' hoặc ');
+        msg = `Theo trace log telemetry của tôi, luồng crash trùng khớp kỳ lạ với hướng của ${names}. Anh em dồn nghi vấn vào đây!`;
+      } else {
+        const top = typeof state.findTopSuspectForBot === 'function' ? state.findTopSuspectForBot(sGp.id) : null;
+        if (top && top.suspect) {
+          const sName = top.suspect.displayName;
+          const mTitle = top.meansCard ? top.meansCard.vi : 'hành vi lỗi';
+          const cTitle = top.clueCard ? top.clueCard.vi : 'dấu vết';
+          msg = `Tech Lead đã ghim Root Cause là '[${causeText}]' và Tầng sập '[${layerText}]'. Tôi thấy '${mTitle}' và '${cTitle}' của ${sName} rất đáng ngờ!`;
+        } else {
+          msg = `Tech Lead đã ghim rất rõ: Root Cause là [${causeText}] và Tầng sập [${layerText}]. Anh em đối chiếu kỹ cặp thẻ Xanh - Đỏ nhé!`;
+        }
+      }
+
+      if (msg) {
+        const chatItem = {
+          id: `msg_bot_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          senderId: speaker.id,
+          senderName: `${speaker.displayName} (AI)`,
+          avatar: speaker.avatar || '🤖',
+          text: msg,
+          isSystem: false,
+          timestamp: Date.now()
+        };
+        room.chatMessages.push(chatItem);
+        if (room.chatMessages.length > 80) room.chatMessages.shift();
+        this.io.to(room.roomCode).emit('deception:new_chat', chatItem);
+      }
+    }, 22000);
+
+    if (room._botChatInterval && typeof room._botChatInterval.unref === 'function') {
+      room._botChatInterval.unref();
+    }
+  }
+
+  /**
+   * Xử lý Bot AI phản hồi tin nhắn của người chơi con người trong phòng online
+   */
+  handleBotChatReaction(room, player, text) {
+    if (!room || !player || !text) return;
+    const bots = (room.players || []).filter(p => p.isBot);
+    if (!bots.length) return;
+
+    // Xác định bot Pháp y để loại trừ (Tech Lead tuyệt đối không nói)
+    let forensicBotId = null;
+    if (room.gameState) {
+      const forensic = room.gameState.getForensicPlayer();
+      const forensicIdx = room.gameState.players.indexOf(forensic);
+      const forensicRp = forensicIdx >= 0 ? room.players[forensicIdx] : null;
+      if (forensicRp && forensicRp.isBot) {
+        forensicBotId = forensicRp.id;
+      }
+    }
+
+    const eligibleBots = bots.filter(b => b.id !== forensicBotId && room.gameState?.getPlayerById(b.id)?.role !== 'FORENSIC_SCIENTIST');
+    if (!eligibleBots.length) return;
+
+    // Kiểm tra xem tin nhắn có nhắc đến tên một bot cụ thể nào không
+    const lower = text.toLowerCase();
+    const mentionedBot = eligibleBots.find(b => lower.includes(b.displayName.toLowerCase()));
+    const responder = mentionedBot || eligibleBots[Math.floor(Math.random() * eligibleBots.length)];
+    if (!responder) return;
+
+    const delay = 800 + Math.floor(Math.random() * 600);
+
+    room._botChatTimeout = setTimeout(() => {
+      if (!this.rooms.has(room.roomCode)) return;
+
+      let replyText = '';
+
+      if (room.status === 'WAITING') {
+        const waitingReplies = [
+          `Chào bác ${player.displayName}! Em đã sẵn sàng nhận nhiệm vụ ca trực hôm nay rồi!`,
+          `Em ngồi trực chờ sẵn từ nãy giờ rồi bác ${player.displayName} ơi! Đợi đông đủ là chiến thôi.`,
+          `Mong là hôm nay không có ai vô tình chạy DROP TABLE lúc 2h sáng 😂`,
+          `Em đã chuẩn bị sẵn cà phê ca đêm rồi, đợi chủ phòng bấm bắt đầu là quẩy ngay!`
+        ];
+        replyText = waitingReplies[Math.floor(Math.random() * waitingReplies.length)];
+      } else if (room.status === 'PLAYING' && room.gameState) {
+        const state = room.gameState;
+        if (state.phase === 'GAME_OVER') return;
+
+        const rIdx = room.players.indexOf(responder);
+        const rGp = rIdx >= 0 ? state.players[rIdx] : null;
+        const role = rGp ? rGp.role : 'INVESTIGATOR';
+
+        const causeTile = state.activeSceneTiles?.find(t => t.id === 'tile_cause_01');
+        const layerTile = state.activeSceneTiles?.find(t => t.color === 'GREEN' || t.type === 'LOCATION_OF_CRIME');
+        const causeText = causeTile && causeTile.selectedOptionIndex !== null && causeTile.selectedOptionIndex !== undefined
+          ? (causeTile.options_vi ? causeTile.options_vi[causeTile.selectedOptionIndex] : 'chưa rõ')
+          : 'chưa rõ';
+        const layerText = layerTile && layerTile.selectedOptionIndex !== null && layerTile.selectedOptionIndex !== undefined
+          ? (layerTile.options_vi ? layerTile.options_vi[layerTile.selectedOptionIndex] : 'Hạ tầng hệ thống')
+          : 'Hạ tầng hệ thống';
+
+        if (role === 'MURDERER') {
+          const others = state.players.filter(p => p.id !== rGp.id && p.role !== 'FORENSIC_SCIENTIST' && p.role !== 'ACCOMPLICE');
+          const innocent = others.length ? others[Math.floor(Math.random() * others.length)] : null;
+          const targetName = innocent ? innocent.displayName : 'đồng nghiệp khác';
+          const myMeans = rGp.meansCards && rGp.meansCards[0] ? rGp.meansCards[0].vi : 'thẻ của tôi';
+          const innocentMeans = innocent && innocent.meansCards && innocent.meansCards[0] ? innocent.meansCards[0].vi : 'thẻ khác';
+
+          if (lower.includes('nghi ngờ') || lower.includes('thủ phạm') || lower.includes('chính là') || mentionedBot) {
+            replyText = `Bác ${player.displayName} đừng vội đổ oan cho em! Thẻ '${myMeans}' của em chạy test ở Staging đàng hoàng. Bác nhìn sang bàn của ${targetName} có '${innocentMeans}' kìa!`;
+          } else {
+            replyText = `Tôi có lịch sử Git commit bình thường. Marker '${causeText}' của Tech Lead chỉ rõ nguyên nhân ở hướng khác, mọi người hãy soi kỹ lại!`;
+          }
+        } else if (role === 'ACCOMPLICE') {
+          replyText = `Tôi thấy nhận định của bác ${player.displayName} cần xem lại. Cứ bám sát thông số Tech Lead đưa ra ở tầng [${layerText}] đã!`;
+        } else if (role === 'WITNESS') {
+          const culprits = state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
+          const names = culprits.map(c => c.displayName).join(' hoặc ');
+          replyText = `Theo telemetry log tôi soi được, dấu vết crash chỉ phát ra từ nhóm của ${names}. Mọi người hãy đối chiếu cặp thẻ của nhóm này!`;
+        } else {
+          // Điều tra viên Bot
+          const top = typeof state.findTopSuspectForBot === 'function' ? state.findTopSuspectForBot(rGp.id) : null;
+          if (lower.includes('nghi ngờ') || lower.includes('manh mối') || lower.includes('ý kiến') || lower.includes('ai')) {
+            if (top && top.suspect) {
+              const sName = top.suspect.displayName;
+              const mTitle = top.meansCard ? top.meansCard.vi : 'hành vi lỗi';
+              const cTitle = top.clueCard ? top.clueCard.vi : 'dấu vết';
+              replyText = `Tôi cũng đồng quan điểm với bác ${player.displayName}! Tôi đang rất nghi ngờ ${sName}, thẻ '${mTitle}' và '${cTitle}' khớp đến 90% với Root Cause [${causeText}]!`;
+            } else {
+              replyText = `Tech Lead đã ghim Root Cause [${causeText}] và Tầng sập [${layerText}]. Bác ${player.displayName} thử soi thẻ xanh đỏ trên bàn đối diện xem!`;
+            }
+          } else if (lower.includes('phá án') || lower.includes('đập bàn')) {
+            replyText = `Ai có chứng cứ chắc chắn hãy đập bàn phá án ngay! Mỗi điều tra viên chỉ có duy nhất 1 Huy hiệu thôi đấy!`;
+          } else {
+            const genericReplies = [
+              `Tôi đồng ý với bác ${player.displayName}. Chúng ta cần bám sát từng đạn gỗ của Tech Lead.`,
+              `Root Cause [${causeText}] là chìa khóa then chốt của vụ án này, mọi người hãy tập trung vào đó!`,
+              `Các log trace đang dần sáng tỏ, hãy quan sát biểu hiện của từng người trên bàn!`
+            ];
+            replyText = genericReplies[Math.floor(Math.random() * genericReplies.length)];
+          }
+        }
+      }
+
+      if (replyText) {
+        const botMsg = {
+          id: `msg_bot_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          senderId: responder.id,
+          senderName: `${responder.displayName} (AI)`,
+          avatar: responder.avatar || '🤖',
+          text: replyText,
+          isSystem: false,
+          timestamp: Date.now()
+        };
+        room.chatMessages.push(botMsg);
+        if (room.chatMessages.length > 80) room.chatMessages.shift();
+        this.io.to(room.roomCode).emit('deception:new_chat', botMsg);
+      }
+    }, delay);
+
+    if (room._botChatTimeout && typeof room._botChatTimeout.unref === 'function') {
+      room._botChatTimeout.unref();
     }
   }
 
