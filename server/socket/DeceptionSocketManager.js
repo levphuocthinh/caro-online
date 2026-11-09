@@ -483,7 +483,7 @@ class DeceptionSocketManager {
       const { targetId, meansId, clueId } = data;
       const playerIdx = room.players.findIndex(p => p.id === socket.id);
       const accuserGp = room.gameState.players[playerIdx];
-      if (!accuserGp || !accuserGp.hasBadge) return;
+      if (!accuserGp || !accuserGp.hasBadge || accuserGp.role === 'FORENSIC_SCIENTIST') return;
 
       const result = room.gameState.makeAccusation(accuserGp.id, targetId, meansId, clueId);
       if (result && result.valid) {

@@ -5076,7 +5076,7 @@ body.deception-app {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .online-room-header {
@@ -5646,7 +5646,7 @@ console.log('Successfully updated deception.css!');
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .quick-editor-title {
@@ -5778,7 +5778,7 @@ console.log('Successfully updated deception.css!');
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .seats-roster-header {

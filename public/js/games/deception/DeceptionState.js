@@ -1313,8 +1313,8 @@ export class DeceptionState {
 
     const accuser = this.getPlayerById(accuserId);
     const suspect = this.getPlayerById(suspectId);
-    if (!accuser || !suspect || !accuser.hasBadge) {
-      return { valid: false };
+    if (!accuser || !suspect || !accuser.hasBadge || accuser.role === 'FORENSIC_SCIENTIST') {
+      return { valid: false, reason: 'FORENSIC_CANNOT_ACCUSE' };
     }
 
     const meansCard = suspect.meansCards.find(c => c.id === meansId);

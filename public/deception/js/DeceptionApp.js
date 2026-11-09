@@ -1668,6 +1668,20 @@ class DeceptionAppController {
     text = (text || '').trim();
     if (!text) return;
 
+    const human = this.state.getHumanPlayer();
+    const isForensic = (human && human.role === 'FORENSIC_SCIENTIST') ||
+      (this.onlineSecretIntel && this.onlineSecretIntel.role === 'FORENSIC_SCIENTIST');
+    const isInvestigating = this.state.phase && (this.state.phase.startsWith('ROUND_') || this.state.phase === 'INVESTIGATION');
+
+    if (isForensic && isInvestigating) {
+      this.showToast(this.isVi
+        ? '⚠️ ĐIỀU CẤM KỴ: Bạn là Tech Lead / Incident Commander! Tuyệt đối không được chat gợi ý hay nói chuyện, mọi chỉ dẫn chỉ qua đạn gỗ trên bảng!'
+        : '⚠️ TABOO RULE: You are the Tech Lead! You must remain completely silent; all guidance is strictly via bullet markers!'
+      );
+      this.playAudio('error');
+      return;
+    }
+
     if (this.isOnlineMatch && this.socket && this.onlineRoom) {
       this.socket.emit('deception:send_chat', { message: text });
     } else {
@@ -1717,7 +1731,8 @@ class DeceptionAppController {
 
   triggerContextualBotDiscussionMessage() {
     if (this.isOnlineMatch) return;
-    const bots = (this.state.players || []).filter(p => !p.isHuman);
+    // Tech Lead bot tuyệt đối giữ im lặng, không tham gia chat tranh luận
+    const bots = (this.state.players || []).filter(p => !p.isHuman && p.role !== 'FORENSIC_SCIENTIST');
     if (!bots.length) return;
 
     // Lấy thông tin marker hiện tại của Tech Lead
@@ -2046,6 +2061,32 @@ class DeceptionAppController {
   /* =========================================================================
      STAGE 1: LOBBY & IT WAR ROOM WORKSTATIONS
      ========================================================================= */
+
+  getSeatPositionClasses(angle) {
+    const sin = Math.sin(angle);
+    const cos = Math.cos(angle);
+
+    let posClass = 'seat-pos-top';
+    let bubblePosClass = 'bubble-pos-top';
+
+    if (sin > 0.3) {
+      posClass = 'seat-pos-bottom';
+      bubblePosClass = 'bubble-pos-bottom';
+    } else if (sin < -0.3) {
+      posClass = 'seat-pos-top';
+      bubblePosClass = 'bubble-pos-top';
+    } else {
+      if (cos < 0) {
+        posClass = 'seat-pos-left';
+        bubblePosClass = 'bubble-pos-left';
+      } else {
+        posClass = 'seat-pos-right';
+        bubblePosClass = 'bubble-pos-right';
+      }
+    }
+
+    return { posClass, bubblePosClass };
+  }
 
   getDevActivity(player, index, isOnline = false) {
     if (player.isHuman || (isOnline && player.id === this.myPlayerId)) {
@@ -2666,21 +2707,28 @@ class DeceptionAppController {
 
     // Accuse buttons disabled state
     const human = this.state.getHumanPlayer();
-    const canAccuse = Boolean(human && human.hasBadge && human.role !== 'FORENSIC_SCIENTIST');
+    const isForensic = (human && human.role === 'FORENSIC_SCIENTIST') ||
+      (this.onlineSecretIntel && this.onlineSecretIntel.role === 'FORENSIC_SCIENTIST');
+    const canAccuse = Boolean(human && human.hasBadge && !isForensic);
     const btnHudAccuse = document.getElementById('btn-hud-accuse');
     const btnDockAccuse = document.getElementById('btn-dock-accuse');
     [btnHudAccuse, btnDockAccuse].forEach(btn => {
       if (!btn) return;
-      if (canAccuse) {
-        btn.classList.remove('btn-accuse-spent');
-        btn.removeAttribute('disabled');
-        btn.style.opacity = '1';
-        btn.style.cursor = 'pointer';
+      if (isForensic) {
+        btn.style.display = 'none';
       } else {
-        btn.classList.add('btn-accuse-spent');
-        btn.setAttribute('disabled', 'true');
-        btn.style.opacity = '0.4';
-        btn.style.cursor = 'not-allowed';
+        btn.style.display = 'inline-flex';
+        if (canAccuse) {
+          btn.classList.remove('btn-accuse-spent');
+          btn.removeAttribute('disabled');
+          btn.style.opacity = '1';
+          btn.style.cursor = 'pointer';
+        } else {
+          btn.classList.add('btn-accuse-spent');
+          btn.setAttribute('disabled', 'true');
+          btn.style.opacity = '0.4';
+          btn.style.cursor = 'not-allowed';
+        }
       }
     });
 
@@ -3505,8 +3553,12 @@ class DeceptionAppController {
 
   handleGlobalAccuseTrigger() {
     const human = this.state.getHumanPlayer();
-    if (!human || !human.hasBadge) {
-      alert(this.isVi ? 'Bạn đã hết Huy hiệu Phá án!' : 'You have no badges remaining!');
+    if (!human || !human.hasBadge || human.role === 'FORENSIC_SCIENTIST') {
+      if (human && human.role === 'FORENSIC_SCIENTIST') {
+        this.showToast(this.isVi ? '⚠️ Tech Lead không thể phá án!' : '⚠️ Tech Lead cannot make accusations!');
+      } else {
+        alert(this.isVi ? 'Bạn đã hết Huy hiệu Phá án!' : 'You have no badges remaining!');
+      }
       return;
     }
 
@@ -3537,8 +3589,12 @@ class DeceptionAppController {
 
   openAccusationDialog(preselectedSuspectId = null) {
     const human = this.state.getHumanPlayer();
-    if (!human || !human.hasBadge) {
-      alert(this.isVi ? 'Bạn đã hết Huy hiệu Phá án!' : 'You have no badges remaining!');
+    if (!human || !human.hasBadge || human.role === 'FORENSIC_SCIENTIST') {
+      if (human && human.role === 'FORENSIC_SCIENTIST') {
+        this.showToast(this.isVi ? '⚠️ Tech Lead không thể phá án!' : '⚠️ Tech Lead cannot make accusations!');
+      } else {
+        alert(this.isVi ? 'Bạn đã hết Huy hiệu Phá án!' : 'You have no badges remaining!');
+      }
       return;
     }
 
