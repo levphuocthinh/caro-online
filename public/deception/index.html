@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Deception: Murder in Viet Nam • Board Game Online</title>
+  <title>WHO BROKE PROD? • Ai Đã Làm Sập Production? (FSOFT MEN GEN GAME)</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- Fonts: Playfair Display for Noir Titles, Be Vietnam Pro for Vietnamese UI, Nunito for Crisp Reading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,16 +38,16 @@
           <span>Sảnh Game</span>
         </button>
         <div class="noir-brand">
-          <span class="noir-brand-badge">VIET NAM NOIR</span>
-          <h1 class="noir-brand-title">DECEPTION</h1>
-          <span class="noir-brand-sub">MURDER IN VIET NAM</span>
+          <span class="noir-brand-badge">FSOFT MEN GEN GAME</span>
+          <h1 class="noir-brand-title">WHO BROKE PROD?</h1>
+          <span class="noir-brand-sub">AI ĐÃ LÀM SẬP PRODUCTION?</span>
         </div>
       </div>
 
       <div class="header-center">
         <div class="case-file-tag">
-          <i class="fa-solid fa-folder-open"></i>
-          <span>HỒ SƠ TRỌNG ÁN: <b id="lbl-case-id">PHỐ HÀNG ĐẪY #VN-1997</b></span>
+          <i class="fa-solid fa-server"></i>
+          <span>SỰ CỐ HỆ THỐNG: <b id="lbl-case-id">WAR-ROOM #INC-2026</b></span>
         </div>
         <div class="ws-status-badge status-connected" id="ws-connection-indicator" title="Trạng thái máy chủ đa người chơi">
           <span class="status-dot"></span>
@@ -83,11 +83,11 @@
         <div class="lobby-card">
           <div class="lobby-card-header">
             <div>
-              <span class="view-eyebrow"><i class="fa-solid fa-users"></i> PHÒNG ĐIỀU TRA VỤ ÁN</span>
-              <h2 class="view-title">Bàn Hội Chẩn Trọng Án (4 – 9 Người Chơi)</h2>
+              <span class="view-eyebrow"><i class="fa-solid fa-terminal"></i> WAR ROOM KHẨN CẤP • FSOFT MEN GEN GAME (2 PHÚT/VÒNG)</span>
+              <h2 class="view-title">War Room Điều Tra Sự Cố Production (4 – 9 Kỹ Sư)</h2>
             </div>
             <div class="room-share-badge">
-              <span>MÃ BÀN: <b id="lbl-room-code">#HANG-DAY-88</b></span>
+              <span>MÃ BÀN: <b id="lbl-room-code">#PROD-88</b></span>
               <button type="button" class="btn-copy-code" id="btn-copy-code" title="Sao chép mã bàn">
                 <i class="fa-solid fa-copy"></i>
               </button>
@@ -115,8 +115,8 @@
               <div class="detective-round-table">
                 <div class="table-felt">
                   <div class="table-emblem">
-                    <i class="fa-solid fa-fingerprint"></i>
-                    <span>CẢNH SÁT HÌNH SỰ • HÀ NỘI</span>
+                    <i class="fa-solid fa-server"></i>
+                    <span>FSOFT WAR ROOM • INCIDENT RESPONSE</span>
                   </div>
                 </div>
                 <div class="table-seats-ring" id="lobby-seats-ring">
@@ -128,19 +128,19 @@
             <!-- Compact Configuration Bar -->
             <div class="lobby-controls-bar">
               <div class="cfg-group">
-                <label for="cfg-player-name">Tên thám tử của bạn:</label>
-                <input type="text" id="cfg-player-name" class="noir-ctrl-input" value="Thám tử Trưởng" maxlength="18">
+                <label for="cfg-player-name">Tên kỹ sư của bạn:</label>
+                <input type="text" id="cfg-player-name" class="noir-ctrl-input" value="Senior Dev" maxlength="18">
               </div>
 
               <div class="cfg-group">
-                <label for="cfg-player-count">Số người chơi:</label>
+                <label for="cfg-player-count">Quy mô đội dự án:</label>
                 <select id="cfg-player-count" class="noir-ctrl-select">
-                  <option value="4">4 Người (1 Pháp y, 1 Hung thủ, 2 Điều tra)</option>
-                  <option value="5">5 Người (Có thêm Thám tử Cố vấn)</option>
-                  <option value="6" selected>6 Người (Chuẩn: Có Đồng phạm & Nhân chứng ★)</option>
-                  <option value="7">7 Người (+ Kỹ thuật viên Lab ★)</option>
-                  <option value="8">8 Người (+ Nội gián đánh cắp huy hiệu ★)</option>
-                  <option value="9">9 Người (Bàn đại tiệc phá án tối đa)</option>
+                  <option value="4">4 Kỹ sư (1 Tech Lead, 1 Culprit, 2 Responder)</option>
+                  <option value="5">5 Kỹ sư (Có thêm System Architect)</option>
+                  <option value="6" selected>6 Kỹ sư (Chuẩn: Có Accomplice & Whistleblower ★)</option>
+                  <option value="7">7 Kỹ sư (+ DevOps / QA Health Check ★)</option>
+                  <option value="8">8 Kỹ sư (+ Log Tamperer khóa quyền báo cáo ★)</option>
+                  <option value="9">9 Kỹ sư (Full War Room 9 Vai Trò IT)</option>
                 </select>
               </div>
 
@@ -148,15 +148,15 @@
                 <label for="cfg-preferred-role">Vai trò bạn muốn cầm:</label>
                 <select id="cfg-preferred-role" class="noir-ctrl-select">
                   <option value="RANDOM">🎲 Ngẫu Nhiên (Trải nghiệm chuẩn)</option>
-                  <option value="FORENSIC_SCIENTIST">🔬 Chuyên gia Pháp y</option>
-                  <option value="MURDERER">🔪 Kẻ Sát Nhân</option>
-                  <option value="INVESTIGATOR">🕵️ Điều tra viên</option>
-                  <option value="WITNESS">👁️ Nhân chứng</option>
-                  <option value="ACCOMPLICE">🎭 Đồng phạm</option>
-                  <option value="LAB_TECHNICIAN">🧪 Kỹ thuật viên Phòng Lab</option>
-                  <option value="INSIDE_MAN">🕶️ Nội gián</option>
-                  <option value="PROTECTIVE_DETAIL">🛡️ Đặc vụ Bảo vệ</option>
-                  <option value="CONSULTING_DETECTIVE">🎩 Thám tử Cố vấn</option>
+                  <option value="FORENSIC_SCIENTIST">🖥️ Tech Lead / Incident Commander</option>
+                  <option value="MURDERER">🐛 The Culprit (Thủ phạm gây lỗi)</option>
+                  <option value="INVESTIGATOR">🛠️ Incident Responder (Đội ứng phó)</option>
+                  <option value="WITNESS">👀 Whistleblower / Senior Dev</option>
+                  <option value="ACCOMPLICE">🎭 The Accomplice (Kẻ đồng lõa)</option>
+                  <option value="LAB_TECHNICIAN">🔬 DevOps / QA Engineer</option>
+                  <option value="INSIDE_MAN">🧹 Log Tamperer (Kẻ xóa/sửa log)</option>
+                  <option value="PROTECTIVE_DETAIL">🎧 IT Support / Helpdesk</option>
+                  <option value="CONSULTING_DETECTIVE">🏗️ System Architect</option>
                 </select>
               </div>
             </div>
@@ -164,7 +164,7 @@
             <div class="lobby-cta-row">
               <button type="button" class="btn-noir-hero" id="btn-start-investigation">
                 <i class="fa-solid fa-play"></i>
-                <span>BẮT ĐẦU VỤ ÁN VỚI BOT</span>
+                <span>VÀO WAR ROOM ĐIỀU TRA VỚI BOT AI</span>
               </button>
             </div>
           </div>
@@ -457,8 +457,8 @@
         <div class="role-reveal-stage">
           <div class="confidential-dossier-card" id="role-dossier-card">
             <div class="dossier-folder-tab">
-              <span class="folder-label"><i class="fa-solid fa-folder-closed"></i> HỒ SƠ ÁN MẠNG PHỐ HÀNG ĐẪY #VN-1997</span>
-              <span class="folder-stamp-red">TUYỆT MẬT • BẢO MẬT</span>
+              <span class="folder-label"><i class="fa-solid fa-folder-closed"></i> HỒ SƠ SỰ CỐ PRODUCTION #INC-2026</span>
+              <span class="folder-stamp-red">SEV-1 CRITICAL • WAR ROOM</span>
             </div>
             <div class="dossier-folder-body">
               <div class="dossier-left-badge">
@@ -467,9 +467,9 @@
                 <span class="role-faction-pill" id="role-display-faction">PHE ĐIỀU TRA</span>
               </div>
               <div class="dossier-right-info">
-                <div class="dossier-header-conf">CỤC CẢNH SÁT HÌNH SỰ • BỘ CÔNG AN VIỆT NAM</div>
-                <div class="dossier-loc-tag" style="font-size: 11px; font-weight: 800; color: #a04000; margin-bottom: 6px;"><i class="fa-solid fa-location-dot"></i> HIỆN TRƯỜNG: <b>PHỐ HÀNG ĐẪY, HÀ NỘI</b></div>
-                <h2 class="role-display-title" id="role-display-title">Điều Tra Viên</h2>
+                <div class="dossier-header-conf">TRUNG TÂM ĐIỀU HÀNH HỆ THỐNG • FSOFT INCIDENT COMMAND</div>
+                <div class="dossier-loc-tag" style="font-size: 11px; font-weight: 800; color: #a04000; margin-bottom: 6px;"><i class="fa-solid fa-server"></i> HỆ THỐNG: <b>PRODUCTION CLUSTER • F-VILLE / HÒA LẠC</b></div>
+                <h2 class="role-display-title" id="role-display-title">Incident Responder</h2>
                 <div class="role-display-motto" id="role-display-motto">Lưới trời lồng lộng — Phân tích vật chứng, vạch trần tội ác</div>
                 <div class="dossier-divider"></div>
 
@@ -498,41 +498,41 @@
           </div>
           <div class="role-actions">
             <button type="button" class="btn-noir-hero" id="btn-role-ack">
-              <span>ĐÃ HIỂU NHIỆM VỤ — BƯỚC VÀO BAN ĐÊM PHỐ HÀNG ĐẪY</span>
+              <span>ĐÃ HIỂU NHIỆM VỤ — BƯỚC VÀO CA TRỰC ĐÊM (ON-CALL)</span>
               <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>
         </div>
       </section>
 
-      <!-- VIEW 3: NIGHT CRIME SELECTION (Ban Đêm Gây Án) -->
+      <!-- VIEW 3: NIGHT CRIME SELECTION (Ca Trực Đêm Gây Lỗi Production) -->
       <section class="noir-view" id="view-night">
         <div class="night-stage">
           <div class="night-banner">
-            <span class="night-moon-icon"><i class="fa-solid fa-moon"></i></span>
-            <h2 id="night-headline">Màn Đêm Buông Xuống...</h2>
-            <p id="night-sub">Kẻ Sát Nhân đang bí mật hành động trong bóng tối của phố cổ.</p>
+            <span class="night-moon-icon"><i class="fa-solid fa-terminal"></i></span>
+            <h2 id="night-headline">Ca Trực Đêm 02:00 AM...</h2>
+            <p id="night-sub">The Culprit (Thủ phạm gây lỗi) đang bí mật thao tác làm sập Production.</p>
           </div>
 
           <!-- Murderer Pick Hand (Only active when human is Murderer) -->
           <div class="night-picker-container" id="night-murderer-picker" style="display: none;">
             <div class="night-pick-instruction">
-              <span>Hãy chọn <b>1 Thẻ Phương Thức (Xanh)</b> và <b>1 Thẻ Manh Mối (Đỏ)</b> của bạn:</span>
+              <span>Hãy chọn <b>1 Thẻ Hành Vi Gây Lỗi (Xanh)</b> và <b>1 Thẻ Dấu Vết Log (Đỏ)</b> của bạn:</span>
             </div>
             <div class="night-cards-split">
               <div class="night-col">
-                <h4 class="col-lbl col-blue"><i class="fa-solid fa-skull"></i> Phương Thức Gây Án (Xanh)</h4>
+                <h4 class="col-lbl col-blue"><i class="fa-solid fa-bug"></i> Hành Vi / Tác Nhân Gây Lỗi (Xanh)</h4>
                 <div class="night-cards-grid" id="night-means-grid"></div>
               </div>
               <div class="night-col">
-                <h4 class="col-lbl col-red"><i class="fa-solid fa-fingerprint"></i> Manh Mối Vật Chứng (Đỏ)</h4>
+                <h4 class="col-lbl col-red"><i class="fa-solid fa-file-code"></i> Dấu Vết Log / Vật Chứng (Đỏ)</h4>
                 <div class="night-cards-grid" id="night-clues-grid"></div>
               </div>
             </div>
             <div class="night-confirm-row">
               <button type="button" class="btn-noir-hero btn-crimson" id="btn-night-confirm-crime">
-                <i class="fa-solid fa-skull-crossbones"></i>
-                <span>XÁC NHẬN GÂY ÁN & RỜI HIỆN TRƯỜNG</span>
+                <i class="fa-solid fa-bug"></i>
+                <span>XÁC NHẬN GÂY LỖI PROD & XÓA DẤU VẾT</span>
               </button>
             </div>
           </div>
@@ -541,8 +541,8 @@
           <div class="night-intel-box" id="night-intel-box" style="display: none;">
             <div class="intel-content" id="night-intel-content"></div>
             <button type="button" class="btn-noir-hero" id="btn-night-proceed">
-              <span>BÌNH MINH LÊN — VÀO HIỆN TRƯỜNG VÒNG 1</span>
-              <i class="fa-solid fa-sun"></i>
+              <span>PAGERDUTY BÁO ĐỘNG — VÀO WAR ROOM VÒNG 1</span>
+              <i class="fa-solid fa-bell"></i>
             </button>
           </div>
 
@@ -565,19 +565,19 @@
             <div class="timeline-step" id="tl-step-night" data-phase="NIGHT">
               <span class="step-num">1</span>
               <span class="step-icon"><i class="fa-solid fa-moon"></i></span>
-              <span class="step-label">Đêm Gây Án</span>
+              <span class="step-label">Đêm Sự Cố</span>
             </div>
             <div class="timeline-connector"></div>
             <div class="timeline-step" id="tl-step-evidence" data-phase="EVIDENCE">
               <span class="step-num">2</span>
               <span class="step-icon"><i class="fa-solid fa-bullseye"></i></span>
-              <span class="step-label">Pháp Y Ghim Đạn</span>
+              <span class="step-label">Tech Lead Ghim Log</span>
             </div>
             <div class="timeline-connector"></div>
             <div class="timeline-step" id="tl-step-r1" data-phase="R1">
               <span class="step-num">3</span>
               <span class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
-              <span class="step-label">Vòng 1</span>
+              <span class="step-label">Vòng 1 (2p)</span>
             </div>
             <div class="timeline-connector"></div>
             <div class="timeline-step" id="tl-step-r2" data-phase="R2">
@@ -589,7 +589,7 @@
             <div class="timeline-step" id="tl-step-r3" data-phase="R3">
               <span class="step-num">5</span>
               <span class="step-icon"><i class="fa-solid fa-gavel"></i></span>
-              <span class="step-label">Vòng 3 (Chốt Án)</span>
+              <span class="step-label">Vòng 3 (Chốt RCA)</span>
             </div>
           </div>
 
@@ -624,7 +624,7 @@
           <div class="discussion-hud-center">
             <div class="round-countdown-box" id="round-countdown-box" title="Thời gian thảo luận của vòng này">
               <span class="countdown-icon"><i class="fa-solid fa-stopwatch"></i></span>
-              <span class="countdown-digits" id="round-countdown-digits">03:00</span>
+              <span class="countdown-digits" id="round-countdown-digits">02:00</span>
             </div>
             <div class="countdown-controls">
               <button type="button" class="btn-timer-ctrl" id="btn-timer-toggle-pause" title="Tạm dừng / Tiếp tục đếm ngược">
@@ -682,14 +682,26 @@
           </button>
         </div>
 
-        <!-- Banner xác nhận / đổi thẻ của Pháp Y -->
+        <!-- AI FORENSIC MASTER: BÁO CÁO GIÁM ĐỊNH LOG HỆ THỐNG MỖI VÒNG -->
+        <div class="ai-forensic-analyzer-banner" id="ai-forensic-analyzer-banner">
+          <div class="ai-forensic-badge">
+            <i class="fa-solid fa-microchip"></i>
+            <span id="ai-forensic-title">🤖 AI FORENSIC MASTER • VÒNG 1</span>
+            <span class="ai-severity-pill" id="ai-forensic-severity">SEV-1 CRITICAL</span>
+          </div>
+          <div class="ai-forensic-message" id="ai-forensic-message">
+            🤖 AI Log Analyzer: Đang thu thập 6 chỉ dấu hệ thống từ Tech Lead để phân tích nguyên nhân sập Production...
+          </div>
+        </div>
+
+        <!-- Banner xác nhận / đổi thẻ của Tech Lead -->
         <div class="forensic-floating-banner" id="forensic-actions-slot"></div>
 
-        <!-- MẶT BÀN GỖ MỘC KHÁM NGHIỆM VỤ ÁN CHUẨN ẢNH MẪU -->
+        <!-- MẶT BÀN WAR ROOM KHÁM NGHIỆM SỰ CỐ PRODUCTION -->
         <div class="crime-scene-master-table" id="crime-scene-master-table" data-view-mode="panoramic">
-          <!-- Băng vàng cảnh sát vắt ngang mặt bàn gỗ -->
+          <!-- Băng vàng cảnh báo vắt ngang mặt bàn -->
           <div class="tape-strip tape-horizontal-center">
-            <span class="tape-text">CẢNH SÁT HÌNH SỰ • KHU VỰC PHONG TỎA HIỆN TRƯỜNG ÁN MẠNG PHỐ HÀNG ĐẪY • KHÔNG PHẬN SỰ CẤM VÀO • CRIME SCENE DO NOT CROSS</span>
+            <span class="tape-text">FSOFT INCIDENT WAR ROOM • CẢNH BÁO SEV-1: PRODUCTION DOWN • ĐỘI ỨNG PHÓ KHẨN CẤP • WHO BROKE PROD? DO NOT PUSH TO MASTER</span>
           </div>
 
           <!-- TIER 1: HÀNG NGHI PHẠM PHÍA TRÊN (TOP SUSPECTS ROW) -->
@@ -741,15 +753,15 @@
         </div>
       </section>
 
-      <!-- VIEW 5: WITNESS REVERSAL (Kẻ Sát Nhân Phản Công) -->
+      <!-- VIEW 5: WITNESS REVERSAL (The Culprit Đổ Vạ Cuối Trận) -->
       <section class="noir-view" id="view-witness-reversal">
         <div class="reversal-stage">
           <div class="reversal-card">
-            <span class="view-eyebrow text-crimson">🔫 LẬT KÈO CUỐI TRẬN</span>
-            <h2 class="view-title">Kẻ Sát Nhân Rút Súng Tìm Bắn [Nhân Chứng]</h2>
+            <span class="view-eyebrow text-crimson">🎯 ĐỔ VẠ CUỐI TRẬN (BLAME GAME)</span>
+            <h2 class="view-title">The Culprit Tung Đòn Đổ Vạ Tìm [Whistleblower / Senior Dev]</h2>
             <p class="reversal-desc">
-              Cảnh sát đã tìm ra cặp vật chứng! Nhưng nếu bàn chơi có Nhân chứng, Kẻ Sát Nhân được quyền bắn 1 phát súng định mệnh:
-              Nếu bắn trúng Nhân chứng, phe Tội phạm sẽ cướp lấy chiến thắng!
+              Đội ứng phó đã tìm ra cặp bug gây sập Prod! Nhưng nếu bàn chơi có Whistleblower, Thủ phạm được quyền chỉ điểm đổ vạ 1 người cuối trận:
+              Nếu chỉ trúng Whistleblower, phe Gây Lỗi sẽ lật kèo chiến thắng!
             </p>
 
             <div class="reversal-targets-grid" id="reversal-targets-grid">
@@ -769,17 +781,49 @@
 
             <div class="dossier-evidence-box">
               <div class="evidence-item">
-                <span class="ev-lbl">KẺ SÁT NHÂN</span>
-                <div class="ev-val" id="dossier-murderer">🕵️ Thám tử A</div>
+                <span class="ev-lbl">THỦ PHẠM (THE CULPRIT)</span>
+                <div class="ev-val" id="dossier-murderer">🐛 Senior Dev</div>
               </div>
               <div class="evidence-item">
-                <span class="ev-lbl">HUNG KHÍ (PHƯƠNG THỨC)</span>
-                <div class="ev-val val-blue" id="dossier-means">🧪 Thuốc độc</div>
+                <span class="ev-lbl">HÀNH VI GÂY LỖI (TRIGGER)</span>
+                <div class="ev-val val-blue" id="dossier-means">💥 Chạy lệnh DROP TABLE</div>
               </div>
               <div class="evidence-item">
-                <span class="ev-lbl">VẬT CHỨNG (MANH MỐI)</span>
-                <div class="ev-val val-red" id="dossier-clue">🩸 Vết máu</div>
+                <span class="ev-lbl">DẤU VẾT LOG (EVIDENCE)</span>
+                <div class="ev-val val-red" id="dossier-clue">🌙 Git commit 2h sáng</div>
               </div>
+            </div>
+
+            <!-- AI FORENSIC MASTER: BẢN TỔNG HỢP RCA (ROOT CAUSE ANALYSIS) CUỐI TRẬN -->
+            <div class="ai-rca-report-box" id="ai-rca-report-box">
+              <div class="ai-rca-header">
+                <div class="ai-rca-title-wrap">
+                  <i class="fa-solid fa-robot"></i>
+                  <span id="ai-rca-header-title">📋 BẢN TỔNG HỢP RCA (AI ROOT CAUSE ANALYSIS)</span>
+                </div>
+                <button type="button" class="btn-copy-rca" id="btn-copy-rca" title="Sao chép bản báo cáo RCA">
+                  <i class="fa-solid fa-copy"></i> <span id="lbl-copy-rca">Sao chép RCA</span>
+                </button>
+              </div>
+              <div class="ai-rca-grid">
+                <div class="ai-rca-row">
+                  <span class="rca-key">🚨 Incident:</span>
+                  <span class="rca-val" id="rca-val-incident">—</span>
+                </div>
+                <div class="ai-rca-row">
+                  <span class="rca-key">⚡ Direct Cause:</span>
+                  <span class="rca-val" id="rca-val-direct">—</span>
+                </div>
+                <div class="ai-rca-row">
+                  <span class="rca-key">🧠 Root Cause:</span>
+                  <span class="rca-val" id="rca-val-root">—</span>
+                </div>
+                <div class="ai-rca-row rca-row-preventive">
+                  <span class="rca-key">🛡️ Preventive Action:</span>
+                  <span class="rca-val" id="rca-val-preventive">—</span>
+                </div>
+              </div>
+              <div class="ai-rca-verdict" id="rca-val-verdict"></div>
             </div>
 
             <!-- Full Roles Roster -->
@@ -818,8 +862,8 @@
     <div class="noir-modal-card">
       <div class="noir-modal-header">
         <div>
-          <span class="view-eyebrow text-crimson">🚨 OFFICIAL ACCUSATION</span>
-          <h3 class="modal-heading">Chỉ Định Hung Thủ & Cặp Vật Chứng</h3>
+          <span class="view-eyebrow text-crimson">🚨 CHỐT ĐƠN BẮT LỖI PRODUCTION</span>
+          <h3 class="modal-heading">Chỉ Định Thủ Phạm (Culprit) & Cặp Bug Gây Lỗi</h3>
         </div>
         <button type="button" class="btn-modal-close" data-close="modal-accuse"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -838,11 +882,11 @@
         <!-- Step 2 & 3: Pick Means and Clue -->
         <div class="accuse-cards-picker-row">
           <div class="accuse-card-col">
-            <label class="col-lbl col-blue">2. Chọn 1 Phương thức (Xanh):</label>
+            <label class="col-lbl col-blue">2. Chọn 1 Hành vi gây lỗi (Xanh):</label>
             <div class="accuse-options-list" id="accuse-means-picker"></div>
           </div>
           <div class="accuse-card-col">
-            <label class="col-lbl col-red">3. Chọn 1 Manh mối (Đỏ):</label>
+            <label class="col-lbl col-red">3. Chọn 1 Dấu vết Log (Đỏ):</label>
             <div class="accuse-options-list" id="accuse-clues-picker"></div>
           </div>
         </div>
@@ -872,16 +916,16 @@
       <div class="modal-body-scroll">
         <div class="rules-summary-grid">
           <div class="rule-box">
-            <h4>1. Ban Đêm Gây Án</h4>
-            <p>Hung thủ bí mật chọn 1 Hung Khí (Xanh) + 1 Manh Mối (Đỏ). Pháp y & Đồng phạm biết đáp án; Nhân chứng thấy 2 nghi phạm.</p>
+            <h4>1. Ca Trực Đêm Gây Lỗi (On-Call Night)</h4>
+            <p>The Culprit bí mật chọn 1 Hành vi gây lỗi (Xanh) + 1 Dấu vết Log (Đỏ). Tech Lead & Accomplice biết đáp án; Whistleblower biết 2 nghi phạm.</p>
           </div>
           <div class="rule-box">
-            <h4>2. Ba Vòng Giám Định</h4>
-            <p>Pháp y KHÔNG được nói, chỉ đặt 6 viên đạn gỗ lên 6 Thẻ Hiện Trường. Sang Vòng 2 & 3 thay dần từng thẻ để thu hẹp manh mối.</p>
+            <h4>2. Ba Vòng War Room (2 Phút / Vòng)</h4>
+            <p>Tech Lead KHÔNG được nói, chỉ ghim 6 Marker lên 6 Thẻ Thông Số Sự Cố. AI Forensic Master tự động phát bản tin phân tích log mỗi vòng!</p>
           </div>
           <div class="rule-box">
-            <h4>3. Phá Án & Lật Kèo</h4>
-            <p>Mỗi người có 1 Huy hiệu để phá án. Nếu hung thủ bị bắt nhưng bàn có Nhân chứng, hung thủ được bắn 1 phát cuối để lật kèo thắng!</p>
+            <h4>3. Chốt Đơn Bắt Lỗi & Báo Cáo RCA</h4>
+            <p>Mỗi kỹ sư có 1 Huy hiệu để chốt thủ phạm. Nếu Culprit bị bắt nhưng chỉ điểm trúng Whistleblower cuối trận, phe Gây Lỗi lật kèo thắng! Cuối trận AI xuất bản RCA.</p>
           </div>
         </div>
 

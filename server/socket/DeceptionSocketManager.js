@@ -3,16 +3,16 @@
  * Thêm Bot và Tin nhắn thời gian thực (WebSocket / Socket.io) cho "Deception: Murder in Viet Nam".
  */
 
-const DETECTIVE_AVATARS = ['🕵️', '🔍', '👮', '🕶️', '🎩', '💼', '👤', '⚡', '☕'];
+const DETECTIVE_AVATARS = ['👨‍💻', '👩‍💻', '🧑‍🔧', '🕵️', '🕶️', '🏗️', '💼', '⚡', '☕'];
 const BOT_NAMES = [
-  'Đặc vụ Hàng Đẫy',
-  'Thám tử Tràng Tiền',
-  'Thanh tra Cầu Giấy',
-  'Điều tra viên Ba Đình',
-  'Giám định viên Hoàn Kiếm',
-  'Đặc vụ Đống Đa',
-  'Sĩ quan Tây Hồ',
-  'Đặc nhiệm Hai Bà Trưng'
+  'DevOps Cầu Giấy',
+  'Senior F-Ville',
+  'Tech Lead Hòa Lạc',
+  'QA F-Town',
+  'SecOps Đà Nẵng',
+  'Fullstack Quy Nhơn',
+  'BA Cần Thơ',
+  'SRE Duy Tân'
 ];
 
 class DeceptionSocketManager {
@@ -458,10 +458,15 @@ class DeceptionSocketManager {
       const { tileIndex, optionIndex } = data;
       const success = room.gameState.placeBulletOnTile(tileIndex, optionIndex);
       if (success) {
+        let aiReport = room.gameState.latestAiLogReport;
+        if (room.gameState.areAllSceneTilesMarked()) {
+          aiReport = room.gameState.generateAiRoundLogAnalysis(room.gameState.round);
+        }
         this.io.to(roomCode).emit('deception:bullet_placed', {
           tileIndex,
           optionIndex,
-          activeSceneTiles: room.gameState.activeSceneTiles
+          activeSceneTiles: room.gameState.activeSceneTiles,
+          latestAiLogReport: aiReport
         });
       }
     }));
@@ -496,6 +501,7 @@ class DeceptionSocketManager {
           winReasonKey: room.gameState.winReasonKey,
           winReasonText: room.gameState.winReasonText,
           solution: isGameOver ? room.gameState.solution : undefined,
+          aiRcaReport: isGameOver ? room.gameState.aiRcaReport : undefined,
           players: isGameOver ? room.gameState.players.map(p => ({
             id: p.id,
             role: p.role,
@@ -528,6 +534,7 @@ class DeceptionSocketManager {
                   winReasonKey: room.gameState.winReasonKey,
                   winReasonText: room.gameState.winReasonText,
                   solution: room.gameState.solution,
+                  aiRcaReport: room.gameState.aiRcaReport,
                   players: room.gameState.players.map(p => ({
                     id: p.id,
                     role: p.role,
@@ -565,6 +572,7 @@ class DeceptionSocketManager {
           winReasonKey: room.gameState.winReasonKey,
           winReasonText: room.gameState.winReasonText,
           solution: room.gameState.solution,
+          aiRcaReport: room.gameState.aiRcaReport,
           players: room.gameState.players.map(p => ({
             id: p.id,
             role: p.role,
@@ -656,6 +664,8 @@ class DeceptionSocketManager {
         winnerTeam: isGameOver ? state.winnerTeam : undefined,
         winReasonKey: isGameOver ? state.winReasonKey : undefined,
         winReasonText: isGameOver ? state.winReasonText : undefined,
+        latestAiLogReport: state.latestAiLogReport,
+        aiRcaReport: isGameOver ? state.aiRcaReport : undefined,
         solution: isGameOver ? state.solution : undefined,
         players: isGameOver ? state.players.map(p => ({
           id: p.id,
@@ -681,6 +691,8 @@ class DeceptionSocketManager {
       round: state.round,
       phase: state.phase,
       activeSceneTiles: state.activeSceneTiles,
+      latestAiLogReport: state.latestAiLogReport,
+      aiForensicReports: state.aiForensicReports,
       players: state.players.map((gp, i) => {
         const rp = room.players[i] || {};
         const isForensic = gp.role === 'FORENSIC_SCIENTIST';

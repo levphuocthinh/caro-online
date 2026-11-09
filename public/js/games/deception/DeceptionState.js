@@ -35,17 +35,50 @@ export const GAME_PHASES = {
   GAME_OVER: 'GAME_OVER'
 };
 
-const DETECTIVE_AVATARS = ['🕵️‍♂️', '👩‍🔬', '🧑‍✈️', '👨‍⚕️', '👩‍💼', '🧔‍♂️', '👩‍🎨', '🧑‍🍳', '🕶️'];
+const DETECTIVE_AVATARS = ['👨‍💻', '👩‍💻', '🧑‍🔧', '🕵️‍♂️', '👩‍🔬', '🧑‍🚀', '🧔‍♂️', '👩‍💼', '🕶️'];
 
 const BOT_NAMES_VI = [
-  'Thanh tra Trần', 'Bác sĩ Lâm', 'Phóng viên Hà', 'Luật sư Kiệt',
-  'Giáo sư Minh', 'Thám tử Vũ', 'Chuyên viên Ngọc', 'Kỹ sư Hoàng'
+  'Senior Tuấn', 'DevOps Lâm', 'QA Thảo', 'BA Kiệt',
+  'Scrum Minh', 'SecOps Vũ', 'Frontend Ngọc', 'Backend Hoàng'
 ];
 
 const BOT_NAMES_EN = [
-  'Inspector Chan', 'Dr. Lin', 'Reporter Ha', 'Attorney Kiet',
-  'Prof. Minh', 'Detective Vu', 'Specialist Ngoc', 'Engineer Hoang'
+  'Senior Tuan', 'DevOps Lam', 'QA Thao', 'BA Kiet',
+  'Scrum Minh', 'SecOps Vu', 'Frontend Ngoc', 'Backend Hoang'
 ];
+
+/**
+ * Hệ thống Prompt & Cấu trúc JSON cho tính năng sáng tạo AI FORENSIC MASTER
+ * (Tích hợp trực tiếp vào mỗi vòng điều tra & tổng hợp báo cáo RCA cuối trận)
+ */
+export const AI_FORENSIC_SYSTEM_PROMPT = `Bạn là "AI Forensic Master" — Hệ thống Trí tuệ Nhân tạo Giám định Sự cố IT trong tựa game "WHO BROKE PROD? (Ai đã làm sập Production?)" tại cuộc thi MEN GEN GAME (FSOFT MEN'S DAY 2026).
+
+1. PHÂN TÍCH LOG MỖI VÒNG (AI Log Analyzer):
+   - Đầu vào: Cặp bài ẩn của Thủ phạm (Hành vi gây lỗi [Trigger] + Dấu vết [Log Trace]) và 6 viên đạn gỗ (Markers) mà Tech Lead đã ghim lên các thẻ Thông số Sự cố (Incident Parameters).
+   - Đầu ra JSON:
+     {
+       "round": 1,
+       "incidentId": "INC-2026",
+       "timestamp": "02:13 AM",
+       "severity": "SEV-1",
+       "confidence": "86%",
+       "logAnalysisVi": "Câu thông báo giám định hệ thống ngắn gọn, hài hước kiểu dân IT dự án (không tiết lộ thẳng tên thẻ đáp án)",
+       "logAnalysisEn": "Witty IT system diagnostic broadcast in English"
+     }
+
+2. TỔNG HỢP BÁO CÁO RCA CUỐI TRẬN (Automated Post-Mortem RCA):
+   - Đầu vào: Kết quả ván đấu, danh tính Thủ phạm (The Culprit), Đồng lõa, Whistleblower, cặp thẻ Hành vi + Dấu vết và toàn bộ Thông số Sự cố.
+   - Đầu ra JSON:
+     {
+       "incidentId": "INC-2026",
+       "severity": "SEV-0 CRITICAL",
+       "status": "RESOLVED (HOTFIXED) | SLA BREACHED (UNRESOLVED)",
+       "incident": "Mô tả sự cố sập hệ thống",
+       "directCause": "Nguyên nhân trực tiếp từ cặp thẻ Hành vi + Dấu vết của Thủ phạm",
+       "rootCause": "Nguyên nhân gốc rễ từ thẻ Root Cause và lỗ hổng quy trình",
+       "preventiveAction": "Hành động phòng ngừa châm biếm kiểu dân dự án (VD: Cấm tiệt deploy chiều thứ Sáu)",
+       "satiricalVerdict": "Phán quyết hài hước dành cho Thủ phạm"
+     }`;
 
 function shuffleArray(arr) {
   const copy = [...arr];
@@ -68,12 +101,12 @@ export class DeceptionState {
       includeAccompliceAndWitness: true,
       includeUndercoverAllies: true,
       includeEventTiles: true,
-      presentationSeconds: 30,
-      playerName: 'Thám tử Trưởng'
+      presentationSeconds: 120,
+      playerName: 'Senior Dev'
     };
 
-    this.caseId = 'HK-' + Math.floor(Math.random() * 8999 + 1000);
-    this.roomCode = 'NOIR' + Math.floor(Math.random() * 89 + 10);
+    this.caseId = 'INC-' + Math.floor(Math.random() * 8999 + 1000);
+    this.roomCode = 'PROD' + Math.floor(Math.random() * 89 + 10);
     this.phase = GAME_PHASES.LOBBY;
     this.previousPhase = null;
     this.round = 1;
@@ -131,8 +164,13 @@ export class DeceptionState {
     this.accuserPlayerId = null;
     this.witnessShotTargetId = null;
 
-    // Nhật ký hồ sơ vụ án
+    // Nhật ký hồ sơ sự cố
     this.caseLogs = [];
+
+    // Dữ liệu AI Forensic Master (AI Log Analyzer mỗi vòng & Báo cáo RCA cuối trận)
+    this.aiForensicReports = {};
+    this.latestAiLogReport = null;
+    this.aiRcaReport = null;
 
     this.initPreviewTable();
   }
@@ -141,13 +179,16 @@ export class DeceptionState {
    * Khởi tạo dữ liệu xem trước ở sảnh chờ (LOBBY)
    */
   initPreviewTable() {
-    this.caseId = 'HK-' + Math.floor(Math.random() * 8999 + 1000);
+    this.caseId = 'INC-' + Math.floor(Math.random() * 8999 + 1000);
     this.phase = GAME_PHASES.LOBBY;
     this.round = 1;
     this.winnerTeam = null;
     this.activeEventTile = null;
     this.pinnedCardIds.clear();
     this.caseLogs = [];
+    this.aiForensicReports = {};
+    this.latestAiLogReport = null;
+    this.aiRcaReport = null;
 
     // Tạo danh sách ghế ngồi theo config.playerCount
     const count = Math.min(9, Math.max(4, Number(this.config.playerCount) || 6));
@@ -262,7 +303,7 @@ export class DeceptionState {
     const count = Math.min(9, Math.max(4, Number(this.config.playerCount) || 6));
     const cardsPer = Math.min(5, Math.max(3, Number(this.config.cardsPerPlayer) || 4));
 
-    this.caseId = 'HK-' + Math.floor(Math.random() * 8999 + 1000);
+    this.caseId = 'INC-' + Math.floor(Math.random() * 8999 + 1000);
     this.round = 1;
     this.winnerTeam = null;
     this.winReasonKey = '';
@@ -273,6 +314,9 @@ export class DeceptionState {
     this.reversePresentationOrder = false;
     this.pinnedCardIds.clear();
     this.caseLogs = [];
+    this.aiForensicReports = {};
+    this.latestAiLogReport = null;
+    this.aiRcaReport = null;
     this.privateIntel = {
       labCheckedCardId: null,
       labCheckedResult: null,
@@ -335,7 +379,7 @@ export class DeceptionState {
         seatIndex: i,
         displayName: isHuman ? (this.config.playerName || 'Thám tử Trưởng') : BOT_NAMES_VI[i - 1] || `Đặc vụ #${i + 1}`,
         displayNameEn: isHuman ? (this.config.playerName || 'Chief Detective') : BOT_NAMES_EN[i - 1] || `Agent #${i + 1}`,
-        avatar: isForensic ? '🔬' : DETECTIVE_AVATARS[i % DETECTIVE_AVATARS.length],
+        avatar: isForensic ? '🖥️' : DETECTIVE_AVATARS[i % DETECTIVE_AVATARS.length],
         role,
         team: roleDef.team,
         isHuman,
@@ -386,8 +430,8 @@ export class DeceptionState {
 
     this.phase = GAME_PHASES.ROLE_CASTING;
     this.addLog(
-      `Hồ sơ vụ án #${this.caseId} đã mở với ${count} người tham gia (${cardsPer} Phương thức + ${cardsPer} Manh mối/người).`,
-      `Case Dossier #${this.caseId} opened with ${count} players (${cardsPer} Means + ${cardsPer} Clues each).`,
+      `🚨 War Room Sự cố #${this.caseId} đã kích hoạt với ${count} thành viên (${cardsPer} Hành vi Xanh + ${cardsPer} Dấu vết Đỏ/người).`,
+      `🚨 Incident War Room #${this.caseId} opened with ${count} responders (${cardsPer} Triggers + ${cardsPer} Log Traces each).`,
       'system'
     );
   }
@@ -455,8 +499,8 @@ export class DeceptionState {
     this.solution.clueCardId = validClue.id;
 
     this.addLog(
-      'Trong màn đêm Hồng Kông, Kẻ Sát Nhân đã bí mật gây án và để lại 1 Phương thức cùng 1 Manh mối.',
-      'Under the Hong Kong night, the Murderer secretly committed the crime, leaving behind 1 Means and 1 Clue.',
+      '🌙 Đêm Deployment: Thủ phạm (The Culprit) đã bí mật kích hoạt 1 Hành vi gây lỗi và để lại 1 Dấu vết Log làm sập Production!',
+      '🌙 Deployment Night: The Culprit secretly triggered 1 Action and left behind 1 Log Trace, crashing Production!',
       'crime'
     );
     return true;
@@ -472,8 +516,8 @@ export class DeceptionState {
     if (hasWitnessOrProtective) {
       this.phase = GAME_PHASES.NIGHT_WITNESS_REVEAL;
       this.addLog(
-        'Nhân chứng đã thoáng thấy bóng dáng của Kẻ Sát Nhân và Đồng phạm rời khỏi hiện trường.',
-        'The Witness caught a fleeting glimpse of the Murderer and Accomplice fleeing the scene.',
+        '👁️ Whistleblower (Senior Dev) đã phát hiện 2 nghi phạm thuộc phe Gây Lỗi truy cập Server lúc nửa đêm.',
+        '👁️ The Whistleblower (Senior Dev) spotted 2 suspects from the Bug Team accessing the server at midnight.',
         'night'
       );
     } else {
@@ -581,10 +625,13 @@ export class DeceptionState {
       .join(' • ');
 
     this.addLog(
-      `Pháp y đã đặt đạn gỗ lên Bảng Hiện Trường (Vòng ${this.round}): ${summaryVi}`,
-      `Forensic Scientist placed scene bullets (Round ${this.round}): ${summaryEn}`,
+      `🖥️ Tech Lead đã ghim đạn gỗ lên Bảng Thông Số Sự Cố (Vòng ${this.round}): ${summaryVi}`,
+      `🖥️ Tech Lead pinned system markers (Round ${this.round}): ${summaryEn}`,
       'forensic'
     );
+
+    // Tự động kích hoạt AI Forensic Master phân tích Log đầu vòng
+    this.generateAiRoundLogAnalysis(this.round);
   }
 
   /**
@@ -625,7 +672,12 @@ export class DeceptionState {
     this.currentSpeakerIndex = 0;
     this.speakerTimeLeft = this.config.presentationSeconds || 30;
 
-    // Tạo phát biểu suy luận đầu vòng của các đặc vụ AI
+    // Nếu Tech Lead là người chơi vừa ghim xong đạn gỗ, sinh báo cáo AI Log Analyzer cho vòng hiện tại
+    if (!this.aiForensicReports[this.round]) {
+      this.generateAiRoundLogAnalysis(this.round);
+    }
+
+    // Tạo phát biểu suy luận đầu vòng của các thành viên AI
     this.generateBotRoundDeductions();
   }
 
@@ -763,8 +815,8 @@ export class DeceptionState {
 
     if (speaker && top) {
       this.addLog(
-        `[Vòng ${this.round}] ${speaker.displayName}: "Pháp y chỉ vào [${causeVi}], tôi thấy cặp [${top.meansCard.vi}] & [${top.clueCard.vi}] của ${top.suspect.displayName} rất đáng ngờ!"`,
-        `[Round ${this.round}] ${speaker.displayNameEn || speaker.displayName}: "Forensic marked [${causeEn}], so ${(top.suspect.displayNameEn || top.suspect.displayName)}'s [${top.meansCard.en}] & [${top.clueCard.en}] look very suspicious!"`,
+        `[Vòng ${this.round}] ${speaker.displayName}: "Tech Lead ghim [${causeVi}], tôi nghi cặp [${top.meansCard.vi}] & [${top.clueCard.vi}] trên máy của ${top.suspect.displayName} chính là thủ phạm làm sập Prod!"`,
+        `[Round ${this.round}] ${speaker.displayNameEn || speaker.displayName}: "Tech Lead marked [${causeEn}], so ${(top.suspect.displayNameEn || top.suspect.displayName)}'s [${top.meansCard.en}] & [${top.clueCard.en}] look like the culprit!"`,
         'speech'
       );
     }
@@ -801,12 +853,12 @@ export class DeceptionState {
     } else if (this.round === 2) {
       this.startRound3Evidence();
     } else {
-      // Hết cả 3 vòng trình bày mà Hung thủ vẫn chưa bị bắt -> Phe Tội phạm thắng!
+      // Hết cả 3 vòng họp War Room mà Thủ phạm vẫn chưa bị bắt -> Phe Gây Lỗi thắng!
       this.finishGame(
         'CRIMINAL',
         'TIME_EXPIRED',
-        'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra đúng cặp Phương thức & Manh mối. Kẻ Sát Nhân đã cao chạy xa bay!',
-        'All 3 investigation rounds ended without a correct accusation. The Murderer escaped into the night!'
+        'Hết 3 vòng họp War Room (Quá hạn SLA) mà Đội Ứng Phó chưa tìm ra đúng cặp Hành vi & Dấu vết Log. Thủ phạm đã xóa sạch dấu vết và hạ cánh an toàn!',
+        'All 3 War Room rounds ended (SLA Breached) without pinpointing the exact Trigger & Log Trace. The Culprit got away clean!'
       );
     }
   }
@@ -850,8 +902,8 @@ export class DeceptionState {
     this.privateIntel.labCheckedCardId = cardId;
     this.privateIntel.labCheckedResult = isMatch;
     this.addLog(
-      'Đêm Mở Rộng: Kỹ thuật viên Phòng Lab đã bí mật xét nghiệm 1 mẫu vật chứng tại hiện trường.',
-      'Allies Night: The Lab Technician secretly analyzed 1 piece of evidence in the lab.',
+      '🧪 Giữa Ca Trực: DevOps / QA Engineer đã bí mật chạy Health Check kiểm tra 1 thẻ bài trên bàn.',
+      '🧪 Mid-Shift Check: DevOps / QA Engineer secretly ran a Health Check on 1 card on the table.',
       'night'
     );
     return isMatch;
@@ -865,8 +917,8 @@ export class DeceptionState {
     target.hasBadge = false;
     this.privateIntel.insideManTargetId = targetPlayerId;
     this.addLog(
-      `Đêm Mở Rộng: Nội gián đã bí mật đánh cắp Huy hiệu Phá án của ${target.displayName}!`,
-      `Allies Night: The Inside Man secretly stripped ${(target.displayNameEn || target.displayName)}'s Police Badge!`,
+      `🕶️ Giữa Ca Trực: Log Tamperer (Kẻ xóa log) đã bí mật vô hiệu hóa Huy hiệu Phá án của ${target.displayName}!`,
+      `🕶️ Mid-Shift Sabotage: The Log Tamperer secretly disabled ${(target.displayNameEn || target.displayName)}'s Accusation Badge!`,
       'crime'
     );
     return true;
@@ -934,8 +986,8 @@ export class DeceptionState {
     this.activeSceneTiles[tileIndex] = newTile;
 
     this.addLog(
-      `Vòng ${this.round}: Pháp y đã thay thẻ [${targetTile.name_vi}] bằng thẻ mới [${newTile.name_vi}].`,
-      `Round ${this.round}: Forensic Scientist replaced [${targetTile.name_en}] with [${newTile.name_en}].`,
+      `Vòng ${this.round}: Tech Lead đã cập nhật thông số [${targetTile.name_vi}] sang thẻ mới [${newTile.name_vi}].`,
+      `Round ${this.round}: Tech Lead updated parameter [${targetTile.name_en}] to [${newTile.name_en}].`,
       'forensic'
     );
     return true;
@@ -1121,8 +1173,8 @@ export class DeceptionState {
     player.hasBadge = false;
     player.isRoleRevealed = true;
     this.addLog(
-      `🎩 ${player.displayName} đã nộp bỏ Huy hiệu để công khai danh tính [Thám tử Cố vấn] — chứng minh 100% thuộc phe Điều tra!`,
-      `🎩 ${(player.displayNameEn || player.displayName)} discarded their Badge to publicly reveal [Consulting Detective] — proving 100% innocence!`,
+      `🏗️ ${player.displayName} đã tự nguyện bỏ quyền phá án để lật thẻ [System Architect] — chứng minh 100% trong sạch (Zero-Commit)!`,
+      `🏗️ ${(player.displayNameEn || player.displayName)} voluntarily discarded their Badge to reveal [System Architect] — proving 100% innocence!`,
       'forensic'
     );
     return true;
@@ -1164,17 +1216,17 @@ export class DeceptionState {
 
     if (isCorrect) {
       this.addLog(
-        `🚨 PHÁ ÁN CHÍNH XÁC! ${accuser.displayName} đã vạch trần Kẻ Sát Nhân ${suspect.displayName} với cặp bằng chứng [${meansCard.vi}] & [${clueCard.vi}]!`,
-        `🚨 CASE CRACKED! ${(accuser.displayNameEn || accuser.displayName)} exposed Murderer ${(suspect.displayNameEn || suspect.displayName)} with [${meansCard.en}] & [${clueCard.en}]!`,
+        `🚨 CHỐT ĐƠN CHÍNH XÁC! ${accuser.displayName} đã bắt tận tay Thủ phạm ${suspect.displayName} với cặp lỗi [${meansCard.vi}] & [${clueCard.vi}]!`,
+        `🚨 BUG PINPOINTED! ${(accuser.displayNameEn || accuser.displayName)} exposed Culprit ${(suspect.displayNameEn || suspect.displayName)} with [${meansCard.en}] & [${clueCard.en}]!`,
         'success'
       );
 
-      // Nếu bàn chơi có Nhân chứng (WITNESS) -> Chuyển sang pha Phản công cuối trận (WITNESS_REVERSAL)
+      // Nếu bàn chơi có Whistleblower (WITNESS) -> Chuyển sang pha Đổ vạ cuối trận (WITNESS_REVERSAL)
       if (this.solution.witnessPlayerId) {
         this.phase = GAME_PHASES.WITNESS_REVERSAL;
         this.addLog(
-          '🔫 LẬT KÈO CUỐI TRẬN: Kẻ Sát Nhân đã bị lộ diện nhưng rút súng nhắm tìm [Nhân chứng] để thủ tiêu!',
-          '🔫 WITNESS REVERSAL: The Murderer is cornered and draws a revolver to assassinate the [Witness]!',
+          '🎯 ĐỔ VẠ CUỐI TRẬN: Thủ phạm đã bị lộ nhưng đang tìm cách chỉ điểm [Whistleblower / Senior Dev] để kéo sập cả đội!',
+          '🎯 SCAPEGOAT REVERSAL: The Culprit is cornered and attempts to pinpoint the [Whistleblower / Senior Dev] to steal the win!',
           'crime'
         );
 
@@ -1193,17 +1245,17 @@ export class DeceptionState {
         this.finishGame(
           'INVESTIGATION',
           'ARRESTED',
-          `${accuser.displayName} đã bắt giữ thành công Kẻ Sát Nhân ${suspect.displayName} với cặp vật chứng [${meansCard.vi}] + [${clueCard.vi}]!`,
-          `${(accuser.displayNameEn || accuser.displayName)} successfully arrested Murderer ${(suspect.displayNameEn || suspect.displayName)} with [${meansCard.en}] + [${clueCard.en}]!`
+          `${accuser.displayName} đã khôi phục Production thành công và tóm gọn Thủ phạm ${suspect.displayName} với cặp lỗi [${meansCard.vi}] + [${clueCard.vi}]!`,
+          `${(accuser.displayNameEn || accuser.displayName)} restored Production and caught Culprit ${(suspect.displayNameEn || suspect.displayName)} with [${meansCard.en}] + [${clueCard.en}]!`
         );
       }
 
       return { valid: true, isCorrect: true, meansCard, clueCard, suspect };
     } else {
-      // Cáo buộc SAI: Pháp y chỉ lắc đầu báo SAI, không tiết lộ sai ở đâu
+      // Cáo buộc SAI: Tech Lead chỉ lắc đầu báo SAI, không tiết lộ sai ở đâu
       this.addLog(
-        `❌ BÁC BỎ! ${accuser.displayName} cáo buộc ${suspect.displayName} dùng [${meansCard.vi}] + [${clueCard.vi}], nhưng Pháp y xác nhận: KHÔNG CHÍNH XÁC! (${accuser.displayName} mất Huy hiệu).`,
-        `❌ DISMISSED! ${(accuser.displayNameEn || accuser.displayName)} accused ${(suspect.displayNameEn || suspect.displayName)} of [${meansCard.en}] + [${clueCard.en}], but Forensic Scientist ruled: INCORRECT! (Badge lost).`,
+        `❌ BẮT NHẦM BUG! ${accuser.displayName} nghi ngờ ${suspect.displayName} gây lỗi bằng [${meansCard.vi}] + [${clueCard.vi}], nhưng Tech Lead xác nhận: KHÔNG KHỚP LOG! (${accuser.displayName} mất Huy hiệu).`,
+        `❌ FALSE ALARM! ${(accuser.displayNameEn || accuser.displayName)} accused ${(suspect.displayNameEn || suspect.displayName)} of [${meansCard.en}] + [${clueCard.en}], but Tech Lead ruled: LOG MISMATCH! (Badge lost).`,
         'error'
       );
 
@@ -1213,8 +1265,8 @@ export class DeceptionState {
         this.finishGame(
           'CRIMINAL',
           'NO_BADGES_LEFT',
-          'Toàn bộ Huy hiệu Cảnh sát đã dùng hết mà không tìm ra chân tướng. Phe Tội phạm giành chiến thắng tuyệt đối!',
-          'All Police Badges have been exhausted without solving the crime. The Criminal faction wins!'
+          'Toàn bộ Huy hiệu Phá án của Đội Ứng Phó đã cạn sạch mà vẫn chưa fix được lỗi. Phe Gây Lỗi giành chiến thắng tuyệt đối!',
+          'All Accusation Badges have been exhausted without resolving the outage. The Bug Team wins!'
         );
       }
 
@@ -1236,15 +1288,15 @@ export class DeceptionState {
       this.finishGame(
         'CRIMINAL',
         'WITNESS_ASSASSINATED',
-        `💥 ÁM SÁT THÀNH CÔNG! Kẻ Sát Nhân đã bắn trúng Nhân chứng ${target.displayName}! Nhân chứng bị thủ tiêu, phe Tội phạm lật kèo giành chiến thắng!`,
-        `💥 WITNESS ELIMINATED! The Murderer shot Witness ${(target.displayNameEn || target.displayName)}! With the key witness silenced, the Criminals steal the victory!`
+        `💥 ĐỔ VẠ THÀNH CÔNG! Thủ phạm đã chỉ điểm trúng Whistleblower ${target.displayName}! Người tố cáo bị lộ diện chịu phạt chung, Phe Gây Lỗi lật kèo giành chiến thắng!`,
+        `💥 WHISTLEBLOWER EXPOSED! The Culprit successfully scapegoated Whistleblower ${(target.displayNameEn || target.displayName)}! The Bug Team steals the victory!`
       );
     } else {
       this.finishGame(
         'INVESTIGATION',
         'WITNESS_SURVIVED',
-        `🛡️ BẢO VỆ NHÂN CHỨNG THÀNH CÔNG! Kẻ Sát Nhân bắn nhầm vào ${target.displayName} (${ROLE_DEFINITIONS[target.role]?.name_vi}). Nhân chứng an toàn ra tòa làm chứng, Phe Cảnh sát toàn thắng!`,
-        `🛡️ WITNESS PROTECTED! The Murderer shot ${(target.displayNameEn || target.displayName)} (${ROLE_DEFINITIONS[target.role]?.name_en}) instead of the Witness. The Investigation team triumphs!`
+        `🛡️ BẢO VỆ WHISTLEBLOWER THÀNH CÔNG! Thủ phạm đổ vạ nhầm sang ${target.displayName} (${ROLE_DEFINITIONS[target.role]?.name_vi}). Whistleblower an toàn gửi báo cáo lên sếp tổng, Đội Ứng Phó toàn thắng!`,
+        `🛡️ WHISTLEBLOWER PROTECTED! The Culprit wrongly blamed ${(target.displayNameEn || target.displayName)} (${ROLE_DEFINITIONS[target.role]?.name_en}). The Incident Response team triumphs!`
       );
     }
 
@@ -1254,6 +1306,188 @@ export class DeceptionState {
   /**
    * Kết thúc ván đấu & Mở toàn bộ vai trò bí mật
    */
+  /**
+   * AI FORENSIC MASTER — 1. Sinh thông báo "Báo cáo Giám định Hệ thống (AI Log Analyzer)" mỗi vòng
+   * Dựa trên cặp bài (Hành vi + Dấu vết) của Thủ phạm và các thẻ đạn gỗ mà Tech Lead đã ghim
+   */
+  generateAiRoundLogAnalysis(roundNum = this.round) {
+    const mFound = this.findCardById(this.solution.meansCardId);
+    const cFound = this.findCardById(this.solution.clueCardId);
+    const mCard = mFound?.card;
+    const cCard = cFound?.card;
+
+    const causeTile = this.activeSceneTiles.find(t => t.color === 'PURPLE');
+    const locTile = this.activeSceneTiles.find(t => t.color === 'GREEN');
+    const brownTiles = this.activeSceneTiles.filter(t => t.color === 'BROWN' && t.selectedOptionIndex !== null);
+
+    const causeIdx = tileOptionSafe(causeTile?.selectedOptionIndex);
+    const locIdx = tileOptionSafe(locTile?.selectedOptionIndex);
+
+    const rootCauseVi = causeTile?.options_vi?.[causeIdx] || 'Sự cố bất thường';
+    const rootCauseEn = causeTile?.options_en?.[causeIdx] || 'Anomalous failure';
+    const layerVi = locTile?.options_vi?.[locIdx] || 'Production Cluster';
+    const layerEn = locTile?.options_en?.[locIdx] || 'Production Cluster';
+
+    const latestBrown = brownTiles[brownTiles.length - 1] || brownTiles[0];
+    const brownOptIdx = tileOptionSafe(latestBrown?.selectedOptionIndex);
+    const brownNameVi = latestBrown ? latestBrown.name_vi : 'Trạng thái hệ thống';
+    const brownValVi = latestBrown?.options_vi?.[brownOptIdx] || 'Đang quá tải';
+    const brownNameEn = latestBrown ? latestBrown.name_en : 'System State';
+    const brownValEn = latestBrown?.options_en?.[brownOptIdx] || 'Overloaded';
+
+    // Gợi ý gián tiếp từ nhóm category của thẻ Hành vi & Dấu vết (không lộ tên thẻ cụ thể)
+    const mCat = (mCard?.category || '').toLowerCase();
+    const cCat = (cCard?.category || '').toLowerCase();
+
+    let triggerHintVi = 'thao tác can thiệp trực tiếp vào luồng vận hành';
+    let triggerHintEn = 'direct operational intervention';
+    if (mCat.includes('poison')) {
+      triggerHintVi = 'lỗ hổng phân quyền, rò rỉ khóa bảo mật hoặc chèn mã độc ngầm';
+      triggerHintEn = 'security credential leak or unauthorized script injection';
+    } else if (mCat.includes('suffoc')) {
+      triggerHintVi = 'tác vụ gây nghẽn cổ chai, vòng lặp treo cứng hoặc cạn kiệt tài nguyên bộ nhớ';
+      triggerHintEn = 'resource starvation, deadlock, or infinite loop bottleneck';
+    } else if (mCat.includes('blood')) {
+      triggerHintVi = 'lệnh xóa dữ liệu nguy hiểm, đứt gãy kết nối hoặc phá hủy cấu hình gốc';
+      triggerHintEn = 'destructive data command, severed connection, or wiped config';
+    } else if (mCat.includes('severe')) {
+      triggerHintVi = 'tác vụ tính toán quá tải làm vọt 100% CPU hoặc đẩy code thẳng lên Live không qua kiểm thử';
+      triggerHintEn = 'heavy compute spike hitting 100% CPU or unverified live deployment';
+    } else if (mCat.includes('illness') || mCat.includes('accident')) {
+      triggerHintVi = 'xung đột phiên bản thư viện hoặc sự cố hạ tầng vật lý dây chuyền';
+      triggerHintEn = 'dependency version conflict or cascading infrastructure outage';
+    }
+
+    let traceHintVi = 'dấu vết lưu lại tại bàn làm việc của nghi phạm';
+    let traceHintEn = 'physical or digital trace left at the suspect station';
+    if (cCat.includes('written')) {
+      traceHintVi = 'bản ghi văn bản, tài liệu, hóa đơn hoặc lịch sử commit/ticket';
+      traceHintEn = 'written log, documentation, invoice, or commit/ticket note';
+    } else if (cCat.includes('personal')) {
+      traceHintVi = 'vật dụng cá nhân, thẻ nhân viên hoặc phụ kiện công sở của Dev';
+      traceHintEn = 'personal dev gear, access badge, or office accessory';
+    } else if (cCat.includes('natural')) {
+      traceHintVi = 'đồ ăn, thức uống, vết cà phê/trà sữa đổ hoặc yếu tố sinh học';
+      traceHintEn = 'food, beverage spill, coffee/boba trace, or organic item';
+    } else if (cCat.includes('synthetic')) {
+      traceHintVi = 'thiết bị phần cứng, cáp mạng, thông số hệ thống hoặc log máy chủ';
+      traceHintEn = 'hardware device, cable, system metric, or server log';
+    } else if (cCat.includes('artistic') || cCat.includes('unrelated')) {
+      traceHintVi = 'giao diện hình ảnh, trò chơi giải trí hoặc vật phẩm tâm linh trên bàn code';
+      traceHintEn = 'visual asset, office game, or lucky charm on the desk';
+    }
+
+    const timestamps = ['02:13 AM', '17:59 PM', '11:42 PM', '03:07 AM', '14:28 PM'];
+    const ts = timestamps[(roundNum + (mCard?.id?.charCodeAt(2) || 0)) % timestamps.length];
+    const conf = roundNum === 1 ? '74%' : (roundNum === 2 ? '88%' : '96%');
+    const sev = roundNum === 3 ? 'SEV-0 CRITICAL' : 'SEV-1 HIGH';
+
+    const quipsVi = [
+      `🤖 AI Log Analyzer [Vòng ${roundNum} • Độ tin cậy ${conf}]: Phát hiện sự cố xảy ra lúc ${ts} đánh sập [${layerVi}] với triệu chứng [${rootCauseVi}]. Cảnh báo: Ghi nhận dấu hiệu của ${triggerHintVi} kết hợp với ${traceHintVi}!`,
+      `🤖 AI Log Analyzer [Vòng ${roundNum} • Độ tin cậy ${conf}]: Quét sâu thông số [${brownNameVi}: ${brownValVi}] tại tầng [${layerVi}]. Phân tích tương quan chỉ ra nguyên nhân bắt nguồn từ ${triggerHintVi}, hiện trường còn vương lại ${traceHintVi}.`,
+      `🤖 AI Log Analyzer [Vòng ${roundNum} • Độ tin cậy ${conf}]: Báo động đỏ ${sev}! Trước khi [${layerVi}] ngưng thở vì [${rootCauseVi}], hệ thống kịp chụp lại dấu vết ${traceHintVi} đi kèm ${triggerHintVi}. Đề nghị khoanh vùng ngay!`
+    ];
+
+    const quipsEn = [
+      `🤖 AI Log Analyzer [Round ${roundNum} • Confidence ${conf}]: Outage detected at ${ts} crashing [${layerEn}] via [${rootCauseEn}]. Telemetry flags ${triggerHintEn} paired with ${traceHintEn}!`,
+      `🤖 AI Log Analyzer [Round ${roundNum} • Confidence ${conf}]: Deep scan on [${brownNameEn}: ${brownValEn}] at [${layerEn}] reveals ${triggerHintEn} leaving behind ${traceHintEn}.`,
+      `🤖 AI Log Analyzer [Round ${roundNum} • Confidence ${conf}]: ${sev} Alert! Right before [${layerEn}] collapsed from [${rootCauseEn}], system logs captured ${traceHintEn} linked to ${triggerHintEn}!`
+    ];
+
+    const report = {
+      round: roundNum,
+      incidentId: this.caseId,
+      timestamp: ts,
+      severity: sev,
+      confidence: conf,
+      affectedLayerVi: layerVi,
+      affectedLayerEn: layerEn,
+      rootCauseVi,
+      rootCauseEn,
+      highlightParamVi: `${brownNameVi}: ${brownValVi}`,
+      highlightParamEn: `${brownNameEn}: ${brownValEn}`,
+      logAnalysisVi: quipsVi[(roundNum - 1) % quipsVi.length],
+      logAnalysisEn: quipsEn[(roundNum - 1) % quipsEn.length]
+    };
+
+    this.aiForensicReports[roundNum] = report;
+    this.latestAiLogReport = report;
+
+    this.addLog(report.logAnalysisVi, report.logAnalysisEn, 'forensic');
+    return report;
+  }
+
+  /**
+   * AI FORENSIC MASTER — 2. Tự động tổng hợp bản Báo cáo RCA (Root Cause Analysis) cuối ván chơi
+   * Gồm: Incident, Direct Cause, Root Cause, Preventive Action & Lời bình châm biếm kiểu dân dự án IT
+   */
+  generateAiRcaReport() {
+    const murderer = this.getMurdererPlayer();
+    const accomplice = this.players.find(p => p.role === 'ACCOMPLICE');
+    const witness = this.players.find(p => p.role === 'WITNESS');
+    const accuser = this.getPlayerById(this.accuserPlayerId);
+    const mFound = this.findCardById(this.solution.meansCardId);
+    const cFound = this.findCardById(this.solution.clueCardId);
+    const mCard = mFound?.card || { vi: 'Thao tác ẩn', en: 'Hidden Trigger', id: 'M000' };
+    const cCard = cFound?.card || { vi: 'Log ẩn', en: 'Hidden Trace', id: 'C000' };
+
+    const causeTile = this.activeSceneTiles.find(t => t.color === 'PURPLE');
+    const locTile = this.activeSceneTiles.find(t => t.color === 'GREEN');
+    const rootCauseVi = causeTile?.options_vi?.[tileOptionSafe(causeTile?.selectedOptionIndex)] || 'Tràn RAM / Quá tải hệ thống';
+    const rootCauseEn = causeTile?.options_en?.[tileOptionSafe(causeTile?.selectedOptionIndex)] || 'Out of Memory / System Overload';
+    const layerVi = locTile?.options_vi?.[tileOptionSafe(locTile?.selectedOptionIndex)] || 'Production Server';
+    const layerEn = locTile?.options_en?.[tileOptionSafe(locTile?.selectedOptionIndex)] || 'Production Server';
+
+    const culpritName = murderer ? murderer.displayName : 'Ẩn danh';
+    const culpritNameEn = murderer ? (murderer.displayNameEn || murderer.displayName) : 'Unknown';
+    const isResolved = this.winnerTeam === 'INVESTIGATION';
+
+    const preventiveActionsVi = [
+      `1. Cấm tiệt mọi lệnh Deploy lên [${layerVi}] vào chiều thứ Sáu sau 16h00.\n2. Thu hồi quyền sudo/root của ${culpritName} trong 3 Sprint liên tiếp, bắt buộc qua 2 lớp Code Review.\n3. Tịch thu tang vật [${cCard.vi}] tại bàn làm việc và cài AI Pre-Commit Hook chặn hành vi [${mCard.vi}].`,
+      `1. Thiết lập luật thép: Ai làm sập [${layerVi}] vì [${mCard.vi}] phải trực chiến OT viết 100 Unit Test bù.\n2. Đưa tang vật [${cCard.vi}] vào bảo tàng kỷ vật War Room của dự án để răn đe.\n3. Bắt buộc chạy Chaos Engineering và kiểm tra tự động trước mỗi ca Go-Live.`,
+      `1. Khóa cứng quyền truy cập trực tiếp vào [${layerVi}], mọi thay đổi phải đi qua CI/CD Pipeline.\n2. Yêu cầu ${culpritName} viết bản Post-Mortem dài 5 trang A4 giải trình về sự xuất hiện của [${cCard.vi}].\n3. Cấm vừa xử lý [${mCard.vi}] vừa mở tab giải trí trong giờ cao điểm!`
+    ];
+
+    const preventiveActionsEn = [
+      `1. Strictly ban all deployments to [${layerEn}] after 4:00 PM on Fridays.\n2. Revoke sudo/root access for ${culpritNameEn} for 3 Sprints and enforce 2-approver PR reviews.\n3. Confiscate [${cCard.en}] and install an AI Pre-Commit Hook to block [${mCard.en}].`,
+      `1. Enforce the Golden Rule: Anyone crashing [${layerEn}] via [${mCard.en}] must write 100 unit tests.\n2. Archive [${cCard.en}] in the FSOFT War Room Hall of Fame as a cautionary tale.\n3. Mandate automated staging health checks prior to every release.`
+    ];
+
+    const pickIdx = (mCard.id.charCodeAt(mCard.id.length - 1) || 0) % preventiveActionsVi.length;
+
+    const satiricalVi = isResolved
+      ? `Phán quyết từ AI Forensic Master: Dù ${culpritName} đã cố ngụy trang bằng câu thần chú "Trên máy em vẫn chạy ngon!", bằng chứng [${cCard.vi}] đã tố cáo tất cả. Đề nghị ${culpritName}${accomplice ? ' cùng đồng phạm ' + accomplice.displayName : ''} khao toàn bộ anh em War Room một chầu trà sữa full topping để tạ lỗi!`
+      : `Phán quyết từ AI Forensic Master: Thủ phạm ${culpritName} đã thực hiện pha "xóa log thoát xác" đỉnh cao khiến cả phòng họp War Room quay cuồng đổ lỗi cho nhau! Hệ thống [${layerVi}] tiếp tục nằm thở oxy, còn ${culpritName} ung dung tắt máy đi về đúng 17h30!`;
+
+    const satiricalEn = isResolved
+      ? `AI Forensic Verdict: Despite ${culpritNameEn}'s classic excuse "It works on my machine!", the [${cCard.en}] trace exposed the truth. ${culpritNameEn} owes the entire War Room a round of boba tea!`
+      : `AI Forensic Verdict: Culprit ${culpritNameEn} pulled off the ultimate cover-up! While the War Room argued in circles, ${culpritNameEn} quietly closed their laptop and clocked out at 5:30 PM!`;
+
+    this.aiRcaReport = {
+      incidentId: this.caseId,
+      severity: isResolved ? 'SEV-1 (RESOLVED)' : 'SEV-0 (SLA BREACHED)',
+      statusVi: isResolved ? 'ĐÃ KHẮC PHỤC & BẮT ĐƯỢC THỦ PHẠM' : 'THỦ PHẠM THOÁT ÁN / SẬP TOÀN DIỆN',
+      statusEn: isResolved ? 'RESOLVED & CULPRIT CAUGHT' : 'UNRESOLVED / CULPRIT ESCAPED',
+      culpritName,
+      culpritNameEn,
+      accompliceName: accomplice ? accomplice.displayName : null,
+      witnessName: witness ? witness.displayName : null,
+      accuserName: accuser ? accuser.displayName : null,
+      incidentVi: `Sự cố sập tầng [${layerVi}] kéo dài qua ${this.round} vòng họp War Room với biểu hiện chính là [${rootCauseVi}].`,
+      incidentEn: `Outage on [${layerEn}] lasting ${this.round} War Room rounds with primary signature [${rootCauseEn}].`,
+      directCauseVi: `Thủ phạm [${culpritName}] đã thực hiện hành vi [${mCard.vi}] và để lộ dấu vết [${cCard.vi}] tại hiện trường.`,
+      directCauseEn: `Culprit [${culpritNameEn}] executed [${mCard.en}] and left behind [${cCard.en}] at the station.`,
+      rootCauseVi: `Nguyên nhân gốc rễ do [${rootCauseVi}] trên tầng [${layerVi}], cộng thêm việc thiếu kiểm soát quyền truy cập và duyệt PR lỏng lẻo.`,
+      rootCauseEn: `Root cause traced to [${rootCauseEn}] on [${layerEn}], compounded by lax access control and blind PR approvals.`,
+      preventiveActionVi: preventiveActionsVi[pickIdx],
+      preventiveActionEn: preventiveActionsEn[pickIdx % preventiveActionsEn.length],
+      satiricalVerdictVi: satiricalVi,
+      satiricalVerdictEn: satiricalEn
+    };
+
+    return this.aiRcaReport;
+  }
+
   finishGame(winnerTeam, reasonKey, textVi, textEn) {
     this.phase = GAME_PHASES.GAME_OVER;
     this.winnerTeam = winnerTeam;
@@ -1263,6 +1497,7 @@ export class DeceptionState {
       p.isRoleRevealed = true;
     });
     this.addLog(textVi, textEn, winnerTeam === 'INVESTIGATION' ? 'success' : 'crime');
+    this.generateAiRcaReport();
   }
 }
 

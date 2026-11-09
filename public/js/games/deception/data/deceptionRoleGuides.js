@@ -1,439 +1,440 @@
 /**
- * DECEPTION: MURDER IN VIET NAM - ROLE QUICK PLAYBOOKS & GUIDES
- * Comprehensive, concise, easy-to-understand guides for all 9 roles.
+ * WHO BROKE PROD? (Ai đã làm sập Production?) - ROLE QUICK PLAYBOOKS & GUIDES
+ * FSOFT MEN'S DAY 2026 • MEN GEN GAME EDITION
+ * Comprehensive, concise, easy-to-understand guides for all 9 IT Incident Response roles.
  * Includes: Core Goal, 3-Step Action Playbook, Crucial Rule/Pro Tip (Bilingual VI/EN).
  */
 
 export const ROLE_GUIDES = {
   "FORENSIC_SCIENTIST": {
     "roleId": "FORENSIC_SCIENTIST",
-    "title_vi": "Chuyên Gia Pháp Y",
-    "title_en": "Forensic Scientist",
+    "title_vi": "Tech Lead / Incident Commander",
+    "title_en": "Tech Lead / Incident Commander",
     "team": "INVESTIGATION",
-    "icon": "🔬",
-    "motto_vi": "Người nắm giữ chân tướng — Dẫn lối bằng đạn gỗ",
-    "motto_en": "Master of truth — Leading detectives via wooden markers",
-    "goal_vi": "Giúp Cảnh sát đoán đúng cặp Hung khí + Manh mối của Sát nhân trước khi hết 3 vòng.",
-    "goal_en": "Help the Investigators deduce the exact Means + Clue cards before Round 3 ends.",
+    "icon": "🖥️",
+    "motto_vi": "Chỉ huy War Room — Nắm rõ Root Cause, chỉ điểm bằng Marker",
+    "motto_en": "War Room Commander — Knows the Root Cause, guides via system markers",
+    "goal_vi": "Dẫn dắt Đội Ứng Phó tìm ra đúng cặp Hành vi (Xanh) + Dấu vết Log (Đỏ) của Thủ phạm trước khi hết 3 vòng.",
+    "goal_en": "Help Incident Responders deduce the exact Trigger + Log Trace cards before Round 3 ends.",
     "steps_vi": [
       {
         "num": 1,
-        "title": "Mở Mắt Trong Đêm",
-        "desc": "Thấy rõ ai là Kẻ Sát Nhân và cặp thẻ gây án (1 Hung khí Xanh + 1 Manh mối Đỏ)."
+        "title": "Soi Log Đêm Deploy",
+        "desc": "Thấy rõ ai là Thủ phạm (The Culprit) và cặp thẻ gây sập hệ thống (1 Hành vi Xanh + 1 Dấu vết Đỏ)."
       },
       {
         "num": 2,
-        "title": "Cắm 6 Viên Đạn Gợi Ý",
-        "desc": "Đặt 6 viên đạn vào các thẻ Hiện trường (Nguyên nhân tử vong, Địa điểm,...) để gợi ý tới 2 thẻ đó."
+        "title": "Ghim 6 Đạn Gỗ (Marker)",
+        "desc": "Đặt 6 viên đạn gỗ vào các thẻ Thông số Sự cố (Root Cause, Tầng bị sập, Hiện trạng...) để gợi ý tới 2 thẻ lỗi đó."
       },
       {
         "num": 3,
-        "title": "Đổi Thẻ Sau Mỗi Vòng",
-        "desc": "Đầu Vòng 2 & 3, rút 1 thẻ hiện trường mới thay thế 1 thẻ cũ để điều chỉnh hướng suy luận."
+        "title": "Cập Nhật Thông Số",
+        "desc": "Đầu Vòng 2 & 3, rút 1 thẻ Thông số mới thay thế 1 thẻ Nâu cũ để tinh chỉnh hướng truy vết cùng AI Log Analyzer."
       }
     ],
     "steps_en": [
       {
         "num": 1,
-        "title": "Witness in the Dark",
-        "desc": "See the Murderer and their chosen Means (Blue) and Clue (Red) cards."
+        "title": "Audit Deployment Night",
+        "desc": "See the Culprit and their chosen Trigger (Blue) and Log Trace (Red) cards."
       },
       {
         "num": 2,
-        "title": "Place 6 Bullet Markers",
-        "desc": "Place markers onto Scene Tiles (Cause of Death, Location, etc.) to evoke the murder cards."
+        "title": "Pin 6 System Markers",
+        "desc": "Place markers onto Incident Parameter tiles (Root Cause, Affected Layer, etc.) to evoke the bug cards."
       },
       {
         "num": 3,
-        "title": "Cycle Tiles Each Round",
-        "desc": "At the start of Rounds 2 and 3, replace 1 old Scene Tile to refine your clues."
+        "title": "Refresh Telemetry Each Round",
+        "desc": "At the start of Rounds 2 and 3, replace 1 old Brown Parameter Tile to refine your clues."
       }
     ],
-    "crucial_vi": "⚠️ ĐIỀU CẤM KỴ: Tuyệt đối KHÔNG NÓI CHUYỆN, gật/lắc đầu hay ra hiệu. Mọi giao tiếp CHỈ qua đạn gỗ!",
-    "crucial_en": "⚠️ STRICT RULE: Never speak, nod, shake head, or gesture. All communication is via wooden markers!"
+    "crucial_vi": "⚠️ ĐIỀU CẤM KỴ: Tuyệt đối KHÔNG NÓI CHUYỆN, chat gợi ý, gật/lắc đầu hay ra hiệu. Mọi chỉ dẫn CHỈ qua đạn gỗ trên bảng!",
+    "crucial_en": "⚠️ STRICT RULE: Never speak, nod, shake head, or gesture. All communication is strictly via system markers!"
   },
 
   "MURDERER": {
     "roleId": "MURDERER",
-    "title_vi": "Kẻ Sát Nhân",
-    "title_en": "The Murderer",
+    "title_vi": "The Culprit (Thủ phạm gây lỗi)",
+    "title_en": "The Culprit",
     "team": "CRIMINAL",
-    "icon": "🔪",
-    "motto_vi": "Bóng ma hiện trường — Trà trộn, đánh lạc hướng và đào tẩu",
-    "motto_en": "Shadow of the crime — Blend in, mislead, and escape",
-    "goal_vi": "Trốn thoát qua 3 vòng điều tra mà không bị bắt, hoặc ám sát thành công Nhân Chứng ở cuối trận.",
-    "goal_en": "Survive 3 rounds without being caught, or assassinate the Witness if exposed.",
+    "icon": "💣",
+    "motto_vi": "Sát thủ Production — Gây sập hệ thống, xóa dấu vết, đổ vạ đồng nghiệp",
+    "motto_en": "Production Saboteur — Crash the server, hide the logs, blame others",
+    "goal_vi": "Sống sót qua 3 vòng họp War Room mà không bị bắt lỗi, hoặc 'đổ vạ' (bắn) trúng Whistleblower ở cuối trận.",
+    "goal_en": "Survive 3 War Room rounds without being caught, or scapegoat the Whistleblower if exposed.",
     "steps_vi": [
       {
         "num": 1,
-        "title": "Chọn Thẻ Gây Án",
-        "desc": "Trong Đêm, chọn bí mật 1 Hung khí (Xanh) và 1 Manh mối (Đỏ) trên bàn của bạn để hạ sát nạn nhân."
+        "title": "Kích Hoạt Lỗi Đêm Khuya",
+        "desc": "Trong Đêm Deploy, bí mật chọn 1 thẻ Hành vi (Xanh) và 1 thẻ Dấu vết Log (Đỏ) của chính bạn làm nguyên nhân sập Prod."
       },
       {
         "num": 2,
-        "title": "Trà Trộn & Tung Hỏa Mù",
-        "desc": "Nói năng tự nhiên như người vô tội; khéo léo giải thích đạn Pháp y theo hướng trỏ vào thẻ của người khác."
+        "title": "Ngụy Trang & Đổ Lỗi",
+        "desc": "Tranh luận tự nhiên như người vô tội; phân tích đạn gỗ của Tech Lead theo hướng trỏ sang bài của đồng nghiệp khác."
       },
       {
         "num": 3,
-        "title": "Bắn Hạ Nhân Chứng",
-        "desc": "Nếu bị Cảnh sát bắt, bạn có 1 cơ hội cuối cùng: Đoán ai là Nhân chứng — nếu bắn trúng, bạn LẬT KÈO THẮNG!"
+        "title": "Đổ Vạ Whistleblower",
+        "desc": "Nếu bị bắt bài, bạn có 1 cơ hội cuối: Chỉ điểm ai là Whistleblower (Senior Dev) — nếu đoán trúng, phe bạn LẬT KÈO THẮNG!"
       }
     ],
     "steps_en": [
       {
         "num": 1,
-        "title": "Pick Crime Cards",
-        "desc": "At Night, secretly pick 1 Means (Blue) and 1 Clue (Red) in your own station."
+        "title": "Trigger the Outage",
+        "desc": "At Night, secretly pick 1 Trigger (Blue) and 1 Log Trace (Red) from your own station."
       },
       {
         "num": 2,
-        "title": "Blend in & Misdirect",
-        "desc": "Act innocent, join debate, and subtly interpret forensic clues toward other players."
+        "title": "Deflect & Blame",
+        "desc": "Act like a helpful responder and subtly interpret Tech Lead's markers toward other colleagues."
       },
       {
         "num": 3,
-        "title": "Shoot the Witness",
-        "desc": "If arrested, guess the Witness—hit correctly to steal the victory!"
+        "title": "Scapegoat the Whistleblower",
+        "desc": "If caught, identify the Whistleblower—hit correctly to steal the victory!"
       }
     ],
-    "crucial_vi": "💡 MẸO SỐNG CÒN: Quan sát xem ai đang cố lèo lái bàn chơi nhắm vào thẻ của bạn một cách bí hiểm — kẻ đó rất có thể là Nhân Chứng!",
-    "crucial_en": "💡 SURVIVAL TIP: Watch for anyone subtly steering the table toward your cards—they are likely the Witness!"
+    "crucial_vi": "💡 MẸO SỐNG CÒN: Để ý xem ai đang cố lèo lái cuộc họp nhắm vào bàn của bạn một cách đầy ẩn ý — đó rất có thể là Whistleblower!",
+    "crucial_en": "💡 SURVIVAL TIP: Watch for anyone subtly steering the War Room toward your cards—they are likely the Whistleblower!"
   },
 
   "INVESTIGATOR": {
     "roleId": "INVESTIGATOR",
-    "title_vi": "Điều Tra Viên",
-    "title_en": "Investigator",
+    "title_vi": "Incident Responder (Đội Ứng Phó)",
+    "title_en": "Incident Responder",
     "team": "INVESTIGATION",
-    "icon": "🕵️",
-    "motto_vi": "Lưới trời lồng lộng — Phân tích vật chứng, vạch trần tội ác",
-    "motto_en": "Seeker of truth — Analyze evidence, unmask the culprit",
-    "goal_vi": "Tìm ra ai là Kẻ Sát Nhân và đúng cặp Hung khí (Xanh) + Manh mối (Đỏ) của hắn.",
-    "goal_en": "Identify the true Murderer and their exact Means (Blue) + Clue (Red) cards.",
+    "icon": "🛠️",
+    "motto_vi": "Chiến binh trực chiến — Đọc vị Log, khoanh vùng Bug, chốt đơn Thủ phạm",
+    "motto_en": "On-call hero — Analyze logs, isolate the bug, pinpoint the Culprit",
+    "goal_vi": "Tìm ra đúng Thủ phạm gây lỗi và chính xác cặp thẻ Hành vi (Xanh) + Dấu vết Log (Đỏ) của người đó.",
+    "goal_en": "Identify the true Culprit and their exact Trigger (Blue) + Log Trace (Red) pair.",
     "steps_vi": [
       {
         "num": 1,
-        "title": "Soi Đạn Pháp Y",
-        "desc": "Đối chiếu 6 viên đạn trên các thẻ Hiện trường (Nguyên nhân tử vong, Địa điểm...) với thẻ các nghi can."
+        "title": "Phân Tích Chỉ Dấu & AI",
+        "desc": "Đối chiếu 6 viên đạn gỗ trên bảng Thông số Sự cố và bản tin AI Log Analyzer với các thẻ bài trên bàn."
       },
       {
         "num": 2,
-        "title": "Thảo Luận & Phản Biện",
-        "desc": "Tích cực trao đổi, tìm kiếm mối liên kết giữa các vật chứng và quan sát thái độ của từng người."
+        "title": "Họp War Room Phản Biện",
+        "desc": "Trao đổi nhanh gọn trong 2 phút, tìm mối liên hệ logic giữa Hành vi - Dấu vết và phát hiện kẻ đang tung hỏa mù."
       },
       {
         "num": 3,
-        "title": "Phá Án 1 Chạm",
-        "desc": "Khi chắc chắn, nhấp chọn 1 Hung khí + 1 Manh mối của nghi can rồi bấm [⚡ Phá án ngay]!"
+        "title": "Chốt Đơn Phá Án",
+        "desc": "Khi đã chắc chắn, chọn 1 Hành vi + 1 Dấu vết của nghi phạm rồi dùng Huy hiệu bấm [⚡ Chốt Thủ Phạm]!"
       }
     ],
     "steps_en": [
       {
         "num": 1,
-        "title": "Examine Markers",
-        "desc": "Compare the 6 bullet markers on Scene Tiles with evidence cards across all suspect stations."
+        "title": "Analyze Markers & AI Log",
+        "desc": "Compare the 6 markers on Incident Tiles and AI Log Analyzer reports with cards across all stations."
       },
       {
         "num": 2,
-        "title": "Debate & Interrogate",
-        "desc": "Discuss theories, look for creative interpretations of forensic clues, and spot inconsistencies."
+        "title": "Debate in the War Room",
+        "desc": "Discuss theories rapidly, connect triggers to log traces, and spot suspicious excuses."
       },
       {
         "num": 3,
-        "title": "Accuse in 1-Click",
-        "desc": "When confident, select 1 Means + 1 Clue on a suspect and click [⚡ Accuse Now]!"
+        "title": "Pinpoint the Bug",
+        "desc": "When confident, select 1 Trigger + 1 Log Trace on a suspect and spend your Badge to accuse!"
       }
     ],
-    "crucial_vi": "⚠️ LƯU Ý QUAN TRỌNG: Bạn chỉ có DUY NHẤT 1 HUY HIỆU PHÁ ÁN. Đoán sai sẽ mất vĩnh viễn quyền phá án (nhưng vẫn được thảo luận)!",
-    "crucial_en": "⚠️ CRUCIAL NOTE: You only have ONE BADGE. If incorrect, you lose your badge permanently (though you can still debate)!"
+    "crucial_vi": "⚠️ LƯU Ý QUAN TRỌNG: Mỗi người chỉ có DUY NHẤT 1 HUY HIỆU PHÁ ÁN. Bắt sai sẽ mất quyền chốt đơn (nhưng vẫn được thảo luận)!",
+    "crucial_en": "⚠️ CRUCIAL NOTE: You only have ONE BADGE. A wrong accusation costs your badge permanently!"
   },
 
   "ACCOMPLICE": {
     "roleId": "ACCOMPLICE",
-    "title_vi": "Đồng Phạm",
+    "title_vi": "The Accomplice (Kẻ đồng lõa)",
     "title_en": "The Accomplice",
     "team": "CRIMINAL",
     "icon": "🎭",
-    "motto_vi": "Tay trong bóng tối — Che chắn hung thủ, gây nhiễu cuộc điều tra",
-    "motto_en": "Partner in crime — Shield the killer, disrupt the investigation",
-    "goal_vi": "Bảo vệ Kẻ Sát Nhân không bị bắt, hoặc hỗ trợ Sát nhân tìm ra Nhân Chứng.",
-    "goal_en": "Protect the Murderer from being arrested, or help identify the Witness.",
+    "motto_vi": "Người bấm Approve PR — Biết rõ lỗi nhưng quyết tâm bao che đến cùng",
+    "motto_en": "Blind PR Approver — Knows the bug pair, dedicated to covering it up",
+    "goal_vi": "Tung hỏa mù bảo vệ Thủ phạm không bị bắt, hoặc giúp Thủ phạm tìm ra Whistleblower.",
+    "goal_en": "Protect the Culprit from being exposed, or help unmask the Whistleblower.",
     "steps_vi": [
       {
         "num": 1,
-        "title": "Biết Rõ Kẻ Gây Án",
-        "desc": "Trong Đêm mở mắt cùng Sát nhân, biết rõ ai là Sát nhân và cặp thẻ gây án đã chọn."
+        "title": "Nắm Rõ Kịch Bản Lỗi",
+        "desc": "Trong Đêm Deploy, bạn biết rõ ai là Thủ phạm và cặp bài (Hành vi + Dấu vết) đã làm sập Production."
       },
       {
         "num": 2,
-        "title": "Tung Hỏa Mù Tích Cực",
-        "desc": "Giải thích các viên đạn Pháp y theo hướng hợp lý nhưng lại trỏ vào thẻ của các Điều tra viên vô tội."
+        "title": "Tung Hỏa Mù Trong Họp",
+        "desc": "Diễn giải các marker của Tech Lead theo hướng cực kỳ hợp lý nhưng lại trỏ sang bài của đồng nghiệp vô tội."
       },
       {
         "num": 3,
-        "title": "Thu Hút Hỏa Lực",
-        "desc": "Nhận bớt nghi ngờ về mình hoặc dùng Huy hiệu phá án bừa để đánh lừa và làm rối Cảnh sát."
+        "title": "Đánh Lạc Hướng & Săn Tìm",
+        "desc": "Thu hút sự nghi ngờ về phía mình hoặc tiêu tốn Huy hiệu giả vờ bắt nhầm để làm loạn phòng họp."
       }
     ],
     "steps_en": [
       {
         "num": 1,
-        "title": "Meet the Murderer",
-        "desc": "At Night, wake up with the Murderer and learn their identity and the 2 murder cards."
+        "title": "Know the Bug Pair",
+        "desc": "At Night, learn who the Culprit is and which Trigger + Log Trace cards caused the outage."
       },
       {
         "num": 2,
-        "title": "Deploy Smoke & Mirrors",
-        "desc": "Provide clever arguments linking forensic markers to innocent players' cards."
+        "title": "Deploy Smoke Screens",
+        "desc": "Craft convincing arguments that link the Tech Lead's markers to innocent colleagues' cards."
       },
       {
         "num": 3,
-        "title": "Draw Fire",
-        "desc": "Attract suspicion onto yourself or spend your badge on a wrong accusation to mislead the police."
+        "title": "Draw Suspicion",
+        "desc": "Deflect heat away from the Culprit and help spot who is secretly acting as the Whistleblower."
       }
     ],
-    "crucial_vi": "💡 MẸO SỐNG CÒN: Nếu Sát nhân bị nghi ngờ, hãy gây chú ý để Sát nhân có cơ hội quan sát và tìm ra Nhân Chứng!",
-    "crucial_en": "💡 PRO TIP: If suspicion falls on the Murderer, draw attention to yourself so the Murderer can spot the Witness!"
+    "crucial_vi": "💡 MẸO SỐNG CÒN: Đừng bênh vực Thủ phạm quá lộ liễu! Hãy giả vờ nghi ngờ nhẹ rồi lái mũi dùi sang một cặp bài hấp dẫn khác.",
+    "crucial_en": "💡 PRO TIP: Never defend the Culprit too obviously—redirect the room toward a tempting decoy pair instead!"
   },
 
   "WITNESS": {
     "roleId": "WITNESS",
-    "title_vi": "Nhân Chứng",
-    "title_en": "The Witness",
+    "title_vi": "Whistleblower / Senior Dev",
+    "title_en": "Whistleblower / Senior Dev",
     "team": "INVESTIGATION",
     "icon": "👁️",
-    "motto_vi": "Đôi mắt vô hình — Thấy rõ tội ác nhưng phải giấu mình để sống sót",
-    "motto_en": "The silent eye — Sees the criminals but must stay hidden to survive",
-    "goal_vi": "Dẫn dắt Cảnh sát bắt đúng Kẻ Sát Nhân mà TUYỆT ĐỐI KHÔNG ĐƯỢC ĐỂ LỘ BẢN THÂN.",
-    "goal_en": "Guide the investigation to catch the Murderer while KEEPING YOUR IDENTITY HIDDEN.",
+    "motto_vi": "Bậc thầy đọc Git Blame — Biết mặt kẻ gây họa nhưng phải ẩn mình",
+    "motto_en": "Silent Senior Dev — Knows the suspects but must stay undercover",
+    "goal_vi": "Dẫn dắt Đội Ứng Phó bắt đúng Thủ phạm mà KHÔNG ĐỂ LỘ MÌNH LÀ WHISTLEBLOWER.",
+    "goal_en": "Guide the team to catch the Culprit while KEEPING YOUR IDENTITY HIDDEN.",
     "steps_vi": [
       {
         "num": 1,
-        "title": "Thấy Phe Tội Phạm",
-        "desc": "Trong Đêm, bạn thấy 2 kẻ gian (Sát nhân & Đồng phạm), nhưng KHÔNG BIẾT ai là ai và họ chọn thẻ gì."
+        "title": "Nhận Diện 2 Nghi Phạm",
+        "desc": "Trong Đêm, bạn thấy tên 2 người thuộc phe Gây Lỗi (Thủ phạm & Đồng lõa), nhưng KHÔNG BIẾT ai giữ vai nào."
       },
       {
         "num": 2,
-        "title": "Gợi Ý Khéo Léo",
-        "desc": "Tế nhị hướng bàn chơi vào thẻ của 2 người này, nhưng nói năng tự nhiên như người chưa biết gì."
+        "title": "Gợi Ý Tinh Tế",
+        "desc": "Khéo léo dựa vào đạn gỗ của Tech Lead để hướng mọi người soi kỹ bài của 2 nghi phạm này."
       },
       {
         "num": 3,
-        "title": "Ẩn Mình Cẩn Trọng",
-        "desc": "Đừng bao giờ khẳng định chắc nịch hoặc ép người khác, tránh bị Sát nhân nhận diện."
+        "title": "Giấu Mặt Tuyệt Đối",
+        "desc": "Tránh chỉ điểm quá gắt từ Vòng 1 kẻo Thủ phạm phát hiện và 'đổ vạ' ngược lại bạn lúc cuối trận."
       }
     ],
     "steps_en": [
       {
         "num": 1,
-        "title": "See the Culprits",
-        "desc": "At Night, see the 2 Criminals (Murderer & Accomplice), without knowing which is which."
+        "title": "Spot the Suspects",
+        "desc": "At Night, see the 2 Bug Team members (Culprit & Accomplice), without knowing which is which."
       },
       {
         "num": 2,
         "title": "Subtle Guidance",
-        "desc": "Nudge detectives toward these 2 suspects' cards using plausible, natural reasoning."
+        "desc": "Nudge responders toward those 2 stations using natural deduction from the system markers."
       },
       {
         "num": 3,
-        "title": "Stay in Shadows",
-        "desc": "Never sound overly certain or authoritative—acting too knowledgeable will expose you!"
+        "title": "Avoid Being Scapegoated",
+        "desc": "Do not sound overly certain—if the caught Culprit points at you at the end, the Bug Team steals the win!"
       }
     ],
-    "crucial_vi": "⚠️ NGUY HIỂM CHÍ MẠNG: Dù Cảnh sát phá án đúng, nhưng nếu Sát nhân bắn trúng bạn ở cuối trận, PHE CẢNH SÁT SẼ THUA!",
-    "crucial_en": "⚠️ DEADLY HAZARD: Even if police solve the case, if the Murderer shoots you at the end, THE POLICE LOSE!"
+    "crucial_vi": "⚠️ NGUY HIỂM CHÍ MẠNG: Dù Đội Ứng Phó bắt đúng Thủ phạm, nhưng nếu Thủ phạm đoán trúng bạn là Whistleblower thì PHE GÂY LỖI THẮNG!",
+    "crucial_en": "⚠️ DEADLY HAZARD: Even if the Culprit is caught, if they correctly scapegoat you at the end, THE BUG TEAM WINS!"
   },
 
   "LAB_TECHNICIAN": {
     "roleId": "LAB_TECHNICIAN",
-    "title_vi": "Kỹ Thuật Viên Phòng Lab",
-    "title_en": "Lab Technician",
+    "title_vi": "DevOps / QA Engineer",
+    "title_en": "DevOps / QA Engineer",
     "team": "INVESTIGATION",
     "icon": "🧪",
-    "motto_vi": "Khoa học hình sự — Kiểm chứng mẫu vật trực tiếp trong phòng thí nghiệm",
-    "motto_en": "Forensic testing — Test evidence directly in the laboratory",
-    "goal_vi": "Kiểm định 1 thẻ bài nghi vấn để mang lại manh mối thép cho phe Điều tra.",
-    "goal_en": "Test 1 suspicious card to provide definitive proof to the investigation.",
+    "motto_vi": "Chuyên gia Health Check — Chạy test thực nghiệm, xác thực nguồn lỗi",
+    "motto_en": "CI/CD & QA Specialist — Run health checks to verify the bug source",
+    "goal_vi": "Sử dụng quyền Health Check giữa Vòng 1 và 2 để kiểm chứng 1 thẻ bài đáng ngờ nhất trên bàn.",
+    "goal_en": "Run a Health Check between Round 1 and 2 to verify whether a suspicious card is part of the solution.",
     "steps_vi": [
       {
         "num": 1,
-        "title": "Đêm Hoạt Động Ngầm",
-        "desc": "Giữa Vòng 1 và Vòng 2, bí mật chọn 1 lá bài bất kỳ trên bàn để xét nghiệm trong phòng lab."
+        "title": "Chạy Health Check Đêm",
+        "desc": "Giữa Vòng 1 và Vòng 2, bí mật chọn 1 lá bài bất kỳ trên bàn để chạy script kiểm định."
       },
       {
         "num": 2,
-        "title": "Nhận Kết Quả",
-        "desc": "Hệ thống báo ngay kết quả: Lá bài đó có phải là một phần của vụ án hay không (Dương tính / Âm tính)."
+        "title": "Nhận Báo Cáo Tự Động",
+        "desc": "Hệ thống trả kết quả ngay lập tức: Thẻ đó CÓ thuộc đáp án làm sập Prod hay KHÔNG."
       },
       {
         "num": 3,
-        "title": "Dẫn Dắt Thông Minh",
-        "desc": "Dùng kết quả này để định hướng điều tra mà không để Sát nhân nghi bạn là Nhân chứng."
+        "title": "Dẫn Dắt Đội Ứng Phó",
+        "desc": "Tận dụng thông tin vàng này để khoanh vùng Thủ phạm hoặc đánh đánh lạc hướng rằng mình là Whistleblower để đỡ đạn!"
       }
     ],
     "steps_en": [
       {
         "num": 1,
-        "title": "Undercover Night Test",
-        "desc": "Between Round 1 and 2, secretly choose any 1 card on the table to run lab tests on."
+        "title": "Run Night Health Check",
+        "desc": "Between Round 1 and 2, secretly select any 1 card on the table to inspect."
       },
       {
         "num": 2,
-        "title": "Instant Result",
-        "desc": "Receive immediate feedback: Whether the card is positive (part of crime) or negative."
+        "title": "Instant Diagnostics",
+        "desc": "Learn immediately whether that card is part of the true Incident Solution."
       },
       {
         "num": 3,
-        "title": "Tactical Guidance",
-        "desc": "Use confirmed intel to guide the room without making yourself look like the Witness."
+        "title": "Steer the War Room",
+        "desc": "Use confirmed diagnostics to lock onto the Culprit without exposing the real Whistleblower."
       }
     ],
-    "crucial_vi": "💡 MẸO SỐNG CÒN: Mẫu Dương tính là bằng chứng vàng để bắt hung thủ; mẫu Âm tính giúp loại trừ ngay một hướng đi sai!",
-    "crucial_en": "💡 PRO TIP: A positive test is golden evidence; a negative test instantly eliminates a misleading rabbit hole!"
+    "crucial_vi": "💡 MẸO SỐNG CÒN: Nếu soi trúng thẻ ĐÚNG, bạn nắm giữ 50% đáp án! Bạn còn có thể giả làm Whistleblower để thu hút phát đạn cuối trận.",
+    "crucial_en": "💡 PRO TIP: Finding a matching card gives you 50% of the solution—and lets you act as a decoy for the Whistleblower!"
   },
 
   "INSIDE_MAN": {
     "roleId": "INSIDE_MAN",
-    "title_vi": "Nội Gián",
-    "title_en": "Inside Man",
+    "title_vi": "Log Tamperer (Kẻ xóa/sửa log)",
+    "title_en": "Log Tamperer",
     "team": "CRIMINAL",
     "icon": "🕶️",
-    "motto_vi": "Bàn tay giấu mặt — Đánh cắp huy hiệu, chặt đứt quyền lực cảnh sát",
-    "motto_en": "Hidden sabotage — Steal police badges, cripple the investigation",
-    "goal_vi": "Tê liệt khả năng phá án của Điều tra viên nguy hiểm nhất trên bàn.",
-    "goal_en": "Neutralize the most dangerous Investigator by stripping their badge.",
+    "motto_vi": "Bóng ma Root Access — Xóa lịch sử log, thu hồi quyền phá án",
+    "motto_en": "Root Access Phantom — Wipe the logs, revoke accusation privileges",
+    "goal_vi": "Vô hiệu hóa Huy hiệu Phá án của thành viên Đội Ứng Phó nguy hiểm nhất giữa Vòng 1 và 2.",
+    "goal_en": "Disable the Accusation Badge of the sharpest responder between Round 1 and 2.",
     "steps_vi": [
       {
         "num": 1,
-        "title": "Hành Động Trong Đêm",
-        "desc": "Giữa Vòng 1 và Vòng 2, bí mật chọn 1 Điều tra viên để đánh cắp Huy hiệu Phá án của họ."
+        "title": "Can Thiệp Quyền Truy Cập",
+        "desc": "Giữa Vòng 1 và Vòng 2, bí mật chọn 1 người chơi bất kỳ trên bàn để thu hồi Huy hiệu Phá án."
       },
       {
         "num": 2,
-        "title": "Tước Quyền Phá Án",
-        "desc": "Người bị chọn sẽ vĩnh viễn mất quyền bấm phá án trong toàn bộ các vòng còn lại."
+        "title": "Khóa Mõm Chốt Đơn",
+        "desc": "Người bị xóa quyền sẽ mất vĩnh viễn khả năng bấm [Chốt Thủ Phạm] trong phần còn lại của ván đấu."
       },
       {
         "num": 3,
-        "title": "Bảo Vệ Sát Nhân",
-        "desc": "Tiếp tục giả làm cảnh sát để tung tin giả và bảo vệ đồng bọn."
+        "title": "Hỗ Trợ Thủ Phạm",
+        "desc": "Tiếp tục đóng vai thành viên tích cực trong cuộc họp để làm nhiễu loạn thông tin."
       }
     ],
     "steps_en": [
       {
         "num": 1,
-        "title": "Undercover Strike",
-        "desc": "Between Round 1 and 2, secretly choose 1 player to steal their badge."
+        "title": "Revoke Access at Night",
+        "desc": "Between Round 1 and 2, secretly target 1 player to strip their Accusation Badge."
       },
       {
         "num": 2,
-        "title": "Neutralize Target",
-        "desc": "The chosen investigator permanently loses their right to make an accusation."
+        "title": "Disable Pinpointing",
+        "desc": "The targeted responder permanently loses the ability to make an official accusation."
       },
       {
         "num": 3,
-        "title": "Cover the Killer",
-        "desc": "Blend in, feed disinformation, and protect your criminal partner."
+        "title": "Cover the Outage",
+        "desc": "Blend into the War Room and sow confusion to run down the clock."
       }
     ],
-    "crucial_vi": "💡 MẸO SỐNG CÒN: Hãy tước huy hiệu của Điều tra viên có suy luận sắc sảo nhất hoặc người đang nghi ngờ đúng Sát nhân!",
-    "crucial_en": "💡 PRO TIP: Steal the badge of the sharpest detective or whoever is closest to unmasking the Murderer!"
+    "crucial_vi": "💡 MẸO SỐNG CÒN: Hãy nhắm vào người đang phân tích sát đáp án nhất ở Vòng 1 để chặt đứt mũi nhọn của Đội Ứng Phó!",
+    "crucial_en": "💡 PRO TIP: Target whoever made the sharpest deduction in Round 1 to silence the team's best investigator!"
   },
 
   "PROTECTIVE_DETAIL": {
     "roleId": "PROTECTIVE_DETAIL",
-    "title_vi": "Đặc Vụ Bảo Vệ",
-    "title_en": "Protective Detail",
+    "title_vi": "IT Support / Helpdesk",
+    "title_en": "IT Support / Helpdesk",
     "team": "INVESTIGATION",
     "icon": "🛡️",
-    "motto_vi": "Lá chắn thép — Thu hút hỏa lực, bảo vệ Nhân Chứng đến cùng",
-    "motto_en": "The steel shield — Draw fire, protect the Witness at all costs",
-    "goal_vi": "Lừa Kẻ Sát Nhân bắn vào bạn thay vì bắn vào Nhân Chứng ở cuối trận.",
-    "goal_en": "Shield the Witness by tricking the Murderer into shooting you at the end.",
+    "motto_vi": "Tuyến đầu đỡ đạn — Biết rõ Whistleblower, sẵn sàng chịu trận thay",
+    "motto_en": "Frontline Shield — Knows the Whistleblower, ready to take the blame",
+    "goal_vi": "Thu hút sự chú ý để Thủ phạm tưởng bạn là Whistleblower và bắn nhầm vào bạn lúc cuối trận.",
+    "goal_en": "Draw the Culprit's attention so they scapegoat you instead of the real Whistleblower.",
     "steps_vi": [
       {
         "num": 1,
-        "title": "Biết Rõ Nhân Chứng",
-        "desc": "Ngay trong pha Đêm, bạn được biết chính xác ai là Nhân Chứng thật của vụ án."
+        "title": "Biết Mặt Whistleblower",
+        "desc": "Ngay từ đầu ván, bạn được hệ thống mật báo chính xác ai là Whistleblower / Senior Dev."
       },
       {
         "num": 2,
-        "title": "Đóng Giả Nhân Chứng",
-        "desc": "Hành xử sắc sảo, tự tin để Kẻ Sát Nhân tin rằng bạn chính là Nhân Chứng."
+        "title": "Đóng Vai Kẻ Biết Tuốt",
+        "desc": "Phát biểu sắc bén, phụ họa theo ý của Whistleblower để Thủ phạm tin rằng bạn mới là người nắm thóp họ."
       },
       {
         "num": 3,
         "title": "Đỡ Đạn Cuối Trận",
-        "desc": "Nếu Sát nhân bị bắt và bắn vào bạn thay vì Nhân chứng, PHE CẢNH SÁT TOÀN THẮNG!"
+        "desc": "Nếu Thủ phạm bị bắt và chỉ điểm nhầm vào bạn thay vì Whistleblower thật, ĐỘI ỨNG PHÓ TOÀN THẮNG!"
       }
     ],
     "steps_en": [
       {
         "num": 1,
-        "title": "Know the Witness",
-        "desc": "At Night, learn the exact identity of the Witness."
+        "title": "Identify the Whistleblower",
+        "desc": "At Night, learn the exact identity of the real Whistleblower / Senior Dev."
       },
       {
         "num": 2,
-        "title": "Act as Decoy",
-        "desc": "Speak with keen insight and subtle confidence to draw the Murderer's eyes onto you."
+        "title": "Act Like the Senior Dev",
+        "desc": "Speak with bold confidence and echo the Whistleblower's leads to draw the Culprit's suspicion."
       },
       {
         "num": 3,
-        "title": "Take the Bullet",
-        "desc": "If the caught Murderer shoots you instead of the real Witness, THE POLICE WIN!"
+        "title": "Take the Scapegoat Shot",
+        "desc": "If the caught Culprit blames you instead of the real Whistleblower, THE RESPONSE TEAM WINS!"
       }
     ],
-    "crucial_vi": "💡 MẸO SỐNG CÒN: Hãy tự tin và thu hút sự chú ý! Bạn càng giống Nhân Chứng thì Nhân Chứng thật càng an toàn.",
-    "crucial_en": "💡 PRO TIP: Do not shy from attention! The more you look like the Witness, the safer the real Witness is."
+    "crucial_vi": "💡 MẸO SỐNG CÒN: Đừng ngại tỏa sáng! Bạn càng tỏ ra nguy hiểm thì Whistleblower thật càng được an toàn tuyệt đối.",
+    "crucial_en": "💡 PRO TIP: Be vocal and analytical! The more you look like the Whistleblower, the safer your teammate is."
   },
 
   "CONSULTING_DETECTIVE": {
     "roleId": "CONSULTING_DETECTIVE",
-    "title_vi": "Thám Tử Cố Vấn",
-    "title_en": "Consulting Detective",
+    "title_vi": "System Architect",
+    "title_en": "System Architect",
     "team": "INVESTIGATION",
-    "icon": "🔎",
-    "motto_vi": "Bậc thầy suy luận — Đổi phù hiệu lấy sự trong sạch tuyệt đối",
-    "motto_en": "Master deductive mind — Sacrifice badge to prove 100% innocence",
-    "goal_vi": "Chứng minh sự trong sạch tuyệt đối để thu hẹp diện nghi can cho cuộc điều tra.",
-    "goal_en": "Prove complete innocence to narrow down suspect pool for detectives.",
+    "icon": "🏗️",
+    "motto_vi": "Kiến trúc sư trưởng — Tự nguyện bỏ quyền phá án để chứng minh 100% trong sạch",
+    "motto_en": "Chief Architect — Discard badge to publicly prove 100% innocence",
+    "goal_vi": "Chứng minh mình 100% vô tội để loại bỏ hoàn toàn 8 lá bài của mình khỏi diện nghi vấn.",
+    "goal_en": "Flip your role card face-up to eliminate all 8 of your cards from suspicion.",
     "steps_vi": [
       {
         "num": 1,
-        "title": "Điều Tra Tự Do",
-        "desc": "Tham gia thảo luận và soi vật chứng như một thám tử độc lập."
+        "title": "Phân Tích Độc Lập",
+        "desc": "Tham gia mổ xẻ log và thông số sự cố cùng toàn bộ thành viên trong phòng họp."
       },
       {
         "num": 2,
-        "title": "Nộp Lại Huy Hiệu",
-        "desc": "Có thể chủ động hủy Huy hiệu Phá án để công khai lật mở thẻ vai trò của mình."
+        "title": "Lật Bài Chứng Minh",
+        "desc": "Bất kỳ lúc nào, bạn có thể tự nguyện nộp bỏ Huy hiệu Phá án để lật ngửa thẻ System Architect lên bàn."
       },
       {
         "num": 3,
-        "title": "Xóa Sổ Nghi Can",
-        "desc": "Khi được chứng minh vô tội, toàn bộ 8 thẻ bài trên trạm của bạn được loại bỏ 100%!"
+        "title": "Thu Hẹp Vòng Vây",
+        "desc": "Ngay khi lộ diện, toàn bộ 8 thẻ bài của bạn được xác nhận trong sạch 100%, giúp cả đội tập trung vào kẻ gian thật sự!"
       }
     ],
     "steps_en": [
       {
         "num": 1,
-        "title": "Analyze Freely",
-        "desc": "Analyze forensic evidence alongside all other detectives."
+        "title": "Audit Architecture",
+        "desc": "Analyze system parameters and debate alongside other responders."
       },
       {
         "num": 2,
-        "title": "Sacrifice Badge",
-        "desc": "Discard your Badge to publicly reveal your innocent role."
+        "title": "Sacrifice Badge to Reveal",
+        "desc": "Voluntarily discard your Badge at any time to publicly flip your role card face-up."
       },
       {
         "num": 3,
-        "title": "Clear Suspicion",
-        "desc": "Once revealed, all 8 cards at your station are 100% ruled out as murder cards!"
+        "title": "Clear Your Station",
+        "desc": "Once revealed, all 8 cards at your station are 100% ruled out as the outage cause!"
       }
     ],
-    "crucial_vi": "💡 MẸO SỐNG CÒN: Khi bàn chơi bị phân tâm vào thẻ của bạn, hãy dùng năng lực này để giải oan ngay lập tức!",
-    "crucial_en": "💡 PRO TIP: If suspicion focuses on your station, reveal yourself to immediately refocus on the true killer!"
+    "crucial_vi": "💡 MẸO SỐNG CÒN: Nếu thấy phe Gây Lỗi đang cố tình đổ vạ vào các thẻ bài trên bàn của bạn, hãy lật bài ngay để bẻ gãy âm mưu của chúng!",
+    "crucial_en": "💡 PRO TIP: Wait until the Bug Team tries to frame your cards, then flip your role to expose their lie!"
   }
 };

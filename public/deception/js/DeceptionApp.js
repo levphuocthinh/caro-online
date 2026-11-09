@@ -26,7 +26,7 @@ class DeceptionAppController {
     this.state = new DeceptionState();
     this.isVi = true;
     this.roundTimerId = null;
-    this.roundTimeLeft = 180; // 3 phút thảo luận tự do mỗi vòng
+    this.roundTimeLeft = 120; // 2 phút thảo luận tự do mỗi vòng (chuẩn MEN GEN GAME)
     this.isTimerPaused = false;
     this.speakerTimerId = null; // backward compatibility
     this.soundEnabled = true;
@@ -900,6 +900,15 @@ class DeceptionAppController {
         if (data.activeSceneTiles) {
           this.state.activeSceneTiles = data.activeSceneTiles;
         }
+        if (data.aiForensicReports) {
+          this.state.aiForensicReports = data.aiForensicReports;
+        }
+        if (data.latestAiLogReport) {
+          this.state.latestAiLogReport = data.latestAiLogReport;
+        }
+        if (data.aiRcaReport) {
+          this.state.aiRcaReport = data.aiRcaReport;
+        }
         if (data.isGameOver) {
           this.state.winnerTeam = data.winnerTeam;
           this.state.winReasonKey = data.winReasonKey;
@@ -926,8 +935,11 @@ class DeceptionAppController {
       this.socket.on('deception:bullet_placed', (data) => {
         if (data && data.activeSceneTiles) {
           this.state.activeSceneTiles = data.activeSceneTiles;
+          if (data.aiForensicReports) this.state.aiForensicReports = data.aiForensicReports;
+          if (data.latestAiLogReport) this.state.latestAiLogReport = data.latestAiLogReport;
           this.playAudio('bullet_drop');
           this.renderActiveSceneTiles();
+          this.renderAiForensicBanner();
           this.updateInvestigationTimeline();
         }
       });
@@ -953,6 +965,9 @@ class DeceptionAppController {
         }
         if (data.solution) {
           this.state.solution = data.solution;
+        }
+        if (data.aiRcaReport) {
+          this.state.aiRcaReport = data.aiRcaReport;
         }
         if (data.players) {
           data.players.forEach(revealed => {
@@ -997,6 +1012,9 @@ class DeceptionAppController {
         this.state.winReasonText = data.winReasonText;
         if (data.solution) {
           this.state.solution = data.solution;
+        }
+        if (data.aiRcaReport) {
+          this.state.aiRcaReport = data.aiRcaReport;
         }
         if (data.players) {
           data.players.forEach(revealed => {
@@ -1733,6 +1751,9 @@ class DeceptionAppController {
     this.state.round = data.publicState.round || 1;
     this.state.phase = data.publicState.phase || 'NIGHT_MURDER';
     this.state.activeSceneTiles = data.publicState.activeSceneTiles || [];
+    this.state.aiForensicReports = data.publicState.aiForensicReports || {};
+    this.state.latestAiLogReport = data.publicState.latestAiLogReport || null;
+    this.state.aiRcaReport = data.publicState.aiRcaReport || null;
 
     const inGameFeed = document.getElementById('ingame-chat-feed');
     if (inGameFeed) {
@@ -1777,7 +1798,7 @@ class DeceptionAppController {
     if (this.state.phase.startsWith('ROUND_') || this.state.phase === 'INVESTIGATION') {
       this.renderInvestigationTable();
       this.showView('view-investigation');
-      this.roundTimeLeft = data.publicState.roundTimeLimit || 180;
+      this.roundTimeLeft = data.publicState.roundTimeLimit || 120;
       this.startRoundTimer();
     } else {
       this.showRoleReveal();
@@ -1984,20 +2005,20 @@ class DeceptionAppController {
     if (alliesBox) alliesBox.style.display = 'none';
 
     if (isMurderer) {
-      if (headline) headline.textContent = this.isVi ? 'Bạn Là Kẻ Sát Nhân' : 'You Are The Murderer';
+      if (headline) headline.textContent = this.isVi ? 'Bạn Là The Culprit (Thủ Phạm Gây Lỗi)' : 'You Are The Culprit';
       if (sub) sub.textContent = this.isVi
-        ? 'Hãy chọn 1 Hung Khí (Xanh) và 1 Manh Mối (Đỏ) của chính bạn để gây án.'
-        : 'Select 1 Blue Means and 1 Red Clue from your hand to commit the crime.';
+        ? 'Hãy chọn 1 Hành Vi Gây Lỗi (Xanh) và 1 Dấu Vết Log (Đỏ) trên bàn của bạn để làm sập Production.'
+        : 'Select 1 Blue Trigger/Action and 1 Red Evidence/Log Trace from your hand to break Production.';
 
       if (murdererPicker) murdererPicker.style.display = 'flex';
       if (intelBox) intelBox.style.display = 'none';
 
       this.renderNightMurdererHand();
     } else {
-      if (headline) headline.textContent = this.isVi ? 'Màn Đêm Phố Cổ...' : 'Night Falls Over The City...';
+      if (headline) headline.textContent = this.isVi ? 'Ca Trực Đêm 02:00 AM...' : '02:00 AM On-Call Shift...';
       if (sub) sub.textContent = this.isVi
-        ? 'Kẻ Sát Nhân đang bí mật gây án trong bóng tối.'
-        : 'The Murderer is operating secretly in the shadows.';
+        ? 'The Culprit đang bí mật thao tác gây sập hệ thống Production.'
+        : 'The Culprit is secretly triggering a Production outage.';
 
       if (murdererPicker) murdererPicker.style.display = 'none';
       if (intelBox) intelBox.style.display = 'flex';
@@ -2185,7 +2206,8 @@ class DeceptionAppController {
     } else {
       // Pháp y là Bot tự động đặt đạn xong -> Bắt đầu Vòng tranh luận tự do 1 (3:00)
       this.state.startPresentationPhase();
-      this.roundTimeLeft = 180;
+      this.roundTimeLeft = 120;
+      this.renderAiForensicBanner();
       this.startRoundTimer();
     }
   }
@@ -2195,7 +2217,39 @@ class DeceptionAppController {
     this.updateInvestigationTimeline();
     this.updateDiscussionHud();
     this.renderActiveSceneTiles();
+    this.renderAiForensicBanner();
     this.renderAuthenticSuspectsTable();
+  }
+
+  renderAiForensicBanner() {
+    const banner = document.getElementById('ai-forensic-analyzer-banner');
+    const titleEl = document.getElementById('ai-forensic-title');
+    const sevEl = document.getElementById('ai-forensic-severity');
+    const msgEl = document.getElementById('ai-forensic-message');
+    if (!banner || !msgEl) return;
+
+    const round = this.state.round || 1;
+    if (!this.isOnlineMatch && this.state.areAllSceneTilesMarked() && (!this.state.aiForensicReports || !this.state.aiForensicReports[round])) {
+      this.state.generateAiRoundLogAnalysis(round);
+    }
+
+    const report = (this.state.aiForensicReports && this.state.aiForensicReports[round]) || this.state.latestAiLogReport;
+    if (titleEl) {
+      titleEl.textContent = this.isVi
+        ? `🤖 AI FORENSIC MASTER • PHÂN TÍCH LOG VÒNG ${round}`
+        : `🤖 AI FORENSIC MASTER • ROUND ${round} LOG ANALYZER`;
+    }
+    if (report) {
+      if (sevEl) {
+        sevEl.textContent = `${report.severity || 'SEV-1'} • CONFIDENCE ${report.confidence || 85}%`;
+      }
+      msgEl.textContent = this.isVi ? report.message_vi : report.message_en;
+    } else {
+      if (sevEl) sevEl.textContent = 'WAITING FOR TECH LEAD';
+      msgEl.textContent = this.isVi
+        ? '🤖 AI Log Analyzer: Đang chờ Tech Lead ghim đủ 6 chỉ dấu thông số sự cố để chạy mô hình chẩn đoán...'
+        : '🤖 AI Log Analyzer: Waiting for Tech Lead to pin all 6 incident parameter markers...';
+    }
   }
 
   updateInvestigationTimeline() {
@@ -2377,12 +2431,12 @@ class DeceptionAppController {
         }
 
         // Sinh lời thoại suy luận của Bot định kỳ
-        if (this.roundTimeLeft === 120 || this.roundTimeLeft === 60) {
+        if (this.roundTimeLeft === 90 || this.roundTimeLeft === 45) {
           this.state.generateBotRoundDeductions();
         }
 
-        // Cơ hội phá án của Bot Investigator (chỉ dành cho Chơi Đơn)
-        if (!this.isOnlineMatch && (this.roundTimeLeft === 90 || this.roundTimeLeft === 30)) {
+        // Cơ hội phá án của Bot Incident Responder (chỉ dành cho Chơi Đơn)
+        if (!this.isOnlineMatch && (this.roundTimeLeft === 75 || this.roundTimeLeft === 25)) {
           const human = this.state.getHumanPlayer();
           if (human && (human.role === 'FORENSIC_SCIENTIST' || human.team === 'CRIMINAL')) {
             const botAttempt = this.state.triggerBotAccusationAttempt();
@@ -2476,27 +2530,27 @@ class DeceptionAppController {
 
     if (roundBadge) {
       if (round === 1) {
-        roundBadge.innerHTML = `<i class="fa-solid fa-comments"></i> ${this.isVi ? 'VÒNG 1: TRANH LUẬN TỰ DO' : 'ROUND 1: OPEN DISCUSSION'}`;
+        roundBadge.innerHTML = `<i class="fa-solid fa-comments"></i> ${this.isVi ? 'VÒNG 1: HỘI CHẨN WAR ROOM (2 PHÚT)' : 'ROUND 1: WAR ROOM TRIAGE (2 MIN)'}`;
       } else if (round === 2) {
-        roundBadge.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> ${this.isVi ? 'VÒNG 2: TRANH LUẬN (ĐÃ ĐỔI 1 THẺ NÂU)' : 'ROUND 2: DISCUSSION (1 TILE SWAPPED)'}`;
+        roundBadge.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> ${this.isVi ? 'VÒNG 2: TRACE LOG (ĐÃ ĐỔI 1 THẺ THÔNG SỐ)' : 'ROUND 2: LOG TRACE (1 PARAMETER SWAPPED)'}`;
       } else {
-        roundBadge.innerHTML = `<i class="fa-solid fa-gavel"></i> ${this.isVi ? 'VÒNG 3: TRANH LUẬN LƯỢT CUỐI (CHỐT ÁN)' : 'ROUND 3: FINAL CALL FOR ACCUSATION'}`;
+        roundBadge.innerHTML = `<i class="fa-solid fa-gavel"></i> ${this.isVi ? 'VÒNG 3: CHỐT RCA CUỐI CÙNG (2 PHÚT)' : 'ROUND 3: FINAL RCA CALL (2 MIN)'}`;
       }
     }
 
     if (guidance) {
       if (round === 1) {
         guidance.textContent = this.isVi
-          ? '🗣️ Cả phòng tự do bàn luận qua Mic/Chat! Soi 6 đạn Pháp Y với thẻ nghi phạm. Bất kỳ ai có Huy hiệu đều có thể bấm [Phá Án] bất cứ lúc nào!'
-          : '🗣️ Free discussion for everyone! Match 6 forensic pegs with suspect cards. Anyone with a badge can Accuse at any time!';
+          ? '🗣️ Cả War Room tự do thảo luận (2 phút/vòng)! Đối chiếu 6 Marker của Tech Lead & bản tin AI Log Analyzer với thẻ của nghi phạm để chốt lỗi!'
+          : '🗣️ Open War Room triage (2m/round)! Match Tech Lead markers & AI Log Analyzer hints with suspect cards!';
       } else if (round === 2) {
         guidance.textContent = this.isVi
-          ? '🔍 Pháp Y đã đổi 1 thẻ hiện trường mới! Hãy đối chiếu lại để loại trừ những nghi phạm vô tội.'
-          : '🔍 Forensic Scientist swapped a scene tile! Re-examine cards to eliminate innocent suspects.';
+          ? '🔍 Tech Lead đã cập nhật thêm 1 thẻ Thông Số Sự Cố mới! Xem ngay phân tích mới từ AI Forensic Master.'
+          : '🔍 Tech Lead swapped an Incident Parameter tile! Check the updated AI Forensic Master report.';
       } else {
         guidance.textContent = this.isVi
-          ? '🚨 Lượt thảo luận cuối cùng! Nếu hết giờ mà không ai phá đúng, Kẻ Sát Nhân sẽ trốn thoát vĩnh viễn!'
-          : '🚨 Final round! If time runs out without a correct accusation, the Murderer escapes forever!';
+          ? '🚨 Lượt họp khẩn cuối cùng! Nếu hết giờ mà chưa bắt đúng The Culprit, hệ thống sập hoàn toàn và thủ phạm cao chạy xa bay!'
+          : '🚨 Final triage round! If time expires without catching The Culprit, Production stays down!';
       }
     }
 
@@ -2549,7 +2603,7 @@ class DeceptionAppController {
           }
           this.playAudio('gavel');
           this.state.startPresentationPhase();
-          this.roundTimeLeft = 180;
+          this.roundTimeLeft = 120;
           this.renderInvestigationTable();
           this.startRoundTimer();
         });
@@ -2587,7 +2641,7 @@ class DeceptionAppController {
           }
           this.playAudio('gavel');
           this.state.startPresentationPhase();
-          this.roundTimeLeft = 180;
+          this.roundTimeLeft = 120;
           this.renderInvestigationTable();
           this.startRoundTimer();
         });
@@ -2602,9 +2656,9 @@ class DeceptionAppController {
         tile.color === 'GREEN' ? 'tile-green' : 'tile-brown';
 
       const badgeName =
-        tile.color === 'PURPLE' ? (this.isVi ? 'NGUYÊN NHÂN TỬ VONG' : 'CAUSE OF DEATH') :
-        tile.color === 'GREEN' ? (this.isVi ? 'ĐỊA ĐIỂM GÂY ÁN' : 'LOCATION OF CRIME') :
-        (this.isVi ? `HIỆN TRƯỜNG (VÒNG ${tile.roundPlaced || 1})` : `SCENE (ROUND ${tile.roundPlaced || 1})`);
+        tile.color === 'PURPLE' ? (this.isVi ? 'ROOT CAUSE (NGUYÊN NHÂN GỐC)' : 'ROOT CAUSE') :
+        tile.color === 'GREEN' ? (this.isVi ? 'TẦNG HỆ THỐNG BỊ SẬP' : 'AFFECTED LAYER') :
+        (this.isVi ? `THÔNG SỐ SỰ CỐ (VÒNG ${tile.roundPlaced || 1})` : `INCIDENT PARAM (R${tile.roundPlaced || 1})`);
 
       return `
         <div class="scene-tile-card ${colorClass}">
@@ -2785,7 +2839,7 @@ class DeceptionAppController {
                 return `
                   <div class="table-card-item card-blue ${isPinned ? 'is-pinned' : ''} ${isSolutionMeans ? 'is-crime-solution solution-means' : ''}" data-card-id="${m.id}" data-card-type="MEANS" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Hung khí này' : 'Click to select this Means')}">
                     ${isPinned ? `<span class="card-pin-indicator" title="Đã chọn nghi vấn">📌</span>` : ''}
-                    <span class="card-type-tag tag-blue">${this.isVi ? 'HUNG KHÍ' : 'MEANS'}</span>
+                    <span class="card-type-tag tag-blue">${this.isVi ? 'HÀNH VI LỖI' : 'TRIGGER'}</span>
                     <div class="card-icon-area">
                       ${renderCardIconHtml(m, 'card-svg')}
                       <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${m.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
@@ -2812,7 +2866,7 @@ class DeceptionAppController {
                 return `
                   <div class="table-card-item card-red ${isPinned ? 'is-pinned' : ''} ${isSolutionClue ? 'is-crime-solution solution-clue' : ''}" data-card-id="${c.id}" data-card-type="CLUE" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Manh mối này' : 'Click to select this Clue')}">
                     ${isPinned ? `<span class="card-pin-indicator" title="Đã chọn nghi vấn">📌</span>` : ''}
-                    <span class="card-type-tag tag-red">${this.isVi ? 'MANH MỐI' : 'CLUE'}</span>
+                    <span class="card-type-tag tag-red">${this.isVi ? 'DẤU VẾT LOG' : 'LOG TRACE'}</span>
                     <div class="card-icon-area">
                       ${renderCardIconHtml(c, 'card-svg')}
                       <button type="button" class="card-inspect-trigger-btn" data-inspect-card="${c.id}" data-owner-name="${s.displayName}" title="${this.isVi ? 'Xem chi tiết thẻ' : 'Inspect card'}">
@@ -3011,7 +3065,7 @@ class DeceptionAppController {
 
   startInvestigationRoundAfterEvidence() {
     const human = this.state.getHumanPlayer();
-    this.roundTimeLeft = 180; // 3 phút thảo luận tự do mới
+    this.roundTimeLeft = 120; // 2 phút thảo luận tự do mỗi vòng
     this.renderInvestigationTable();
     this.showView('view-investigation');
 
@@ -3532,8 +3586,8 @@ class DeceptionAppController {
     const roster = document.getElementById('dossier-roster');
 
     if (headline) headline.textContent = isPoliceWin
-      ? (this.isVi ? 'PHE CẢNH SÁT CHIẾN THẮNG!' : 'INVESTIGATION TEAM WINS!')
-      : (this.isVi ? 'PHE TỘI PHẠM CHIẾN THẮNG!' : 'CRIMINAL FACTION WINS!');
+      ? (this.isVi ? 'ĐỘI ỨNG PHÓ SỰ CỐ CHIẾN THẮNG!' : 'INCIDENT RESPONSE TEAM WINS!')
+      : (this.isVi ? 'PHE GÂY LỖI PRODUCTION CHIẾN THẮNG!' : 'BUG CULPRIT TEAM WINS!');
 
     if (sub) {
       const reasonObj = this.state.winReasonText;
@@ -3556,13 +3610,50 @@ class DeceptionAppController {
         return `
           <div class="roster-chip" style="border-left: 3px solid ${color};">
             <b>${p.avatar} ${p.displayName}:</b> <span style="color: ${color}; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;"><span class="tile-icon-area" style="width: 16px; height: 16px;">${renderRoleIconHtml(p.role, 'chip-svg')}</span> ${this.isVi ? def.name_vi : def.name_en}</span>
-            ${isMurderer ? '<span style="color: var(--crimson); font-weight: 900; margin-left: 4px;">[HUNG THỦ]</span>' : ''}
+            ${isMurderer ? '<span style="color: var(--crimson); font-weight: 900; margin-left: 4px;">[THE CULPRIT]</span>' : ''}
           </div>
         `;
       }).join('');
     }
 
+    this.renderAiRcaReport();
     this.showView('view-game-over');
+  }
+
+  renderAiRcaReport() {
+    if (!this.state.aiRcaReport && typeof this.state.generateAiRcaReport === 'function') {
+      this.state.generateAiRcaReport();
+    }
+    const rca = this.state.aiRcaReport;
+    if (!rca) return;
+
+    const incEl = document.getElementById('rca-val-incident');
+    const dirEl = document.getElementById('rca-val-direct');
+    const rootEl = document.getElementById('rca-val-root');
+    const prevEl = document.getElementById('rca-val-preventive');
+    const verdEl = document.getElementById('rca-val-verdict');
+    const hdrEl = document.getElementById('ai-rca-header-title');
+
+    if (hdrEl) {
+      hdrEl.textContent = this.isVi
+        ? '📋 BẢN TỔNG HỢP RCA TỰ ĐỘNG (AI POST-MORTEM ANALYSIS)'
+        : '📋 AUTOMATED RCA REPORT (AI POST-MORTEM ANALYSIS)';
+    }
+    if (incEl) incEl.textContent = this.isVi ? rca.incident_vi : rca.incident_en;
+    if (dirEl) dirEl.textContent = this.isVi ? rca.direct_cause_vi : rca.direct_cause_en;
+    if (rootEl) rootEl.textContent = this.isVi ? rca.root_cause_vi : rca.root_cause_en;
+    if (prevEl) prevEl.textContent = this.isVi ? rca.preventive_action_vi : rca.preventive_action_en;
+    if (verdEl) verdEl.textContent = this.isVi ? rca.satirical_verdict_vi : rca.satirical_verdict_en;
+
+    const copyBtn = document.getElementById('btn-copy-rca');
+    if (copyBtn) {
+      copyBtn.onclick = () => {
+        const text = this.isVi
+          ? `[WHO BROKE PROD? - BÁO CÁO RCA #${rca.caseId}]\n• Incident: ${rca.incident_vi}\n• Direct Cause: ${rca.direct_cause_vi}\n• Root Cause: ${rca.root_cause_vi}\n• Preventive Action: ${rca.preventive_action_vi}\n• AI Verdict: ${rca.satirical_verdict_vi}`
+          : `[WHO BROKE PROD? - RCA REPORT #${rca.caseId}]\n• Incident: ${rca.incident_en}\n• Direct Cause: ${rca.direct_cause_en}\n• Root Cause: ${rca.root_cause_en}\n• Preventive Action: ${rca.preventive_action_en}\n• AI Verdict: ${rca.satirical_verdict_en}`;
+        this.copyToClipboard(text, this.isVi ? '📋 Đã sao chép Bản Báo Cáo RCA vào bộ nhớ tạm!' : '📋 Copied RCA Report to clipboard!');
+      };
+    }
   }
 
   /* =========================================================================

@@ -1,14 +1,16 @@
 /**
- * DECEPTION: MURDER IN HONG KONG / VIET NAM - COMPLETE OFFICIAL DATASET
- * - 9 Roles (5 Core + 3 Undercover Allies + 1 Promo)
- * - 26 Scene Tiles (1 Purple Cause of Death, 4 Green Locations, 21 Brown Scene Tiles = 156 bilingual options)
- * - 7 Event Tiles (6 Core + 1 Undercover Allies)
- * - 90 Means of Murder Cards (M001 - M090, Blue Cards)
- * - 200 Key Evidence / Clue Cards (C001 - C200, Red Cards)
+ * WHO BROKE PROD? (Ai đã làm sập Production?) - COMPLETE IT INCIDENT DATASET
+ * FSOFT MEN'S DAY 2026 • MEN GEN GAME EDITION
+ * - 9 IT Incident Response Roles
+ * - 26 Incident Parameter Tiles (1 Purple Root Cause, 4 Green Affected Layers, 21 Brown System State Tiles = 156 bilingual options)
+ * - 7 Incident Event Tiles
+ * - 90 Trigger / Action Cards (M001 - M090, Blue Cards)
+ * - 200 Evidence / Log Trace Cards (C001 - C200, Red Cards)
  */
 
 export const DECEPTION_META = {
-  "game": "Deception: Murder in Hong Kong",
+  "game": "WHO BROKE PROD? (Ai đã làm sập Production?)",
+  "subtitle": "FSOFT MEN'S DAY 2026 • MEN GEN GAME EDITION",
   "supportedPlayers": {
     "min": 4,
     "max": 9,
@@ -28,73 +30,73 @@ export const DECEPTION_META = {
 export const ROLE_DEFINITIONS = {
   "FORENSIC_SCIENTIST": {
     "id": "FORENSIC_SCIENTIST",
-    "name_vi": "Chuyên gia Pháp y",
-    "name_en": "Forensic Scientist",
+    "name_vi": "Tech Lead / Incident Commander",
+    "name_en": "Tech Lead / Incident Commander",
     "team": "INVESTIGATION",
-    "icon": "🔬",
+    "icon": "🖥️",
     "minPlayers": 4,
     "isOpenRole": true,
     "hasCards": false,
     "hasBadge": false,
-    "desc_vi": "Biết rõ chân tướng vụ án nhưng không được phép nói hay ra hiệu bằng lời. Dẫn dắt các Điều tra viên bằng cách đặt 6 viên đạn gỗ lên các Thẻ Hiện Trường.",
-    "desc_en": "Knows the full solution but cannot speak or gesture. Guides Investigators solely by placing wooden bullets onto the Scene Tiles."
+    "desc_vi": "Biết rõ sự thật (ai làm sập Prod và bằng cặp bài nào) nhưng không được nói hay ra hiệu trực tiếp. Chỉ dùng 6 'đạn gỗ' (Marker) để đánh dấu vào các thẻ Thông số Sự cố (Incident Parameters).",
+    "desc_en": "Knows the full incident truth but cannot speak or gesture. Guides the response team solely by placing 6 wooden markers onto the Incident Parameter tiles."
   },
   "MURDERER": {
     "id": "MURDERER",
-    "name_vi": "Kẻ Sát Nhân",
-    "name_en": "Murderer",
+    "name_vi": "The Culprit (Thủ phạm gây lỗi)",
+    "name_en": "The Culprit",
     "team": "CRIMINAL",
-    "icon": "🔪",
+    "icon": "💣",
     "minPlayers": 4,
     "isOpenRole": false,
     "hasCards": true,
     "hasBadge": true,
-    "desc_vi": "Vào Pha Đêm, bí mật chọn 1 lá Phương thức (Xanh) và 1 lá Manh mối (Đỏ) của chính mình làm hung khí & vật chứng. Trà trộn và đánh lạc hướng cho đến hết Vòng 3.",
-    "desc_en": "At Night, secretly chooses 1 Means card and 1 Clue card from their own hand. Survive 3 rounds or assassinate the Witness if caught."
+    "desc_vi": "Người bí mật chọn 1 Hành vi gây lỗi (Xanh) và 1 Dấu vết Log (Đỏ) của chính mình vào ban đêm (Deployment Night). Ngụy trang trong cuộc họp War Room suốt 3 vòng hoặc 'đổ vạ' (bắn) trúng Whistleblower lúc cuối trận!",
+    "desc_en": "Secretly selects 1 Trigger/Action card (Blue) and 1 Evidence/Log Trace card (Red) at Night. Survive 3 rounds or scapegoat the Whistleblower if caught!"
   },
   "INVESTIGATOR": {
     "id": "INVESTIGATOR",
-    "name_vi": "Điều tra viên",
-    "name_en": "Investigator",
+    "name_vi": "Incident Responder (Đội Ứng Phó)",
+    "name_en": "Incident Responder",
     "team": "INVESTIGATION",
-    "icon": "🕵️",
+    "icon": "🛠️",
     "minPlayers": 4,
     "isOpenRole": false,
     "hasCards": true,
     "hasBadge": true,
-    "desc_vi": "Phân tích các viên đạn gợi ý từ Pháp y, tranh luận trong 30 giây mỗi vòng và sử dụng Huy hiệu Cảnh sát để chỉ định chính xác cặp Phương thức + Manh mối của Kẻ Sát Nhân.",
-    "desc_en": "Analyze the Forensic Scientist's scene markers, debate suspects, and spend your single Badge to accuse the Murderer's exact Means + Clue pair."
+    "desc_vi": "Thành viên đội ứng phó sự cố: Phân tích log từ Tech Lead và AI Log Analyzer, tranh luận nhanh và dùng Huy hiệu Phá án để chốt đơn bắt đúng cặp (Hành vi + Dấu vết) của Thủ phạm.",
+    "desc_en": "Incident Response Team member: Analyze system logs and markers, debate suspects, and spend your single Badge to pinpoint the Culprit's exact Trigger + Log Trace pair."
   },
   "ACCOMPLICE": {
     "id": "ACCOMPLICE",
-    "name_vi": "Đồng phạm",
-    "name_en": "Accomplice",
+    "name_vi": "The Accomplice (Kẻ đồng lõa)",
+    "name_en": "The Accomplice",
     "team": "CRIMINAL",
     "icon": "🎭",
     "minPlayers": 6,
     "isOpenRole": false,
     "hasCards": true,
     "hasBadge": true,
-    "desc_vi": "Biết ai là Kẻ Sát Nhân và cặp bài Phương thức + Manh mối đã chọn. Hỗ trợ đánh lạc hướng cuộc điều tra để bảo vệ hung thủ.",
-    "desc_en": "Knows the Murderer and their chosen Means + Clue pair. Helps deflect suspicion away from the true culprit."
+    "desc_vi": "Người bấm Approve PR mù quáng! Biết rõ ai là Thủ phạm và cặp bài gây lỗi đã chọn, tìm cách tung hỏa mù và lái hướng điều tra sang đồng nghiệp vô tội trong cuộc họp.",
+    "desc_en": "Knows the Culprit and the exact Trigger + Log Trace bug pair. Throws smoke screens in the War Room meeting to deflect blame."
   },
   "WITNESS": {
     "id": "WITNESS",
-    "name_vi": "Nhân chứng",
-    "name_en": "Witness",
+    "name_vi": "Whistleblower / Senior Dev",
+    "name_en": "Whistleblower / Senior Dev",
     "team": "INVESTIGATION",
     "icon": "👁️",
     "minPlayers": 6,
     "isOpenRole": false,
     "hasCards": true,
     "hasBadge": true,
-    "desc_vi": "Biết 2 nghi phạm thuộc phe Tội phạm (Sát nhân & Đồng phạm) nhưng không rõ ai giữ vai nào. Phải dẫn dắt khéo léo vì nếu Sát nhân bị bắt nhưng đoán trúng bạn là Nhân chứng, Tội phạm sẽ lật kèo thắng!",
-    "desc_en": "Sees the Murderer and Accomplice at Night without knowing which is which. Stay hidden—if the caught Murderer shoots you at the end, Criminals steal the win!"
+    "desc_vi": "Biết 2 nghi phạm phe Gây Lỗi (Thủ phạm & Đồng lõa) nhưng không rõ ai là người gõ lệnh. Phải dẫn dắt khéo léo và giấu mặt để không bị Thủ phạm 'đổ vạ' (bắn) lúc cuối trận!",
+    "desc_en": "Knows the 2 suspects on the Bug Team (Culprit & Accomplice) without knowing who is who. Stay hidden so the Culprit cannot scapegoat you at the end!"
   },
   "LAB_TECHNICIAN": {
     "id": "LAB_TECHNICIAN",
-    "name_vi": "Kỹ thuật viên Phòng Lab",
-    "name_en": "Lab Technician",
+    "name_vi": "DevOps / QA Engineer",
+    "name_en": "DevOps / QA Engineer",
     "team": "INVESTIGATION",
     "icon": "🧪",
     "minPlayers": 7,
@@ -102,13 +104,13 @@ export const ROLE_DEFINITIONS = {
     "isOpenRole": false,
     "hasCards": true,
     "hasBadge": true,
-    "desc_vi": "Bản mở rộng Undercover Allies: Giữa Vòng 1 và Vòng 2, được bí mật kiểm tra 1 lá bài bất kỳ trên bàn xem có nằm trong đáp án vụ án hay không.",
-    "desc_en": "Undercover Allies Expansion: Between Round 1 and 2, secretly inspects 1 card on the table to learn whether it is part of the Crime Solution."
+    "desc_vi": "Chuyên gia CI/CD & QA: Giữa Vòng 1 và Vòng 2 được chạy 'Health Check' kiểm tra bí mật 1 thẻ bài trên bàn xem có thuộc đáp án lỗi làm sập Production hay không.",
+    "desc_en": "Between Round 1 and Round 2, runs a secret Health Check on 1 card on the table to verify whether it belongs to the actual Incident Solution."
   },
   "INSIDE_MAN": {
     "id": "INSIDE_MAN",
-    "name_vi": "Nội gián",
-    "name_en": "Inside Man",
+    "name_vi": "Log Tamperer (Kẻ xóa/sửa log)",
+    "name_en": "Log Tamperer",
     "team": "CRIMINAL",
     "icon": "🕶️",
     "minPlayers": 8,
@@ -116,13 +118,13 @@ export const ROLE_DEFINITIONS = {
     "isOpenRole": false,
     "hasCards": true,
     "hasBadge": true,
-    "desc_vi": "Bản mở rộng Undercover Allies: Giữa Vòng 1 và Vòng 2, bí mật vô hiệu hóa Huy hiệu Phá án của 1 người chơi bất kỳ trên bàn.",
-    "desc_en": "Undercover Allies Expansion: Between Round 1 and 2, secretly strips 1 player's Badge so they can no longer make an accusation."
+    "desc_vi": "Kẻ xóa dấu vết hệ thống: Giữa Vòng 1 và Vòng 2, bí mật vô hiệu hóa Huy hiệu Phá án (Quyền truy cập) của 1 người chơi nguy hiểm nhất trên bàn.",
+    "desc_en": "Between Round 1 and Round 2, secretly disables the Accusation Badge of the most dangerous investigator at the table."
   },
   "PROTECTIVE_DETAIL": {
     "id": "PROTECTIVE_DETAIL",
-    "name_vi": "Đặc vụ Bảo vệ",
-    "name_en": "Protective Detail",
+    "name_vi": "IT Support / Helpdesk",
+    "name_en": "IT Support / Helpdesk",
     "team": "INVESTIGATION",
     "icon": "🛡️",
     "minPlayers": 7,
@@ -130,22 +132,22 @@ export const ROLE_DEFINITIONS = {
     "isOpenRole": false,
     "hasCards": true,
     "hasBadge": true,
-    "desc_vi": "Bản mở rộng Undercover Allies: Biết rõ ai là Nhân chứng từ đầu ván để tung hỏa mù và đỡ đạn thay cho Nhân chứng ở pha Phản công cuối trận.",
-    "desc_en": "Undercover Allies Expansion: Knows the identity of the Witness at Night and can act as a decoy to draw the Murderer's bullet."
+    "desc_vi": "Lá chắn tuyến đầu: Biết rõ ai là Whistleblower từ đầu ván để cố tình thu hút sự chú ý và đứng ra 'đỡ đạn' chịu phạt thay ở cuối trận.",
+    "desc_en": "Knows who the Whistleblower is at Night to draw attention and take the blame/bullet for them at the end of the match."
   },
   "CONSULTING_DETECTIVE": {
     "id": "CONSULTING_DETECTIVE",
-    "name_vi": "Thám tử Cố vấn",
-    "name_en": "Consulting Detective",
+    "name_vi": "System Architect",
+    "name_en": "System Architect",
     "team": "INVESTIGATION",
-    "icon": "🎩",
+    "icon": "🏗️",
     "minPlayers": 5,
     "isExpansion": true,
     "isOpenRole": false,
     "hasCards": true,
     "hasBadge": true,
-    "desc_vi": "Promo Đặc biệt: Có thể tự nguyện nộp bỏ Huy hiệu Phá án của mình bất kỳ lúc nào để lật ngửa thẻ Vai trò, chứng minh 100% mình thuộc phe Điều tra vô tội.",
-    "desc_en": "Promo Role: Can voluntarily discard their Badge at any time to publicly flip their role card face-up, proving 100% innocence."
+    "desc_vi": "Kiến trúc sư trưởng: Có thể tự nguyện bỏ quyền phá án (Huy hiệu) bất kỳ lúc nào để lật bài chứng minh mình 100% trong sạch trước toàn bộ phòng họp War Room.",
+    "desc_en": "Can voluntarily discard their Accusation Badge at any time to flip their role card face-up, proving 100% innocence."
   }
 };
 
@@ -154,71 +156,71 @@ export const EVENT_TILES = [
     "id": "EVENT_01",
     "type": "EVENT_TILE",
     "color": "BLUE_EVENT",
-    "name_en": "Sudden Twist",
-    "name_vi": "Manh mối Bổ sung",
+    "name_en": "Client Escalation",
+    "name_vi": "Khách hàng Escalate Khẩn",
     "icon": "⚡",
-    "desc_en": "Forensic Scientist immediately draws 1 extra Brown Scene Tile and places an additional bullet marker without discarding an existing tile.",
-    "desc_vi": "Pháp y lập tức rút thêm 1 Ô Hiện Trường Nâu mới và đặt thêm 1 viên đạn gợi ý (không cần bỏ bớt ô cũ)."
+    "desc_en": "Tech Lead immediately draws 1 extra Brown Incident Tile and places an additional marker without discarding an existing tile.",
+    "desc_vi": "Khách hàng gửi mail CC cả sếp tổng! Tech Lead lập tức rút thêm 1 Thẻ Thông Số Sự Cố Nâu mới và ghim thêm 1 đạn gỗ gợi ý (không cần bỏ thẻ cũ)."
   },
   {
     "id": "EVENT_02",
     "type": "EVENT_TILE",
     "color": "BLUE_EVENT",
-    "name_en": "Forensic Breakthrough",
-    "name_vi": "Đột phá Pháp y",
+    "name_en": "AI Log Breakthrough",
+    "name_vi": "Đột phá AI Log Analyzer",
     "icon": "💡",
-    "desc_en": "Forensic Scientist may relocate 1 bullet marker on an existing Scene Tile to a more accurate option.",
-    "desc_vi": "Pháp y được quyền dời vị trí 1 viên đạn trên một Ô Hiện Trường đang có sang mục khác chính xác hơn."
+    "desc_en": "Tech Lead may relocate 1 marker on an existing Incident Parameter tile to a more accurate option.",
+    "desc_vi": "AI phát hiện luồng trace mới! Tech Lead được quyền dời vị trí 1 đạn gỗ trên một Thẻ Thông Số Sự Cố đang mở sang mục khác chính xác hơn."
   },
   {
     "id": "EVENT_03",
     "type": "EVENT_TILE",
     "color": "BLUE_EVENT",
-    "name_en": "Evidence Tampering",
-    "name_vi": "Xáo trộn Hiện trường",
+    "name_en": "Log Rotation Wipeout",
+    "name_vi": "Tràn Ổ Cứng & Mất Log",
     "icon": "🔥",
-    "desc_en": "Forensic Scientist must discard 2 existing Brown Scene Tiles and only draw 1 replacement tile.",
-    "desc_vi": "Hiện trường bị phá hoại! Pháp y buộc phải bỏ đi 2 Ô Hiện Trường Nâu cũ và chỉ được rút bù 1 ô mới."
+    "desc_en": "Tech Lead must discard 2 existing Brown Incident Tiles and only draw 1 replacement tile.",
+    "desc_vi": "Server tự động xoay vòng xóa mất log cũ! Tech Lead buộc phải bỏ đi 2 Thẻ Thông Số Nâu đang mở và chỉ được rút bù 1 thẻ mới."
   },
   {
     "id": "EVENT_04",
     "type": "EVENT_TILE",
     "color": "BLUE_EVENT",
-    "name_en": "Witness Protection",
-    "name_vi": "Bảo vệ Nhân chứng",
+    "name_en": "Whistleblower Shield",
+    "name_vi": "Bảo vệ Whistleblower",
     "icon": "🛡️",
     "desc_en": "Presentation order is reversed (counter-clockwise) for this round to disrupt suspect patterns.",
-    "desc_vi": "Đảo ngược thứ tự trình bày (ngược chiều kim đồng hồ) trong vòng này để bảo vệ luồng suy luận của Nhân chứng."
+    "desc_vi": "Đảo ngược thứ tự báo cáo Daily Standup (ngược chiều kim đồng hồ) trong vòng này để bảo vệ luồng suy luận của Whistleblower."
   },
   {
     "id": "EVENT_05",
     "type": "EVENT_TILE",
     "color": "BLUE_EVENT",
-    "name_en": "Internal Investigation",
-    "name_vi": "Điều tra Nội bộ",
+    "name_en": "Peer Code Audit",
+    "name_vi": "Audit Code Nội bộ",
     "icon": "🔍",
-    "desc_en": "Each investigator flags the single most suspicious card of the player seated to their right before presentations begin.",
-    "desc_vi": "Mỗi người chơi chỉ định 1 lá bài đáng ngờ nhất của người ngồi kế bên trước khi bắt đầu vòng Trình bày."
+    "desc_en": "Each responder flags the single most suspicious card of the colleague seated to their right before presentations begin.",
+    "desc_vi": "Review chéo khẩn cấp! Mỗi thành viên chỉ điểm 1 thẻ đáng ngờ nhất của đồng nghiệp ngồi kế bên trước khi bắt đầu vòng Báo cáo."
   },
   {
     "id": "EVENT_06",
     "type": "EVENT_TILE",
     "color": "BLUE_EVENT",
-    "name_en": "Clean Sweep",
-    "name_vi": "Thay máu Địa điểm",
+    "name_en": "Cluster Failover",
+    "name_vi": "Chuyển Cụm Server (Failover)",
     "icon": "🧹",
-    "desc_en": "Forensic Scientist swaps the Green Location of Crime tile for a different Location tile and places a fresh bullet.",
-    "desc_vi": "Pháp y được quyền đổi Ô Địa Điểm Gây Án (Xanh lá) sang một thẻ Địa điểm khác phù hợp hơn và đặt lại đạn."
+    "desc_en": "Tech Lead swaps the Green Affected Layer tile for a different Layer tile and places a fresh marker.",
+    "desc_vi": "Tech Lead được quyền đổi Thẻ Tầng Hệ Thống Bị Sập (Xanh lá) sang một thẻ Tầng Hệ Thống khác sát thực tế hơn và đặt lại đạn gỗ."
   },
   {
     "id": "EVENT_07",
     "type": "EVENT_TILE",
     "color": "BLUE_EVENT",
-    "name_en": "The Perfect Crime",
-    "name_vi": "Tội ác Hoàn hảo",
-    "icon": "🃏",
-    "desc_en": "Undercover Allies: Forensic Scientist peeks at the top Scene Deck card; if it is another Event, tension spikes and 1 bonus clue hint is unlocked.",
-    "desc_vi": "Undercover Allies: Pháp y bí mật kiểm tra đỉnh chồng bài Hiện trường; áp lực điều tra tăng cao tối đa!"
+    "name_en": "SEV-0 Global Outage",
+    "name_vi": "Báo Động Đỏ SEV-0",
+    "icon": "🚨",
+    "desc_en": "SEV-0 Alert! Tech Lead peeks at the top Incident Deck card; tension spikes and 1 bonus log trace is unlocked.",
+    "desc_vi": "Sự cố nâng lên mức SEV-0 toàn cầu! Tech Lead kiểm tra đỉnh chồng bài Thông Số; áp lực phòng họp War Room tăng kịch trần!"
   }
 ];
 
@@ -227,598 +229,598 @@ export const SCENE_TILES = [
     "id": "tile_cause_01",
     "type": "CAUSE_OF_DEATH",
     "color": "PURPLE",
-    "name_en": "Cause of Death",
-    "name_vi": "Nguyên nhân Tử vong",
+    "name_en": "Root Cause (Core Failure)",
+    "name_vi": "Root Cause (Nguyên nhân Gốc rễ)",
     "options_en": [
-      "Suffocation",
-      "Severe Injury",
-      "Loss of Blood",
-      "Illness / Disease",
-      "Poisoning",
-      "Accident"
+      "Out of Memory (OOM)",
+      "CPU Overload (100% Spike)",
+      "DB Connection / Cable Cut",
+      "Dependency / Library Conflict",
+      "Permission / Security Breach",
+      "DDoS / Network Attack"
     ],
     "options_vi": [
-      "Ngạt thở",
-      "Chấn thương nặng",
-      "Mất máu quá nhiều",
-      "Bệnh lý / Ốm đau",
-      "Trúng độc",
-      "Tai nạn"
+      "Tràn RAM (Out of Memory)",
+      "Quá tải CPU (100% Spike)",
+      "Đứt cáp / Mất kết nối DB",
+      "Xung đột thư viện (Dependency)",
+      "Lỗi phân quyền / Rò rỉ bảo mật",
+      "DDoS / Tấn công mạng"
     ]
   },
   {
     "id": "tile_loc_01",
     "type": "LOCATION_OF_CRIME",
     "color": "GREEN",
-    "name_en": "Location of Crime (1/4)",
-    "name_vi": "Địa điểm Gây án (1/4 - Nhà ở)",
+    "name_en": "Affected Layer (1/4 - Core Infra)",
+    "name_vi": "Môi trường / Tầng bị sập (1/4 - Hạ tầng Lõi)",
     "options_en": [
-      "Living Room",
-      "Bedroom",
-      "Storeroom",
-      "Bathroom",
-      "Kitchen",
-      "Balcony"
+      "Production Database",
+      "API Gateway",
+      "Cloud Server / K8s",
+      "Payment System",
+      "Auth / Login Portal",
+      "Redis Cache Cluster"
     ],
     "options_vi": [
-      "Phòng khách",
-      "Phòng ngủ",
-      "Nhà kho",
-      "Phòng tắm",
-      "Nhà bếp",
-      "Ban công"
+      "Production Database",
+      "API Gateway",
+      "Cloud Server / Cụm K8s",
+      "Hệ thống Payment",
+      "Cổng Auth / Login",
+      "Cụm Redis Cache"
     ]
   },
   {
     "id": "tile_loc_02",
     "type": "LOCATION_OF_CRIME",
     "color": "GREEN",
-    "name_en": "Location of Crime (2/4)",
-    "name_vi": "Địa điểm Gây án (2/4 - Dịch vụ & Công trình)",
+    "name_en": "Affected Layer (2/4 - DevOps & Pipeline)",
+    "name_vi": "Môi trường / Tầng bị sập (2/4 - Dịch vụ & Pipeline)",
     "options_en": [
-      "Pub",
-      "Bookstore",
-      "Restaurant",
-      "Hotel",
-      "Hospital",
-      "Building Site"
+      "CI/CD Pipeline",
+      "Load Balancer / CDN",
+      "Message Queue (Kafka)",
+      "Cloud Storage (S3 Bucket)",
+      "Billing & Invoice Service",
+      "Search Engine (Elastic)"
     ],
     "options_vi": [
-      "Quán rượu / Bar",
-      "Hiệu sách",
-      "Nhà hàng",
-      "Khách sạn",
-      "Bệnh viện",
-      "Công trường xây dựng"
+      "Đường ống CI/CD Pipeline",
+      "Load Balancer / CDN",
+      "Hàng đợi Kafka / RabbitMQ",
+      "Kho lưu trữ Cloud S3",
+      "Hệ thống Hóa đơn & Billing",
+      "Máy chủ Tìm kiếm (Elastic)"
     ]
   },
   {
     "id": "tile_loc_03",
     "type": "LOCATION_OF_CRIME",
     "color": "GREEN",
-    "name_en": "Location of Crime (3/4)",
-    "name_vi": "Địa điểm Gây án (3/4 - Trường học & Nội khu)",
+    "name_en": "Affected Layer (3/4 - Apps & Portal)",
+    "name_vi": "Môi trường / Tầng bị sập (3/4 - Ứng dụng & Cổng)",
     "options_en": [
-      "Playground",
-      "Classroom",
-      "Dormitory",
-      "Cafeteria",
-      "Elevator",
-      "Toilet"
+      "Mobile App (iOS/Android)",
+      "Web Admin Portal",
+      "Customer Landing Page",
+      "Internal VPN / Intranet",
+      "AI Chatbot Service",
+      "Email / OTP Notification Hub"
     ],
     "options_vi": [
-      "Sân chơi",
-      "Lớp học",
-      "Ký túc xá",
-      "Nhà ăn / Căng tin",
-      "Thang máy",
-      "Nhà vệ sinh"
+      "Ứng dụng Mobile (iOS/Android)",
+      "Trang Quản trị Web Admin",
+      "Trang chủ Khách hàng",
+      "Mạng nội bộ VPN / Intranet",
+      "Hệ thống AI / LLM Service",
+      "Cổng Gửi Email / OTP"
     ]
   },
   {
     "id": "tile_loc_04",
     "type": "LOCATION_OF_CRIME",
     "color": "GREEN",
-    "name_en": "Location of Crime (4/4)",
-    "name_vi": "Địa điểm Gây án (4/4 - Công cộng & Ngoài trời)",
+    "name_en": "Affected Layer (4/4 - Lab & ODC)",
+    "name_vi": "Môi trường / Tầng bị sập (4/4 - Phòng Lab & ODC)",
     "options_en": [
-      "Vacation Home",
-      "Park",
-      "Supermarket",
-      "School",
-      "Woods",
-      "Bank"
+      "On-Premise Server Room",
+      "F-Ville / F-Town ODC Room",
+      "Client Live Demo Room",
+      "Staging / UAT Environment",
+      "Disaster Recovery Backup",
+      "Third-Party Partner API"
     ],
     "options_vi": [
-      "Nhà nghỉ dưỡng",
-      "Công viên / Bãi đỗ xe",
-      "Siêu thị",
-      "Trường học",
-      "Rừng cây",
-      "Ngân hàng"
+      "Phòng Server Vật lý (On-Prem)",
+      "Phòng dự án ODC (F-Ville/F-Town)",
+      "Phòng họp Demo Khách hàng",
+      "Môi trường Staging / UAT",
+      "Hệ thống Backup Dự phòng",
+      "API Đối tác Bên thứ 3"
     ]
   },
   {
     "id": "tile_scene_01",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Corpse Condition",
-    "name_vi": "Tình trạng Thi thể",
+    "name_en": "System Status",
+    "name_vi": "Trạng thái Hệ thống Hiện tại",
     "options_en": [
-      "Still Warm",
-      "Stiff",
-      "Decayed",
-      "Incomplete",
-      "Intact",
-      "Twisted"
+      "Blue Screen / Kernel Panic",
+      "502 Bad Gateway",
+      "Data Encrypted / Corrupted",
+      "Partial Microservice Down",
+      "UI Up, Backend Dead",
+      "Infinite Loading Spinner"
     ],
     "options_vi": [
-      "Còn ấm",
-      "Cứng đờ",
-      "Phân hủy",
-      "Không nguyên vẹn",
-      "Nguyên vẹn",
-      "Vặn vẹo / Biến dạng"
+      "Màn hình xanh / Lỗi 502 Bad Gateway",
+      "Treo cứng 100% không phản hồi",
+      "Dữ liệu bị mã hóa / Biến dạng",
+      "Chết rải rác từng cụm Microservice",
+      "Giao diện vẫn lên nhưng API chết",
+      "Xoay vòng Loading vô tận"
     ]
   },
   {
     "id": "tile_scene_02",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Day of Crime",
-    "name_vi": "Ngày xảy ra Vụ án",
+    "name_en": "Incident Timing",
+    "name_vi": "Thời điểm Xảy ra Sự cố",
     "options_en": [
-      "Weekday",
-      "Weekend",
-      "Spring",
-      "Summer",
-      "Autumn",
-      "Winter"
+      "Peak Hours (Flash Sale)",
+      "Friday Afternoon Deploy",
+      "Scheduled Maintenance",
+      "Right Before Client Demo",
+      "Midnight Release Go-Live",
+      "Monday Morning Standup"
     ],
     "options_vi": [
-      "Ngày trong tuần",
-      "Cuối tuần",
-      "Mùa xuân",
-      "Mùa hè",
-      "Mùa thu",
-      "Mùa đông"
+      "Giờ cao điểm (Peak hours)",
+      "Chiều thứ Sáu trước giờ về",
+      "Đang bảo trì định kỳ",
+      "Ngay trước giờ Demo khách hàng",
+      "Đêm Release Go-Live",
+      "Sáng thứ Hai đầu tuần"
     ]
   },
   {
     "id": "tile_scene_03",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Duration of Crime",
-    "name_vi": "Thời lượng Gây án",
+    "name_en": "Outage Progression",
+    "name_vi": "Tốc độ Phát tán Lỗi",
     "options_en": [
-      "Instantaneous",
-      "Brief",
-      "Gradual",
-      "Prolonged",
-      "Few Days",
-      "Unclear"
+      "Instant Crash",
+      "Brief Spike",
+      "Gradual Memory Leak",
+      "Prolonged Hang",
+      "Latent Bug for Days",
+      "Intermittent / Flaky"
     ],
     "options_vi": [
-      "Tức thì",
-      "Chớp nhoáng",
-      "Từ từ / Ngấm dần",
-      "Kéo dài",
-      "Vài ngày",
-      "Không rõ ràng"
+      "Sập tức thì ngay khi bấm nút",
+      "Chớp nhoáng vài giây",
+      "Rò rỉ ngấm dần (Memory Leak)",
+      "Treo hệ thống kéo dài",
+      "Lỗi ngầm ủ bệnh vài ngày",
+      "Chập chờn lúc được lúc mất"
     ]
   },
   {
     "id": "tile_scene_04",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Evidence Left Behind",
-    "name_vi": "Bản chất Vật chứng Để lại",
+    "name_en": "Nature of Log Trace",
+    "name_vi": "Bản chất Dấu vết Để lại",
     "options_en": [
-      "Natural",
-      "Artistic",
-      "Written",
-      "Synthetic",
-      "Personal",
-      "Unrelated"
+      "Food / Drink / Physical",
+      "UI / Media / Visual Asset",
+      "Log File / Doc / Chat Text",
+      "Config / System / Network",
+      "Personal Dev Gear",
+      "Office / External Chaos"
     ],
     "options_vi": [
-      "Tự nhiên",
-      "Nghệ thuật",
-      "Chữ viết / Văn bản",
-      "Nhân tạo / Tổng hợp",
-      "Đồ cá nhân",
-      "Không liên quan"
+      "Đồ ăn / Thức uống / Vật lý",
+      "Giao diện / Hình ảnh / Media",
+      "Bản ghi Log / Văn bản / Chat",
+      "File Cấu hình / Hệ thống / Mạng",
+      "Thiết bị / Đồ cá nhân của Dev",
+      "Vật dụng giải trí / Ngoại cảnh"
     ]
   },
   {
     "id": "tile_scene_05",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "General Impression",
-    "name_vi": "Ấn tượng Chung",
+    "name_en": "War Room Impression",
+    "name_vi": "Ấn tượng Chung về Bug",
     "options_en": [
-      "Common",
-      "Creative",
-      "Fishy",
-      "Cruel",
-      "Horrible",
-      "Suspenseful"
+      "Classic Rookie Mistake",
+      "Ingenious / Bizarre Bug",
+      "Suspicious Cover-up",
+      "Brutal Wipeout",
+      "Catastrophic Nightmare",
+      "Mystery Unseen on StackOverflow"
     ],
     "options_vi": [
-      "Phổ biến / Bình thường",
-      "Sáng tạo / Tinh vi",
-      "Đáng ngờ / Mờ ám",
-      "Tàn nhẫn",
-      "Kinh hoàng",
-      "Hồi hộp / Bí ẩn"
+      "Lỗi kinh điển phổ biến",
+      "Bug cực dị / Sáng tạo bất ngờ",
+      "Đáng ngờ / Có mùi xóa log",
+      "Phá hủy tàn khốc",
+      "Ác mộng kinh hoàng",
+      "Bí ẩn chưa từng có tiền lệ"
     ]
   },
   {
     "id": "tile_scene_06",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Hint on Corpse",
-    "name_vi": "Dấu hiệu trên Thi thể",
+    "name_en": "Blast Radius (Impact Scope)",
+    "name_vi": "Phạm vi Ảnh hưởng trên Hệ thống",
     "options_en": [
-      "Head",
-      "Chest",
-      "Hand",
-      "Leg",
-      "Partial",
-      "All-over"
+      "Core Engine / Master Node",
+      "Database / Storage Layer",
+      "Frontend UI / Client App",
+      "Network / API Pipeline",
+      "Single Feature Module",
+      "Entire System (Full Outage)"
     ],
     "options_vi": [
-      "Đầu",
-      "Ngực",
-      "Tay",
-      "Chân",
-      "Một phần cơ thể",
-      "Toàn thân"
+      "Core Engine / Master Node",
+      "Tầng Database / Lưu trữ",
+      "Tầng Giao diện / Client",
+      "Luồng Network / API",
+      "Một phân hệ cục bộ",
+      "Toàn bộ Hệ thống (Sập 100%)"
     ]
   },
   {
     "id": "tile_scene_07",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Motive of Crime",
-    "name_vi": "Động cơ Gây án",
+    "name_en": "Psychological Trigger",
+    "name_vi": "Động cơ / Nguyên nhân Tâm lý",
     "options_en": [
-      "Hatred",
-      "Power",
-      "Money",
-      "Love",
-      "Jealousy",
-      "Justice"
+      "Burnout / OT Frustration",
+      "Flexing Admin / Root Power",
+      "Rushing KPI / Bonus",
+      "Distracted by Crush Chat",
+      "Ego After Code Review",
+      "Heroic Refactoring Gone Wrong"
     ],
     "options_vi": [
-      "Thù hận",
-      "Quyền lực",
-      "Tiền bạc",
-      "Tình yêu",
-      "Ghen tuông",
-      "Công lý / Báo thù"
+      "Quá tải OT / Bức xúc tích tụ",
+      "Thích thể hiện quyền Admin/Root",
+      "Chạy tiến độ / Săn thưởng nóng",
+      "Mải nhắn tin Crush / Xao nhãng",
+      "Tự ái khi bị chê trong Code Review",
+      "Muốn 'Refactor làm sạch' hệ thống"
     ]
   },
   {
     "id": "tile_scene_08",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Murderer's Personality",
-    "name_vi": "Tính cách Hung thủ",
+    "name_en": "Culprit's Coding Style",
+    "name_vi": "Phong cách Code của Thủ phạm",
     "options_en": [
-      "Arrogant",
-      "Despicable",
-      "Furious",
-      "Greedy",
-      "Forceful",
-      "Perverted"
+      "Arrogant ('Works on My Machine')",
+      "Sneaky Shortcut Taker",
+      "Furious Force-Pusher",
+      "Greedy 100-File Committer",
+      "Over-Engineered Bossy",
+      "Live-Server Cowboy"
     ],
     "options_vi": [
-      "Ngạo mạn",
-      "Đê tiện / Hèn hạ",
-      "Hung dữ / Điên cuồng",
-      "Tham lam",
-      "Áp đặt / Tàn bạo",
-      "Biến thái / Lệch lạc"
+      "Tự tin 'Chạy ngon trên máy em'",
+      "Hay lách luật / Bỏ qua Unit Test",
+      "Nóng vội Force Push cho lẹ",
+      "Tham gom 100 file vào 1 Commit",
+      "Áp đặt kiến trúc cồng kềnh",
+      "Đam mê sửa code thẳng trên Live"
     ]
   },
   {
     "id": "tile_scene_09",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "State of The Scene",
-    "name_vi": "Hiện trạng Hiện trường",
+    "name_en": "State of Culprit's Desk",
+    "name_vi": "Hiện trạng Bàn làm việc",
     "options_en": [
-      "Bits and Pieces",
-      "Ashes",
-      "Water Stain",
-      "Cracked",
-      "Disorderly",
-      "Tidy"
+      "50 StackOverflow Tabs Open",
+      "Burnt / Overheated Hardware",
+      "Coffee / Boba Spill Stain",
+      "Cracked Screen / Stuck Key",
+      "Tangled Mess of Cables",
+      "Suspiciously Clean & Locked"
     ],
     "options_vi": [
-      "Mảnh vỡ vụn",
-      "Tro tàn",
-      "Vết nước loang",
-      "Nứt vỡ",
-      "Hỗn loạn / Bừa bộn",
-      "Gọn gàng / Ngăn nắp"
+      "Mảnh giấy Note dán chi chít",
+      "Thiết bị nóng ran / Khét lẹt",
+      "Vết cà phê / Trà sữa đổ loang",
+      "Bàn phím kẹt nút / Màn hình nứt",
+      "Dây mạng & đồ đạc bừa bộn",
+      "Gọn gàng sạch sẽ đáng ngờ"
     ]
   },
   {
     "id": "tile_scene_10",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "In Progress",
-    "name_vi": "Hoạt động Đang diễn ra",
+    "name_en": "Activity During Outage",
+    "name_vi": "Hoạt động Đang diễn ra lúc Sập",
     "options_en": [
-      "Entertainment",
-      "Relaxation",
-      "Assembly",
-      "Trading",
-      "Visit",
-      "Dining"
+      "Playing Foosball / Gaming",
+      "Taking a Nap at Desk",
+      "Sprint Retro / All-Hands",
+      "Live Checkout / Flash Sale",
+      "Client Onsite Visit",
+      "Team Boba / Pizza Party"
     ],
     "options_vi": [
-      "Giải trí / Vui chơi",
-      "Nghỉ ngơi / Thư giãn",
-      "Họp mặt / Tụ tập",
-      "Giao dịch / Mua bán",
-      "Thăm viếng",
-      "Ăn uống / Tiệc tùng"
+      "Đang giải lao chơi Bi lắc / Game",
+      "Đang nghỉ ngơi / Ngủ trưa",
+      "Đang họp Sprint Retro / Standup",
+      "Đang mở cổng thanh toán / Sale",
+      "Đang đón đoàn Khách hàng thăm ODC",
+      "Đang liên hoan Trà sữa / Pizza"
     ]
   },
   {
     "id": "tile_scene_11",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Noticed by Bystander",
-    "name_vi": "Người qua đường Phát hiện",
+    "name_en": "First Alert Triggered",
+    "name_vi": "Tín hiệu Phát hiện Đầu tiên",
     "options_en": [
-      "Sudden Sound",
-      "Prolonged Sound",
-      "Smell",
-      "Visual",
-      "Action",
-      "Nothing"
+      "Loud PagerDuty Siren",
+      "Continuous Server Fan Roar",
+      "Burnt Silicon Smell",
+      "Red Grafana Dashboard",
+      "Panicked Action in War Room",
+      "Dead Silence (Monitor Also Died)"
     ],
     "options_vi": [
-      "Tiếng động bất ngờ",
-      "Âm thanh kéo dài",
-      "Mùi lạ",
-      "Nhìn thấy tận mắt",
-      "Hành động bất thường",
-      "Không ai chú ý"
+      "Chuông PagerDuty kêu bất ngờ",
+      "Tiếng quạt Server hú kéo dài",
+      "Mùi khét lẹt từ tủ máy chủ",
+      "Nhìn thấy Dashboard đỏ rực",
+      "Thao tác gõ phím bất thường",
+      "Im lặng tuyệt đối (Alert cũng sập)"
     ]
   },
   {
     "id": "tile_scene_12",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Social Relationship",
-    "name_vi": "Mối quan hệ Xã hội",
+    "name_en": "Project Relationship",
+    "name_vi": "Mối quan hệ trong Dự án",
     "options_en": [
-      "Relatives",
-      "Friends",
-      "Colleagues",
-      "Employer / Employee",
-      "Lovers",
-      "Stranger"
+      "Core Founders",
+      "Close OT Buddies",
+      "Same Squad Colleagues",
+      "Tech Lead & Junior Dev",
+      "Office Couple",
+      "Cross-Team / Newbie"
     ],
     "options_vi": [
-      "Họ hàng / Người thân",
-      "Bạn bè",
-      "Đồng nghiệp",
-      "Chủ - Thợ / Cấp trên - Cấp dưới",
-      "Tình nhân",
-      "Người dưng / Kẻ lạ"
+      "Anh em ruột thịt cùng cảnh OT",
+      "Bạn thân chí cốt",
+      "Đồng nghiệp chung Squad",
+      "Cấp trên - Cấp dưới (Sếp - Đệ)",
+      "Cặp đôi công sở",
+      "Người mới onboard / Khác bộ phận"
     ]
   },
   {
     "id": "tile_scene_13",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Time of Death",
-    "name_vi": "Thời điểm Tử vong",
+    "name_en": "Time of Outage",
+    "name_vi": "Khung giờ Sập Hệ thống",
     "options_en": [
-      "Dawn",
-      "Morning",
-      "Noon",
-      "Afternoon",
-      "Evening",
-      "Night"
+      "02:00 - 05:00 AM (Dawn)",
+      "08:30 - 10:30 AM (Morning)",
+      "12:00 - 01:30 PM (Noon)",
+      "03:00 - 05:00 PM (Afternoon)",
+      "05:59 PM (Evening Rush)",
+      "11:00 PM - 01:00 AM (Night)"
     ],
     "options_vi": [
-      "Rạng sáng / Bình minh",
-      "Buổi sáng",
-      "Buổi trưa",
-      "Buổi chiều",
-      "Chập tối / Hoàng hôn",
-      "Đêm khuya"
+      "Rạng sáng (02:00 - 05:00 AM)",
+      "Buổi sáng đầu ca",
+      "Buổi trưa nghỉ ngơi",
+      "Buổi chiều cao điểm",
+      "Chập tối sát giờ tan tầm (17:59)",
+      "Đêm khuya thanh vắng"
     ]
   },
   {
     "id": "tile_scene_14",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Trace at The Scene",
-    "name_vi": "Dấu vết tại Hiện trường",
+    "name_en": "Forensic Trace Found",
+    "name_vi": "Dấu vết Giám định tại Chỗ",
     "options_en": [
-      "Fingerprint",
-      "Footprint",
-      "Bruise",
-      "Blood Stain",
-      "Bodily Fluid",
-      "Scar"
+      "Keystroke / Fingerprint on Key",
+      "Server Room Access Footprint",
+      "Dented Hardware / Rack",
+      "Red Stack Trace / Core Dump",
+      "Spilled Drink / Condensation",
+      "Scratched / Rebased Git History"
     ],
     "options_vi": [
-      "Dấu vân tay",
-      "Dấu chân",
-      "Vết bầm / Va đập",
-      "Vết máu",
-      "Dịch cơ thể",
-      "Vết xước / Sẹo"
+      "Dấu vân tay / Lịch sử gõ phím",
+      "Dấu giày ra vào phòng Server",
+      "Vết va đập phần cứng",
+      "Stack Trace đỏ lòm như máu",
+      "Vết nước / Cà phê đổ loang",
+      "Dấu vết xóa / sửa Git History"
     ]
   },
   {
     "id": "tile_scene_15",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Sudden Incident",
-    "name_vi": "Sự cố Bất ngờ",
+    "name_en": "Collateral Incident",
+    "name_vi": "Sự cố Phát sinh Kèm theo",
     "options_en": [
-      "Power Failure",
-      "Fire",
-      "Conflict",
-      "Loss of Valuables",
-      "Scream",
-      "Nothing"
+      "UPS Power Outage",
+      "Server Rack Overheat",
+      "Heated Slack Argument",
+      "Loss of Backup Data",
+      "PM Screaming in Panic",
+      "Nothing Else"
     ],
     "options_vi": [
-      "Mất điện",
-      "Hỏa hoạn / Cháy",
-      "Xô xát / Ẩu đả",
-      "Mất tài sản quý giá",
-      "Tiếng hét thất thanh",
-      "Không có gì"
+      "Mất điện nguồn dự phòng UPS",
+      "Báo động nhiệt / Bốc khói",
+      "Tranh cãi nảy lửa trên nhóm chat",
+      "Mất luôn bản Backup quý giá",
+      "Tiếng hét thất thanh của PM",
+      "Không có biểu hiện phụ"
     ]
   },
   {
     "id": "tile_scene_16",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Victim's Build",
-    "name_vi": "Vóc dáng Nạn nhân",
+    "name_en": "System Architecture Size",
+    "name_vi": "Quy mô Hệ thống Bị nạn",
     "options_en": [
-      "Large",
-      "Thin",
-      "Tall",
-      "Short",
-      "Disfigured",
-      "Fit"
+      "Giant Monolith",
+      "Lean Microservice",
+      "Deep Multi-Tier",
+      "Small MVP / Internal Tool",
+      "Tangled Legacy System",
+      "Well-Balanced Cloud Native"
     ],
     "options_vi": [
-      "To béo / Đồ sộ",
-      "Gầy gò",
-      "Cao lớn",
-      "Thấp bé",
-      "Dị dạng / Khuyết tật",
-      "Cân đối / Khỏe mạnh"
+      "Monolith khổng lồ đồ sộ",
+      "Microservice mỏng nhẹ",
+      "Kiến trúc nhiều tầng cao lớn",
+      "Tool nhỏ / MVP mới dựng",
+      "Hệ thống Legacy chắp vá",
+      "Cân đối / Cloud-Native chuẩn"
     ]
   },
   {
     "id": "tile_scene_17",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Victim's Clothes",
-    "name_vi": "Trang phục Nạn nhân",
+    "name_en": "Codebase Hygiene",
+    "name_vi": "Tình trạng Codebase",
     "options_en": [
-      "Neat",
-      "Untidy",
-      "Elegant",
-      "Shabby",
-      "Bizarre",
-      "Naked"
+      "Clean & Well-Formatted",
+      "Messy Spaghetti Code",
+      "Over-Engineered Enterprise",
+      "Outdated & Deprecated",
+      "Esoteric / Weird Syntax",
+      "Zero Comments / No Docs"
     ],
     "options_vi": [
-      "Chỉnh tề / Gọn gàng",
-      "Xộc xệch",
-      "Sang trọng / Lịch lãm",
-      "Rách rưới / Cũ kỹ",
-      "Kỳ dị / Lập dị",
-      "Không mặc quần áo"
+      "Clean Code gọn gàng",
+      "Spaghetti Code xộc xệch",
+      "Kiến trúc sang xịn mịn",
+      "Code cũ kỹ nhiều năm tuổi",
+      "Cú pháp kỳ dị / Hack não",
+      "Trống trơn không một dòng Document"
     ]
   },
   {
     "id": "tile_scene_18",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Victim's Expression",
-    "name_vi": "Biểu cảm Nạn nhân",
+    "name_en": "PM / Client Reaction",
+    "name_vi": "Biểu cảm của PM / Khách hàng",
     "options_en": [
-      "Peaceful",
-      "Struggling",
-      "Frightened",
-      "In Pain",
-      "Blank",
-      "Angry"
+      "Calm ('We Have Backups')",
+      "Struggling to Rollback",
+      "Terrified of SLA Penalty",
+      "Agonizing Over Lost Data",
+      "Speechless / Frozen",
+      "Furious in War Room"
     ],
     "options_vi": [
-      "Bình thản",
-      "Giãy giụa / Chống cự",
-      "Hoảng sợ",
-      "Đau đớn",
-      "Vô hồn / Trống rỗng",
-      "Tức giận"
+      "Bình thản ('Tưởng tính năng mới')",
+      "Vật lộn tìm cách Rollback",
+      "Hoảng sợ nhìn SLA tụt dốc",
+      "Đau khổ ôm đầu",
+      "Đứng hình mất 5 giây",
+      "Tức giận triệu tập War Room"
     ]
   },
   {
     "id": "tile_scene_19",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Victim's Occupation",
-    "name_vi": "Nghề nghiệp Nạn nhân",
+    "name_en": "Who Takes the Fall?",
+    "name_vi": "Đối tượng Chịu ảnh hưởng Chính",
     "options_en": [
-      "Boss",
-      "Professional",
-      "Worker",
-      "Student",
-      "Unemployed",
-      "Retired"
+      "C-Level / Director",
+      "Solution Architect / Lead",
+      "Hardworking Dev / QA",
+      "Intern / Fresher",
+      "Between Projects (Bench)",
+      "Legacy Maintainer"
     ],
     "options_vi": [
-      "Ông chủ / Sếp lớn",
-      "Chuyên gia / Trí thức",
-      "Công nhân / Lao động",
-      "Học sinh / Sinh viên",
-      "Thất nghiệp",
-      "Nghỉ hưu"
+      "Sếp lớn / Giám đốc dự án",
+      "Chuyên gia / Tech Lead",
+      "Anh em Dev / Ops trực chiến",
+      "Thực tập sinh / Fresher",
+      "Nhân sự đang chờ dự án",
+      "Cựu trào sắp bàn giao"
     ]
   },
   {
     "id": "tile_scene_20",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Victim's Identity",
-    "name_vi": "Nhân thân Nạn nhân",
+    "name_en": "Suspect Profile",
+    "name_vi": "Đặc điểm Nhân sự Liên quan",
     "options_en": [
-      "Child",
-      "Young Adult",
-      "Middle-Aged",
-      "Senior",
-      "Male",
-      "Female"
+      "Rookie / Intern",
+      "Young Gen-Z Coder",
+      "Mid-Career Senior",
+      "Veteran / Guru",
+      "Backend / Infra Specialist",
+      "Frontend / Fullstack Specialist"
     ],
     "options_vi": [
-      "Trẻ em",
-      "Thanh niên",
-      "Trung niên",
-      "Người cao tuổi",
-      "Nam giới",
-      "Nữ giới"
+      "Mới tập sự (Intern)",
+      "Dev trẻ Gen-Z năng động",
+      "Senior dày dạn kinh nghiệm",
+      "Lão làng công nghệ",
+      "Chuyên trị Backend / Hạ tầng",
+      "Chuyên trị Giao diện / Fullstack"
     ]
   },
   {
     "id": "tile_scene_21",
     "type": "SCENE_TILE",
     "color": "BROWN",
-    "name_en": "Weather",
-    "name_vi": "Thời tiết",
+    "name_en": "War Room Atmosphere",
+    "name_vi": "Bầu không khí Phòng họp",
     "options_en": [
-      "Sunny",
-      "Stormy",
-      "Dry",
-      "Humid",
-      "Cold",
-      "Hot"
+      "Calm & Clear",
+      "Stormy Slack Ping Flood",
+      "Dry & Tense",
+      "Sweaty & Humid",
+      "Freezing 16°C AC",
+      "Boiling Hot Server Room"
     ],
     "options_vi": [
-      "Nắng ráo",
-      "Mưa bão",
-      "Khô hanh",
-      "Ẩm ướt",
-      "Lạnh giá",
-      "Nóng bức"
+      "Quang đãng / Bình tĩnh",
+      "Bão tin nhắn réo dồn dập",
+      "Căng thẳng khô khốc",
+      "Toát mồ hôi lạnh",
+      "Lạnh buốt điều hòa 16 độ",
+      "Nóng như chảo lửa"
     ]
   }
 ];
@@ -826,1781 +828,2071 @@ export const SCENE_TILES = [
 export const MEANS_CARDS = [
   {
     "id": "M001",
-    "en": "Alcohol",
-    "vi": "Rượu mạnh quá liều",
-    "category": "Poisoning"
+    "en": "Coding After Happy Hour",
+    "vi": "Code say xỉn sau chầu nhậu",
+    "category": "Poisoning",
+    "icon": "🍷"
   },
   {
     "id": "M002",
-    "en": "Arsenic",
-    "vi": "Thạch tín (Arsenic)",
-    "category": "Poisoning"
+    "en": "Hardcode Root Password",
+    "vi": "Hardcode mật khẩu Root trong code",
+    "category": "Poisoning",
+    "icon": "🧪"
   },
   {
     "id": "M003",
-    "en": "Chemicals",
-    "vi": "Hóa chất công nghiệp",
-    "category": "Poisoning"
+    "en": "Toxic Third-Party Script",
+    "vi": "Nhúng Script bên thứ 3 độc hại",
+    "category": "Poisoning",
+    "icon": "☣️"
   },
   {
     "id": "M004",
-    "en": "Dirty Water",
-    "vi": "Nước bẩn nhiễm khuẩn",
-    "category": "Poisoning/Illness"
+    "en": "Unfiltered Dirty Input",
+    "vi": "Không lọc dữ liệu bẩn (Dirty Input)",
+    "category": "Poisoning/Illness",
+    "icon": "💧"
   },
   {
     "id": "M005",
-    "en": "Illegal Drug",
-    "vi": "Ma túy / Chất cấm",
-    "category": "Poisoning"
+    "en": "Install Cracked Software",
+    "vi": "Cài phần mềm Crack lên Server",
+    "category": "Poisoning",
+    "icon": "⚗️"
   },
   {
     "id": "M006",
-    "en": "Injection",
-    "vi": "Ống tiêm độc dược",
-    "category": "Poisoning"
+    "en": "Raw SQL Injection",
+    "vi": "Nối chuỗi SQL gây lỗi SQL Injection",
+    "category": "Poisoning",
+    "icon": "💉"
   },
   {
     "id": "M007",
-    "en": "Liquid Drug",
-    "vi": "Thuốc độc dạng lỏng",
-    "category": "Poisoning"
+    "en": "Push .env to Public Repo",
+    "vi": "Push nhầm file .env lên GitHub Public",
+    "category": "Poisoning",
+    "icon": "🧪"
   },
   {
     "id": "M008",
-    "en": "Mercury",
-    "vi": "Thủy ngân",
-    "category": "Poisoning"
+    "en": "Crypto Miner Malware",
+    "vi": "Dính mã độc đào Coin ngầm",
+    "category": "Poisoning",
+    "icon": "🌡️"
   },
   {
     "id": "M009",
-    "en": "Pesticide",
-    "vi": "Thuốc trừ sâu",
-    "category": "Poisoning"
+    "en": "Mass Spam Webhook Loop",
+    "vi": "Bắn Spam API hàng loạt không kiểm soát",
+    "category": "Poisoning",
+    "icon": "🔫"
   },
   {
     "id": "M010",
-    "en": "Overdose",
-    "vi": "Thuốc ngủ quá liều",
-    "category": "Poisoning"
+    "en": "100-Year JWT Expiry",
+    "vi": "Set thời hạn Token 100 năm không hết hạn",
+    "category": "Poisoning",
+    "icon": "💊"
   },
   {
     "id": "M011",
-    "en": "Pill",
-    "vi": "Viên thuốc con nhộng",
-    "category": "Poisoning/Illness"
+    "en": "Fake Typosquatting NPM",
+    "vi": "Cài nhầm thư viện NPM giả mạo",
+    "category": "Poisoning/Illness",
+    "icon": "💊"
   },
   {
     "id": "M012",
-    "en": "Poisonous Gas",
-    "vi": "Khí độc rò rỉ",
-    "category": "Poisoning/Suffocation"
+    "en": "Leak AWS Secret Key",
+    "vi": "Lộ AWS Secret Key trên nhóm chat",
+    "category": "Poisoning/Suffocation",
+    "icon": "☁️"
   },
   {
     "id": "M013",
-    "en": "Poisonous Needle",
-    "vi": "Kim châm tẩm độc",
-    "category": "Poisoning"
+    "en": "Backdoor Debug Endpoint",
+    "vi": "Mở cổng Backdoor không cần đăng nhập",
+    "category": "Poisoning",
+    "icon": "🪡"
   },
   {
     "id": "M014",
-    "en": "Powder Drug",
-    "vi": "Thuốc bột hòa tan",
-    "category": "Poisoning"
+    "en": "XSS Script Payload",
+    "vi": "Lỗ hổng XSS chèn mã độc vào giao diện",
+    "category": "Poisoning",
+    "icon": "🧂"
   },
   {
     "id": "M015",
-    "en": "Radiation",
-    "vi": "Phóng xạ hạt nhân",
-    "category": "Illness/Poisoning"
+    "en": "Chmod 777 Entire Server",
+    "vi": "Phân quyền chmod 777 toàn bộ máy chủ",
+    "category": "Poisoning/Illness",
+    "icon": "☢️"
   },
   {
     "id": "M016",
-    "en": "Venomous Scorpion",
-    "vi": "Bọ cạp độc",
-    "category": "Poisoning"
+    "en": "Midnight Poison Cronjob",
+    "vi": "Cronjob lỗi tự kích hoạt lúc 0h đêm",
+    "category": "Poisoning",
+    "icon": "🦂"
   },
   {
     "id": "M017",
-    "en": "Venomous Snake",
-    "vi": "Rắn độc cắn",
-    "category": "Poisoning"
+    "en": "Run Untrusted Python Script",
+    "vi": "Chạy script Python trôi nổi bằng quyền Sudo",
+    "category": "Poisoning",
+    "icon": "🐍"
   },
   {
     "id": "M018",
-    "en": "Wine",
-    "vi": "Rượu vang pha độc",
-    "category": "Poisoning"
+    "en": "Disable SSL Verification",
+    "vi": "Tắt kiểm tra chứng chỉ bảo mật SSL",
+    "category": "Poisoning",
+    "icon": "🍾"
   },
   {
     "id": "M019",
-    "en": "Rope",
-    "vi": "Dây thừng siết cổ",
-    "category": "Suffocation"
+    "en": "Infinite while(true) Loop",
+    "vi": "Vòng lặp vô tận while(true)",
+    "category": "Suffocation",
+    "icon": "➰"
   },
   {
     "id": "M020",
-    "en": "Bank Vault",
-    "vi": "Nhốt trong két sắt ngân hàng",
-    "category": "Suffocation"
+    "en": "DB Transaction Deadlock",
+    "vi": "Khóa cứng bảng DB (Deadlock)",
+    "category": "Suffocation",
+    "icon": "🏦"
   },
   {
     "id": "M021",
-    "en": "Dirty Hands",
-    "vi": "Bóp cổ bằng tay không",
-    "category": "Suffocation"
+    "en": "Block Main Event Loop",
+    "vi": "Chặn đứng Main Thread bằng tác vụ đồng bộ",
+    "category": "Suffocation",
+    "icon": "✋"
   },
   {
     "id": "M022",
-    "en": "Shipping Container",
-    "vi": "Nhốt trong thùng Container",
-    "category": "Suffocation"
+    "en": "20GB Bloated Docker Image",
+    "vi": "Build Docker Image nặng 20GB tràn RAM",
+    "category": "Suffocation",
+    "icon": "📦"
   },
   {
     "id": "M023",
-    "en": "Pillow",
-    "vi": "Gối bông úp mặt",
-    "category": "Suffocation"
+    "en": "Thread.sleep(999999) in Prod",
+    "vi": "Bỏ quên hàm sleep(999999) trong code",
+    "category": "Suffocation",
+    "icon": "🛌"
   },
   {
     "id": "M024",
-    "en": "Plastic Bag",
-    "vi": "Túi nilon trùm đầu",
-    "category": "Suffocation"
+    "en": "SELECT * 50 Million Rows",
+    "vi": "Truy vấn SELECT * 50 triệu dòng vào RAM",
+    "category": "Suffocation",
+    "icon": "🛍️"
   },
   {
     "id": "M025",
-    "en": "Towel",
-    "vi": "Khăn tắm ướt",
-    "category": "Suffocation"
+    "en": "Empty Catch Block Swallow",
+    "vi": "Bắt lỗi try-catch rỗng làm treo ngầm",
+    "category": "Suffocation",
+    "icon": "🧣"
   },
   {
     "id": "M026",
-    "en": "Scarf",
-    "vi": "Khăn choàng lụa",
-    "category": "Suffocation"
+    "en": "Global Variable Memory Leak",
+    "vi": "Lưu rác vào biến toàn cục gây tràn RAM",
+    "category": "Suffocation",
+    "icon": "🧥"
   },
   {
     "id": "M027",
-    "en": "Belt",
-    "vi": "Thắt lưng da",
-    "category": "Suffocation"
+    "en": "Max Connections Set to 1",
+    "vi": "Giới hạn Connection Pool xuống còn 1",
+    "category": "Suffocation",
+    "icon": "🪢"
   },
   {
     "id": "M028",
-    "en": "Necktie",
-    "vi": "Cà vạt siết cổ",
-    "category": "Suffocation"
+    "en": "Unbounded Recursion",
+    "vi": "Đệ quy không điểm dừng gây StackOverflow",
+    "category": "Suffocation",
+    "icon": "👔"
   },
   {
     "id": "M029",
-    "en": "Steel Wire",
-    "vi": "Dây thép mảnh / Dây đàn",
-    "category": "Suffocation/Loss of Blood"
+    "en": "Shut Down Firewall Ports",
+    "vi": "Tắt nhầm Firewall chặn sạch kết nối",
+    "category": "Suffocation",
+    "icon": "🚧"
   },
   {
     "id": "M030",
-    "en": "Drowning",
-    "vi": "Dìm nước",
-    "category": "Suffocation"
+    "en": "Debug Log Floods 100% Disk",
+    "vi": "In Debug Log làm đầy 100% ổ cứng",
+    "category": "Suffocation/Accident",
+    "icon": "🌊"
   },
   {
     "id": "M031",
-    "en": "Burying Alive",
-    "vi": "Chôn sống",
-    "category": "Suffocation"
+    "en": "Zombie Process Army",
+    "vi": "Hàng vạn tiến trình Zombie ăn hết RAM",
+    "category": "Suffocation/Severe Injury",
+    "icon": "🪦"
   },
   {
     "id": "M032",
-    "en": "Smoke",
-    "vi": "Ngạt khói đám cháy",
-    "category": "Suffocation/Accident"
+    "en": "Kafka Queue Overflow",
+    "vi": "Nghẽn cổ chai hàng triệu bản tin Queue",
+    "category": "Suffocation",
+    "icon": "💣"
   },
   {
     "id": "M033",
-    "en": "Packing Tape",
-    "vi": "Băng keo dán kín miệng mũi",
-    "category": "Suffocation"
+    "en": "Rate Limit Set to Zero",
+    "vi": "Cấu hình Rate Limit = 0 chặn mọi user",
+    "category": "Suffocation",
+    "icon": "🚧"
   },
   {
     "id": "M034",
-    "en": "Chain",
-    "vi": "Dây xích sắt",
-    "category": "Suffocation/Severe Injury"
+    "en": "Circular Microservice Call",
+    "vi": "2 Microservice gọi vòng tròn nhau vô tận",
+    "category": "Suffocation",
+    "icon": "⛓️"
   },
   {
     "id": "M035",
-    "en": "Dagger",
-    "vi": "Dao găm",
-    "category": "Loss of Blood"
+    "en": "Run DROP TABLE on Prod",
+    "vi": "Chạy lệnh DROP TABLE trên Production",
+    "category": "Loss of Blood",
+    "icon": "🗡️"
   },
   {
     "id": "M036",
-    "en": "Kitchen Knife",
-    "vi": "Dao làm bếp",
-    "category": "Loss of Blood"
+    "en": "UPDATE Without WHERE",
+    "vi": "Chạy lệnh UPDATE quên điều kiện WHERE",
+    "category": "Loss of Blood",
+    "icon": "🔪"
   },
   {
     "id": "M037",
-    "en": "Cleaver",
-    "vi": "Dao phay chặt thịt",
-    "category": "Loss of Blood"
+    "en": "TRUNCATE Users Table",
+    "vi": "Truncate sạch bảng tài khoản khách hàng",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "🪓"
   },
   {
     "id": "M038",
-    "en": "Box Cutter",
-    "vi": "Dao rọc giấy",
-    "category": "Loss of Blood"
+    "en": "sudo rm -rf / on Server",
+    "vi": "Gõ nhầm sudo rm -rf / trên Server chính",
+    "category": "Loss of Blood",
+    "icon": "🛠️"
   },
   {
     "id": "M039",
-    "en": "Razor Blade",
-    "vi": "Lưỡi dao cạo râu",
-    "category": "Loss of Blood"
+    "en": "Delete Production S3 Bucket",
+    "vi": "Xóa nhầm S3 Bucket chứa dữ liệu thật",
+    "category": "Loss of Blood",
+    "icon": "🪒"
   },
   {
     "id": "M040",
-    "en": "Scissors",
-    "vi": "Kéo cắt may",
-    "category": "Loss of Blood"
+    "en": "Unplug Fiber Optic Cable",
+    "vi": "Rút nhầm dây cáp quang phòng máy chủ",
+    "category": "Loss of Blood",
+    "icon": "✂️"
   },
   {
     "id": "M041",
-    "en": "Scalpel",
-    "vi": "Dao mổ y tế",
-    "category": "Loss of Blood"
+    "en": "Live Hotfix via Vim",
+    "vi": "Sửa code trực tiếp bằng Vim trên Prod",
+    "category": "Loss of Blood",
+    "icon": "🔪"
   },
   {
     "id": "M042",
-    "en": "Chainsaw",
-    "vi": "Cưa máy",
-    "category": "Loss of Blood/Severe Injury"
+    "en": "Docker System Prune Volumes",
+    "vi": "Chạy docker prune xóa bay Volume Database",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "🪚"
   },
   {
     "id": "M043",
-    "en": "Axe",
-    "vi": "Rìu bổ củi",
-    "category": "Loss of Blood/Severe Injury"
+    "en": "Kill -9 Master DB Process",
+    "vi": "Kill -9 tiến trình Database đang ghi đĩa",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "🪓"
   },
   {
     "id": "M044",
-    "en": "Machete",
-    "vi": "Mã tấu / Dao đi rừng",
-    "category": "Loss of Blood"
+    "en": "Drop All Primary Indexes",
+    "vi": "Xóa sạch Index của các bảng giao dịch",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "🗡️"
   },
   {
     "id": "M045",
-    "en": "Sword",
-    "vi": "Kiếm cổ",
-    "category": "Loss of Blood"
+    "en": "Git Push --force to Main",
+    "vi": "Force Push đè mất sạch lịch sử nhánh Main",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "⚔️"
   },
   {
     "id": "M046",
-    "en": "Ice Pick",
-    "vi": "Dùi đục nước đá",
-    "category": "Loss of Blood"
+    "en": "Overwrite Prod DB URI",
+    "vi": "Ghi đè chuỗi kết nối DB sang localhost",
+    "category": "Loss of Blood",
+    "icon": "🦴"
   },
   {
     "id": "M047",
-    "en": "Glass Shard",
-    "vi": "Mảnh kính vỡ",
-    "category": "Loss of Blood"
+    "en": "Faulty Schema Migration",
+    "vi": "Chạy Migration lỗi làm gãy toàn bộ bảng",
+    "category": "Loss of Blood",
+    "icon": "💔"
   },
   {
     "id": "M048",
-    "en": "Broken Bottle",
-    "vi": "Chai bia đập bể",
-    "category": "Loss of Blood/Severe Injury"
+    "en": "Delete SSL Private Key",
+    "vi": "Xóa mất Private Key trên Load Balancer",
+    "category": "Loss of Blood",
+    "icon": "🍾"
   },
   {
     "id": "M049",
-    "en": "Pistol",
-    "vi": "Súng lục",
-    "category": "Loss of Blood/Severe Injury"
+    "en": "Run E2E Wipe Test on Prod",
+    "vi": "Trỏ nhầm Automation Test xóa sạch DB thật",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "🔫"
   },
   {
     "id": "M050",
-    "en": "Sniper Rifle",
-    "vi": "Súng bắn tỉa",
-    "category": "Loss of Blood/Severe Injury"
+    "en": "FLUSHALL on Production Redis",
+    "vi": "Chạy lệnh FLUSHALL xóa trắng Redis Cache",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "🎯"
   },
   {
     "id": "M051",
-    "en": "Shotgun",
-    "vi": "Súng hoa cải",
-    "category": "Loss of Blood/Severe Injury"
+    "en": "Terraform Destroy Prod",
+    "vi": "Chạy terraform destroy xóa sổ hạ tầng",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "💥"
   },
   {
     "id": "M052",
-    "en": "Crossbow",
-    "vi": "Nỏ bắn tên",
-    "category": "Loss of Blood"
+    "en": "Wipe API Gateway Routes",
+    "vi": "Xóa nhầm bảng định tuyến API Gateway",
+    "category": "Loss of Blood",
+    "icon": "🏹"
   },
   {
     "id": "M053",
-    "en": "Bow and Arrow",
-    "vi": "Cung tên",
-    "category": "Loss of Blood"
+    "en": "Point DNS A-Record to 0.0.0.0",
+    "vi": "Trỏ nhầm tên miền chính về IP 127.0.0.1",
+    "category": "Loss of Blood",
+    "icon": "🏹"
   },
   {
     "id": "M054",
-    "en": "Nail Gun",
-    "vi": "Súng bắn đinh",
-    "category": "Loss of Blood/Accident"
+    "en": "ON DELETE CASCADE Disaster",
+    "vi": "Xóa 1 bản ghi kéo sập toàn bộ bảng liên kết",
+    "category": "Loss of Blood",
+    "icon": "📌"
   },
   {
     "id": "M055",
-    "en": "Fork",
-    "vi": "Nĩa ăn bít tết",
-    "category": "Loss of Blood"
+    "en": "Unclosed DB Connection Leak",
+    "vi": "Mở kết nối DB liên tục không bao giờ đóng",
+    "category": "Loss of Blood",
+    "icon": "🍴"
   },
   {
     "id": "M056",
-    "en": "Wine Opener",
-    "vi": "Đồ khui rượu vang",
-    "category": "Loss of Blood"
+    "en": "Restore Empty Backup to Live",
+    "vi": "Restore nhầm bản Backup rỗng đè lên Prod",
+    "category": "Loss of Blood",
+    "icon": "🍾"
   },
   {
     "id": "M057",
-    "en": "High Heels",
-    "vi": "Gót giày cao gót nhọn",
-    "category": "Loss of Blood/Severe Injury"
+    "en": "Kick Server Rack Power Cord",
+    "vi": "Đá văng phích cắm nguồn của tủ Server",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "👠"
   },
   {
     "id": "M058",
-    "en": "Hook",
-    "vi": "Móc sắt treo thịt",
-    "category": "Loss of Blood"
+    "en": "Drain Cloud Billing Quota",
+    "vi": "Làm cạn sạch hạn mức thẻ tín dụng Cloud",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "🪝"
   },
   {
     "id": "M059",
-    "en": "Drill",
-    "vi": "Máy khoan cầm tay",
-    "category": "Loss of Blood/Severe Injury"
+    "en": "N+1 Queries in 3 Nested Loops",
+    "vi": "Gọi 10,000 câu Query trong 3 vòng for lồng nhau",
+    "category": "Severe Injury/Loss of Blood",
+    "icon": "🔩"
   },
   {
     "id": "M060",
-    "en": "Rabid Dog",
-    "vi": "Chó dữ cắn xé",
-    "category": "Loss of Blood/Illness"
+    "en": "Pet Dog Bites Server Cable",
+    "vi": "Chó cưng dẫn lên văn phòng cắn đứt cáp mạng",
+    "category": "Loss of Blood/Severe Injury",
+    "icon": "🐺"
   },
   {
     "id": "M061",
-    "en": "Hammer",
-    "vi": "Búa đóng đinh",
-    "category": "Severe Injury"
+    "en": "Deploy Straight to Prod",
+    "vi": "Deploy thẳng lên Prod không qua Staging",
+    "category": "Severe Injury",
+    "icon": "🔨"
   },
   {
     "id": "M062",
-    "en": "Wrench",
-    "vi": "Cờ lê sắt",
-    "category": "Severe Injury"
+    "en": "Disable Auto-Scaling",
+    "vi": "Tắt Auto-Scaling ngay trước giờ Flash Sale",
+    "category": "Severe Injury",
+    "icon": "🔧"
   },
   {
     "id": "M063",
-    "en": "Iron Pipe",
-    "vi": "Ống nước bằng sắt",
-    "category": "Severe Injury"
+    "en": "Full Table Scan No Index",
+    "vi": "Quét Full Table 100 triệu dòng không Index",
+    "category": "Severe Injury",
+    "icon": "🦯"
   },
   {
     "id": "M064",
-    "en": "Crowbar",
-    "vi": "Xà beng",
-    "category": "Severe Injury"
+    "en": "Bypass CI/CD Pipeline",
+    "vi": "Bỏ qua CI/CD, copy đè file build bằng tay",
+    "category": "Severe Injury",
+    "icon": "🛠️"
   },
   {
     "id": "M065",
-    "en": "Baseball Bat",
-    "vi": "Gậy bóng chày",
-    "category": "Severe Injury"
+    "en": "Stress Test Live Server",
+    "vi": "Bắn JMeter Stress Test thẳng vào Production",
+    "category": "Severe Injury",
+    "icon": "🏏"
   },
   {
     "id": "M066",
-    "en": "Golf Club",
-    "vi": "Gậy đánh Golf",
-    "category": "Severe Injury"
+    "en": "Evil Regex Backtracking",
+    "vi": "Regex lỗi làm treo 100% toàn bộ nhân CPU",
+    "category": "Severe Injury",
+    "icon": "⛳"
   },
   {
     "id": "M067",
-    "en": "Dumbbell",
-    "vi": "Quả tạ tay",
-    "category": "Severe Injury"
+    "en": "Sync 4K Video Encoding",
+    "vi": "Render video 4K đồng bộ ngay trên API chính",
+    "category": "Severe Injury",
+    "icon": "🏋️"
   },
   {
     "id": "M068",
-    "en": "Trophy",
-    "vi": "Cúp lưu niệm kim loại",
-    "category": "Severe Injury"
+    "en": "Disable Cache Layer",
+    "vi": "Tắt toàn bộ Cache bắt DB gánh 100% tải",
+    "category": "Severe Injury",
+    "icon": "🏆"
   },
   {
     "id": "M069",
-    "en": "Sculpture",
-    "vi": "Tượng điêu khắc đá",
-    "category": "Severe Injury"
+    "en": "Run Heavy Build on Live VM",
+    "vi": "Chạy npm build ngốn 100% CPU trên máy Live",
+    "category": "Severe Injury",
+    "icon": "🗿"
   },
   {
     "id": "M070",
-    "en": "Brick",
-    "vi": "Viên gạch xây nhà",
-    "category": "Severe Injury/Accident"
+    "en": "Bypass CDN Protection",
+    "vi": "Tắt Cloudflare CDN làm lộ IP máy chủ gốc",
+    "category": "Severe Injury",
+    "icon": "🧱"
   },
   {
     "id": "M071",
-    "en": "Stone",
-    "vi": "Tảng đá lớn",
-    "category": "Severe Injury"
+    "en": "Export 5GB Excel Synchronously",
+    "vi": "Xuất báo cáo Excel 5GB không phân trang",
+    "category": "Severe Injury",
+    "icon": "🪨"
   },
   {
     "id": "M072",
-    "en": "Potted Plant",
-    "vi": "Chậu cây rơi trúng đầu",
-    "category": "Severe Injury/Accident"
+    "en": "Unhandled Promise Crash",
+    "vi": "Quên bắt lỗi Promise làm sập tiến trình Node",
+    "category": "Severe Injury/Accident",
+    "icon": "🌵"
   },
   {
     "id": "M073",
-    "en": "Folding Chair",
-    "vi": "Ghế xếp kim loại",
-    "category": "Severe Injury"
+    "en": "Scale K8s Replicas to 0",
+    "vi": "Scale nhầm số lượng Pod Kubernetes về 0",
+    "category": "Severe Injury",
+    "icon": "🪑"
   },
   {
     "id": "M074",
-    "en": "Candlestick",
-    "vi": "Chân nến bằng đồng",
-    "category": "Severe Injury"
+    "en": "Train AI Model on Prod DB",
+    "vi": "Chạy huấn luyện AI trực tiếp trên máy chủ DB",
+    "category": "Severe Injury",
+    "icon": "🕯️"
   },
   {
     "id": "M075",
-    "en": "Fire Extinguisher",
-    "vi": "Bình cứu hỏa",
-    "category": "Severe Injury"
+    "en": "Hit Emergency Reboot Button",
+    "vi": "Bấm nhầm nút Reboot cụm máy chủ đang chạy",
+    "category": "Severe Injury",
+    "icon": "🧯"
   },
   {
     "id": "M076",
-    "en": "Frying Pan",
-    "vi": "Chảo gang",
-    "category": "Severe Injury"
+    "en": "Cartesian Join 10 Tables",
+    "vi": "JOIN 10 bảng quên điều kiện ON gây nổ CPU",
+    "category": "Severe Injury",
+    "icon": "🍳"
   },
   {
     "id": "M077",
-    "en": "Crutch",
-    "vi": "Nạng gỗ y tế",
-    "category": "Severe Injury"
+    "en": "Broken Load Balancer Probe",
+    "vi": "Cấu hình sai Healthcheck làm chết sạch Pod",
+    "category": "Severe Injury",
+    "icon": "🦿"
   },
   {
     "id": "M078",
-    "en": "Wooden Stick",
-    "vi": "Gậy gỗ",
-    "category": "Severe Injury"
+    "en": "Infinite useEffect API Storm",
+    "vi": "Code useEffect lỗi bắn 1000 request/giây",
+    "category": "Severe Injury",
+    "icon": "🖼️"
   },
   {
     "id": "M079",
-    "en": "Whip",
-    "vi": "Roi da",
-    "category": "Severe Injury"
+    "en": "Push Code on Friday 5:59 PM",
+    "vi": "Push code thứ Sáu lúc 17h59 rồi tắt máy",
+    "category": "Severe Injury",
+    "icon": "⚡"
   },
   {
     "id": "M080",
-    "en": "Taser / Electric Shock",
-    "vi": "Súng điện / Điện giật",
-    "category": "Accident/Severe Injury"
+    "en": "Botnet DDoS Flood",
+    "vi": "Mở cổng Public bị Botnet DDoS đánh sập",
+    "category": "Accident/Severe Injury",
+    "icon": "⚡"
   },
   {
     "id": "M081",
-    "en": "Electric Current",
-    "vi": "Dây điện trần rò điện",
-    "category": "Accident"
+    "en": "Short Circuit in Server Rack",
+    "vi": "Chập điện tủ Rack do cắm chung ấm đun nước",
+    "category": "Accident",
+    "icon": "🔌"
   },
   {
     "id": "M082",
-    "en": "Explosives",
-    "vi": "Thuốc nổ / Bom tự chế",
-    "category": "Severe Injury"
+    "en": "Timezone / Leap Year Bug",
+    "vi": "Bug lệch múi giờ UTC làm nổ tung lịch trình",
+    "category": "Severe Injury",
+    "icon": "🧨"
   },
   {
     "id": "M083",
-    "en": "Kerosene / Arson",
-    "vi": "Dầu hỏa phóng hỏa",
-    "category": "Severe Injury/Accident"
+    "en": "Server Room AC Breakdown",
+    "vi": "Tắt nhầm điều hòa phòng Server làm cháy máy",
+    "category": "Severe Injury/Accident",
+    "icon": "🔥"
   },
   {
     "id": "M084",
-    "en": "Matches",
-    "vi": "Que diêm châm lửa",
-    "category": "Accident"
+    "en": "Trigger Fire Sprinkler",
+    "vi": "Hút thuốc làm kích hoạt vòi phun nước phòng Lab",
+    "category": "Accident",
+    "icon": "🔥"
   },
   {
     "id": "M085",
-    "en": "Push from Roof",
-    "vi": "Xô ngã từ sân thượng",
-    "category": "Severe Injury/Accident"
+    "en": "Single-Zone Cloud Outage",
+    "vi": "Đặt toàn bộ Server vào 1 Zone không có dự phòng",
+    "category": "Severe Injury/Accident",
+    "icon": "📉"
   },
   {
     "id": "M086",
-    "en": "Elevator Sabotage",
-    "vi": "Cắt cáp thang máy",
-    "category": "Accident/Severe Injury"
+    "en": "Major Framework Upgrade Live",
+    "vi": "Nâng cấp thẳng Framework bản mới gây xung đột",
+    "category": "Illness/Accident",
+    "icon": "🛗"
   },
   {
     "id": "M087",
-    "en": "Scooter / Car Crash",
-    "vi": "Tông xe máy / Xe hơi",
-    "category": "Accident/Severe Injury"
+    "en": "Race Condition in Checkout",
+    "vi": "Lỗi Race Condition khi 100 người mua cùng lúc",
+    "category": "Accident/Severe Injury",
+    "icon": "🛞"
   },
   {
     "id": "M088",
-    "en": "Parachute Sabotage",
-    "vi": "Phá hỏng dù lượn",
-    "category": "Accident/Severe Injury"
+    "en": "Deploy Without Rollback Script",
+    "vi": "Deploy liều lĩnh không có kịch bản Rollback",
+    "category": "Accident/Severe Injury",
+    "icon": "🪂"
   },
   {
     "id": "M089",
-    "en": "Bear Trap",
-    "vi": "Bẫy gấu bằng thép",
-    "category": "Loss of Blood/Accident"
+    "en": "Delete package-lock.json",
+    "vi": "Xóa file lock gây xung đột thư viện dây chuyền",
+    "category": "Illness",
+    "icon": "🪤"
   },
   {
     "id": "M090",
-    "en": "Surgical Operation",
-    "vi": "Ca phẫu thuật ngụy tạo",
-    "category": "Illness/Accident"
+    "en": "Incompatible Runtime Update",
+    "vi": "Cập nhật Node/Java lệch chuẩn làm gãy hệ thống",
+    "category": "Illness/Accident",
+    "icon": "🧰"
   }
 ];
 
 export const CLUE_CARDS = [
   {
     "id": "C001",
-    "en": "Love Letter",
-    "vi": "Bức thư tình",
-    "category": "Written"
+    "en": "Reply-All Love Email",
+    "vi": "Email tỏ tình bấm nhầm Reply All toàn công ty",
+    "category": "Written",
+    "icon": "💌"
   },
   {
     "id": "C002",
-    "en": "Suicide Note",
-    "vi": "Thư tuyệt mệnh giả",
-    "category": "Written"
+    "en": "Draft Resignation Letter",
+    "vi": "Đơn xin nghỉ việc viết dở trên Desktop",
+    "category": "Written",
+    "icon": "📄"
   },
   {
     "id": "C003",
-    "en": "Diary",
-    "vi": "Cuốn nhật ký",
-    "category": "Written"
+    "en": "2:00 AM Git Commit Log",
+    "vi": "Lịch sử Git commit lúc 2h sáng",
+    "category": "Written",
+    "icon": "📓"
   },
   {
     "id": "C004",
-    "en": "IOU / Debt Note",
-    "vi": "Giấy ghi nợ",
-    "category": "Written"
+    "en": "$50,000 AWS Billing Alert",
+    "vi": "Hóa đơn AWS Cloud tăng vọt $50,000",
+    "category": "Written",
+    "icon": "💸"
   },
   {
     "id": "C005",
-    "en": "Will / Testament",
-    "vi": "Bản di chúc",
-    "category": "Written"
+    "en": "Legacy Handover Doc",
+    "vi": "Tài liệu bàn giao viết vội của người cũ",
+    "category": "Written",
+    "icon": "📜"
   },
   {
     "id": "C006",
-    "en": "Insurance Policy",
-    "vi": "Hợp đồng bảo hiểm nhân thọ",
-    "category": "Written"
+    "en": "Expired SSL Certificate",
+    "vi": "Chứng chỉ bảo mật SSL đã quá hạn",
+    "category": "Written",
+    "icon": "📜"
   },
   {
     "id": "C007",
-    "en": "Business Card",
-    "vi": "Danh thiếp (Name card)",
-    "category": "Written"
+    "en": "Client VIP Business Card",
+    "vi": "Danh thiếp của Giám đốc Khách hàng",
+    "category": "Written",
+    "icon": "🪪"
   },
   {
     "id": "C008",
-    "en": "Receipt",
-    "vi": "Hóa đơn mua hàng",
-    "category": "Written"
+    "en": "Domain Renewal Invoice",
+    "vi": "Hóa đơn gia hạn tên miền chưa thanh toán",
+    "category": "Written",
+    "icon": "🧾"
   },
   {
     "id": "C009",
-    "en": "Boarding Pass",
-    "vi": "Vé máy bay / Vé tàu",
-    "category": "Written"
+    "en": "Onsite Flight Boarding Pass",
+    "vi": "Vé máy bay đi Onsite Nhật Bản",
+    "category": "Written",
+    "icon": "🎫"
   },
   {
     "id": "C010",
-    "en": "Lottery Ticket",
-    "vi": "Tờ vé số trúng thưởng",
-    "category": "Written"
+    "en": "Scratch-off Lottery Ticket",
+    "vi": "Tờ vé số cầu may ngày Release",
+    "category": "Written",
+    "icon": "🍀"
   },
   {
     "id": "C011",
-    "en": "Newspaper Clipping",
-    "vi": "Mẩu báo cắt rời",
-    "category": "Written"
+    "en": "Tech News Cyberattack Clip",
+    "vi": "Bài báo viết về vụ sập hệ thống",
+    "category": "Written",
+    "icon": "📰"
   },
   {
     "id": "C012",
-    "en": "Calendar",
-    "vi": "Tờ lịch để bàn khoanh đỏ",
-    "category": "Written"
+    "en": "Red-Circled Release Calendar",
+    "vi": "Lịch để bàn khoanh đỏ ngày Go-Live",
+    "category": "Written",
+    "icon": "📅"
   },
   {
     "id": "C013",
-    "en": "Map",
-    "vi": "Bản đồ đánh dấu",
-    "category": "Written"
+    "en": "Network Topology Diagram",
+    "vi": "Sơ đồ kiến trúc mạng vẽ tay chi chít",
+    "category": "Written",
+    "icon": "🗺️"
   },
   {
     "id": "C014",
-    "en": "Menu",
-    "vi": "Thực đơn nhà hàng",
-    "category": "Written"
+    "en": "Midnight OT Boba Receipt",
+    "vi": "Menu đặt trà sữa & pizza ăn đêm OT",
+    "category": "Written",
+    "icon": "🍴"
   },
   {
     "id": "C015",
-    "en": "Medical Report",
-    "vi": "Bệnh án y khoa",
-    "category": "Written"
+    "en": "Server Health Check Report",
+    "vi": "Báo cáo Health Check toàn dấu X đỏ",
+    "category": "Written",
+    "icon": "📋"
   },
   {
     "id": "C016",
-    "en": "Prescription",
-    "vi": "Đơn thuốc của bác sĩ",
-    "category": "Written"
+    "en": "Quick Hotfix Snippet",
+    "vi": "Đoạn code Hotfix copy từ bình luận dạo",
+    "category": "Written",
+    "icon": "💊"
   },
   {
     "id": "C017",
-    "en": "Contract",
-    "vi": "Bản hợp đồng thương mại",
-    "category": "Written"
+    "en": "SLA 99.99% Contract",
+    "vi": "Phụ lục hợp đồng cam kết SLA 99.99%",
+    "category": "Written",
+    "icon": "🤝"
   },
   {
     "id": "C018",
-    "en": "Envelope",
-    "vi": "Phong bì thư niêm phong",
-    "category": "Written"
+    "en": "Unread PagerDuty Email",
+    "vi": "Hàng trăm Email cảnh báo chưa mở đọc",
+    "category": "Written",
+    "icon": "✉️"
   },
   {
     "id": "C019",
-    "en": "Postcard",
-    "vi": "Bưu thiếp du lịch",
-    "category": "Written"
+    "en": "Vacation Leave Request",
+    "vi": "Đơn xin nghỉ phép đúng ngày hệ thống sập",
+    "category": "Written",
+    "icon": "✉️"
   },
   {
     "id": "C020",
-    "en": "Invitation Card",
-    "vi": "Thiệp mời dự tiệc",
-    "category": "Written"
+    "en": "Release Party Invitation",
+    "vi": "Thiệp mời tiệc mừng dự án thành công",
+    "category": "Written",
+    "icon": "💌"
   },
   {
     "id": "C021",
-    "en": "Flyer / Leaflet",
-    "vi": "Tờ rơi quảng cáo",
-    "category": "Written"
+    "en": "AWS Certification Cheat Sheet",
+    "vi": "Tờ giấy ghi công thức lệnh Linux nhanh",
+    "category": "Written",
+    "icon": "📜"
   },
   {
     "id": "C022",
-    "en": "Notebook",
-    "vi": "Sổ tay ghi chép",
-    "category": "Written"
+    "en": "Scrum Daily Standup Notes",
+    "vi": "Sổ tay ghi chú cuộc họp Daily Scrum",
+    "category": "Written",
+    "icon": "📓"
   },
   {
     "id": "C023",
-    "en": "Sticky Note",
-    "vi": "Giấy nhớ (Post-it)",
-    "category": "Written"
+    "en": "Password Sticky Note on Monitor",
+    "vi": "Giấy note dán mật khẩu trên màn hình",
+    "category": "Written",
+    "icon": "🟨"
   },
   {
     "id": "C024",
-    "en": "Passport",
-    "vi": "Hộ chiếu",
-    "category": "Written/Personal"
+    "en": "Onsite Visa & Passport",
+    "vi": "Hộ chiếu chuẩn bị bay đi gặp khách hàng",
+    "category": "Written/Personal",
+    "icon": "🛂"
   },
   {
     "id": "C025",
-    "en": "ID Card",
-    "vi": "Thẻ căn cước",
-    "category": "Written/Personal"
+    "en": "FSOFT Employee Badge",
+    "vi": "Thẻ nhân viên FSOFT quẹt cửa phòng Lab",
+    "category": "Written/Personal",
+    "icon": "🪪"
   },
   {
     "id": "C026",
-    "en": "Student ID",
-    "vi": "Thẻ sinh viên",
-    "category": "Written/Personal"
+    "en": "Intern Access Pass",
+    "vi": "Thẻ thực tập sinh mượn quyền truy cập",
+    "category": "Written/Personal",
+    "icon": "🪪"
   },
   {
     "id": "C027",
-    "en": "VIP Membership Card",
-    "vi": "Thẻ hội viên VIP",
-    "category": "Written/Personal"
+    "en": "Root Admin Privilege Card",
+    "vi": "Thẻ cấp quyền Root Admin tối cao",
+    "category": "Written/Personal",
+    "icon": "🪪"
   },
   {
     "id": "C028",
-    "en": "Bank Statement",
-    "vi": "Sao kê ngân hàng",
-    "category": "Written"
+    "en": "Payment Gateway Transaction Log",
+    "vi": "Sao kê log giao dịch bị nhân đôi tiền",
+    "category": "Written",
+    "icon": "🏦"
   },
   {
     "id": "C029",
-    "en": "Checkbook",
-    "vi": "Sổ séc",
-    "category": "Written"
+    "en": "Overtime Timesheet Log",
+    "vi": "Bảng chấm công OT lúc 3h sáng",
+    "category": "Written",
+    "icon": "💵"
   },
   {
     "id": "C030",
-    "en": "Pawn Ticket",
-    "vi": "Giấy cầm đồ",
-    "category": "Written"
+    "en": "Jira Bug Ticket #404",
+    "vi": "Ticket Jira Priority Highest bị bỏ quên",
+    "category": "Written",
+    "icon": "🎟️"
   },
   {
     "id": "C031",
-    "en": "Exam Paper",
-    "vi": "Bài kiểm tra điểm kém",
-    "category": "Written"
+    "en": "Failed Unit Test Report",
+    "vi": "Báo cáo 99/100 Unit Test bị đánh Skip",
+    "category": "Written",
+    "icon": "✏️"
   },
   {
     "id": "C032",
-    "en": "Comic Book",
-    "vi": "Truyện tranh",
-    "category": "Written/Artistic"
+    "en": "Manga Reading Tab",
+    "vi": "Quyển truyện tranh đọc dở lúc chờ Build",
+    "category": "Written/Artistic",
+    "icon": "📖"
   },
   {
     "id": "C033",
-    "en": "Novel",
-    "vi": "Tiểu thuyết trinh thám",
-    "category": "Written/Artistic"
+    "en": "Clean Code Book on Desk",
+    "vi": "Cuốn sách 'Clean Code' còn nguyên bọc nilon",
+    "category": "Written/Artistic",
+    "icon": "📘"
   },
   {
     "id": "C034",
-    "en": "Magazine",
-    "vi": "Tạp chí thời trang",
-    "category": "Written"
+    "en": "StackOverflow Copy-Paste History",
+    "vi": "Lịch sử duyệt web 50 tab StackOverflow",
+    "category": "Written",
+    "icon": "📰"
   },
   {
     "id": "C035",
-    "en": "Confidential File",
-    "vi": "Tập hồ sơ tuyệt mật",
-    "category": "Written"
+    "en": ".env File With Plaintext Passwords",
+    "vi": "File .env chứa đầy password dạng rõ",
+    "category": "Written",
+    "icon": "📁"
   },
   {
     "id": "C036",
-    "en": "Lipstick",
-    "vi": "Thỏi son môi",
-    "category": "Personal"
+    "en": "Red Marker on Whiteboard",
+    "vi": "Bút dạ đỏ viết chữ 'CẤM ĐỤNG VÀO' trên bảng",
+    "category": "Personal",
+    "icon": "💄"
   },
   {
     "id": "C037",
-    "en": "Perfume",
-    "vi": "Chai nước hoa",
-    "category": "Personal"
+    "en": "Eye Drops for Night Coding",
+    "vi": "Lọ thuốc nhỏ mắt V.Rohto dùng xuyên đêm",
+    "category": "Personal",
+    "icon": "💧"
   },
   {
     "id": "C038",
-    "en": "Wristwatch",
-    "vi": "Đồng hồ đeo tay vỡ",
-    "category": "Personal"
+    "en": "Smartwatch Heart Rate 160 BPM",
+    "vi": "Đồng hồ thông minh báo nhịp tim 160 BPM",
+    "category": "Personal",
+    "icon": "⌚"
   },
   {
     "id": "C039",
-    "en": "Pocket Watch",
-    "vi": "Đồng hồ quả quýt",
-    "category": "Personal"
+    "en": "Pomodoro Focus Timer",
+    "vi": "Đồng hồ bấm giờ Pomodoro đang đếm ngược",
+    "category": "Personal",
+    "icon": "⏱️"
   },
   {
     "id": "C040",
-    "en": "Diamond Ring",
-    "vi": "Nhẫn kim cương",
-    "category": "Personal"
+    "en": "YubiKey Hardware Token",
+    "vi": "Khóa bảo mật cứng YubiKey cắm quên trên máy",
+    "category": "Personal",
+    "icon": "💍"
   },
   {
     "id": "C041",
-    "en": "Earring",
-    "vi": "Khuyên tai rơi lẻ",
-    "category": "Personal"
+    "en": "Single Lost AirPod",
+    "vi": "Chiếc tai nghe AirPod rơi dưới gầm bàn",
+    "category": "Personal",
+    "icon": "🎧"
   },
   {
     "id": "C042",
-    "en": "Necklace",
-    "vi": "Dây chuyền đứt",
-    "category": "Personal"
+    "en": "Orange FSOFT Lanyard",
+    "vi": "Dây đeo thẻ màu cam bị đứt khóa",
+    "category": "Personal",
+    "icon": "📿"
   },
   {
     "id": "C043",
-    "en": "Bracelet",
-    "vi": "Vòng tay ngọc bích",
-    "category": "Personal"
+    "en": "Feng Shui Lucky Bracelet",
+    "vi": "Vòng tay phong thủy cầu code không bug",
+    "category": "Personal",
+    "icon": "📿"
   },
   {
     "id": "C044",
-    "en": "Brooch",
-    "vi": "Trâm cài áo",
-    "category": "Personal/Artistic"
+    "en": "Best Bug Hunter Pin",
+    "vi": "Huy hiệu 'Vua Săn Bug' cài trên balo",
+    "category": "Personal/Artistic",
+    "icon": "🎖️"
   },
   {
     "id": "C045",
-    "en": "Hairpin",
-    "vi": "Kẹp tóc",
-    "category": "Personal"
+    "en": "SIM Ejector Pin",
+    "vi": "Que chọc SIM dùng để bấm nút Reset cứng",
+    "category": "Personal",
+    "icon": "🧷"
   },
   {
     "id": "C046",
-    "en": "Wig",
-    "vi": "Bộ tóc giả",
-    "category": "Personal"
+    "en": "Clump of Pulled-Out Hair",
+    "vi": "Chùm tóc rụng trên bàn phím vì nghĩ thuật toán",
+    "category": "Personal",
+    "icon": "💇"
   },
   {
     "id": "C047",
-    "en": "Glasses",
-    "vi": "Kính cận gãy gọng",
-    "category": "Personal"
+    "en": "Blue-Light Blocking Glasses",
+    "vi": "Kính chống ánh sáng xanh in bóng màn hình lỗi",
+    "category": "Personal",
+    "icon": "👓"
   },
   {
     "id": "C048",
-    "en": "Sunglasses",
-    "vi": "Kính râm đen",
-    "category": "Personal"
+    "en": "Dark Mode Sunglasses",
+    "vi": "Kính râm đeo trong phòng họp để che mắt ngủ gật",
+    "category": "Personal",
+    "icon": "🕶️"
   },
   {
     "id": "C049",
-    "en": "Contact Lens",
-    "vi": "Kính áp tròng",
-    "category": "Personal"
+    "en": "Bloodshot Eye Reflection",
+    "vi": "Đôi mắt đỏ ngầu sau 48 giờ trực chiến",
+    "category": "Personal",
+    "icon": "👁️"
   },
   {
     "id": "C050",
-    "en": "Button",
-    "vi": "Cúc áo bị đứt",
-    "category": "Personal"
+    "en": "Popped Enter Keycap",
+    "vi": "Nút phím Enter văng rời vì gõ lệnh quá mạnh",
+    "category": "Personal",
+    "icon": "⌨️"
   },
   {
     "id": "C051",
-    "en": "Cufflink",
-    "vi": "Khuy măng sét áo sơ mi",
-    "category": "Personal"
+    "en": "Custom Artisan Keycap",
+    "vi": "Nút Keycap độ hình đầu lâu trên bàn phím cơ",
+    "category": "Personal",
+    "icon": "💎"
   },
   {
     "id": "C052",
-    "en": "Gloves",
-    "vi": "Đôi găng tay da",
-    "category": "Personal"
+    "en": "Anti-Static Server Gloves",
+    "vi": "Găng tay chống tĩnh điện trong phòng Server",
+    "category": "Personal",
+    "icon": "🧤"
   },
   {
     "id": "C053",
-    "en": "Surgical Mask",
-    "vi": "Khẩu trang y tế",
-    "category": "Personal/Synthetic"
+    "en": "Anonymous Hacker Mask",
+    "vi": "Khẩu trang đen che kín mặt lúc đi qua Camera",
+    "category": "Personal/Synthetic",
+    "icon": "🎭"
   },
   {
     "id": "C054",
-    "en": "Hat / Cap",
-    "vi": "Mũ lưỡi trai",
-    "category": "Personal"
+    "en": "Black Hoodie Cap",
+    "vi": "Mũ lưỡi trai đen kéo sụp che mặt ở góc phòng",
+    "category": "Personal",
+    "icon": "🧢"
   },
   {
     "id": "C055",
-    "en": "Raincoat",
-    "vi": "Áo mưa mỏng",
-    "category": "Personal/Synthetic"
+    "en": "Thermal Hoodie in Server Room",
+    "vi": "Áo khoác dày mặc trong phòng máy lạnh 16 độ",
+    "category": "Personal/Synthetic",
+    "icon": "🧥"
   },
   {
     "id": "C056",
-    "en": "Umbrella",
-    "vi": "Chiếc ô (dù)",
-    "category": "Personal"
+    "en": "Wet Umbrella Near Power Strip",
+    "vi": "Chiếc ô ướt sũng dựng sát ổ điện máy chủ",
+    "category": "Personal",
+    "icon": "☂️"
   },
   {
     "id": "C057",
-    "en": "Handkerchief",
-    "vi": "Khăn tay thêu tên",
-    "category": "Personal"
+    "en": "Microfiber Screen Cloth",
+    "vi": "Khăn lau màn hình chùi vội dấu vân tay",
+    "category": "Personal",
+    "icon": "🧣"
   },
   {
     "id": "C058",
-    "en": "Wallet",
-    "vi": "Ví da rỗng",
-    "category": "Personal"
+    "en": "Hardware Crypto Wallet",
+    "vi": "Ví lạnh chứa khóa bí mật để quên trên bàn",
+    "category": "Personal",
+    "icon": "👛"
   },
   {
     "id": "C059",
-    "en": "Handbag",
-    "vi": "Túi xách hàng hiệu",
-    "category": "Personal"
+    "en": "Overstuffed Laptop Backpack",
+    "vi": "Balo đựng 3 chiếc Laptop dự án khác nhau",
+    "category": "Personal",
+    "icon": "🎒"
   },
   {
     "id": "C060",
-    "en": "Briefcase",
-    "vi": "Cặp táp khóa số",
-    "category": "Personal"
+    "en": "Locked NDA Briefcase",
+    "vi": "Cặp tài liệu bảo mật dự án ODC",
+    "category": "Personal",
+    "icon": "💼"
   },
   {
     "id": "C061",
-    "en": "Key",
-    "vi": "Chùm chìa khóa đồng",
-    "category": "Personal"
+    "en": "Server Rack Cabinet Key",
+    "vi": "Chìa khóa tủ Rack máy chủ vật lý",
+    "category": "Personal",
+    "icon": "🔑"
   },
   {
     "id": "C062",
-    "en": "Keycard",
-    "vi": "Thẻ từ khách sạn",
-    "category": "Personal/Synthetic"
+    "en": "ODC Door Access Keycard",
+    "vi": "Log quẹt thẻ từ ra vào cửa ODC lúc nửa đêm",
+    "category": "Personal/Synthetic",
+    "icon": "💳"
   },
   {
     "id": "C063",
-    "en": "Lighter",
-    "vi": "Bật lửa Zippo",
-    "category": "Personal"
+    "en": "Vape / Lighter on Balcony",
+    "vi": "Chiếc bật lửa bỏ quên ngoài hành lang hút thuốc",
+    "category": "Personal",
+    "icon": "🔥"
   },
   {
     "id": "C064",
-    "en": "Cigarette Butt",
-    "vi": "Đầu lọc thuốc lá",
-    "category": "Personal"
+    "en": "Ashtray Full of Butts",
+    "vi": "Gạt tàn đầy đầu lọc thuốc sau đêm fix bug",
+    "category": "Personal",
+    "icon": "🚬"
   },
   {
     "id": "C065",
-    "en": "Cigar",
-    "vi": "Điếu xì gà Cuba",
-    "category": "Personal"
+    "en": "Celebration Cigar",
+    "vi": "Điếu xì gà định hút mừng lên Prod thành công",
+    "category": "Personal",
+    "icon": "🚬"
   },
   {
     "id": "C066",
-    "en": "Smoking Pipe",
-    "vi": "Tẩu thuốc gỗ",
-    "category": "Personal"
+    "en": "Inhaler / Peppermint Tube",
+    "vi": "Ống hít mũi thông xoang chống buồn ngủ",
+    "category": "Personal",
+    "icon": "🪈"
   },
   {
     "id": "C067",
-    "en": "Comb",
-    "vi": "Chiếc lược chải đầu",
-    "category": "Personal"
+    "en": "Cable Management Comb",
+    "vi": "Lược cài dây cáp mạng bị tháo tung",
+    "category": "Personal",
+    "icon": "🪮"
   },
   {
     "id": "C068",
-    "en": "Mirror",
-    "vi": "Gương trang điểm nhỏ",
-    "category": "Personal"
+    "en": "Rearview Desk Mirror",
+    "vi": "Gương nhỏ gắn góc màn hình để canh sếp đi qua",
+    "category": "Personal",
+    "icon": "🪞"
   },
   {
     "id": "C069",
-    "en": "Nail Polish",
-    "vi": "Lọ sơn móng tay",
-    "category": "Personal"
+    "en": "Thermal Paste Tube",
+    "vi": "Tuýp keo tản nhiệt bôi lem nhem trên CPU",
+    "category": "Personal",
+    "icon": "🧪"
   },
   {
     "id": "C070",
-    "en": "Fake Fingernail",
-    "vi": "Móng tay giả",
-    "category": "Personal"
+    "en": "Bitten Fingernails",
+    "vi": "Mẩu móng tay cắn nham nhở vì lo lắng",
+    "category": "Personal",
+    "icon": "💅"
   },
   {
     "id": "C071",
-    "en": "Toothbrush",
-    "vi": "Bàn chải đánh răng",
-    "category": "Personal"
+    "en": "Overtime Toothbrush Kit",
+    "vi": "Bàn chải đánh răng chứng tỏ ngủ lại công ty",
+    "category": "Personal",
+    "icon": "🪥"
   },
   {
     "id": "C072",
-    "en": "Towel",
-    "vi": "Khăn mặt dính vết bẩn",
-    "category": "Personal"
+    "en": "Cold Sweat Towel",
+    "vi": "Khăn giấy thấm đẫm mồ hôi hột",
+    "category": "Personal",
+    "icon": "🧻"
   },
   {
     "id": "C073",
-    "en": "Sock",
-    "vi": "Chiếc tất lẻ",
-    "category": "Personal"
+    "en": "Programming Socks",
+    "vi": "Đôi tất sọc dài tăng 200% tốc độ gõ code",
+    "category": "Personal",
+    "icon": "🧦"
   },
   {
     "id": "C074",
-    "en": "Leather Shoe",
-    "vi": "Giày tây nam",
-    "category": "Personal"
+    "en": "Formal Dress Shoes",
+    "vi": "Đôi giày tây đi họp với khách hàng",
+    "category": "Personal",
+    "icon": "👞"
   },
   {
     "id": "C075",
-    "en": "Sneakers",
-    "vi": "Giày thể thao dính bùn",
-    "category": "Personal"
+    "en": "Running Shoes for Fast Escape",
+    "vi": "Giày chạy bộ sẵn sàng chuồn êm lúc 17h30",
+    "category": "Personal",
+    "icon": "👟"
   },
   {
     "id": "C076",
-    "en": "Slippers",
-    "vi": "Dép đi trong nhà",
-    "category": "Personal"
+    "en": "Honeycomb Office Slippers",
+    "vi": "Đôi dép tổ ong huyền thoại dưới gầm bàn",
+    "category": "Personal",
+    "icon": "🩴"
   },
   {
     "id": "C077",
-    "en": "Apron",
-    "vi": "Tạp dề làm bếp",
-    "category": "Personal"
+    "en": "Company Event T-Shirt",
+    "vi": "Áo thun đồng phục sự kiện công ty",
+    "category": "Personal",
+    "icon": "👕"
   },
   {
     "id": "C078",
-    "en": "Uniform",
-    "vi": "Đồng phục nhân viên",
-    "category": "Personal"
+    "en": "FSOFT Orange Polo Shirt",
+    "vi": "Áo Polo cam FSOFT treo trên ghế xoay",
+    "category": "Personal",
+    "icon": "👕"
   },
   {
     "id": "C079",
-    "en": "Badge / Medal",
-    "vi": "Huy chương kỷ niệm",
-    "category": "Personal"
+    "en": "Hackathon Champion Medal",
+    "vi": "Huy chương vô địch Hackathon để trên bàn",
+    "category": "Personal",
+    "icon": "🏅"
   },
   {
     "id": "C080",
-    "en": "Whistle",
-    "vi": "Còi bạc",
-    "category": "Personal"
+    "en": "Scrum Master Whistle",
+    "vi": "Chiếc còi báo hết giờ họp Daily Standup",
+    "category": "Personal",
+    "icon": "📢"
   },
   {
     "id": "C081",
-    "en": "Hair",
-    "vi": "Sợi tóc dài",
-    "category": "Natural"
+    "en": "Hair Caught in Cooling Fan",
+    "vi": "Sợi tóc cuốn kẹt cứng quạt tản nhiệt Laptop",
+    "category": "Natural",
+    "icon": "〰️"
   },
   {
     "id": "C082",
-    "en": "Cat Hair",
-    "vi": "Lông mèo",
-    "category": "Natural"
+    "en": "Cat Paw Print on Keyboard",
+    "vi": "Dấu chân mèo đi ngang qua bàn phím lúc WFH",
+    "category": "Natural",
+    "icon": "🐱"
   },
   {
     "id": "C083",
-    "en": "Dog Fur",
-    "vi": "Lông chó",
-    "category": "Natural"
+    "en": "Chewed Patch Cord Marks",
+    "vi": "Vết răng thú cưng gặm nát đầu dây mạng RJ45",
+    "category": "Natural",
+    "icon": "🐶"
   },
   {
     "id": "C084",
-    "en": "Feather",
-    "vi": "Lông vũ chim",
-    "category": "Natural"
+    "en": "Neck Pillow Feather",
+    "vi": "Lông vũ rơi ra từ gối kê cổ ngủ trưa",
+    "category": "Natural",
+    "icon": "🪶"
   },
   {
     "id": "C085",
-    "en": "Rose Petal",
-    "vi": "Cánh hoa hồng khô",
-    "category": "Natural/Artistic"
+    "en": "Withered Desk Rose",
+    "vi": "Bông hoa héo khô trên bàn từ dịp lễ trước",
+    "category": "Natural/Artistic",
+    "icon": "🌹"
   },
   {
     "id": "C086",
-    "en": "Leaf",
-    "vi": "Chiếc lá cây lạ",
-    "category": "Natural"
+    "en": "Lucky Money Plant Leaf",
+    "vi": "Lá cây Kim Tiền phong thủy đặt cạnh Case máy",
+    "category": "Natural",
+    "icon": "🍃"
   },
   {
     "id": "C087",
-    "en": "Grass",
-    "vi": "Cỏ dại dính đất",
-    "category": "Natural"
+    "en": "Cactus Soil on Desk",
+    "vi": "Đất trồng cây xương rồng hút bức xạ đổ ra bàn",
+    "category": "Natural",
+    "icon": "🌱"
   },
   {
     "id": "C088",
-    "en": "Mud / Soil",
-    "vi": "Bùn đất ướt",
-    "category": "Natural"
+    "en": "Muddy Footprints to Rack",
+    "vi": "Vết giày dính bùn đi thẳng vào phòng Server",
+    "category": "Natural",
+    "icon": "👣"
   },
   {
     "id": "C089",
-    "en": "Sand",
-    "vi": "Cát biển",
-    "category": "Natural"
+    "en": "Broken Hourglass Sand",
+    "vi": "Cát từ chiếc đồng hồ cát đếm ngược Deadline",
+    "category": "Natural",
+    "icon": "⏳"
   },
   {
     "id": "C090",
-    "en": "Seashell",
-    "vi": "Vỏ sò biển",
-    "category": "Natural"
+    "en": "Bash Shell Script Icon",
+    "vi": "Biểu tượng vỏ ốc của file thực thi .sh",
+    "category": "Natural",
+    "icon": "🐚"
   },
   {
     "id": "C091",
-    "en": "Spider Web",
-    "vi": "Mạng nhện",
-    "category": "Natural"
+    "en": "Cobwebs on Backup Server",
+    "vi": "Mạng nhện giăng kín máy chủ Backup lâu không bật",
+    "category": "Natural",
+    "icon": "🕸️"
   },
   {
     "id": "C092",
-    "en": "Dead Insect",
-    "vi": "Xác côn trùng",
-    "category": "Natural"
+    "en": "Actual Dead Bug in Motherboard",
+    "vi": "Xác con bọ thật nằm chập mạch trên bo mạch chủ",
+    "category": "Natural",
+    "icon": "🐞"
   },
   {
     "id": "C093",
-    "en": "Mosquito",
-    "vi": "Vết muỗi đốt / Xác muỗi",
-    "category": "Natural"
+    "en": "Mosquito Repellent Coil",
+    "vi": "Vết muỗi đốt chi chít vì ngồi OT góc tối",
+    "category": "Natural",
+    "icon": "🦟"
   },
   {
     "id": "C094",
-    "en": "Apple",
-    "vi": "Quả táo cắn dở",
-    "category": "Natural"
+    "en": "Half-Bitten Apple Logo",
+    "vi": "Quả táo cắn dở đặt cạnh chiếc MacBook Pro",
+    "category": "Natural",
+    "icon": "🍎"
   },
   {
     "id": "C095",
-    "en": "Banana Peel",
-    "vi": "Vỏ chuối",
-    "category": "Natural"
+    "en": "Banana Peel Near Server Rack",
+    "vi": "Vỏ chuối làm trượt chân văng tay vào nút nguồn",
+    "category": "Natural",
+    "icon": "🍌"
   },
   {
     "id": "C096",
-    "en": "Orange",
-    "vi": "Vỏ cam tươi",
-    "category": "Natural"
+    "en": "Vitamin C Effervescent Tube",
+    "vi": "Ly nước C sủi tăng đề kháng để sát bàn phím",
+    "category": "Natural",
+    "icon": "🍊"
   },
   {
     "id": "C097",
-    "en": "Peanut",
-    "vi": "Hạt đậu phộng (dị ứng)",
-    "category": "Natural"
+    "en": "Salted Peanuts Snack",
+    "vi": "Vỏ đậu phộng rang muối rơi lọt khe phím",
+    "category": "Natural",
+    "icon": "🥜"
   },
   {
     "id": "C098",
-    "en": "Coffee Beans",
-    "vi": "Hạt cà phê rang",
-    "category": "Natural"
+    "en": "Roasted Arabica Coffee Beans",
+    "vi": "Hạt cà phê nguyên chất chống buồn ngủ",
+    "category": "Natural",
+    "icon": "🫘"
   },
   {
     "id": "C099",
-    "en": "Tea Leaves",
-    "vi": "Bã trà Ô Long",
-    "category": "Natural"
+    "en": "Spilled Coffee on Keyboard",
+    "vi": "Ly cà phê đổ lênh láng lên bàn phím",
+    "category": "Natural",
+    "icon": "☕"
   },
   {
     "id": "C100",
-    "en": "Herbs",
-    "vi": "Thảo dược Đông y",
-    "category": "Natural"
+    "en": "Herbal Stress-Relief Tea",
+    "vi": "Túi trà thảo mộc hạ hỏa lúc họp War Room",
+    "category": "Natural",
+    "icon": "🌿"
   },
   {
     "id": "C101",
-    "en": "Spices",
-    "vi": "Bột gia vị cay",
-    "category": "Natural"
+    "en": "Spicy Instant Noodle Packet",
+    "vi": "Gói gia vị mì cay Hàn Quốc ăn lúc 1h sáng",
+    "category": "Natural",
+    "icon": "🌶️"
   },
   {
     "id": "C102",
-    "en": "Sugar / Salt",
-    "vi": "Hạt đường / Muối trắng",
-    "category": "Natural"
+    "en": "Hashed Salt String",
+    "vi": "Lọ muối trắng đặt cạnh tờ giấy ghi chữ 'Salt Hash'",
+    "category": "Natural",
+    "icon": "🧂"
   },
   {
     "id": "C103",
-    "en": "Flour",
-    "vi": "Bột mì vương vãi",
-    "category": "Natural"
+    "en": "Snack Crumbs in Keyboard",
+    "vi": "Vụn bánh quy kẹt cứng dưới nút Ctrl + Z",
+    "category": "Natural",
+    "icon": "🍪"
   },
   {
     "id": "C104",
-    "en": "Rice",
-    "vi": "Cơm thừa",
-    "category": "Natural"
+    "en": "Cold Office Lunchbox",
+    "vi": "Hộp cơm trưa chưa kịp ăn vì bận cứu Prod",
+    "category": "Natural",
+    "icon": "🍚"
   },
   {
     "id": "C105",
-    "en": "Noodles",
-    "vi": "Tô mì ăn dở",
-    "category": "Natural"
+    "en": "Half-Eaten Cup Noodles",
+    "vi": "Ly mì tôm úp dở trương phình bên cạnh màn hình",
+    "category": "Natural",
+    "icon": "🍜"
   },
   {
     "id": "C106",
-    "en": "Bread",
-    "vi": "Mẫu bánh mì",
-    "category": "Natural"
+    "en": "Banh Mi Wrapper on Desk",
+    "vi": "Giấy gói bánh mì ăn vội trước giờ lên sóng",
+    "category": "Natural",
+    "icon": "🥖"
   },
   {
     "id": "C107",
-    "en": "Cake",
-    "vi": "Bánh kem sinh nhật",
-    "category": "Natural"
+    "en": "Go-Live Celebration Cake",
+    "vi": "Bánh kem mừng Go-Live chưa kịp cắt đã sập",
+    "category": "Natural",
+    "icon": "🍰"
   },
   {
     "id": "C108",
-    "en": "Chocolate",
-    "vi": "Thanh Sô-cô-la",
-    "category": "Natural"
+    "en": "HTTP Cookie & Chocolate",
+    "vi": "Thanh sô-cô-la đắng giúp tỉnh táo fix bug",
+    "category": "Natural",
+    "icon": "🍫"
   },
   {
     "id": "C109",
-    "en": "Candy",
-    "vi": "Viên kẹo ngọt",
-    "category": "Natural"
+    "en": "Throat Lozenges Candy",
+    "vi": "Kẹo ngậm đau họng vì cãi nhau suốt 3 tiếng",
+    "category": "Natural",
+    "icon": "🍬"
   },
   {
     "id": "C110",
-    "en": "Chewing Gum",
-    "vi": "Bã kẹo cao su",
-    "category": "Natural/Synthetic"
+    "en": "Chewing Gum Over Webcam",
+    "vi": "Bã kẹo cao su dán che kín mắt Camera laptop",
+    "category": "Natural/Synthetic",
+    "icon": "🍬"
   },
   {
     "id": "C111",
-    "en": "Ice Cream",
-    "vi": "Kem tan chảy",
-    "category": "Natural"
+    "en": "Melted Boba Tea Cup",
+    "vi": "Ly trà sữa trân châu đường đen tan hết đá",
+    "category": "Natural",
+    "icon": "🧁"
   },
   {
     "id": "C112",
-    "en": "Ice Cube",
-    "vi": "Viên nước đá đang tan",
-    "category": "Natural"
+    "en": "Bag of Ice on Overheated Laptop",
+    "vi": "Túi nước đá chườm thẳng lên mặt máy tính đang bốc hỏa",
+    "category": "Natural",
+    "icon": "🧊"
   },
   {
     "id": "C113",
-    "en": "Bone",
-    "vi": "Khúc xương động vật",
-    "category": "Natural"
+    "en": "Skeleton Service Template",
+    "vi": "Khung xương kiến trúc hệ thống bị gãy vụn",
+    "category": "Natural",
+    "icon": "🦴"
   },
   {
     "id": "C114",
-    "en": "Fish Scale",
-    "vi": "Vảy cá tươi",
-    "category": "Natural"
+    "en": "Phishing Email Bait",
+    "vi": "Mồi nhử từ đường link Phishing giả mạo IT",
+    "category": "Natural",
+    "icon": "🐟"
   },
   {
     "id": "C115",
-    "en": "Eggshell",
-    "vi": "Vỏ trứng vỡ",
-    "category": "Natural"
+    "en": "Broken Easter Egg Feature",
+    "vi": "Tính năng Easter Egg ẩn do Dev tự ý cài vào",
+    "category": "Natural",
+    "icon": "🥚"
   },
   {
     "id": "C116",
-    "en": "Red Wine Stain",
-    "vi": "Vết rượu vang đỏ",
-    "category": "Natural"
+    "en": "Red Bull Energy Drink Stain",
+    "vi": "Vết nước tăng lực đổ loang trên bản vẽ thiết kế",
+    "category": "Natural",
+    "icon": "🍷"
   },
   {
     "id": "C117",
-    "en": "Juice",
-    "vi": "Ly nước ép trái cây",
-    "category": "Natural"
+    "en": "Empty Beer Cans from Release Party",
+    "vi": "Vỏ lon bia từ bữa tiệc mừng sớm",
+    "category": "Natural",
+    "icon": "🍾"
   },
   {
     "id": "C118",
-    "en": "Milk",
-    "vi": "Hộp sữa đổ",
-    "category": "Natural"
+    "en": "Carton of Fresh Milk",
+    "vi": "Hộp sữa tươi bổ sung dinh dưỡng ca đêm",
+    "category": "Natural",
+    "icon": "🥛"
   },
   {
     "id": "C119",
-    "en": "Wood Chips",
-    "vi": "Mùn cưa / Dăm gỗ",
-    "category": "Natural"
+    "en": "Dead Branch in Git Tree",
+    "vi": "Nhánh code rác lâu năm không ai dọn dẹp",
+    "category": "Natural",
+    "icon": "🪵"
   },
   {
     "id": "C120",
-    "en": "Charcoal",
-    "vi": "Than củi đen",
-    "category": "Natural"
+    "en": "Burnt Silicon Dust",
+    "vi": "Tro bụi cháy đen từ tụ điện nguồn",
+    "category": "Natural",
+    "icon": "🪨"
   },
   {
     "id": "C121",
-    "en": "Smartphone",
-    "vi": "Điện thoại di động",
-    "category": "Synthetic"
+    "en": "2FA Authenticator Phone",
+    "vi": "Điện thoại chứa mã OTP 2FA hết pin sập nguồn",
+    "category": "Synthetic",
+    "icon": "📱"
   },
   {
     "id": "C122",
-    "en": "Laptop",
-    "vi": "Máy tính xách tay",
-    "category": "Synthetic"
+    "en": "Unlocked Laptop With Prod SSH",
+    "vi": "Laptop mở sẵn cửa sổ SSH vào thẳng Production",
+    "category": "Synthetic",
+    "icon": "💻"
   },
   {
     "id": "C123",
-    "en": "USB Flash Drive",
-    "vi": "Thẻ nhớ USB",
-    "category": "Synthetic"
+    "en": "Unlabeled Bootable USB",
+    "vi": "Chiếc USB lạ cắm trực tiếp vào cổng sau máy chủ",
+    "category": "Synthetic",
+    "icon": "🔌"
   },
   {
     "id": "C124",
-    "en": "SD Memory Card",
-    "vi": "Thẻ nhớ máy ảnh",
-    "category": "Synthetic"
+    "en": "Overheated RAM Stick",
+    "vi": "Thanh RAM máy chủ bốc mùi khét",
+    "category": "Synthetic",
+    "icon": "💾"
   },
   {
     "id": "C125",
-    "en": "Camera",
-    "vi": "Máy ảnh kỹ thuật số",
-    "category": "Synthetic"
+    "en": "Phone Photo of Error Screen",
+    "vi": "Ảnh chụp màn hình lỗi bằng điện thoại mờ tịt",
+    "category": "Synthetic",
+    "icon": "📷"
   },
   {
     "id": "C126",
-    "en": "CCTV Tape",
-    "vi": "Băng ghi hình camera an ninh",
-    "category": "Synthetic"
+    "en": "Server Room CCTV Footage",
+    "vi": "Đoạn video CCTV ghi lại bóng người lúc 02:13 AM",
+    "category": "Synthetic",
+    "icon": "📹"
   },
   {
     "id": "C127",
-    "en": "Voice Recorder",
-    "vi": "Máy ghi âm bỏ túi",
-    "category": "Synthetic"
+    "en": "Recorded War Room Meeting",
+    "vi": "File ghi âm cuộc họp đổ lỗi dài 2 tiếng",
+    "category": "Synthetic",
+    "icon": "📼"
   },
   {
     "id": "C128",
-    "en": "Earphones",
-    "vi": "Tai nghe đứt dây",
-    "category": "Synthetic"
+    "en": "Noise-Canceling Headphones",
+    "vi": "Tai nghe chống ồn bật max volume không nghe thấy còi báo",
+    "category": "Synthetic",
+    "icon": "🎧"
   },
   {
     "id": "C129",
-    "en": "Charger Cable",
-    "vi": "Dây cáp sạc",
-    "category": "Synthetic"
+    "en": "Loose RJ45 LAN Cable",
+    "vi": "Dây mạng LAN bị gãy lẫy nhựa lỏng lẻo",
+    "category": "Synthetic",
+    "icon": "🔌"
   },
   {
     "id": "C130",
-    "en": "Battery",
-    "vi": "Viên pin tiểu",
-    "category": "Synthetic"
+    "en": "UPS Battery at 1%",
+    "vi": "Bộ lưu điện UPS nhấp nháy đèn đỏ còn 1% pin",
+    "category": "Synthetic",
+    "icon": "🔋"
   },
   {
     "id": "C131",
-    "en": "Flashlight",
-    "vi": "Đèn pin cầm tay",
-    "category": "Synthetic"
+    "en": "SysAdmin Flashlight",
+    "vi": "Đèn pin soi tủ cáp mạng trong phòng tối",
+    "category": "Synthetic",
+    "icon": "🔦"
   },
   {
     "id": "C132",
-    "en": "Light Bulb",
-    "vi": "Bóng đèn cháy",
-    "category": "Synthetic"
+    "en": "Blinking Red Server LED",
+    "vi": "Đèn báo lỗi ổ cứng RAID chớp đỏ liên hồi",
+    "category": "Synthetic",
+    "icon": "💡"
   },
   {
     "id": "C133",
-    "en": "Fuse",
-    "vi": "Cầu chì điện đứt",
-    "category": "Synthetic"
+    "en": "Blown Power Supply Fuse",
+    "vi": "Cầu chì nguồn tủ Rack bị nổ đen thui",
+    "category": "Synthetic",
+    "icon": "⚡"
   },
   {
     "id": "C134",
-    "en": "Remote Control",
-    "vi": "Điều khiển tivi",
-    "category": "Synthetic"
+    "en": "PS5 Controller at Desk",
+    "vi": "Tay cầm chơi game PS5 giấu trong ngăn kéo bàn",
+    "category": "Synthetic",
+    "icon": "🎮"
   },
   {
     "id": "C135",
-    "en": "Alarm Clock",
-    "vi": "Đồng hồ báo thức",
-    "category": "Synthetic"
+    "en": "Cronjob Timer Set to * * * * *",
+    "vi": "Biểu thức Cronjob * * * * * chạy mỗi giây",
+    "category": "Synthetic",
+    "icon": "⏰"
   },
   {
     "id": "C136",
-    "en": "Electric Fan",
-    "vi": "Quạt máy đang quay",
-    "category": "Synthetic"
+    "en": "Cooling Fan at 6000 RPM",
+    "vi": "Quạt tản nhiệt kêu rồ rồ như máy bay cất cánh",
+    "category": "Synthetic",
+    "icon": "🪭"
   },
   {
     "id": "C137",
-    "en": "Iron",
-    "vi": "Bàn ủi quần áo còn nóng",
-    "category": "Synthetic"
+    "en": "Disabled Firewall Log",
+    "vi": "Nhật ký hệ thống báo dịch vụ Firewall vừa bị Stop",
+    "category": "Synthetic",
+    "icon": "🔥"
   },
   {
     "id": "C138",
-    "en": "Hair Dryer",
-    "vi": "Máy sấy tóc",
-    "category": "Synthetic"
+    "en": "Air Conditioner Remote at 30°C",
+    "vi": "Điều khiển máy lạnh phòng Server bị ai đó chỉnh lên 30 độ",
+    "category": "Synthetic",
+    "icon": "🌬️"
   },
   {
     "id": "C139",
-    "en": "Syringe",
-    "vi": "Ống bơm tiêm rỗng",
-    "category": "Synthetic"
+    "en": "Dependency Injection Trace",
+    "vi": "Log lỗi Circular Dependency Injection",
+    "category": "Synthetic",
+    "icon": "💉"
   },
   {
     "id": "C140",
-    "en": "Medicine Bottle",
-    "vi": "Lọ thuốc rỗng",
-    "category": "Synthetic"
+    "en": "Expired JWT Bearer Token",
+    "vi": "Chuỗi JWT Token đã hết hạn từ năm ngoái",
+    "category": "Synthetic",
+    "icon": "💊"
   },
   {
     "id": "C141",
-    "en": "Bandage",
-    "vi": "Băng gạc y tế dính máu",
-    "category": "Synthetic"
+    "en": "Spaghetti Hotfix Patch",
+    "vi": "Bản vá lỗi tạm bợ băng bó chồng chất",
+    "category": "Synthetic",
+    "icon": "🩹"
   },
   {
     "id": "C142",
-    "en": "Cotton Swab",
-    "vi": "Tăm bông y tế",
-    "category": "Synthetic"
+    "en": "Swab for Cleaning Fiber Port",
+    "vi": "Tăm bông vệ sinh đầu cáp quang",
+    "category": "Synthetic",
+    "icon": "🧹"
   },
   {
     "id": "C143",
-    "en": "Thermometer",
-    "vi": "Nhiệt kế thủy ngân vỡ",
-    "category": "Synthetic"
+    "en": "CPU Temp Alert 105°C",
+    "vi": "Cảnh báo nhiệt độ CPU vượt ngưỡng 105°C",
+    "category": "Synthetic",
+    "icon": "🌡️"
   },
   {
     "id": "C144",
-    "en": "Rubber Gloves",
-    "vi": "Găng tay cao su",
-    "category": "Synthetic"
+    "en": "Rubber Duck Debugger",
+    "vi": "Chú vịt vàng Debug nằm chỏng chơ trên bàn",
+    "category": "Synthetic",
+    "icon": "🧤"
   },
   {
     "id": "C145",
-    "en": "Soap",
-    "vi": "Bánh xà phòng",
-    "category": "Synthetic"
+    "en": "Legacy SOAP XML Payload",
+    "vi": "Gói tin SOAP XML cổ lỗ sĩ bị lỗi cú pháp",
+    "category": "Synthetic",
+    "icon": "🧼"
   },
   {
     "id": "C146",
-    "en": "Detergent / Bleach",
-    "vi": "Chai thuốc tẩy Javel",
-    "category": "Synthetic"
+    "en": "Sanitized Database Dump",
+    "vi": "File dump dữ liệu bị xóa trắng bằng công cụ dọn dẹp",
+    "category": "Synthetic",
+    "icon": "🧪"
   },
   {
     "id": "C147",
-    "en": "Mop / Rag",
-    "vi": "Cây lau nhà / Giẻ lau",
-    "category": "Synthetic"
+    "en": "Cleared bash_history File",
+    "vi": "Lịch sử bash_history bị chạy lệnh history -c xóa sạch",
+    "category": "Synthetic",
+    "icon": "🧹"
   },
   {
     "id": "C148",
-    "en": "Trash Bag",
-    "vi": "Túi đựng rác đen",
-    "category": "Synthetic"
+    "en": "Recycle Bin Full of Prod Files",
+    "vi": "Thùng rác máy chủ chứa đầy file cấu hình vừa xóa",
+    "category": "Synthetic",
+    "icon": "🗑️"
   },
   {
     "id": "C149",
-    "en": "Duct Tape",
-    "vi": "Cuộn băng dính xám",
-    "category": "Synthetic"
+    "en": "Latency Spike 30,000ms",
+    "vi": "Biểu đồ thời gian phản hồi API vọt lên 30,000ms",
+    "category": "Synthetic",
+    "icon": "📏"
   },
   {
     "id": "C150",
-    "en": "Super Glue",
-    "vi": "Keo dán sắt 502",
-    "category": "Synthetic"
+    "en": "Hardcoded Localhost IP",
+    "vi": "Dòng code dính cứng địa chỉ http://localhost:8080",
+    "category": "Synthetic",
+    "icon": "🛢️"
   },
   {
     "id": "C151",
-    "en": "Rope / Twine",
-    "vi": "Đoạn dây gai",
-    "category": "Synthetic"
+    "en": "Tangled Patch Cables",
+    "vi": "Búi dây mạng xoắn chặt vào nhau trong tủ Switch",
+    "category": "Synthetic",
+    "icon": "🪢"
   },
   {
     "id": "C152",
-    "en": "Padlock",
-    "vi": "Ổ khóa bị cạy",
-    "category": "Synthetic"
+    "en": "Unauthenticated Public S3",
+    "vi": "Biểu tượng ổ khóa mở toang trên kho dữ liệu Cloud",
+    "category": "Synthetic",
+    "icon": "🔓"
   },
   {
     "id": "C153",
-    "en": "Screwdriver",
-    "vi": "Tua vít",
-    "category": "Synthetic"
+    "en": "Manual Registry Tweaks",
+    "vi": "Chiếc tua vít tháo tung vỏ thùng máy Server",
+    "category": "Synthetic",
+    "icon": "🪛"
   },
   {
     "id": "C154",
-    "en": "Nails / Screws",
-    "vi": "Đinh vít kim loại",
-    "category": "Synthetic"
+    "en": "Loose Rack Mounting Screws",
+    "vi": "Ốc bắt khay ổ cứng rơi lổn nhổn dưới sàn",
+    "category": "Synthetic",
+    "icon": "🔩"
   },
   {
     "id": "C155",
-    "en": "Sawdust",
-    "vi": "Bụi kim loại / Mạt sắt",
-    "category": "Synthetic"
+    "en": "500 Internal Server Error Log",
+    "vi": "Màn hình ngập tràn chữ 500 Internal Server Error",
+    "category": "Synthetic",
+    "icon": "🚨"
   },
   {
     "id": "C156",
-    "en": "Paint Brush",
-    "vi": "Cọ quét sơn",
-    "category": "Synthetic/Artistic"
+    "en": "Broken CSS Z-Index: 999999",
+    "vi": "Dòng code CSS z-index: 999999 che mất nút Thanh toán",
+    "category": "Synthetic/Artistic",
+    "icon": "🖌️"
   },
   {
     "id": "C157",
-    "en": "Lubricant Oil",
-    "vi": "Vết dầu nhớt bôi trơn",
-    "category": "Synthetic"
+    "en": "Midnight Oil Burner Log",
+    "vi": "Log truy cập VPN từ một IP lạ lúc nửa đêm",
+    "category": "Synthetic",
+    "icon": "🛢️"
   },
   {
     "id": "C158",
-    "en": "Gasoline Can",
-    "vi": "Can xăng nhựa",
-    "category": "Synthetic"
+    "en": "Out-of-Quota Cloud Gas Gauge",
+    "vi": "Đồng hồ đo băng thông báo chạm đáy 0 MB",
+    "category": "Synthetic",
+    "icon": "⛽"
   },
   {
     "id": "C159",
-    "en": "Tire Marks",
-    "vi": "Vết lốp xe phanh gấp",
-    "category": "Synthetic"
+    "en": "Rollback Skid Marks",
+    "vi": "Lịch sử 10 lần bấm Rollback liên tiếp thất bại",
+    "category": "Synthetic",
+    "icon": "🛞"
   },
   {
     "id": "C160",
-    "en": "Helmet",
-    "vi": "Mũ bảo hiểm",
-    "category": "Synthetic"
+    "en": "On-Call Firefighter Helmet",
+    "vi": "Mũ bảo hiểm để sẵn trên bàn để chạy đi cứu net",
+    "category": "Synthetic",
+    "icon": "🪖"
   },
   {
     "id": "C161",
-    "en": "License Plate",
-    "vi": "Biển số xe rơi",
-    "category": "Synthetic"
+    "en": "Suspicious Foreign IP Address",
+    "vi": "IP đăng nhập lạ từ bên kia bán cầu",
+    "category": "Synthetic",
+    "icon": "🌐"
   },
   {
     "id": "C162",
-    "en": "Bullet Casing",
-    "vi": "Vỏ đạn đồng",
-    "category": "Synthetic"
+    "en": "Traceroute Hop Timeout",
+    "vi": "Kết quả lệnh ping và traceroute đứt đoạn toàn dấu sao *",
+    "category": "Synthetic",
+    "icon": "🎯"
   },
   {
     "id": "C163",
-    "en": "Gunpowder Residue",
-    "vi": "Thuốc súng vương lại",
-    "category": "Synthetic"
+    "en": "Burned Motherboard Capacitor",
+    "vi": "Bụi khói đen bám quanh khe cắm nguồn",
+    "category": "Synthetic",
+    "icon": "💨"
   },
   {
     "id": "C164",
-    "en": "Handcuffs",
-    "vi": "Còng tay số 8",
-    "category": "Synthetic"
+    "en": "Locked Admin Account",
+    "vi": "Tài khoản Admin bị khóa cứng vì nhập sai pass 5 lần",
+    "category": "Synthetic",
+    "icon": "⛓️"
   },
   {
     "id": "C165",
-    "en": "Paperclip",
-    "vi": "Kẹp giấy bẻ cong",
-    "category": "Synthetic"
+    "en": "Clippy AI Assistant Prompt",
+    "vi": "Lịch sử hỏi ChatGPT 'Làm sao khôi phục bảng vừa DROP'",
+    "category": "Synthetic",
+    "icon": "📎"
   },
   {
     "id": "C166",
-    "en": "Fountain Pen",
-    "vi": "Bút máy mực đen",
-    "category": "Synthetic/Written"
+    "en": "Forged Digital Signature",
+    "vi": "Chữ ký số bị sai lệch mã băm SHA-256",
+    "category": "Synthetic/Written",
+    "icon": "🖋️"
   },
   {
     "id": "C167",
-    "en": "Chalk",
-    "vi": "Viên phấn trắng",
-    "category": "Synthetic"
+    "en": "Whiteboard Architecture Sketch",
+    "vi": "Sơ đồ luồng dữ liệu xóa nham nhở trên bảng",
+    "category": "Synthetic",
+    "icon": "🖍️"
   },
   {
     "id": "C168",
-    "en": "Eraser",
-    "vi": "Cục tẩy cao su",
-    "category": "Synthetic"
+    "en": "QA 'LGTM' Approval Stamp",
+    "vi": "Dấu mộc 'LGTM - Đã Test' đóng vội không nhìn code",
+    "category": "Synthetic",
+    "icon": "💮"
   },
   {
     "id": "C169",
-    "en": "Ruler",
-    "vi": "Thước kẻ kim loại",
-    "category": "Synthetic"
+    "en": "Pixel-Perfect UI Ruler",
+    "vi": "Công cụ đo lệch 1px giao diện trên trình duyệt",
+    "category": "Synthetic",
+    "icon": "📐"
   },
   {
     "id": "C170",
-    "en": "Wine Glass",
-    "vi": "Ly rượu vang có dấu môi",
-    "category": "Synthetic"
+    "en": "Fragile Glass Monolith",
+    "vi": "Cấu trúc code mỏng manh chạm nhẹ là vỡ",
+    "category": "Synthetic",
+    "icon": "🍷"
   },
   {
     "id": "C171",
-    "en": "Painting",
-    "vi": "Bức tranh sơn dầu rách",
-    "category": "Artistic"
+    "en": "Uncompressed 50MB PNG Banner",
+    "vi": "File ảnh Banner trang chủ nặng 50MB chưa nén",
+    "category": "Artistic",
+    "icon": "🖼️"
   },
   {
     "id": "C172",
-    "en": "Photograph",
-    "vi": "Bức ảnh chụp chung bị xé",
-    "category": "Artistic/Personal"
+    "en": "Cropped Bug Screenshot",
+    "vi": "Ảnh chụp màn hình cố tình cắt mất thanh URL",
+    "category": "Artistic/Personal",
+    "icon": "📸"
   },
   {
     "id": "C173",
-    "en": "Porcelain Vase",
-    "vi": "Bình gốm sứ cổ vỡ",
-    "category": "Artistic"
+    "en": "Shattered Trophy Vase",
+    "vi": "Cúp lưu niệm dự án bị rơi vỡ dưới chân bàn",
+    "category": "Artistic",
+    "icon": "🏺"
   },
   {
     "id": "C174",
-    "en": "Violin",
-    "vi": "Đàn Violin đứt dây",
-    "category": "Artistic"
+    "en": "Sad Violin Meme Sound",
+    "vi": "Tab Youtube đang mở nhạc đám ma 'Astronomia'",
+    "category": "Artistic",
+    "icon": "🎻"
   },
   {
     "id": "C175",
-    "en": "Sheet Music",
-    "vi": "Bản nhạc viết tay",
-    "category": "Artistic/Written"
+    "en": "Beep Error Sound Code",
+    "vi": "Đoạn mã phát tiếng bíp liên hồi từ loa thùng máy",
+    "category": "Artistic/Written",
+    "icon": "🎼"
   },
   {
     "id": "C176",
-    "en": "Theater Mask",
-    "vi": "Mặt nạ kịch Opera",
-    "category": "Artistic"
+    "en": "Incognito Browser Session",
+    "vi": "Cửa sổ trình duyệt ẩn danh (Incognito) chưa kịp tắt",
+    "category": "Artistic",
+    "icon": "🎭"
   },
   {
     "id": "C177",
-    "en": "Origami Crane",
-    "vi": "Hạc giấy Origami",
-    "category": "Artistic"
+    "en": "Origami Crane from Spec Doc",
+    "vi": "Hạc giấy xếp bằng tờ tài liệu Requirement của khách",
+    "category": "Artistic",
+    "icon": "🦢"
   },
   {
     "id": "C178",
-    "en": "Calligraphy Brush",
-    "vi": "Bút lông thư pháp",
-    "category": "Artistic"
+    "en": "Theme Color Override Script",
+    "vi": "Đoạn code đổi màu toàn bộ nút bấm sang màu trắng",
+    "category": "Artistic",
+    "icon": "🖌️"
   },
   {
     "id": "C179",
-    "en": "Antique Coin",
-    "vi": "Đồng xu cổ",
-    "category": "Artistic"
+    "en": "Rounding Error Floating Coins",
+    "vi": "Lỗi làm tròn số thực (Floating Point) làm lệch tiền",
+    "category": "Artistic",
+    "icon": "🪙"
   },
   {
     "id": "C180",
-    "en": "Jade Pendant",
-    "vi": "Mặt ngọc bội điêu khắc",
-    "category": "Artistic/Personal"
+    "en": "Pixelated SVG Icon",
+    "vi": "File SVG lỗi thẻ đóng làm trắng xóa cả trang web",
+    "category": "Artistic/Personal",
+    "icon": "💎"
   },
   {
     "id": "C181",
-    "en": "Mahjong Tile",
-    "vi": "Quân bài Mạt chược",
-    "category": "Unrelated/Personal"
+    "en": "Domino Cascade Failure",
+    "vi": "Hiệu ứng Domino sập dây chuyền từ 1 service nhỏ",
+    "category": "Unrelated/Personal",
+    "icon": "🀄"
   },
   {
     "id": "C182",
-    "en": "Playing Cards",
-    "vi": "Lá bài Tây (Át Bích)",
-    "category": "Unrelated/Artistic"
+    "en": "Planning Poker Card '99'",
+    "vi": "Lá bài ước lượng điểm Scrum 'Vô cực' nằm trên bàn",
+    "category": "Unrelated/Artistic",
+    "icon": "🃏"
   },
   {
     "id": "C183",
-    "en": "Poker Chip",
-    "vi": "Chip sòng bạc",
-    "category": "Unrelated/Synthetic"
+    "en": "All-In Production Gamble",
+    "vi": "Quyết định 'All-in' đẩy code không cần chạy thử",
+    "category": "Unrelated/Synthetic",
+    "icon": "🪙"
   },
   {
     "id": "C184",
-    "en": "Dice",
-    "vi": "Viên xúc xắc",
-    "category": "Unrelated"
+    "en": "Random Number Generator Seed",
+    "vi": "Hàm Math.random() viết cứng trả về số 4",
+    "category": "Unrelated",
+    "icon": "🎲"
   },
   {
     "id": "C185",
-    "en": "Chess Piece",
-    "vi": "Quân cờ Vua (Quân Hậu)",
-    "category": "Artistic"
+    "en": "Chess.com Tab Open During Work",
+    "vi": "Ván cờ vua online đang đánh dở trong giờ làm",
+    "category": "Artistic",
+    "icon": "♛"
   },
   {
     "id": "C186",
-    "en": "Puzzle Piece",
-    "vi": "Mảnh ghép hình (Jigsaw)",
-    "category": "Artistic"
+    "en": "Missing Dependency Puzzle",
+    "vi": "Mảnh ghép thư viện bị thiếu làm gãy bản Build",
+    "category": "Artistic",
+    "icon": "🧩"
   },
   {
     "id": "C187",
-    "en": "Stuffed Toy / Teddy Bear",
-    "vi": "Gấu bông rách",
-    "category": "Personal/Unrelated"
+    "en": "Desk Mascot Teddy Bear",
+    "vi": "Gấu bông ôm ngủ trên ghế sofa văn phòng",
+    "category": "Personal/Unrelated",
+    "icon": "🧸"
   },
   {
     "id": "C188",
-    "en": "Puppet / Doll",
-    "vi": "Con búp bê sứ",
-    "category": "Artistic"
+    "en": "Nested Docker-in-Docker",
+    "vi": "Cấu trúc búp bê Nga: Chạy Docker lồng trong Docker",
+    "category": "Artistic",
+    "icon": "🪆"
   },
   {
     "id": "C189",
-    "en": "Balloon",
-    "vi": "Quả bóng bay xẹp",
-    "category": "Unrelated"
+    "en": "Popped Release Party Balloon",
+    "vi": "Quả bóng bay trang trí nổ cái đùng làm giật mình",
+    "category": "Unrelated",
+    "icon": "🎈"
   },
   {
     "id": "C190",
-    "en": "Gift Box",
-    "vi": "Hộp quà buộc nơ",
-    "category": "Personal"
+    "en": "Mystery Zip Bomb Archive",
+    "vi": "File nén 'Qua_Tang_Sep.zip' giải nén ra 100 Terabyte",
+    "category": "Personal",
+    "icon": "🎁"
   },
   {
     "id": "C191",
-    "en": "Candle",
-    "vi": "Ngọn nến thơm cháy dở",
-    "category": "Artistic"
+    "en": "Prayer Candle on Server Rack",
+    "vi": "Ngọn nến tâm linh thắp cầu nguyện Server đừng sập",
+    "category": "Artistic",
+    "icon": "🕯️"
   },
   {
     "id": "C192",
-    "en": "Incense / Joss Paper",
-    "vi": "Nhang trầm / Tro vàng mã",
-    "category": "Natural/Artistic"
+    "en": "Incense Next to Router",
+    "vi": "Nhang trầm cúng Tổ nghề IT cắm cạnh bộ phát Wifi",
+    "category": "Natural/Artistic",
+    "icon": "🪔"
   },
   {
     "id": "C193",
-    "en": "Amulet / Talisman",
-    "vi": "Lá bùa hộ mệnh",
-    "category": "Personal/Written"
+    "en": "'No Bug' Talisman Sticker",
+    "vi": "Lá bùa 'Code Mượt Không Bug' dán lưng màn hình",
+    "category": "Personal/Written",
+    "icon": "🧿"
   },
   {
     "id": "C194",
-    "en": "Tarot Card",
-    "vi": "Lá bài Tarot (The Death)",
-    "category": "Artistic/Written"
+    "en": "Tarot Card 'The Tower'",
+    "vi": "Lá bài Tarot 'The Tower' báo hiệu sập hệ thống",
+    "category": "Artistic/Written",
+    "icon": "🃏"
   },
   {
     "id": "C195",
-    "en": "Cross / Rosary",
-    "vi": "Chuỗi tràng hạt / Thánh giá",
-    "category": "Personal"
+    "en": "Praying Hands Emoji on Slack",
+    "vi": "Hàng loạt icon 🙏 thả vào tin nhắn thông báo Deploy",
+    "category": "Personal",
+    "icon": "🙏"
   },
   {
     "id": "C196",
-    "en": "Soccer Ball",
-    "vi": "Quả bóng đá",
-    "category": "Unrelated"
+    "en": "Company Football Cup Ball",
+    "vi": "Quả bóng giải FSOFT Men's Day lăn trúng dây nguồn",
+    "category": "Unrelated",
+    "icon": "⚽"
   },
   {
     "id": "C197",
-    "en": "Fishing Rod",
-    "vi": "Lưỡi câu / Dây câu cá",
-    "category": "Synthetic"
+    "en": "Leftover Git Pre-Commit Hook",
+    "vi": "Đoạn script Git Hook bị comment vô hiệu hóa",
+    "category": "Synthetic",
+    "icon": "🪝"
   },
   {
     "id": "C198",
-    "en": "Compass",
-    "vi": "La bàn định hướng",
-    "category": "Synthetic"
+    "en": "Misconfigured Load Compass",
+    "vi": "Bộ định tuyến chuyển hướng nhầm 100% tải vào 1 máy",
+    "category": "Synthetic",
+    "icon": "🧭"
   },
   {
     "id": "C199",
-    "en": "Binoculars",
-    "vi": "Ống nhòm",
-    "category": "Synthetic"
+    "en": "Datadog Monitoring Binoculars",
+    "vi": "Cửa sổ theo dõi log thời gian thực của Datadog",
+    "category": "Synthetic",
+    "icon": "🔭"
   },
   {
     "id": "C200",
-    "en": "Safe Combination",
-    "vi": "Mảnh giấy ghi mã két sắt",
-    "category": "Written"
+    "en": "2FA Backup Recovery Codes",
+    "vi": "Mảnh giấy ghi mã khôi phục 2FA của tài khoản Root",
+    "category": "Written",
+    "icon": "🔐"
   }
 ];
 
 export const CATEGORY_ICONS = {
-  // Means categories
-  'Poisoning': '🧪',
-  'Poisoning/Illness': '🦠',
-  'Poisoning/Suffocation': '☠️',
-  'Suffocation': '🪢',
-  'Suffocation/Accident': '🌊',
-  'Suffocation/Severe Injury': '🪨',
-  'Loss of Blood': '🩸',
-  'Loss of Blood/Severe Injury': '🗡️',
-  'Loss of Blood/Accident': '🦈',
-  'Severe Injury': '🔨',
-  'Severe Injury/Accident': '💥',
-  'Accident': '⚡',
-  'Illness': '💊',
-  // Clue categories
+  // Trigger / Action (Blue) categories
+  'Poisoning': '🔐',
+  'Poisoning/Illness': '☣️',
+  'Poisoning/Suffocation': '☁️',
+  'Suffocation': '♾️',
+  'Suffocation/Accident': '💾',
+  'Suffocation/Severe Injury': '🧟',
+  'Loss of Blood': '🗑️',
+  'Loss of Blood/Severe Injury': '💥',
+  'Loss of Blood/Accident': '🔌',
+  'Severe Injury': '🔥',
+  'Severe Injury/Accident': '⚡',
+  'Accident': '🚨',
+  'Illness': '🧩',
+  // Evidence / Log Trace (Red) categories
   'Written': '📜',
   'Written/Personal': '🪪',
   'Written/Synthetic': '💻',
-  'Personal': '💍',
+  'Personal': '⌨️',
   'Personal/Synthetic': '📱',
   'Personal/Written': '📓',
-  'Personal/Natural': '🦷',
+  'Personal/Natural': '☕',
   'Personal/Unrelated': '🧸',
-  'Natural': '🌿',
+  'Natural': '🍜',
   'Natural/Personal': '🐾',
   'Natural/Artistic': '🕯️',
   'Synthetic': '⚙️',
-  'Synthetic/Artistic': '🖌️',
+  'Synthetic/Artistic': '🎨',
   'Synthetic/Written': '🖋️',
-  'Artistic': '🎭',
-  'Artistic/Personal': '🖼️',
+  'Artistic': '🖼️',
+  'Artistic/Personal': '📸',
   'Artistic/Written': '🎼',
   'Unrelated': '🎲',
   'Unrelated/Personal': '🀄',
