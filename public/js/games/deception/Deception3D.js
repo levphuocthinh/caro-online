@@ -90,10 +90,10 @@ export class Deception3DManager {
     const tagEl = document.getElementById('cutscene-tag');
     const skipBtn = document.getElementById('btn-cutscene-skip');
 
-    if (titleEl) titleEl.textContent = config.title || 'Án Mạng Đêm Khuya';
-    if (subEl) subEl.textContent = config.subtitle || 'Hong Kong Noir Action';
+    if (titleEl) titleEl.textContent = config.title || 'Sự Cố Đêm On-Call: Ai Đã Làm Sập Production?';
+    if (subEl) subEl.textContent = config.subtitle || 'WHO BROKE PROD? • FSOFT War Room SEV-1';
     if (tagEl) {
-      tagEl.textContent = config.badgeText || 'HONG KONG NOIR 3D';
+      tagEl.textContent = config.badgeText || 'WHO BROKE PROD? • FSOFT WAR ROOM';
       tagEl.className = `cutscene-tag ${config.team === 'CRIMINAL' ? 'badge-criminal' : 'badge-police'}`;
     }
 

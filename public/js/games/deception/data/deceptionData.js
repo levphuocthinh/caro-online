@@ -831,77 +831,77 @@ export const MEANS_CARDS = [
     "en": "Coding After Happy Hour",
     "vi": "Code say xỉn sau chầu nhậu",
     "category": "Poisoning",
-    "icon": "🍷"
+    "icon": "🍺"
   },
   {
     "id": "M002",
     "en": "Hardcode Root Password",
     "vi": "Hardcode mật khẩu Root trong code",
     "category": "Poisoning",
-    "icon": "🧪"
+    "icon": "🔑"
   },
   {
     "id": "M003",
     "en": "Toxic Third-Party Script",
     "vi": "Nhúng Script bên thứ 3 độc hại",
     "category": "Poisoning",
-    "icon": "☣️"
+    "icon": "🦠"
   },
   {
     "id": "M004",
     "en": "Unfiltered Dirty Input",
     "vi": "Không lọc dữ liệu bẩn (Dirty Input)",
     "category": "Poisoning/Illness",
-    "icon": "💧"
+    "icon": "⚠️"
   },
   {
     "id": "M005",
     "en": "Install Cracked Software",
     "vi": "Cài phần mềm Crack lên Server",
     "category": "Poisoning",
-    "icon": "⚗️"
+    "icon": "🔓"
   },
   {
     "id": "M006",
     "en": "Raw SQL Injection",
     "vi": "Nối chuỗi SQL gây lỗi SQL Injection",
     "category": "Poisoning",
-    "icon": "💉"
+    "icon": "🗄️"
   },
   {
     "id": "M007",
     "en": "Push .env to Public Repo",
     "vi": "Push nhầm file .env lên GitHub Public",
     "category": "Poisoning",
-    "icon": "🧪"
+    "icon": "📄"
   },
   {
     "id": "M008",
     "en": "Crypto Miner Malware",
     "vi": "Dính mã độc đào Coin ngầm",
     "category": "Poisoning",
-    "icon": "🌡️"
+    "icon": "⛏️"
   },
   {
     "id": "M009",
     "en": "Mass Spam Webhook Loop",
     "vi": "Bắn Spam API hàng loạt không kiểm soát",
     "category": "Poisoning",
-    "icon": "🔫"
+    "icon": "📡"
   },
   {
     "id": "M010",
     "en": "100-Year JWT Expiry",
     "vi": "Set thời hạn Token 100 năm không hết hạn",
     "category": "Poisoning",
-    "icon": "💊"
+    "icon": "🎟️"
   },
   {
     "id": "M011",
     "en": "Fake Typosquatting NPM",
     "vi": "Cài nhầm thư viện NPM giả mạo",
     "category": "Poisoning/Illness",
-    "icon": "💊"
+    "icon": "📦"
   },
   {
     "id": "M012",
@@ -915,28 +915,28 @@ export const MEANS_CARDS = [
     "en": "Backdoor Debug Endpoint",
     "vi": "Mở cổng Backdoor không cần đăng nhập",
     "category": "Poisoning",
-    "icon": "🪡"
+    "icon": "🔓"
   },
   {
     "id": "M014",
     "en": "XSS Script Payload",
     "vi": "Lỗ hổng XSS chèn mã độc vào giao diện",
     "category": "Poisoning",
-    "icon": "🧂"
+    "icon": "💻"
   },
   {
     "id": "M015",
     "en": "Chmod 777 Entire Server",
     "vi": "Phân quyền chmod 777 toàn bộ máy chủ",
     "category": "Poisoning/Illness",
-    "icon": "☢️"
+    "icon": "🛡️"
   },
   {
     "id": "M016",
     "en": "Midnight Poison Cronjob",
     "vi": "Cronjob lỗi tự kích hoạt lúc 0h đêm",
     "category": "Poisoning",
-    "icon": "🦂"
+    "icon": "⏰"
   },
   {
     "id": "M017",
@@ -950,21 +950,21 @@ export const MEANS_CARDS = [
     "en": "Disable SSL Verification",
     "vi": "Tắt kiểm tra chứng chỉ bảo mật SSL",
     "category": "Poisoning",
-    "icon": "🍾"
+    "icon": "🔓"
   },
   {
     "id": "M019",
     "en": "Infinite while(true) Loop",
     "vi": "Vòng lặp vô tận while(true)",
     "category": "Suffocation",
-    "icon": "➰"
+    "icon": "♾️"
   },
   {
     "id": "M020",
     "en": "DB Transaction Deadlock",
     "vi": "Khóa cứng bảng DB (Deadlock)",
     "category": "Suffocation",
-    "icon": "🏦"
+    "icon": "🔒"
   },
   {
     "id": "M021",
@@ -978,49 +978,49 @@ export const MEANS_CARDS = [
     "en": "20GB Bloated Docker Image",
     "vi": "Build Docker Image nặng 20GB tràn RAM",
     "category": "Suffocation",
-    "icon": "📦"
+    "icon": "🐳"
   },
   {
     "id": "M023",
     "en": "Thread.sleep(999999) in Prod",
     "vi": "Bỏ quên hàm sleep(999999) trong code",
     "category": "Suffocation",
-    "icon": "🛌"
+    "icon": "⏳"
   },
   {
     "id": "M024",
     "en": "SELECT * 50 Million Rows",
     "vi": "Truy vấn SELECT * 50 triệu dòng vào RAM",
     "category": "Suffocation",
-    "icon": "🛍️"
+    "icon": "🗄️"
   },
   {
     "id": "M025",
     "en": "Empty Catch Block Swallow",
     "vi": "Bắt lỗi try-catch rỗng làm treo ngầm",
     "category": "Suffocation",
-    "icon": "🧣"
+    "icon": "🕳️"
   },
   {
     "id": "M026",
     "en": "Global Variable Memory Leak",
     "vi": "Lưu rác vào biến toàn cục gây tràn RAM",
     "category": "Suffocation",
-    "icon": "🧥"
+    "icon": "💾"
   },
   {
     "id": "M027",
     "en": "Max Connections Set to 1",
     "vi": "Giới hạn Connection Pool xuống còn 1",
     "category": "Suffocation",
-    "icon": "🪢"
+    "icon": "🔌"
   },
   {
     "id": "M028",
     "en": "Unbounded Recursion",
     "vi": "Đệ quy không điểm dừng gây StackOverflow",
     "category": "Suffocation",
-    "icon": "👔"
+    "icon": "🔄"
   },
   {
     "id": "M029",
@@ -1034,147 +1034,147 @@ export const MEANS_CARDS = [
     "en": "Debug Log Floods 100% Disk",
     "vi": "In Debug Log làm đầy 100% ổ cứng",
     "category": "Suffocation/Accident",
-    "icon": "🌊"
+    "icon": "💿"
   },
   {
     "id": "M031",
     "en": "Zombie Process Army",
     "vi": "Hàng vạn tiến trình Zombie ăn hết RAM",
     "category": "Suffocation/Severe Injury",
-    "icon": "🪦"
+    "icon": "👾"
   },
   {
     "id": "M032",
     "en": "Kafka Queue Overflow",
     "vi": "Nghẽn cổ chai hàng triệu bản tin Queue",
     "category": "Suffocation",
-    "icon": "💣"
+    "icon": "📨"
   },
   {
     "id": "M033",
     "en": "Rate Limit Set to Zero",
     "vi": "Cấu hình Rate Limit = 0 chặn mọi user",
     "category": "Suffocation",
-    "icon": "🚧"
+    "icon": "🚫"
   },
   {
     "id": "M034",
     "en": "Circular Microservice Call",
     "vi": "2 Microservice gọi vòng tròn nhau vô tận",
     "category": "Suffocation",
-    "icon": "⛓️"
+    "icon": "🔄"
   },
   {
     "id": "M035",
     "en": "Run DROP TABLE on Prod",
     "vi": "Chạy lệnh DROP TABLE trên Production",
     "category": "Loss of Blood",
-    "icon": "🗡️"
+    "icon": "🗄️"
   },
   {
     "id": "M036",
     "en": "UPDATE Without WHERE",
     "vi": "Chạy lệnh UPDATE quên điều kiện WHERE",
     "category": "Loss of Blood",
-    "icon": "🔪"
+    "icon": "⚠️"
   },
   {
     "id": "M037",
     "en": "TRUNCATE Users Table",
     "vi": "Truncate sạch bảng tài khoản khách hàng",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "🪓"
+    "icon": "🗑️"
   },
   {
     "id": "M038",
     "en": "sudo rm -rf / on Server",
     "vi": "Gõ nhầm sudo rm -rf / trên Server chính",
     "category": "Loss of Blood",
-    "icon": "🛠️"
+    "icon": "💻"
   },
   {
     "id": "M039",
     "en": "Delete Production S3 Bucket",
     "vi": "Xóa nhầm S3 Bucket chứa dữ liệu thật",
     "category": "Loss of Blood",
-    "icon": "🪒"
+    "icon": "☁️"
   },
   {
     "id": "M040",
     "en": "Unplug Fiber Optic Cable",
     "vi": "Rút nhầm dây cáp quang phòng máy chủ",
     "category": "Loss of Blood",
-    "icon": "✂️"
+    "icon": "🔌"
   },
   {
     "id": "M041",
     "en": "Live Hotfix via Vim",
     "vi": "Sửa code trực tiếp bằng Vim trên Prod",
     "category": "Loss of Blood",
-    "icon": "🔪"
+    "icon": "⌨️"
   },
   {
     "id": "M042",
     "en": "Docker System Prune Volumes",
     "vi": "Chạy docker prune xóa bay Volume Database",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "🪚"
+    "icon": "🐳"
   },
   {
     "id": "M043",
     "en": "Kill -9 Master DB Process",
     "vi": "Kill -9 tiến trình Database đang ghi đĩa",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "🪓"
+    "icon": "🛑"
   },
   {
     "id": "M044",
     "en": "Drop All Primary Indexes",
     "vi": "Xóa sạch Index của các bảng giao dịch",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "🗡️"
+    "icon": "📉"
   },
   {
     "id": "M045",
     "en": "Git Push --force to Main",
     "vi": "Force Push đè mất sạch lịch sử nhánh Main",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "⚔️"
+    "icon": "🌿"
   },
   {
     "id": "M046",
     "en": "Overwrite Prod DB URI",
     "vi": "Ghi đè chuỗi kết nối DB sang localhost",
     "category": "Loss of Blood",
-    "icon": "🦴"
+    "icon": "🔗"
   },
   {
     "id": "M047",
     "en": "Faulty Schema Migration",
     "vi": "Chạy Migration lỗi làm gãy toàn bộ bảng",
     "category": "Loss of Blood",
-    "icon": "💔"
+    "icon": "🗄️"
   },
   {
     "id": "M048",
     "en": "Delete SSL Private Key",
     "vi": "Xóa mất Private Key trên Load Balancer",
     "category": "Loss of Blood",
-    "icon": "🍾"
+    "icon": "🔑"
   },
   {
     "id": "M049",
     "en": "Run E2E Wipe Test on Prod",
     "vi": "Trỏ nhầm Automation Test xóa sạch DB thật",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "🔫"
+    "icon": "🤖"
   },
   {
     "id": "M050",
     "en": "FLUSHALL on Production Redis",
     "vi": "Chạy lệnh FLUSHALL xóa trắng Redis Cache",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "🎯"
+    "icon": "🧹"
   },
   {
     "id": "M051",
@@ -1188,70 +1188,70 @@ export const MEANS_CARDS = [
     "en": "Wipe API Gateway Routes",
     "vi": "Xóa nhầm bảng định tuyến API Gateway",
     "category": "Loss of Blood",
-    "icon": "🏹"
+    "icon": "🌐"
   },
   {
     "id": "M053",
     "en": "Point DNS A-Record to 0.0.0.0",
     "vi": "Trỏ nhầm tên miền chính về IP 127.0.0.1",
     "category": "Loss of Blood",
-    "icon": "🏹"
+    "icon": "🌐"
   },
   {
     "id": "M054",
     "en": "ON DELETE CASCADE Disaster",
     "vi": "Xóa 1 bản ghi kéo sập toàn bộ bảng liên kết",
     "category": "Loss of Blood",
-    "icon": "📌"
+    "icon": "⛓️"
   },
   {
     "id": "M055",
     "en": "Unclosed DB Connection Leak",
     "vi": "Mở kết nối DB liên tục không bao giờ đóng",
     "category": "Loss of Blood",
-    "icon": "🍴"
+    "icon": "🔌"
   },
   {
     "id": "M056",
     "en": "Restore Empty Backup to Live",
     "vi": "Restore nhầm bản Backup rỗng đè lên Prod",
     "category": "Loss of Blood",
-    "icon": "🍾"
+    "icon": "💾"
   },
   {
     "id": "M057",
     "en": "Kick Server Rack Power Cord",
     "vi": "Đá văng phích cắm nguồn của tủ Server",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "👠"
+    "icon": "🔌"
   },
   {
     "id": "M058",
     "en": "Drain Cloud Billing Quota",
     "vi": "Làm cạn sạch hạn mức thẻ tín dụng Cloud",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "🪝"
+    "icon": "💳"
   },
   {
     "id": "M059",
     "en": "N+1 Queries in 3 Nested Loops",
     "vi": "Gọi 10,000 câu Query trong 3 vòng for lồng nhau",
     "category": "Severe Injury/Loss of Blood",
-    "icon": "🔩"
+    "icon": "🔄"
   },
   {
     "id": "M060",
     "en": "Pet Dog Bites Server Cable",
     "vi": "Chó cưng dẫn lên văn phòng cắn đứt cáp mạng",
     "category": "Loss of Blood/Severe Injury",
-    "icon": "🐺"
+    "icon": "🐶"
   },
   {
     "id": "M061",
     "en": "Deploy Straight to Prod",
     "vi": "Deploy thẳng lên Prod không qua Staging",
     "category": "Severe Injury",
-    "icon": "🔨"
+    "icon": "🚀"
   },
   {
     "id": "M062",
@@ -1265,7 +1265,7 @@ export const MEANS_CARDS = [
     "en": "Full Table Scan No Index",
     "vi": "Quét Full Table 100 triệu dòng không Index",
     "category": "Severe Injury",
-    "icon": "🦯"
+    "icon": "🔍"
   },
   {
     "id": "M064",
@@ -1279,98 +1279,98 @@ export const MEANS_CARDS = [
     "en": "Stress Test Live Server",
     "vi": "Bắn JMeter Stress Test thẳng vào Production",
     "category": "Severe Injury",
-    "icon": "🏏"
+    "icon": "📊"
   },
   {
     "id": "M066",
     "en": "Evil Regex Backtracking",
     "vi": "Regex lỗi làm treo 100% toàn bộ nhân CPU",
     "category": "Severe Injury",
-    "icon": "⛳"
+    "icon": "💻"
   },
   {
     "id": "M067",
     "en": "Sync 4K Video Encoding",
     "vi": "Render video 4K đồng bộ ngay trên API chính",
     "category": "Severe Injury",
-    "icon": "🏋️"
+    "icon": "🎬"
   },
   {
     "id": "M068",
     "en": "Disable Cache Layer",
     "vi": "Tắt toàn bộ Cache bắt DB gánh 100% tải",
     "category": "Severe Injury",
-    "icon": "🏆"
+    "icon": "🗄️"
   },
   {
     "id": "M069",
     "en": "Run Heavy Build on Live VM",
     "vi": "Chạy npm build ngốn 100% CPU trên máy Live",
     "category": "Severe Injury",
-    "icon": "🗿"
+    "icon": "⚙️"
   },
   {
     "id": "M070",
     "en": "Bypass CDN Protection",
     "vi": "Tắt Cloudflare CDN làm lộ IP máy chủ gốc",
     "category": "Severe Injury",
-    "icon": "🧱"
+    "icon": "🌐"
   },
   {
     "id": "M071",
     "en": "Export 5GB Excel Synchronously",
     "vi": "Xuất báo cáo Excel 5GB không phân trang",
     "category": "Severe Injury",
-    "icon": "🪨"
+    "icon": "📊"
   },
   {
     "id": "M072",
     "en": "Unhandled Promise Crash",
     "vi": "Quên bắt lỗi Promise làm sập tiến trình Node",
     "category": "Severe Injury/Accident",
-    "icon": "🌵"
+    "icon": "🐛"
   },
   {
     "id": "M073",
     "en": "Scale K8s Replicas to 0",
     "vi": "Scale nhầm số lượng Pod Kubernetes về 0",
     "category": "Severe Injury",
-    "icon": "🪑"
+    "icon": "☸️"
   },
   {
     "id": "M074",
     "en": "Train AI Model on Prod DB",
     "vi": "Chạy huấn luyện AI trực tiếp trên máy chủ DB",
     "category": "Severe Injury",
-    "icon": "🕯️"
+    "icon": "🤖"
   },
   {
     "id": "M075",
     "en": "Hit Emergency Reboot Button",
     "vi": "Bấm nhầm nút Reboot cụm máy chủ đang chạy",
     "category": "Severe Injury",
-    "icon": "🧯"
+    "icon": "🔄"
   },
   {
     "id": "M076",
     "en": "Cartesian Join 10 Tables",
     "vi": "JOIN 10 bảng quên điều kiện ON gây nổ CPU",
     "category": "Severe Injury",
-    "icon": "🍳"
+    "icon": "🔥"
   },
   {
     "id": "M077",
     "en": "Broken Load Balancer Probe",
     "vi": "Cấu hình sai Healthcheck làm chết sạch Pod",
     "category": "Severe Injury",
-    "icon": "🦿"
+    "icon": "🩺"
   },
   {
     "id": "M078",
     "en": "Infinite useEffect API Storm",
     "vi": "Code useEffect lỗi bắn 1000 request/giây",
     "category": "Severe Injury",
-    "icon": "🖼️"
+    "icon": "⚡"
   },
   {
     "id": "M079",
@@ -1398,7 +1398,7 @@ export const MEANS_CARDS = [
     "en": "Timezone / Leap Year Bug",
     "vi": "Bug lệch múi giờ UTC làm nổ tung lịch trình",
     "category": "Severe Injury",
-    "icon": "🧨"
+    "icon": "🕒"
   },
   {
     "id": "M083",
@@ -1426,14 +1426,14 @@ export const MEANS_CARDS = [
     "en": "Major Framework Upgrade Live",
     "vi": "Nâng cấp thẳng Framework bản mới gây xung đột",
     "category": "Illness/Accident",
-    "icon": "🛗"
+    "icon": "📦"
   },
   {
     "id": "M087",
     "en": "Race Condition in Checkout",
     "vi": "Lỗi Race Condition khi 100 người mua cùng lúc",
     "category": "Accident/Severe Injury",
-    "icon": "🛞"
+    "icon": "🏎️"
   },
   {
     "id": "M088",
@@ -1447,7 +1447,7 @@ export const MEANS_CARDS = [
     "en": "Delete package-lock.json",
     "vi": "Xóa file lock gây xung đột thư viện dây chuyền",
     "category": "Illness",
-    "icon": "🪤"
+    "icon": "🔒"
   },
   {
     "id": "M090",
@@ -1569,7 +1569,7 @@ export const CLUE_CARDS = [
     "en": "Quick Hotfix Snippet",
     "vi": "Đoạn code Hotfix copy từ bình luận dạo",
     "category": "Written",
-    "icon": "💊"
+    "icon": "💻"
   },
   {
     "id": "C017",
@@ -1695,7 +1695,7 @@ export const CLUE_CARDS = [
     "en": "StackOverflow Copy-Paste History",
     "vi": "Lịch sử duyệt web 50 tab StackOverflow",
     "category": "Written",
-    "icon": "📰"
+    "icon": "💻"
   },
   {
     "id": "C035",
@@ -1709,7 +1709,7 @@ export const CLUE_CARDS = [
     "en": "Red Marker on Whiteboard",
     "vi": "Bút dạ đỏ viết chữ 'CẤM ĐỤNG VÀO' trên bảng",
     "category": "Personal",
-    "icon": "💄"
+    "icon": "🖍️"
   },
   {
     "id": "C037",
@@ -1919,7 +1919,7 @@ export const CLUE_CARDS = [
     "en": "Inhaler / Peppermint Tube",
     "vi": "Ống hít mũi thông xoang chống buồn ngủ",
     "category": "Personal",
-    "icon": "🪈"
+    "icon": "🌿"
   },
   {
     "id": "C067",
@@ -2248,14 +2248,14 @@ export const CLUE_CARDS = [
     "en": "Skeleton Service Template",
     "vi": "Khung xương kiến trúc hệ thống bị gãy vụn",
     "category": "Natural",
-    "icon": "🦴"
+    "icon": "🏗️"
   },
   {
     "id": "C114",
     "en": "Phishing Email Bait",
     "vi": "Mồi nhử từ đường link Phishing giả mạo IT",
     "category": "Natural",
-    "icon": "🐟"
+    "icon": "🎣"
   },
   {
     "id": "C115",
@@ -2269,14 +2269,14 @@ export const CLUE_CARDS = [
     "en": "Red Bull Energy Drink Stain",
     "vi": "Vết nước tăng lực đổ loang trên bản vẽ thiết kế",
     "category": "Natural",
-    "icon": "🍷"
+    "icon": "🥤"
   },
   {
     "id": "C117",
     "en": "Empty Beer Cans from Release Party",
     "vi": "Vỏ lon bia từ bữa tiệc mừng sớm",
     "category": "Natural",
-    "icon": "🍾"
+    "icon": "🍺"
   },
   {
     "id": "C118",
@@ -2290,14 +2290,14 @@ export const CLUE_CARDS = [
     "en": "Dead Branch in Git Tree",
     "vi": "Nhánh code rác lâu năm không ai dọn dẹp",
     "category": "Natural",
-    "icon": "🪵"
+    "icon": "🌿"
   },
   {
     "id": "C120",
     "en": "Burnt Silicon Dust",
     "vi": "Tro bụi cháy đen từ tụ điện nguồn",
     "category": "Natural",
-    "icon": "🪨"
+    "icon": "⚡"
   },
   {
     "id": "C121",
@@ -2423,21 +2423,21 @@ export const CLUE_CARDS = [
     "en": "Air Conditioner Remote at 30°C",
     "vi": "Điều khiển máy lạnh phòng Server bị ai đó chỉnh lên 30 độ",
     "category": "Synthetic",
-    "icon": "🌬️"
+    "icon": "🌡️"
   },
   {
     "id": "C139",
     "en": "Dependency Injection Trace",
     "vi": "Log lỗi Circular Dependency Injection",
     "category": "Synthetic",
-    "icon": "💉"
+    "icon": "🔄"
   },
   {
     "id": "C140",
     "en": "Expired JWT Bearer Token",
     "vi": "Chuỗi JWT Token đã hết hạn từ năm ngoái",
     "category": "Synthetic",
-    "icon": "💊"
+    "icon": "🎟️"
   },
   {
     "id": "C141",
@@ -2465,21 +2465,21 @@ export const CLUE_CARDS = [
     "en": "Rubber Duck Debugger",
     "vi": "Chú vịt vàng Debug nằm chỏng chơ trên bàn",
     "category": "Synthetic",
-    "icon": "🧤"
+    "icon": "🦆"
   },
   {
     "id": "C145",
     "en": "Legacy SOAP XML Payload",
     "vi": "Gói tin SOAP XML cổ lỗ sĩ bị lỗi cú pháp",
     "category": "Synthetic",
-    "icon": "🧼"
+    "icon": "📄"
   },
   {
     "id": "C146",
     "en": "Sanitized Database Dump",
     "vi": "File dump dữ liệu bị xóa trắng bằng công cụ dọn dẹp",
     "category": "Synthetic",
-    "icon": "🧪"
+    "icon": "🗑️"
   },
   {
     "id": "C147",
@@ -2500,14 +2500,14 @@ export const CLUE_CARDS = [
     "en": "Latency Spike 30,000ms",
     "vi": "Biểu đồ thời gian phản hồi API vọt lên 30,000ms",
     "category": "Synthetic",
-    "icon": "📏"
+    "icon": "📈"
   },
   {
     "id": "C150",
     "en": "Hardcoded Localhost IP",
     "vi": "Dòng code dính cứng địa chỉ http://localhost:8080",
     "category": "Synthetic",
-    "icon": "🛢️"
+    "icon": "💻"
   },
   {
     "id": "C151",
@@ -2556,21 +2556,21 @@ export const CLUE_CARDS = [
     "en": "Midnight Oil Burner Log",
     "vi": "Log truy cập VPN từ một IP lạ lúc nửa đêm",
     "category": "Synthetic",
-    "icon": "🛢️"
+    "icon": "🛡️"
   },
   {
     "id": "C158",
     "en": "Out-of-Quota Cloud Gas Gauge",
     "vi": "Đồng hồ đo băng thông báo chạm đáy 0 MB",
     "category": "Synthetic",
-    "icon": "⛽"
+    "icon": "📉"
   },
   {
     "id": "C159",
     "en": "Rollback Skid Marks",
     "vi": "Lịch sử 10 lần bấm Rollback liên tiếp thất bại",
     "category": "Synthetic",
-    "icon": "🛞"
+    "icon": "🔄"
   },
   {
     "id": "C160",
@@ -2591,7 +2591,7 @@ export const CLUE_CARDS = [
     "en": "Traceroute Hop Timeout",
     "vi": "Kết quả lệnh ping và traceroute đứt đoạn toàn dấu sao *",
     "category": "Synthetic",
-    "icon": "🎯"
+    "icon": "📡"
   },
   {
     "id": "C163",
@@ -2605,14 +2605,14 @@ export const CLUE_CARDS = [
     "en": "Locked Admin Account",
     "vi": "Tài khoản Admin bị khóa cứng vì nhập sai pass 5 lần",
     "category": "Synthetic",
-    "icon": "⛓️"
+    "icon": "🔒"
   },
   {
     "id": "C165",
     "en": "Clippy AI Assistant Prompt",
     "vi": "Lịch sử hỏi ChatGPT 'Làm sao khôi phục bảng vừa DROP'",
     "category": "Synthetic",
-    "icon": "📎"
+    "icon": "🤖"
   },
   {
     "id": "C166",
@@ -2647,7 +2647,7 @@ export const CLUE_CARDS = [
     "en": "Fragile Glass Monolith",
     "vi": "Cấu trúc code mỏng manh chạm nhẹ là vỡ",
     "category": "Synthetic",
-    "icon": "🍷"
+    "icon": "🧩"
   },
   {
     "id": "C171",
@@ -2668,14 +2668,14 @@ export const CLUE_CARDS = [
     "en": "Shattered Trophy Vase",
     "vi": "Cúp lưu niệm dự án bị rơi vỡ dưới chân bàn",
     "category": "Artistic",
-    "icon": "🏺"
+    "icon": "🏆"
   },
   {
     "id": "C174",
     "en": "Sad Violin Meme Sound",
     "vi": "Tab Youtube đang mở nhạc đám ma 'Astronomia'",
     "category": "Artistic",
-    "icon": "🎻"
+    "icon": "🎧"
   },
   {
     "id": "C175",
@@ -2717,7 +2717,7 @@ export const CLUE_CARDS = [
     "en": "Pixelated SVG Icon",
     "vi": "File SVG lỗi thẻ đóng làm trắng xóa cả trang web",
     "category": "Artistic/Personal",
-    "icon": "💎"
+    "icon": "🖼️"
   },
   {
     "id": "C181",
@@ -2731,7 +2731,7 @@ export const CLUE_CARDS = [
     "en": "Planning Poker Card '99'",
     "vi": "Lá bài ước lượng điểm Scrum 'Vô cực' nằm trên bàn",
     "category": "Unrelated/Artistic",
-    "icon": "🃏"
+    "icon": "♾️"
   },
   {
     "id": "C183",

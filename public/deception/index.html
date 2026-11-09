@@ -193,7 +193,7 @@
                     <div class="avatar-quick-selector" id="create-avatar-picker">
                       <button type="button" class="btn-avatar-choice active" data-avatar="🕵️">🕵️</button>
                       <button type="button" class="btn-avatar-choice" data-avatar="🔬">🔬</button>
-                      <button type="button" class="btn-avatar-choice" data-avatar="🔪">🔪</button>
+                      <button type="button" class="btn-avatar-choice" data-avatar="💻">💻</button>
                       <button type="button" class="btn-avatar-choice" data-avatar="🎭">🎭</button>
                       <button type="button" class="btn-avatar-choice" data-avatar="🧪">🧪</button>
                       <button type="button" class="btn-avatar-choice" data-avatar="🕶️">🕶️</button>
@@ -330,7 +330,7 @@
                   <div class="avatar-chips-bar" id="online-avatar-picker">
                     <button type="button" class="avatar-chip-btn active" data-emoji="🕵️">🕵️</button>
                     <button type="button" class="avatar-chip-btn" data-emoji="🔬">🔬</button>
-                    <button type="button" class="avatar-chip-btn" data-emoji="🔪">🔪</button>
+                    <button type="button" class="avatar-chip-btn" data-emoji="💻">💻</button>
                     <button type="button" class="avatar-chip-btn" data-emoji="🎭">🎭</button>
                     <button type="button" class="avatar-chip-btn" data-emoji="🧪">🧪</button>
                     <button type="button" class="avatar-chip-btn" data-emoji="🕶️">🕶️</button>
@@ -775,9 +775,9 @@
       <section class="noir-view" id="view-game-over">
         <div class="game-over-stage">
           <div class="dossier-card" id="game-over-dossier">
-            <div class="dossier-stamp" id="dossier-stamp">CASE CLOSED</div>
-            <h2 class="dossier-headline" id="dossier-headline">Phe Cảnh Sát Chiến Thắng!</h2>
-            <p class="dossier-sub" id="dossier-sub">Vụ án mạng đã được phơi bày ra ánh sáng công lý.</p>
+            <div class="dossier-stamp" id="dossier-stamp">INCIDENT RESOLVED</div>
+            <h2 class="dossier-headline" id="dossier-headline">Đội Ứng Phó Sự Cố Chiến Thắng!</h2>
+            <p class="dossier-sub" id="dossier-sub">Chân tướng sự cố sập Production đã được truy vết thành công.</p>
 
             <div class="dossier-evidence-box">
               <div class="evidence-item">
@@ -967,7 +967,7 @@
       <div class="noir-modal-header">
         <div>
           <span class="view-eyebrow text-gold">HƯỚNG DẪN CƠ BẢN CHO NGƯỜI MỚI</span>
-          <h3 class="modal-heading">Luật Chơi & Tiến Trình 3 Vòng Deception</h3>
+          <h3 class="modal-heading">Luật Chơi & Tiến Trình 3 Vòng WHO BROKE PROD?</h3>
         </div>
         <button type="button" class="btn-modal-close" data-close="modal-quick-guide"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -976,10 +976,10 @@
           <div class="quick-guide-card">
             <div class="qg-badge qg-gold">BƯỚC 1</div>
             <div class="qg-body">
-              <h4 class="qg-title">🎯 Giám Định Pháp Y Không Được Nói!</h4>
+              <h4 class="qg-title">🎯 Tech Lead / SRE (Pháp Y) Không Được Nói!</h4>
               <p class="qg-text">
-                Pháp Y biết chính xác ai là Hung Thủ và cặp vật chứng gây án, nhưng <b>tuyệt đối không được nói thành lời hay ra hiệu</b>.
-                Pháp Y chỉ được đặt <b>6 viên đạn gỗ</b> lên các dòng miêu tả trên 6 Thẻ Hiện Trường để gợi ý manh mối cho Cảnh sát.
+                Tech Lead biết chính xác ai là Thủ phạm (The Culprit) và cặp Hành vi lỗi + Dấu vết Log, nhưng <b>tuyệt đối không được nói thành lời hay ra hiệu</b>.
+                Tech Lead chỉ được đặt <b>6 viên đạn Marker</b> lên các dòng miêu tả trên 6 Thẻ Thông Số Sự Cố để gợi ý cho Đội Ứng Phó.
               </p>
             </div>
           </div>
@@ -989,8 +989,8 @@
             <div class="qg-body">
               <h4 class="qg-title">🗣️ Tranh Luận Tự Do & So Khớp Thẻ Nghi Phạm</h4>
               <p class="qg-text">
-                Mỗi người chơi có <b>4 Thẻ Xanh (Hung Khí)</b> và <b>4 Thẻ Đỏ (Manh Mối)</b> đặt ngửa trước mặt.
-                Cả phòng <b>tự do trò chuyện, phản biện qua Mic hoặc Chat</b> (ai nói cũng được, không bị gò bó lượt). Hãy đối chiếu 6 đạn của Pháp Y với 8 thẻ của từng người để tìm ra kẻ tình nghi nhất!
+                Mỗi kỹ sư có <b>4 Thẻ Xanh (Hành Vi Gây Lỗi)</b> và <b>4 Thẻ Đỏ (Dấu Vết Log)</b> đặt ngửa trước mặt.
+                Cả phòng <b>tự do trò chuyện, phản biện qua Mic hoặc Chat</b>. Hãy đối chiếu 6 Marker của Tech Lead & bản phân tích AI Log với 8 thẻ của từng người để tìm ra nghi phạm!
               </p>
             </div>
           </div>
@@ -998,11 +998,11 @@
           <div class="quick-guide-card">
             <div class="qg-badge qg-crimson">BƯỚC 3</div>
             <div class="qg-body">
-              <h4 class="qg-title">🛡️ Đập Bàn Phá Án Bất Kỳ Lúc Nào!</h4>
+              <h4 class="qg-title">🛡️ Chốt Đơn Bắt Lỗi (Phá Án) Bất Kỳ Lúc Nào!</h4>
               <p class="qg-text">
-                Mỗi người chơi (trừ Pháp Y) sở hữu <b>1 Huy Hiệu Phá Án</b>. Bất kỳ lúc nào trong vòng thảo luận, nếu tự tin mình đã tìm ra chân tướng, bạn có thể bấm <b>[🚨 ĐẬP BÀN PHÁ ÁN]</b> để chỉ định 1 Nghi phạm + 1 Hung khí + 1 Manh mối.<br>
-                • <b>Nếu đoán ĐÚNG cả 2:</b> Cảnh sát bắt giữ hung thủ và thắng cuộc!<br>
-                • <b>Nếu đoán SAI (dù chỉ sai 1 thẻ):</b> Pháp Y lắc đầu. Bạn bị tịch thu Huy hiệu nhưng vẫn được tiếp tục ngồi bàn luận cùng đồng đội.
+                Mỗi kỹ sư (trừ Tech Lead) sở hữu <b>1 Huy Hiệu Phá Án</b>. Bất kỳ lúc nào trong vòng thảo luận, nếu tự tin đã tìm ra Root Cause, bạn có thể bấm <b>[🚨 ĐẬP BÀN PHÁ ÁN]</b> để chỉ định 1 Nghi phạm + 1 Hành vi gây lỗi + 1 Dấu vết Log.<br>
+                • <b>Nếu đoán ĐÚNG cả 2:</b> Đội Ứng Phó bắt sống Thủ phạm và thắng cuộc!<br>
+                • <b>Nếu đoán SAI (dù chỉ sai 1 thẻ):</b> Tech Lead bác bỏ. Bạn mất Huy hiệu nhưng vẫn được tiếp tục ngồi bàn luận cùng đồng đội.
               </p>
             </div>
           </div>
@@ -1010,12 +1010,12 @@
           <div class="quick-guide-card">
             <div class="qg-badge qg-gold">BƯỚC 4</div>
             <div class="qg-body">
-              <h4 class="qg-title">🔄 Tiến Trình 3 Vòng & Pháp Y Đổi Thẻ Gợi Ý Thêm</h4>
+              <h4 class="qg-title">🔄 Tiến Trình 3 Vòng & Tech Lead Đổi Thẻ Gợi Ý Thêm</h4>
               <p class="qg-text">
-                Cuộc điều tra diễn ra trong <b>3 Vòng</b>:<br>
-                • <b>Hết Vòng 1:</b> Pháp Y được <b>rút 1 Thẻ Hiện Trường mới</b>, thay thế 1 thẻ nâu cũ và ghim 1 viên đạn mới để thu hẹp phạm vi nghi vấn.<br>
-                • <b>Hết Vòng 2:</b> Pháp Y tiếp tục <b>đổi thêm 1 thẻ nâu nữa</b> để cung cấp gợi ý then chốt cuối cùng.<br>
-                • <b>Hết Vòng 3 (Chốt án):</b> Nếu hết giờ mà Cảnh sát vẫn không phá được án -> <b>Kẻ Sát Nhân sẽ lên máy bay trốn thoát và giành chiến thắng!</b>
+                Cuộc điều tra War Room diễn ra trong <b>3 Vòng</b>:<br>
+                • <b>Hết Vòng 1:</b> Tech Lead được <b>rút 1 Thẻ Thông Số Sự Cố mới</b>, thay thế 1 thẻ nâu cũ và ghim 1 Marker mới để thu hẹp phạm vi nghi vấn.<br>
+                • <b>Hết Vòng 2:</b> Tech Lead tiếp tục <b>đổi thêm 1 thẻ nâu nữa</b> để cung cấp gợi ý then chốt cuối cùng.<br>
+                • <b>Hết Vòng 3 (Chốt án):</b> Nếu hết giờ mà War Room vẫn không tìm ra đúng cặp lỗi -> <b>The Culprit xóa sạch dấu vết Log, cao chạy xa bay và giành chiến thắng!</b>
               </p>
             </div>
           </div>
@@ -1173,24 +1173,24 @@
     <div class="casting-modal-card" id="casting-modal-card">
       <div class="casting-light-strobe"></div>
       <div class="casting-header">
-        <span class="casting-tag"><i class="fa-solid fa-gavel"></i> TÒA ÁN HÌNH SỰ • LỆNH KHẨN CẤP</span>
-        <h2 class="casting-title">CÁO BUỘC TRỌNG TỘI</h2>
+        <span class="casting-tag"><i class="fa-solid fa-gavel"></i> WAR ROOM INCIDENT COMMAND • LỆNH CHỐT RCA</span>
+        <h2 class="casting-title">CHỈ ĐỊNH THỦ PHẠM PHÁ PROD</h2>
       </div>
 
       <div class="casting-suspects-row">
         <div class="casting-player-side">
-          <div class="side-badge">NGƯỜI TỐ CÁO</div>
-          <div class="casting-avatar" id="cast-accuser-avatar">🕵️</div>
-          <div class="casting-name" id="cast-accuser-name">Điều tra viên</div>
+          <div class="side-badge">NGƯỜI CHỐT ĐƠN</div>
+          <div class="casting-avatar" id="cast-accuser-avatar">🛡️</div>
+          <div class="casting-name" id="cast-accuser-name">Kỹ sư Ứng phó</div>
         </div>
 
         <div class="casting-vs-arrow">
           <i class="fa-solid fa-arrow-right"></i>
-          <span>CHỈ DANH</span>
+          <span>CHỈ ĐỊNH</span>
         </div>
 
         <div class="casting-player-side target-side">
-          <div class="side-badge badge-suspect">ĐỐI TƯỢNG BỊ BẮT</div>
+          <div class="side-badge badge-suspect">NGHI PHẠM GÂY LỖI</div>
           <div class="casting-avatar" id="cast-target-avatar">👤</div>
           <div class="casting-name" id="cast-target-name">Nghi phạm</div>
         </div>
@@ -1198,42 +1198,43 @@
 
       <div class="casting-cards-row">
         <div class="evidence-card-cast card-means">
-          <span class="ev-cast-label"><i class="fa-solid fa-skull"></i> HUNG KHÍ (PHƯƠNG THỨC)</span>
-          <div class="ev-cast-icon" id="cast-means-icon">🔪</div>
-          <div class="ev-cast-title" id="cast-means-name">Dao găm</div>
+          <span class="ev-cast-label"><i class="fa-solid fa-terminal"></i> HÀNH VI GÂY LỖI (TRIGGER)</span>
+          <div class="ev-cast-icon" id="cast-means-icon">💻</div>
+          <div class="ev-cast-title" id="cast-means-name">Chạy lệnh DROP TABLE</div>
         </div>
         <div class="evidence-card-cast card-clue">
-          <span class="ev-cast-label"><i class="fa-solid fa-fingerprint"></i> VẬT CHỨNG (MANH MỐI)</span>
-          <div class="ev-cast-icon" id="cast-clue-icon">🩸</div>
-          <div class="ev-cast-title" id="cast-clue-name">Vết máu</div>
+          <span class="ev-cast-label"><i class="fa-solid fa-file-code"></i> DẤU VẾT LOG (EVIDENCE)</span>
+          <div class="ev-cast-icon" id="cast-clue-icon">📋</div>
+          <div class="ev-cast-title" id="cast-clue-name">Git commit 2h sáng</div>
         </div>
       </div>
 
       <div class="casting-status-area">
         <div class="casting-suspense-pulse" id="cast-suspense-pulse">
           <i class="fa-solid fa-circle-notch fa-spin"></i>
-          <span id="cast-suspense-text">ĐANG ĐỐI CHIẾU HỒ SƠ PHÁP Y...</span>
+          <span id="cast-suspense-text">ĐANG ĐỐI CHIẾU SYSTEM LOG & AUDIT TRAIL...</span>
         </div>
         <div class="casting-stamp-result" id="cast-stamp-result" style="display: none;"></div>
       </div>
     </div>
   </div>
 
-  <!-- CUTSCENE CANVAS OVERLAY (Pixel Art 2D Noir Animation - 0% GPU Idle) -->
+  <!-- CUTSCENE VIDEO OVERLAY (WHO BROKE PROD? Incident Video Cutscene Engine) -->
   <div class="noir-cutscene-overlay" id="cutscene-overlay">
     <div class="cutscene-box">
       <div class="cutscene-top">
-        <span class="cutscene-tag" id="cutscene-tag">HONG KONG NOIR</span>
+        <span class="cutscene-tag" id="cutscene-tag">WHO BROKE PROD? • FSOFT WAR ROOM SEV-1</span>
         <button type="button" class="btn-cutscene-skip" id="btn-cutscene-skip">
           <span>Bỏ qua</span> <i class="fa-solid fa-forward"></i>
         </button>
       </div>
       <div class="cutscene-canvas-wrap">
-        <canvas id="cutscene-canvas" width="480" height="270"></canvas>
+        <video id="cutscene-video" class="cutscene-video-player" playsinline preload="auto"></video>
+        <canvas id="cutscene-canvas" width="480" height="270" style="display: none;"></canvas>
       </div>
       <div class="cutscene-bottom">
-        <h3 id="cutscene-title">Án Mạng Trong Màn Đêm Phố Cổ</h3>
-        <p id="cutscene-sub">Đang diễn ra...</p>
+        <h3 id="cutscene-title">Sự Cố Đêm On-Call: Ai Đã Làm Sập Production?</h3>
+        <p id="cutscene-sub">Đang trích xuất dữ liệu CCTV & System Logs...</p>
       </div>
     </div>
   </div>

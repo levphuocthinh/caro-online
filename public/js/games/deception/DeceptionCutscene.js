@@ -53,7 +53,7 @@ export class DeceptionCutscene {
     if (titleEl) titleEl.textContent = config.title || '';
     if (subEl) subEl.textContent = config.subtitle || '';
     if (badgeEl) {
-      badgeEl.textContent = config.badgeText || 'HONG KONG NOIR ARCHIVE';
+      badgeEl.textContent = config.badgeText || 'WHO BROKE PROD? • FSOFT WAR ROOM';
       badgeEl.className = `cutscene-tag ${config.team === 'CRIMINAL' ? 'badge-criminal' : 'badge-police'}`;
     }
 

@@ -239,20 +239,26 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
   });
 
   await t.test('DeceptionPixelNoir cutscene modes & dedicated methods', async () => {
-    const { DeceptionPixelNoir } = await import('../public/js/games/deception/DeceptionPixelNoir.js');
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const { DeceptionPixelNoir, INCIDENT_VIDEOS } = await import('../public/js/games/deception/DeceptionPixelNoir.js');
     const noir = new DeceptionPixelNoir();
 
     // Verify dedicated methods
     noir.playStreetBrawl();
     assert.equal(noir.murderMode, 'STREET_BRAWL');
+    assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.STREET_BRAWL);
     noir.playPoisoning();
     assert.equal(noir.murderMode, 'POISONING');
+    assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.POISONING);
     noir.playBackStab();
     assert.equal(noir.murderMode, 'BACK_STAB');
+    assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.BACK_STAB);
     noir.playMotorbikeHitAndRun();
     assert.equal(noir.murderMode, 'MOTORBIKE_HIT_RUN');
+    assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.MOTORBIKE_HIT_RUN);
 
-    // Verify smart mode deduction
+    // Verify smart mode deduction (legacy + WHO BROKE PROD? IT incidents)
     noir.playNightCrime({ meansName: 'Thạch tín', category: 'Poisoning' });
     assert.equal(noir.murderMode, 'POISONING');
     noir.playNightCrime({ meansName: 'Xà beng', category: 'Severe Injury' });
@@ -261,12 +267,83 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     assert.equal(noir.murderMode, 'MOTORBIKE_HIT_RUN');
     noir.playNightCrime({ meansName: 'Dao găm', category: 'Loss of Blood' });
     assert.equal(noir.murderMode, 'BACK_STAB');
+
+    noir.playNightCrime({ meansName: 'Chạy lệnh DROP DATABASE không có WHERE', category: 'Loss of Blood' });
+    assert.equal(noir.murderMode, 'BACK_STAB');
+    assert.equal(noir.currentVideoSrc, '/deception/videos/incident-db-wipe.mp4');
+
+    noir.playPoliceArrest({ murdererName: 'DevOps_Suspect' });
+    assert.equal(noir.currentVideoSrc, '/deception/videos/incident-trace-culprit.mp4');
+    assert.ok(noir.duration >= 10.03, 'Default duration must be >= 10.03s so 10.03s MP4 videos are not cut off early');
+    noir.stop(false);
+
+    // Verify all mapped MP4 video files exist on disk, are non-empty, and match duration expectations
+    for (const relUrl of new Set(Object.values(INCIDENT_VIDEOS))) {
+      const fullPath = path.join(process.cwd(), 'public', relUrl.replace(/^\//, ''));
+      assert.ok(fs.existsSync(fullPath), `Video file must exist: ${fullPath}`);
+      const stat = fs.statSync(fullPath);
+      assert.ok(stat.size > 100000, `Video file must be non-empty MP4: ${fullPath}`);
+    }
+
+    // Verify DOM <video> lifecycle & subtitle privacy when meansName/clueName are omitted vs provided
+    const mockElements = {
+      'cutscene-overlay': { classList: { add() {}, remove() {} } },
+      'cutscene-title': { textContent: '' },
+      'cutscene-sub': { textContent: '' },
+      'cutscene-tag': { textContent: '', className: '' },
+      'cutscene-canvas': { style: { display: 'block' } },
+      'cutscene-video': {
+        style: { display: 'none' },
+        muted: false,
+        currentTime: 0,
+        duration: 10.03,
+        _src: '',
+        getAttribute(k) { return k === 'src' ? this._src : null; },
+        setAttribute(k, v) { if (k === 'src') this._src = v; },
+        load() {},
+        play() { return Promise.resolve(); },
+        pause() {}
+      }
+    };
+    const prevDoc = global.document;
+    global.document = {
+      getElementById: (id) => mockElements[id] || null
+    };
+    try {
+      let completedCount = 0;
+      noir.playNightCrime({ category: 'Loss of Blood' }, () => { completedCount++; });
+      assert.ok(mockElements['cutscene-title'].textContent.includes('WHO BROKE PROD?'));
+      assert.ok(!mockElements['cutscene-sub'].textContent.includes('Hành vi gây lỗi: Hành Vi Gây Lỗi'), 'Should not render redundant placeholder card names when omitted');
+      assert.equal(mockElements['cutscene-video']._src, '/deception/videos/incident-db-wipe.mp4');
+      if (typeof mockElements['cutscene-video'].onloadedmetadata === 'function') {
+        mockElements['cutscene-video'].onloadedmetadata();
+      }
+      assert.equal(noir.duration, 10.03);
+      if (typeof mockElements['cutscene-video'].onended === 'function') {
+        mockElements['cutscene-video'].onended();
+      }
+      assert.equal(completedCount, 1);
+      assert.equal(noir.isPlaying, false);
+
+      noir.playNightCrime({
+        category: 'Loss of Blood',
+        meansName: 'Chạy lệnh DROP TABLE trên Production',
+        clueName: 'Lịch sử Git commit lúc 2h sáng'
+      });
+      assert.ok(mockElements['cutscene-sub'].textContent.includes('Chạy lệnh DROP TABLE trên Production'));
+      assert.ok(mockElements['cutscene-sub'].textContent.includes('Lịch sử Git commit lúc 2h sáng'));
+      noir.stop(false);
+    } finally {
+      global.document = prevDoc;
+    }
   });
 
   await t.test('Game-Icons: 100% SVG coverage and semantic accuracy', async () => {
     const {
       getCardGameIconKey,
       getGameIconSvg,
+      renderRoleIconHtml,
+      ROLE_GAME_ICONS,
       MEANS_GAME_ICONS,
       CLUE_GAME_ICONS
     } = await import('../public/js/games/deception/data/deceptionIcons.js');
@@ -274,11 +351,28 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     assert.equal(Object.keys(MEANS_GAME_ICONS).length, 90);
     assert.equal(Object.keys(CLUE_GAME_ICONS).length, 200);
 
+    // Every official role must have a valid SVG icon in ROLE_GAME_ICONS
+    for (const roleId of Object.keys(ROLE_DEFINITIONS)) {
+      assert.ok(ROLE_GAME_ICONS[roleId], `Role ${roleId} must be mapped in ROLE_GAME_ICONS`);
+      const roleSvg = renderRoleIconHtml(roleId);
+      assert.ok(roleSvg.includes('<svg'), `Role ${roleId} must render inline SVG`);
+    }
+
+    const bannedMurderWeaponKeys = new Set([
+      'machete', 'kitchen-knives', 'meat-cleaver', 'switchblade', 'bowie-knife', 'dagger',
+      'revolver', 'pistol-gun', 'shotgun', 'sniper-rifle', 'machine-gun', 'silencer',
+      'poison-bottle', 'syringe', 'noose', 'guillotine', 'chainsaw', 'tomahawk',
+      'Blood', 'bleeding-wound', 'tombstone', 'coffin'
+    ]);
+    const bannedCrimeEmojis = new Set(['🔪', '🩸', '🗡️', '🔫', '💉', '☠️', '⚰️', '🪦', '🪓', '💣']);
+
     // Verify all 90 means
     for (const m of MEANS_CARDS) {
       const key = getCardGameIconKey(m);
       const svg = getGameIconSvg(key);
       assert.ok(svg && svg.length > 20, `Means card ${m.id} should have valid SVG`);
+      assert.ok(!bannedMurderWeaponKeys.has(key), `Means card ${m.id} should not use old weapon icon ${key}`);
+      assert.ok(!bannedCrimeEmojis.has(m.icon), `Means card ${m.id} should not use crime emoji ${m.icon}`);
     }
 
     // Verify all 200 clues
@@ -286,6 +380,8 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
       const key = getCardGameIconKey(c);
       const svg = getGameIconSvg(key);
       assert.ok(svg && svg.length > 20, `Clue card ${c.id} should have valid SVG`);
+      assert.ok(!bannedMurderWeaponKeys.has(key), `Clue card ${c.id} should not use old crime icon ${key}`);
+      assert.ok(!bannedCrimeEmojis.has(c.icon), `Clue card ${c.id} should not use crime emoji ${c.icon}`);
     }
 
     // Semantic accuracy checks
