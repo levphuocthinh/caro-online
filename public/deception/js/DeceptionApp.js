@@ -41,6 +41,7 @@ class DeceptionAppController {
     this.isOnlineMatch = false;
     this.onlineSecretIntel = null;
     this.roundTileSwapped = false;
+    this.showAiHints = true;
 
     // Cache các phần tử DOM thường xuyên truy vấn để tối ưu hiệu năng
     this.dom = {};
@@ -709,6 +710,48 @@ class DeceptionAppController {
       this.openMyRoleGuideModal();
     });
 
+    // Bật/Tắt Gợi ý AI tự động đối chiếu đạn gỗ (AI Detective Co-Pilot)
+    document.getElementById('btn-toggle-ai-hints')?.addEventListener('click', () => {
+      this.showAiHints = !this.showAiHints;
+      this.playAudio('click');
+      this.renderAiForensicBanner();
+      this.renderAuthenticSuspectsTable();
+      this.showToast(this.showAiHints
+        ? (this.isVi ? '💡 Đã BẬT Gợi ý AI tự động đối chiếu đạn gỗ với thẻ bài!' : '💡 AI Detective Co-Pilot Hints ENABLED!')
+        : (this.isVi ? '🙈 Đã TẮT Gợi ý AI để tự suy luận thủ công.' : '🙈 AI Detective Co-Pilot Hints DISABLED.')
+      );
+    });
+
+    // Event delegation trên bảng AI Detective Co-Pilot (Ghim nhanh cặp thẻ gợi ý)
+    const copilotPanel = document.getElementById('ai-hint-copilot-panel');
+    if (copilotPanel) {
+      copilotPanel.addEventListener('click', (e) => {
+        const pinBtn = e.target.closest('.btn-copilot-pin-pair');
+        if (!pinBtn) return;
+        const suspectId = pinBtn.dataset.suspectId;
+        const meansId = pinBtn.dataset.meansId;
+        const clueId = pinBtn.dataset.clueId;
+        const owner = this.state.getPlayerById(suspectId);
+        if (!owner) return;
+
+        owner.meansCards?.forEach(m => this.state.pinnedCardIds.delete(m.id));
+        owner.clueCards?.forEach(c => this.state.pinnedCardIds.delete(c.id));
+        if (meansId) this.state.pinnedCardIds.add(meansId);
+        if (clueId) this.state.pinnedCardIds.add(clueId);
+
+        this.playAudio('cardSlide');
+        this.renderAuthenticSuspectsTable();
+        const stationEl = document.querySelector(`.suspect-station-box[data-station-id="${suspectId}"]`);
+        if (stationEl && typeof stationEl.scrollIntoView === 'function') {
+          stationEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        this.showToast(this.isVi
+          ? `📌 Đã ghim cặp nghi vấn của ${owner.displayName}! Bạn có thể bấm [⚡ Phá án ngay] trên trạm nghi phạm.`
+          : `📌 Pinned ${owner.displayName}'s suspect pair! Click [⚡ Accuse now] on their station.`
+        );
+      });
+    }
+
     // Event delegation trên Bàn Phá Án Nghi Phạm (hiệu năng cao, 0 rò rỉ bộ nhớ)
     const masterTable = document.getElementById('crime-scene-master-table');
     if (masterTable) {
@@ -786,6 +829,8 @@ class DeceptionAppController {
             this.roundTileSwapped = true;
             this.playAudio('bullet_drop');
             this.renderActiveSceneTiles();
+            this.renderAiForensicBanner();
+            this.renderAuthenticSuspectsTable();
             if (this.isOnlineMatch && this.socket) {
               this.socket.emit('deception:swap_tile', { tileIndex: swapIdx });
             }
@@ -805,6 +850,8 @@ class DeceptionAppController {
         this.state.placeBulletOnTile(tIdx, optIdx);
         this.playAudio('bullet_drop');
         this.renderActiveSceneTiles();
+        this.renderAiForensicBanner();
+        this.renderAuthenticSuspectsTable();
 
         if (this.isOnlineMatch && this.socket) {
           this.socket.emit('deception:place_bullet', { tileIndex: tIdx, optionIndex: optIdx });
@@ -1008,6 +1055,7 @@ class DeceptionAppController {
           this.playAudio('bullet_drop');
           this.renderActiveSceneTiles();
           this.renderAiForensicBanner();
+          this.renderAuthenticSuspectsTable();
           this.updateInvestigationTimeline();
         }
       });
@@ -1027,6 +1075,8 @@ class DeceptionAppController {
           this.state.activeEventTile = data.activeEventTile || null;
           this.playAudio('bullet_drop');
           this.renderActiveSceneTiles();
+          this.renderAiForensicBanner();
+          this.renderAuthenticSuspectsTable();
           this.updateInvestigationTimeline();
         }
       });
@@ -2866,7 +2916,18 @@ class DeceptionAppController {
     const titleEl = document.getElementById('ai-forensic-title');
     const sevEl = document.getElementById('ai-forensic-severity');
     const msgEl = document.getElementById('ai-forensic-message');
+    const toggleBtn = document.getElementById('btn-toggle-ai-hints');
+    const toggleLbl = document.getElementById('lbl-toggle-ai-hints');
     if (!banner || !msgEl) return;
+
+    if (toggleBtn) {
+      toggleBtn.classList.toggle('is-active', Boolean(this.showAiHints));
+    }
+    if (toggleLbl) {
+      toggleLbl.textContent = this.showAiHints
+        ? (this.isVi ? '💡 Gợi ý AI: BẬT' : '💡 AI Hints: ON')
+        : (this.isVi ? '🙈 Gợi ý AI: TẮT' : '🙈 AI Hints: OFF');
+    }
 
     const round = this.state.round || 1;
     if (!this.isOnlineMatch && this.state.areAllSceneTilesMarked() && (!this.state.aiForensicReports || !this.state.aiForensicReports[round])) {
@@ -2881,15 +2942,95 @@ class DeceptionAppController {
     }
     if (report) {
       if (sevEl) {
-        sevEl.textContent = `${report.severity || 'SEV-1'} • CONFIDENCE ${report.confidence || 85}%`;
+        sevEl.textContent = `${report.severity || 'SEV-1'} • CONFIDENCE ${report.confidence || '85%'}`;
       }
-      msgEl.textContent = this.isVi ? report.message_vi : report.message_en;
+      msgEl.textContent = this.isVi
+        ? (report.logAnalysisVi || report.message_vi || '')
+        : (report.logAnalysisEn || report.message_en || '');
     } else {
       if (sevEl) sevEl.textContent = 'WAITING FOR TECH LEAD';
       msgEl.textContent = this.isVi
         ? '🤖 AI Log Analyzer: Đang chờ Tech Lead ghim đủ 6 chỉ dấu thông số sự cố để chạy mô hình chẩn đoán...'
         : '🤖 AI Log Analyzer: Waiting for Tech Lead to pin all 6 incident parameter markers...';
     }
+
+    this.renderAiHintCopilotPanel();
+  }
+
+  renderAiHintCopilotPanel() {
+    const panel = document.getElementById('ai-hint-copilot-panel');
+    if (!panel) return;
+
+    if (!this.showAiHints) {
+      panel.style.display = 'none';
+      panel.innerHTML = '';
+      return;
+    }
+
+    panel.style.display = 'block';
+    const analysis = typeof this.state.getPlayerHintAnalysis === 'function'
+      ? this.state.getPlayerHintAnalysis()
+      : null;
+
+    if (!analysis || !analysis.hasMarkers) {
+      panel.innerHTML = `
+        <div class="copilot-empty-hint">
+          <i class="fa-solid fa-compass-drafting"></i>
+          <span>${this.isVi
+            ? '💡 Trợ lý Đối chiếu Chỉ dấu: Đang chờ Tech Lead đặt đạn gỗ lên các thẻ thông số để tự động khoanh vùng Hành vi lỗi (Thẻ Xanh) & Dấu vết Log (Thẻ Đỏ) khớp nhất...'
+            : '💡 AI Detective Co-Pilot: Waiting for Tech Lead to place wooden bullets to automatically highlight matching Means (Blue) & Log Trace (Red) cards...'}</span>
+        </div>
+      `;
+      return;
+    }
+
+    const topPairs = (analysis.topPairs || []).slice(0, 3);
+    panel.innerHTML = `
+      <div class="copilot-guide-bar">
+        <span class="copilot-guide-title">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          ${this.isVi ? 'TRỢ LÝ SUY LUẬN AI (TOP CẶP THẺ KHỚP ĐẠN GỖ):' : 'AI DETECTIVE CO-PILOT (TOP MATCHING PAIRS):'}
+        </span>
+        <div class="copilot-legend-pills">
+          <span class="legend-pill pill-means-guide" title="${this.isVi ? '4 Cột đầu tiên (Root Cause, Tầng bị sập & 2 Thông số đầu) dùng để soi Thẻ Hành Vi Lỗi (Màu Xanh)' : 'First 4 columns describe the Means / Trigger card (Blue)'}">
+            🎯 ${this.isVi ? 'Cột 1–4 ➜ Soi HÀNH VI LỖI (Thẻ Xanh)' : 'Cols 1–4 ➜ Match TRIGGER (Blue)'}
+          </span>
+          <span class="legend-pill pill-clue-guide" title="${this.isVi ? '2 Cột cuối (Bản chất Dấu vết & Thông số cuối) dùng để soi Thẻ Dấu Vết Log (Màu Đỏ)' : 'Last 2 columns describe the Log Trace / Clue card (Red)'}">
+            🧾 ${this.isVi ? 'Cột 5–6 ➜ Soi DẤU VẾT LOG (Thẻ Đỏ)' : 'Cols 5–6 ➜ Match LOG TRACE (Red)'}
+          </span>
+        </div>
+      </div>
+      <div class="copilot-pairs-grid">
+        ${topPairs.map((pair, idx) => {
+          const rankClass = idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : 'rank-3');
+          const mReason = (this.isVi ? pair.meansReasonsVi : pair.meansReasonsEn).slice(0, 2).join(' • ');
+          const cReason = (this.isVi ? pair.clueReasonsVi : pair.clueReasonsEn).slice(0, 2).join(' • ');
+          return `
+            <div class="copilot-pair-card ${rankClass}">
+              <div class="copilot-pair-header">
+                <span class="copilot-rank-badge">#${idx + 1} • ${this.isVi ? 'Khớp' : 'Match'} ${pair.confidencePct}%</span>
+                <span class="copilot-suspect-name">👤 ${this.escapeHtml(pair.playerName)}</span>
+                <button type="button" class="btn-copilot-pin-pair" data-suspect-id="${pair.playerId}" data-means-id="${pair.meansCard.id}" data-clue-id="${pair.clueCard.id}" title="${this.isVi ? 'Ghim nhanh cặp thẻ này trên bàn của nghi phạm' : 'Pin this pair on suspect station'}">
+                  📌 ${this.isVi ? 'Ghim cặp này' : 'Pin pair'}
+                </button>
+              </div>
+              <div class="copilot-pair-cards-row">
+                <div class="copilot-mini-card mini-means" title="${this.escapeHtml(mReason)}">
+                  <span class="mini-card-label">🟦 ${this.isVi ? 'Hành vi lỗi:' : 'Trigger:'}</span>
+                  <strong class="mini-card-name">${this.escapeHtml(this.isVi ? pair.meansCard.vi : pair.meansCard.en)}</strong>
+                  ${mReason ? `<span class="mini-card-reason">✓ ${this.escapeHtml(mReason)}</span>` : ''}
+                </div>
+                <div class="copilot-mini-card mini-clue" title="${this.escapeHtml(cReason)}">
+                  <span class="mini-card-label">🟥 ${this.isVi ? 'Dấu vết Log:' : 'Log Trace:'}</span>
+                  <strong class="mini-card-name">${this.escapeHtml(this.isVi ? pair.clueCard.vi : pair.clueCard.en)}</strong>
+                  ${cReason ? `<span class="mini-card-reason">✓ ${this.escapeHtml(cReason)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
   }
 
   updateInvestigationTimeline() {
@@ -3313,8 +3454,13 @@ class DeceptionAppController {
         tile.color === 'GREEN' ? (this.isVi ? 'TẦNG HỆ THỐNG BỊ SẬP' : 'AFFECTED LAYER') :
         (this.isVi ? `THÔNG SỐ SỰ CỐ (VÒNG ${tile.roundPlaced || 1})` : `INCIDENT PARAM (R${tile.roundPlaced || 1})`);
 
+      const isClueTarget = tile.targetCardType === 'CLUE' || tile.id === 'tile_scene_04' || tIdx >= 4;
+      const targetIndicatorHtml = isClueTarget
+        ? `<div class="tile-target-indicator target-is-clue" title="${this.isVi ? 'Thẻ này dùng để đối chiếu với Thẻ Dấu Vết Log (Màu Đỏ)' : 'This parameter describes the Log Trace / Clue card (Red)'}">🧾 ${this.isVi ? 'SOI THẺ DẤU VẾT LOG (ĐỎ)' : 'MATCHES LOG TRACE (RED)'}</div>`
+        : `<div class="tile-target-indicator target-is-means" title="${this.isVi ? 'Thẻ này dùng để đối chiếu với Thẻ Hành Vi Lỗi (Màu Xanh)' : 'This parameter describes the Trigger / Means card (Blue)'}">🎯 ${this.isVi ? 'SOI THẺ HÀNH VI LỖI (XANH)' : 'MATCHES TRIGGER (BLUE)'}</div>`;
+
       return `
-        <div class="scene-tile-card ${colorClass}">
+        <div class="scene-tile-card ${colorClass} ${isClueTarget ? 'tile-for-clue' : 'tile-for-means'}">
           <div class="tile-header">
             <span class="tile-badge"><span class="tile-icon-area">${renderTileIconHtml(tile.id, 'tile-svg')}</span> ${badgeName}</span>
             ${(isHumanForensic && (this.state.phase === GAME_PHASES.ROUND_2_EVIDENCE || this.state.phase === GAME_PHASES.ROUND_3_EVIDENCE) && tile.color === 'BROWN') ? `
@@ -3323,6 +3469,7 @@ class DeceptionAppController {
               </button>
             ` : ''}
           </div>
+          ${targetIndicatorHtml}
           <div class="tile-title">
             <span class="tile-title-vi">${tile.name_vi}</span>
             <span class="tile-title-en">${tile.name_en}</span>
@@ -3427,6 +3574,9 @@ class DeceptionAppController {
 
     const suspects = this.state.players.filter(p => p.role !== 'FORENSIC_SCIENTIST');
     const currentSpeaker = this.state.getCurrentSpeaker();
+    const hintAnalysis = (this.showAiHints && typeof this.state.getPlayerHintAnalysis === 'function')
+      ? this.state.getPlayerHintAnalysis()
+      : null;
 
     const half = Math.ceil(suspects.length / 2);
     const topSuspects = suspects.slice(0, half);
@@ -3489,8 +3639,11 @@ class DeceptionAppController {
               ${s.meansCards.map(m => {
                 const isPinned = this.state.pinnedCardIds.has(m.id);
                 const isSolutionMeans = canSeeCrimeSolution && (m.id === solMeansId);
+                const mHint = (hintAnalysis && hintAnalysis.hasMarkers && hintAnalysis.meansHints) ? hintAnalysis.meansHints[m.id] : null;
+                const isHighMeansMatch = Boolean(mHint && mHint.isHighMatch);
+                const mReasonTooltip = mHint ? (this.isVi ? mHint.reasonsVi : mHint.reasonsEn).join(' | ') : '';
                 return `
-                  <div class="table-card-item card-blue ${isPinned ? 'is-pinned' : ''} ${isSolutionMeans ? 'is-crime-solution solution-means' : ''}" data-card-id="${m.id}" data-card-type="MEANS" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Hung khí này' : 'Click to select this Means')}">
+                  <div class="table-card-item card-blue ${isPinned ? 'is-pinned' : ''} ${isSolutionMeans ? 'is-crime-solution solution-means' : ''} ${isHighMeansMatch ? 'is-ai-hint-match' : ''}" data-card-id="${m.id}" data-card-type="MEANS" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${m.vi} (${m.en})${mReasonTooltip ? ` — 💡 Khớp: ${mReasonTooltip}` : ''} - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Hung khí này' : 'Click to select this Means')}">
                     ${isPinned ? `<span class="card-pin-indicator" title="Đã chọn nghi vấn">📌</span>` : ''}
                     <span class="card-type-tag tag-blue">${this.isVi ? 'HÀNH VI LỖI' : 'TRIGGER'}</span>
                     <div class="card-icon-area">
@@ -3501,6 +3654,11 @@ class DeceptionAppController {
                     </div>
                     <div class="card-name-vi">${m.vi}</div>
                     <div class="card-name-en">${m.en}</div>
+                    ${isHighMeansMatch && !isSolutionMeans ? `
+                      <span class="ai-card-match-pill pill-means" title="${this.escapeHtml(mReasonTooltip)}">
+                        💡 ${this.isVi ? 'Khớp' : 'Match'} ${mHint.matchedCount}/${mHint.totalTiles}
+                      </span>
+                    ` : ''}
                     ${isSolutionMeans ? `
                       <span class="crime-solution-banner banner-means" title="${this.isVi ? (isMurderer ? 'Hành vi gây lỗi bí mật bạn đã chọn' : 'Hành vi gây lỗi của Thủ phạm') : 'Secret incident trigger'}">
                         <i class="fa-solid fa-bug"></i> ${this.isVi ? 'HÀNH VI LỖI' : 'TRIGGER'}
@@ -3516,8 +3674,11 @@ class DeceptionAppController {
               ${s.clueCards.map(c => {
                 const isPinned = this.state.pinnedCardIds.has(c.id);
                 const isSolutionClue = canSeeCrimeSolution && (c.id === solClueId);
+                const cHint = (hintAnalysis && hintAnalysis.hasMarkers && hintAnalysis.clueHints) ? hintAnalysis.clueHints[c.id] : null;
+                const isHighClueMatch = Boolean(cHint && cHint.isHighMatch);
+                const cReasonTooltip = cHint ? (this.isVi ? cHint.reasonsVi : cHint.reasonsEn).join(' | ') : '';
                 return `
-                  <div class="table-card-item card-red ${isPinned ? 'is-pinned' : ''} ${isSolutionClue ? 'is-crime-solution solution-clue' : ''}" data-card-id="${c.id}" data-card-type="CLUE" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en}) - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Dấu vết Log này' : 'Click to select this Clue')}">
+                  <div class="table-card-item card-red ${isPinned ? 'is-pinned' : ''} ${isSolutionClue ? 'is-crime-solution solution-clue' : ''} ${isHighClueMatch ? 'is-ai-hint-match' : ''}" data-card-id="${c.id}" data-card-type="CLUE" data-owner-id="${s.id}" data-owner-name="${s.displayName}" title="${c.vi} (${c.en})${cReasonTooltip ? ` — 💡 Khớp: ${cReasonTooltip}` : ''} - ${isPinned ? (this.isVi ? 'Nhấp để bỏ chọn' : 'Click to deselect') : (this.isVi ? 'Nhấp để chọn Dấu vết Log này' : 'Click to select this Clue')}">
                     ${isPinned ? `<span class="card-pin-indicator" title="Đã chọn nghi vấn">📌</span>` : ''}
                     <span class="card-type-tag tag-red">${this.isVi ? 'DẤU VẾT LOG' : 'LOG TRACE'}</span>
                     <div class="card-icon-area">
@@ -3528,6 +3689,11 @@ class DeceptionAppController {
                     </div>
                     <div class="card-name-vi">${c.vi}</div>
                     <div class="card-name-en">${c.en}</div>
+                    ${isHighClueMatch && !isSolutionClue ? `
+                      <span class="ai-card-match-pill pill-clue" title="${this.escapeHtml(cReasonTooltip)}">
+                        💡 ${this.isVi ? 'Khớp' : 'Match'} ${cHint.matchedCount}/${cHint.totalTiles}
+                      </span>
+                    ` : ''}
                     ${isSolutionClue ? `
                       <span class="crime-solution-banner banner-clue" title="${this.isVi ? (isMurderer ? 'Dấu vết Log bí mật bạn đã chọn' : 'Dấu vết Log của Thủ phạm') : 'Secret log trace'}">
                         <i class="fa-solid fa-file-code"></i> ${this.isVi ? 'DẤU VẾT LOG' : 'LOG TRACE'}

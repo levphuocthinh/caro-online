@@ -366,6 +366,42 @@ describe('FPT Audit & Deep Verification Suite', () => {
       assert(typeof opt === 'number' && opt >= 0 && opt <= 5, `${locId} must return valid option between 0 and 5`);
     }
   });
+
+  test('FPT Audit 12: Diversified card dealing, 6-tile alignment (4 Means + 2 Clue), and AI Detective Co-Pilot Hint Analysis', () => {
+    const game = new DeceptionState();
+    game.config.playerCount = 6;
+    game.startNewGame();
+
+    const suspects = game.players.filter(p => p.role !== 'FORENSIC_SCIENTIST');
+    for (const s of suspects) {
+      const rootCauses = new Set(s.meansCards.map(m => game.computeSmartBulletOption({ id: 'tile_cause_01', color: 'PURPLE', options_vi: [] }, m, null)));
+      assertEqual(rootCauses.size, 4, `Suspect ${s.displayName} must receive 4 Means cards with 4 distinct Root Causes`);
+      const traceNatures = new Set(s.clueCards.map(c => game.computeSmartBulletOption({ id: 'tile_scene_04', color: 'BROWN', options_vi: [] }, null, c)));
+      assertEqual(traceNatures.size, 4, `Suspect ${s.displayName} must receive 4 Clue cards with 4 distinct Trace Natures`);
+    }
+
+    const murderer = game.getMurdererPlayer();
+    const trueMeans = murderer.meansCards[0];
+    const trueClue = murderer.clueCards[0];
+    game.commitMurdererSelection(trueMeans.id, trueClue.id);
+    game.autoPlaceForensicBullets();
+
+    // Verify slots 0..3 target MEANS and slots 4..5 target CLUE
+    for (let i = 0; i <= 3; i++) {
+      assertEqual(game.activeSceneTiles[i].targetCardType, 'MEANS', `Tile slot ${i} must target MEANS`);
+    }
+    assertEqual(game.activeSceneTiles[4].id, 'tile_scene_04', 'Slot 4 must be tile_scene_04 (Nature of Log Trace)');
+    assertEqual(game.activeSceneTiles[4].targetCardType, 'CLUE', 'Slot 4 must target CLUE');
+    assertEqual(game.activeSceneTiles[5].targetCardType, 'CLUE', 'Slot 5 must target CLUE');
+
+    const analysis = game.getPlayerHintAnalysis();
+    assertEqual(analysis.hasMarkers, true, 'Hint analysis must detect placed markers');
+    assertEqual(analysis.meansHints[trueMeans.id].matchPct, 100, 'True Means card must achieve 100% match');
+    assertEqual(analysis.clueHints[trueClue.id].matchPct, 100, 'True Clue card must achieve 100% match');
+    assert(analysis.topPairs.length >= 3, 'Top pairs must return at least 3 ranked candidates');
+    assertEqual(analysis.topPairs[0].meansCard.id, trueMeans.id, 'Top #1 pair must match true Means card');
+    assertEqual(analysis.topPairs[0].clueCard.id, trueClue.id, 'Top #1 pair must match true Clue card');
+  });
 });
 
 if (require.main === module) {
