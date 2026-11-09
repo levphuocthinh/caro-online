@@ -631,7 +631,7 @@ test('QA Deep Audit 15: D8.02 Online Accusation authoritative broadcast sync to 
     await Promise.all([
       waitForEvent(p1, 'deception:game_started'),
       waitForEvent(p2, 'deception:game_started'),
-      p1.emit('deception:start_game')
+      p1.emit('deception:start_game', { preferredRole: 'FORENSIC_SCIENTIST' })
     ]);
 
     const room = testServer.server.socketController.deceptionSocketManager.rooms.get(created.roomCode);

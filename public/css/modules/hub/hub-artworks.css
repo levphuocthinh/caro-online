@@ -105,14 +105,24 @@
   letter-spacing: 0.8px;
 }
 
-.art-deception {
-  background: url('/images/deception-cover.jpg') center/cover no-repeat !important;
+.art-deception,
+.news-art-deception {
+  background: url('/images/who-broke-prod-banner.jpg') center/cover no-repeat !important;
 }
 
 /* Ẩn icon và tiêu đề chữ phẳng trên bìa Deception để hình ảnh bìa Detective hiển thị trọn vẹn */
 .hub-game-tile[data-game-id="deception"] .tile-center-logo,
 .hub-home-card[data-game-id="deception"] .tile-center-logo,
 .hub-tower-card[data-game-id="deception"] .tile-center-logo {
+  display: none !important;
+}
+
+.hub-cover-artwork.art-deception ~ .hub-cover-logo-box {
+  display: none !important;
+}
+
+.news-card-visual.art-deception i,
+.news-card-visual.news-art-deception i {
   display: none !important;
 }
 
