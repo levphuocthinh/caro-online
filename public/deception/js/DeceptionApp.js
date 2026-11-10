@@ -2219,60 +2219,59 @@ class DeceptionAppController {
     const n = Math.max(4, Math.min(9, totalCount || 6));
     const idx = index % n;
 
-    // Harmonious & Safe Inward Slot maps for n = 4, 5, 6, 7, 8, 9:
-    // rx, ry are percentages of table-seats-ring (with inset: 0 on table perimeter).
-    // Bubbles float inward toward the open felt of the table so they NEVER get clipped by screen edges!
+    // Outward & Non-overlapping Slot maps for n = 4, 5, 6, 7, 8, 9:
+    // Bubbles float outward away from table felt and central emblem, keeping table name 100% clear!
     const slotMaps = {
       4: [
-        { rx: 50, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
-        { rx: 50, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
+        { rx: 50, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 50, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
       ],
       5: [
-        { rx: 32, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 68, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
-        { rx: 50, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
+        { rx: 32, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 68, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 50, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
       ],
       6: [
-        { rx: 32, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 68, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
-        { rx: 68, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 32, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
+        { rx: 32, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 68, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 68, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 32, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
       ],
       7: [
-        { rx: 30, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 70, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 88, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
-        { rx: 88, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
-        { rx: 70, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 30, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
+        { rx: 30, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 70, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 88, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 70, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 30, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
       ],
       8: [
-        { rx: 26, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 50, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 74, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
-        { rx: 74, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 50, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 26, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
+        { rx: 26, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 50, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 74, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 74, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 50, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 26, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
       ],
       9: [
-        { rx: 26, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 50, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 74, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 88, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
-        { rx: 88, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
-        { rx: 74, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 50, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 26, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
-        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
+        { rx: 26, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 50, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 74, ry: 8, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 88, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
+        { rx: 74, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 50, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 26, ry: 90, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
       ]
     };
 
