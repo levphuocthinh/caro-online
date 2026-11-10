@@ -522,6 +522,7 @@ class DeceptionSocketManager {
           clueCard: result.clueCard,
           isCorrect: result.isCorrect,
           phase: room.gameState.phase,
+          finalShowdown: room.gameState.phase === 'FINAL_SHOWDOWN' ? room.gameState.finalShowdown : undefined,
           winnerTeam: room.gameState.winnerTeam,
           winReasonKey: room.gameState.winReasonKey,
           winReasonText: room.gameState.winReasonText,
@@ -535,6 +536,12 @@ class DeceptionSocketManager {
             avatar: p.avatar
           })) : undefined
         });
+
+        if (room.gameState.phase === 'FINAL_SHOWDOWN') {
+          this.io.to(roomCode).emit('deception:final_showdown_started', {
+            finalShowdown: room.gameState.finalShowdown
+          });
+        }
 
         // Nếu bước vào WITNESS_REVERSAL và Hung thủ là Bot -> Server tự động giải quyết phát súng
         if (room.gameState.phase === 'WITNESS_REVERSAL') {
@@ -668,27 +675,35 @@ class DeceptionSocketManager {
 
       const state = room.gameState;
       if (state.maxRounds === 1 || state.round >= state.maxRounds) {
-        state.finishGame(
-          'CRIMINAL',
-          'TIME_EXPIRED',
-          state.maxRounds === 1
-            ? 'Hết 120s Tốc Chiến mà chưa tìm ra đúng Thủ phạm & Dấu vết. Thủ phạm đã cao chạy xa bay!'
-            : 'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra đúng cặp Phương thức & Manh mối. Kẻ Sát Nhân đã cao chạy xa bay!',
-          state.maxRounds === 1
-            ? '2-Minute Blitz ended without a correct accusation. The Murderer escaped into the night!'
-            : 'All 3 investigation rounds ended without a correct accusation. The Murderer escaped into the night!'
-        );
+        if (!state.finalShowdownDone) {
+          state.startFinalShowdownPhase();
+        } else {
+          state.finishGame(
+            'CRIMINAL',
+            'TIME_EXPIRED',
+            state.maxRounds === 1
+              ? 'Hết 120s Tốc Chiến mà chưa tìm ra đúng Thủ phạm & Dấu vết. Thủ phạm đã cao chạy xa bay!'
+              : 'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra đúng cặp Phương thức & Manh mối. Kẻ Sát Nhân đã cao chạy xa bay!',
+            state.maxRounds === 1
+              ? '2-Minute Blitz ended without a correct accusation. The Murderer escaped into the night!'
+              : 'All 3 investigation rounds ended without a correct accusation. The Murderer escaped into the night!'
+          );
+        }
       } else if (state.round === 1) {
         state.startRound2Evidence();
       } else if (state.round === 2) {
         state.startRound3Evidence();
       } else {
-        state.finishGame(
-          'CRIMINAL',
-          'TIME_EXPIRED',
-          'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra đúng cặp Phương thức & Manh mối. Kẻ Sát Nhân đã cao chạy xa bay!',
-          'All 3 investigation rounds ended without a correct accusation. The Murderer escaped into the night!'
-        );
+        if (!state.finalShowdownDone) {
+          state.startFinalShowdownPhase();
+        } else {
+          state.finishGame(
+            'CRIMINAL',
+            'TIME_EXPIRED',
+            'Hết 3 vòng điều tra mà Cảnh sát chưa tìm ra đúng cặp Phương thức & Manh mối. Kẻ Sát Nhân đã cao chạy xa bay!',
+            'All 3 investigation rounds ended without a correct accusation. The Murderer escaped into the night!'
+          );
+        }
       }
 
       const isGameOver = state.phase === 'GAME_OVER';
@@ -701,6 +716,7 @@ class DeceptionSocketManager {
         winReasonKey: isGameOver ? state.winReasonKey : undefined,
         winReasonText: isGameOver ? state.winReasonText : undefined,
         latestAiLogReport: state.latestAiLogReport,
+        finalShowdown: state.finalShowdown,
         aiRcaReport: isGameOver ? state.aiRcaReport : undefined,
         solution: isGameOver ? state.solution : undefined,
         players: isGameOver ? state.players.map(p => ({
@@ -711,7 +727,90 @@ class DeceptionSocketManager {
           avatar: p.avatar
         })) : undefined
       });
+
+      if (state.phase === 'FINAL_SHOWDOWN') {
+        this.io.to(roomCode).emit('deception:final_showdown_started', {
+          finalShowdown: state.finalShowdown
+        });
+      }
       this.broadcastRoomUpdate(room);
+    }));
+
+    // 17. Bỏ phiếu phán quyết sinh tử (50/50 Showdown)
+    socket.on('deception:final_showdown_vote', safeHandler(socket, 'deception:final_showdown_vote', (data = {}) => {
+      const roomCode = this.playerRoomMap.get(socket.id);
+      if (!roomCode) return;
+      const room = this.rooms.get(roomCode);
+      if (!room || room.status !== 'PLAYING' || !room.gameState) return;
+
+      const { candidatePlayerId } = data;
+      const state = room.gameState;
+      if (state.phase !== 'FINAL_SHOWDOWN' || !state.finalShowdown) return;
+
+      const playerIdx = room.players.findIndex(p => p.id === socket.id);
+      const voter = state.players[playerIdx];
+      if (!voter || voter.role === 'FORENSIC_SCIENTIST') return;
+
+      const res = state.resolveFinalShowdown(candidatePlayerId, socket.id);
+      if (res) {
+        const isGameOver = state.phase === 'GAME_OVER';
+        this.io.to(roomCode).emit('deception:final_showdown_resolved', {
+          isCorrect: res.isCorrect,
+          chosenPlayerId: candidatePlayerId,
+          chosenPlayer: { id: res.chosenPlayer?.id, displayName: res.chosenPlayer?.displayName, avatar: res.chosenPlayer?.avatar },
+          phase: state.phase,
+          winnerTeam: state.winnerTeam,
+          winReasonKey: state.winReasonKey,
+          winReasonText: state.winReasonText,
+          solution: isGameOver ? state.solution : undefined,
+          aiRcaReport: isGameOver ? state.aiRcaReport : undefined,
+          players: isGameOver ? state.players.map(p => ({
+            id: p.id,
+            role: p.role,
+            team: p.team,
+            displayName: p.displayName,
+            avatar: p.avatar
+          })) : undefined
+        });
+
+        if (state.phase === 'WITNESS_REVERSAL') {
+          const murderer = state.getMurdererPlayer();
+          const murdererIdx = state.players.indexOf(murderer);
+          const murdererRp = murdererIdx >= 0 ? room.players[murdererIdx] : null;
+          const isBotMurderer = murderer && (!murderer.isHuman || (murdererRp && murdererRp.isBot));
+
+          if (isBotMurderer) {
+            setTimeout(() => {
+              if (room.status !== 'PLAYING' || !room.gameState || room.gameState.phase !== 'WITNESS_REVERSAL') return;
+              const invTargets = room.gameState.players.filter(p => p.team === 'INVESTIGATION' && p.role !== 'FORENSIC_SCIENTIST');
+              if (invTargets.length === 0) return;
+              const botTarget = invTargets[Math.floor(Math.random() * invTargets.length)];
+              const shotRes = room.gameState.resolveWitnessShot(botTarget.id);
+              if (shotRes) {
+                this.io.to(roomCode).emit('deception:witness_shot_resolved', {
+                  hitWitness: shotRes.hitWitness,
+                  targetId: botTarget.id,
+                  targetPlayer: { id: botTarget.id, displayName: botTarget.displayName, avatar: botTarget.avatar },
+                  winnerTeam: room.gameState.winnerTeam,
+                  winReasonKey: room.gameState.winReasonKey,
+                  winReasonText: room.gameState.winReasonText,
+                  solution: room.gameState.solution,
+                  aiRcaReport: room.gameState.aiRcaReport,
+                  players: room.gameState.players.map(p => ({
+                    id: p.id,
+                    role: p.role,
+                    team: p.team,
+                    displayName: p.displayName,
+                    avatar: p.avatar
+                  }))
+                });
+                this.broadcastRoomUpdate(room);
+              }
+            }, 1800);
+          }
+        }
+        this.broadcastRoomUpdate(room);
+      }
     }));
 
     // 17. Xác nhận hoàn tất đạn hiện trường & Bắt đầu thảo luận (Pháp y con người)

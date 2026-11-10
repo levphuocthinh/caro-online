@@ -402,6 +402,75 @@ describe('FPT Audit & Deep Verification Suite', () => {
     assertEqual(analysis.topPairs[0].meansCard.id, trueMeans.id, 'Top #1 pair must match true Means card');
     assertEqual(analysis.topPairs[0].clueCard.id, trueClue.id, 'Top #1 pair must match true Clue card');
   });
+
+  test('FPT Audit 13: Final Showdown (50/50 tiebreaker vote) triggers on endgame without role reveal', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const html = fs.readFileSync(path.join(__dirname, '../public/deception/index.html'), 'utf-8');
+
+    // 1. Verify live AI Hint button and Co-Pilot panel are removed from DOM
+    assert(!html.includes('id="btn-toggle-ai-hints"'), 'AI Hint toggle button must be removed from index.html');
+    assert(!html.includes('id="ai-hint-copilot-panel"'), 'AI Hint copilot panel must be removed from index.html');
+    assert(html.includes('id="modal-final-showdown"'), 'Modal Final Showdown must exist in index.html');
+
+    // 2. Test Final Showdown state machine flow
+    const game = new DeceptionState();
+    game.config.playerCount = 5;
+    game.startNewGame();
+
+    const murderer = game.getMurdererPlayer();
+    const trueMeans = murderer.meansCards[0];
+    const trueClue = murderer.clueCards[0];
+    game.commitMurdererSelection(trueMeans.id, trueClue.id);
+    game.autoPlaceForensicBullets();
+
+    // Trigger Final Showdown
+    const showdown = game.startFinalShowdownPhase();
+    assert(showdown, 'startFinalShowdownPhase must return showdown object');
+    assertEqual(game.phase, 'FINAL_SHOWDOWN', 'Phase must be FINAL_SHOWDOWN');
+    assertEqual(showdown.candidates.length, 2, 'Showdown must provide exactly 2 candidates');
+
+    // Verify candidates DO NOT reveal roles
+    for (const cand of showdown.candidates) {
+      assertEqual(cand.role, undefined, 'Showdown candidate must NEVER reveal their role');
+      assert(cand.playerId, 'Candidate must have playerId');
+      assert(cand.displayName, 'Candidate must have displayName');
+      assert(cand.meansCard && cand.meansCard.vi, 'Candidate must have Means card');
+      assert(cand.clueCard && cand.clueCard.vi, 'Candidate must have Clue card');
+    }
+
+    // Candidate list contains the true culprit and one innocent suspect
+    const containsCulprit = showdown.candidates.some(c => c.playerId === murderer.id);
+    assertEqual(containsCulprit, true, 'Showdown candidates must contain the true Culprit');
+
+    // 3. Test wrong vote -> Criminal victory
+    const innocentCand = showdown.candidates.find(c => c.playerId !== murderer.id);
+    const gameWrong = new DeceptionState();
+    gameWrong.config.playerCount = 5;
+    gameWrong.startNewGame();
+    const mWrong = gameWrong.getMurdererPlayer();
+    gameWrong.commitMurdererSelection(mWrong.meansCards[0].id, mWrong.clueCards[0].id);
+    const sdWrong = gameWrong.startFinalShowdownPhase();
+    const innWrong = sdWrong.candidates.find(c => c.playerId !== mWrong.id);
+    const resWrong = gameWrong.resolveFinalShowdown(innWrong.playerId);
+    assertEqual(resWrong.isCorrect, false, 'Innocent vote must be incorrect');
+    assertEqual(gameWrong.winnerTeam, 'CRIMINAL', 'Criminal team must win on wrong final vote');
+    assertEqual(gameWrong.winReasonKey, 'FINAL_VERDICT_WRONG', 'Win reason must be FINAL_VERDICT_WRONG');
+
+    // 4. Test correct vote -> Investigation victory
+    const gameRight = new DeceptionState();
+    gameRight.config.playerCount = 5;
+    gameRight.startNewGame();
+    // ensure no witness to test direct arrest
+    gameRight.solution.witnessPlayerId = null;
+    const mRight = gameRight.getMurdererPlayer();
+    gameRight.commitMurdererSelection(mRight.meansCards[0].id, mRight.clueCards[0].id);
+    gameRight.startFinalShowdownPhase();
+    const resRight = gameRight.resolveFinalShowdown(mRight.id);
+    assertEqual(resRight.isCorrect, true, 'Culprit vote must be correct');
+    assertEqual(gameRight.winnerTeam, 'INVESTIGATION', 'Investigation team must win on correct final vote');
+    assertEqual(gameRight.winReasonKey, 'FINAL_VERDICT_CORRECT', 'Win reason must be FINAL_VERDICT_CORRECT');
+  });
 });
 
 if (require.main === module) {

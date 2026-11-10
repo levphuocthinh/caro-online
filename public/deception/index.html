@@ -790,16 +790,10 @@
             <i class="fa-solid fa-microchip"></i>
             <span id="ai-forensic-title">🤖 AI FORENSIC MASTER • VÒNG 1</span>
             <span class="ai-severity-pill" id="ai-forensic-severity">SEV-1 CRITICAL</span>
-            <button type="button" class="btn-toggle-ai-hints is-active" id="btn-toggle-ai-hints" title="Bật/Tắt Gợi ý AI tự động đối chiếu đạn gỗ với các thẻ Hành vi lỗi & Dấu vết log">
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
-              <span id="lbl-toggle-ai-hints">💡 Gợi ý AI: BẬT</span>
-            </button>
           </div>
           <div class="ai-forensic-message" id="ai-forensic-message">
             🤖 AI Log Analyzer: Đang thu thập 6 chỉ dấu hệ thống từ Tech Lead để phân tích nguyên nhân sập Production...
           </div>
-          <!-- BẢNG GỢI Ý AI ĐỐI CHIẾU THẺ (AI DETECTIVE CO-PILOT) -->
-          <div class="ai-hint-copilot-panel" id="ai-hint-copilot-panel"></div>
         </div>
 
         <!-- Banner xác nhận / đổi thẻ của Tech Lead -->
@@ -1323,6 +1317,38 @@
           <span id="cast-suspense-text">ĐANG ĐỐI CHIẾU SYSTEM LOG & AUDIT TRAIL...</span>
         </div>
         <div class="casting-stamp-result" id="cast-stamp-result" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: HỘI ĐỒNG PHÁN QUYẾT SINH TỬ (50/50 SHOWDOWN - TIEBREAKER VOTE) -->
+  <div class="noir-modal-overlay" id="modal-final-showdown">
+    <div class="noir-modal-card showdown-modal-card">
+      <div class="noir-modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-tag text-gold"><i class="fa-solid fa-scale-unbalanced"></i> PHÁN QUYẾT SINH TỬ • TỶ LỆ 50/50</span>
+          <h3 class="modal-heading">HỘI ĐỒNG KHOANH VÙNG THỦ PHẠM</h3>
+        </div>
+        <div class="showdown-timer-badge" id="showdown-timer-badge">
+          <i class="fa-solid fa-stopwatch"></i> <span id="lbl-showdown-countdown">30s</span>
+        </div>
+      </div>
+
+      <div class="modal-body-scroll showdown-modal-body">
+        <div class="showdown-alert-lead">
+          <i class="fa-solid fa-triangle-exclamation text-gold"></i>
+          <span><b>HẾT GIỜ ĐIỀU TRA / CẠN HUY HIỆU:</b> Chưa có cáo buộc nào chính xác! Dữ liệu phân tích đã khoanh vùng được <b>2 đối tượng khả nghi nhất</b>. Hãy đối chiếu báo cáo sự cố và đưa ra <b>phán quyết cuối cùng</b> để xác định ai là người làm sập Production!</span>
+        </div>
+
+        <div class="showdown-candidates-grid" id="showdown-candidates-grid">
+          <!-- Rendered dynamically: 2 candidates side-by-side with 0 role reveal -->
+        </div>
+      </div>
+
+      <div class="noir-modal-footer showdown-footer">
+        <span class="showdown-instruction-text" id="showdown-instruction-text">
+          ⚖️ Bấm chọn đúng 1 Nghi phạm bên trên để chốt đơn phán quyết. Nếu chọn nhầm người vô tội, Thủ phạm sẽ tẩu thoát!
+        </span>
       </div>
     </div>
   </div>

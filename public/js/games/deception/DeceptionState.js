@@ -31,6 +31,7 @@ export const GAME_PHASES = {
   ROUND_3_EVIDENCE: 'ROUND_3_EVIDENCE',
   ROUND_3_PRESENTATION: 'ROUND_3_PRESENTATION',
   ACCUSATION_INTERRUPT: 'ACCUSATION_INTERRUPT',
+  FINAL_SHOWDOWN: 'FINAL_SHOWDOWN',
   WITNESS_REVERSAL: 'WITNESS_REVERSAL',
   GAME_OVER: 'GAME_OVER'
 };
@@ -537,6 +538,9 @@ export class DeceptionState {
     this.accuserPlayerId = null;
     this.witnessShotTargetId = null;
     this.activeEventTile = null;
+    this.finalShowdown = null;
+    this.finalShowdownDone = false;
+    this.finalShowdownChosenPlayerId = null;
     this.reversePresentationOrder = false;
     this.pinnedCardIds.clear();
     this.caseLogs = [];
@@ -1868,6 +1872,10 @@ export class DeceptionState {
    */
   advanceAfterPresentation() {
     if (this.maxRounds === 1 || this.round >= this.maxRounds) {
+      if (!this.finalShowdownDone) {
+        this.startFinalShowdownPhase();
+        return;
+      }
       // Hết thời gian War Room (Quá hạn SLA) mà Đội Ứng Phó chưa tìm ra đúng cặp Hành vi & Dấu vết -> Phe Gây Lỗi thắng!
       this.finishGame(
         'CRIMINAL',
@@ -1895,6 +1903,10 @@ export class DeceptionState {
     } else if (this.round === 2) {
       this.startRound3Evidence();
     } else {
+      if (!this.finalShowdownDone) {
+        this.startFinalShowdownPhase();
+        return;
+      }
       // Hết cả 3 vòng họp War Room mà Thủ phạm vẫn chưa bị bắt -> Phe Gây Lỗi thắng!
       this.finishGame(
         'CRIMINAL',
@@ -2307,16 +2319,172 @@ export class DeceptionState {
       // Kiểm tra xem còn ai có Huy hiệu không
       const remainingBadges = this.players.filter(p => p.hasBadge && p.role !== 'FORENSIC_SCIENTIST').length;
       if (remainingBadges === 0) {
-        this.finishGame(
-          'CRIMINAL',
-          'NO_BADGES_LEFT',
-          'Toàn bộ Huy hiệu Phá án của Đội Ứng Phó đã cạn sạch mà vẫn chưa fix được lỗi. Phe Gây Lỗi giành chiến thắng tuyệt đối!',
-          'All Accusation Badges have been exhausted without resolving the outage. The Bug Team wins!'
-        );
+        if (!this.finalShowdownDone) {
+          this.startFinalShowdownPhase();
+        } else {
+          this.finishGame(
+            'CRIMINAL',
+            'NO_BADGES_LEFT',
+            'Toàn bộ Huy hiệu Phá án của Đội Ứng Phó đã cạn sạch mà vẫn chưa fix được lỗi. Phe Gây Lỗi giành chiến thắng tuyệt đối!',
+            'All Accusation Badges have been exhausted without resolving the outage. The Bug Team wins!'
+          );
+        }
       }
 
-      return { valid: true, isCorrect: false, meansCard, clueCard, suspect };
+      return { valid: true, isCorrect: false, meansCard, clueCard, suspect, phase: this.phase };
     }
+  }
+
+  /**
+   * HỘI ĐỒNG PHÁN QUYẾT SINH TỬ (50/50 SHOWDOWN - TIEBREAKER VOTE):
+   * Khi hết 3 vòng hoặc cạn toàn bộ Huy hiệu mà chưa ai phá án thành công,
+   * hệ thống khoanh vùng 2 đối tượng khả nghi nhất (Thủ phạm thật sự & 1 Nghi phạm vô tội có điểm đối trọng cao nhất).
+   * Tuyệt đối KHÔNG TIẾT LỘ vai trò của 2 người này để người chơi tự quyết định trong thế 50/50!
+   */
+  startFinalShowdownPhase() {
+    if (this.phase === GAME_PHASES.GAME_OVER || this.phase === GAME_PHASES.WITNESS_REVERSAL) return null;
+    this.phase = GAME_PHASES.FINAL_SHOWDOWN;
+    this.finalShowdownDone = true;
+
+    const murderer = this.getMurdererPlayer();
+    if (!murderer) return null;
+
+    // Tìm nghi phạm vô tội có điểm số tương quan cao nhất với các thẻ hiện trường
+    const innocentSuspects = this.players.filter(
+      p => p.role !== 'FORENSIC_SCIENTIST' && p.id !== murderer.id
+    );
+
+    let topInnocent = null;
+    let topInnocentMeans = null;
+    let topInnocentClue = null;
+    let highestScore = -1;
+
+    for (const s of innocentSuspects) {
+      for (const m of s.meansCards || []) {
+        for (const c of s.clueCards || []) {
+          const sc = this.evaluateCardPairScore(m, c);
+          if (sc > highestScore) {
+            highestScore = sc;
+            topInnocent = s;
+            topInnocentMeans = m;
+            topInnocentClue = c;
+          }
+        }
+      }
+    }
+
+    if (!topInnocent && innocentSuspects.length > 0) {
+      topInnocent = innocentSuspects[0];
+      topInnocentMeans = topInnocent.meansCards?.[0];
+      topInnocentClue = topInnocent.clueCards?.[0];
+    }
+
+    const trueMeans = this.findCardById(this.solution?.meansCardId)?.card || murderer.meansCards?.[0];
+    const trueClue = this.findCardById(this.solution?.clueCardId)?.card || murderer.clueCards?.[0];
+
+    const candMurderer = {
+      playerId: murderer.id,
+      displayName: murderer.displayName,
+      avatar: murderer.avatar || '👤',
+      meansCard: trueMeans,
+      clueCard: trueClue,
+      isTrueCulprit: true
+    };
+
+    const candInnocent = {
+      playerId: topInnocent ? topInnocent.id : 'innocent_fallback',
+      displayName: topInnocent ? topInnocent.displayName : 'DevOps Team',
+      avatar: topInnocent ? (topInnocent.avatar || '👤') : '👤',
+      meansCard: topInnocentMeans || trueMeans,
+      clueCard: topInnocentClue || trueClue,
+      isTrueCulprit: false
+    };
+
+    // Xáo trộn ngẫu nhiên vị trí 2 ứng viên (50/50 trái hoặc phải, không để lộ ai là hung thủ)
+    const shuffled = Math.random() < 0.5 ? [candMurderer, candInnocent] : [candInnocent, candMurderer];
+
+    this.finalShowdown = {
+      candidates: shuffled.map(c => ({
+        playerId: c.playerId,
+        displayName: c.displayName,
+        avatar: c.avatar,
+        meansCard: c.meansCard,
+        clueCard: c.clueCard
+      })),
+      trueCulpritPlayerId: murderer.id,
+      votes: {}, // playerId -> candidatePlayerId
+      isResolved: false
+    };
+
+    this.addLog(
+      '⚖️ HỘI ĐỒNG PHÁN QUYẾT SINH TỬ: Đã hết thời gian điều tra! Tech Lead đã khoanh vùng được 2 Nghi phạm khả nghi nhất (Tỷ lệ 50/50). Hãy đưa ra phán quyết cuối cùng!',
+      '⚖️ FINAL SHOWDOWN: War Room time expired! Tech Lead isolated 2 top suspects (50/50 deadlock). Cast the final decisive verdict!',
+      'forensic'
+    );
+
+    return this.finalShowdown;
+  }
+
+  /**
+   * Chốt phán quyết cuối cùng của Hội đồng
+   */
+  resolveFinalShowdown(chosenPlayerId, voterId = null) {
+    if (this.phase !== GAME_PHASES.FINAL_SHOWDOWN || !this.finalShowdown) return null;
+    this.finalShowdown.isResolved = true;
+    this.finalShowdownChosenPlayerId = chosenPlayerId;
+
+    const isCorrect = (chosenPlayerId === this.finalShowdown.trueCulpritPlayerId);
+    const chosenPlayer = this.getPlayerById(chosenPlayerId);
+    const murderer = this.getMurdererPlayer();
+
+    if (isCorrect) {
+      this.addLog(
+        `🚨 PHÁN QUYẾT CHÍNH XÁC! Hội đồng đã chỉ định chuẩn xác Thủ phạm ${chosenPlayer ? chosenPlayer.displayName : 'gây lỗi'}!`,
+        `🚨 FINAL VERDICT CORRECT! The Council accurately convicted Culprit ${chosenPlayer ? chosenPlayer.displayName : 'in the outage'}!`,
+        'success'
+      );
+
+      // Nếu bàn chơi có Whistleblower (WITNESS) -> Chuyển sang pha Đổ vạ cuối trận (WITNESS_REVERSAL)
+      if (this.solution?.witnessPlayerId) {
+        this.phase = GAME_PHASES.WITNESS_REVERSAL;
+        this.addLog(
+          '🎯 ĐỔ VẠ CUỐI TRẬN: Thủ phạm đã bị lộ nhưng đang tìm cách chỉ điểm [Whistleblower / Senior Dev] để kéo sập cả đội!',
+          '🎯 SCAPEGOAT REVERSAL: The Culprit is cornered and attempts to pinpoint the [Whistleblower / Senior Dev] to steal the win!',
+          'crime'
+        );
+
+        if (murderer && !murderer.isHuman) {
+          const targets = this.players.filter(
+            p => p.team === 'INVESTIGATION' && p.role !== 'FORENSIC_SCIENTIST'
+          );
+          const shotTarget = targets[Math.floor(Math.random() * targets.length)];
+          if (shotTarget) {
+            this.witnessShotTargetId = shotTarget.id;
+          }
+        }
+      } else {
+        this.finishGame(
+          'INVESTIGATION',
+          'FINAL_VERDICT_CORRECT',
+          `Phán quyết sinh tử chuẩn xác 100%! Đội Ứng Phó đã bắt đúng Thủ phạm ${murderer ? murderer.displayName : ''} trong tình thế 50/50 ngàn cân treo sợi tóc!`,
+          `Flawless Final Verdict! Incident Response Team convicted Culprit ${murderer ? murderer.displayName : ''} in a thrilling 50/50 showdown!`
+        );
+      }
+    } else {
+      this.addLog(
+        `❌ BẮT OAN NGHI PHẠM! ${chosenPlayer ? chosenPlayer.displayName : 'Người này'} hoàn toàn vô tội. Thủ phạm thật sự ${murderer ? murderer.displayName : ''} đã tẩu thoát an toàn!`,
+        `❌ WRONGFUL CONVICTION! ${chosenPlayer ? chosenPlayer.displayName : 'This person'} was innocent. True Culprit ${murderer ? murderer.displayName : ''} slipped away clean!`,
+        'error'
+      );
+      this.finishGame(
+        'CRIMINAL',
+        'FINAL_VERDICT_WRONG',
+        `Hội đồng phán quyết đã bắt nhầm người vô tội (${chosenPlayer ? chosenPlayer.displayName : ''}). Thủ phạm ${murderer ? murderer.displayName : ''} đã xóa dấu vết và tẩu thoát thành công!`,
+        `The Council wrongfully convicted an innocent (${chosenPlayer ? chosenPlayer.displayName : ''}). True Culprit ${murderer ? murderer.displayName : ''} wiped logs and escaped clean!`
+      );
+    }
+
+    return { isCorrect, chosenPlayer, murderer, phase: this.phase, winnerTeam: this.winnerTeam };
   }
 
   /**
@@ -2425,7 +2593,7 @@ export class DeceptionState {
 
     const timestamps = ['02:13 AM', '17:59 PM', '11:42 PM', '03:07 AM', '14:28 PM'];
     const ts = timestamps[(roundNum + (mCard?.id?.charCodeAt(2) || 0)) % timestamps.length];
-    const conf = roundNum === 1 ? '74%' : (roundNum === 2 ? '88%' : '96%');
+    const conf = roundNum === 1 ? '50%' : (roundNum === 2 ? '55%' : '60%');
     const sev = roundNum === 3 ? 'SEV-0 CRITICAL' : 'SEV-1 HIGH';
 
     const quipsVi = [
