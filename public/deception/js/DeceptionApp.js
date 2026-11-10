@@ -1631,19 +1631,20 @@ class DeceptionAppController {
               <span class="bubble-icon">${activity.icon}</span>
               <span class="bubble-text">${activity.text}</span>
             </div>
-            <div class="workstation-chair"></div>
-            <div class="table-seat-avatar">${p.avatar || '👤'}</div>
-            ${p.isHost ? '<span class="seat-badge-crown" title="Chủ phòng">👑</span>' : ''}
-            ${p.isBot ? '<span class="seat-badge-bot" title="Bot AI">🤖</span>' : ''}
-            ${!p.isHost && !p.isBot ? (isReady ? '<span class="seat-badge-ready" title="Đã sẵn sàng">✓</span>' : '<span class="seat-badge-waiting" title="Chờ sẵn sàng">⏳</span>') : ''}
+            <div class="table-seat-avatar-shell">
+              <div class="table-seat-avatar">${p.avatar || '👤'}</div>
+              <div class="seat-device-badge" title="IT Terminal Active">
+                <i class="fa-solid fa-laptop-code"></i>
+              </div>
+              ${p.isHost ? '<span class="seat-badge-crown" title="Chủ phòng">👑</span>' : ''}
+              ${p.isBot ? '<span class="seat-badge-bot" title="Bot AI">🤖</span>' : ''}
+              ${!p.isHost && !p.isBot ? (isReady ? '<span class="seat-badge-ready" title="Đã sẵn sàng">✓</span>' : '<span class="seat-badge-waiting" title="Chờ sẵn sàng">⏳</span>') : ''}
+            </div>
             ${isHost && !isSelf ? `
               <button type="button" class="table-seat-kick-btn" data-player-id="${p.id}" title="Mời ${this.escapeHtml(p.displayName)} ra khỏi phòng">
                 ✕
               </button>
             ` : ''}
-            <div class="workstation-desk-pod">
-              <i class="fa-solid fa-laptop-code desk-laptop-icon"></i>
-            </div>
             <span class="online-table-seat-label">${this.escapeHtml(p.displayName)}${isSelf ? ' (Bạn)' : ''}</span>
           </div>
         `;
@@ -1658,10 +1659,8 @@ class DeceptionAppController {
               <span class="bubble-icon">🪑</span>
               <span class="bubble-text">${isHost ? '+ Mời Bot AI' : 'Bàn trống'}</span>
             </div>
-            <div class="workstation-chair chair-empty"></div>
-            <div class="table-seat-avatar">${isHost ? '<i class="fa-solid fa-plus"></i>' : '<i class="fa-solid fa-chair"></i>'}</div>
-            <div class="workstation-desk-pod pod-empty">
-              <i class="fa-solid fa-laptop desk-laptop-icon"></i>
+            <div class="table-seat-avatar-shell">
+              <div class="table-seat-avatar">${isHost ? '<i class="fa-solid fa-plus"></i>' : '<i class="fa-solid fa-chair"></i>'}</div>
             </div>
             <span class="online-table-seat-label">${isHost ? '+ Bot AI' : `Ghế #${slotIdx}`}</span>
           </div>
@@ -2220,60 +2219,60 @@ class DeceptionAppController {
     const n = Math.max(4, Math.min(9, totalCount || 6));
     const idx = index % n;
 
-    // Slot maps for n = 4, 5, 6, 7, 8, 9:
-    // rx, ry are percentages of table-seats-ring.
-    // Workstations sit along the perimeter rim, bubbles float outward away from table felt and telemetry.
+    // Harmonious & Safe Inward Slot maps for n = 4, 5, 6, 7, 8, 9:
+    // rx, ry are percentages of table-seats-ring (with inset: 0 on table perimeter).
+    // Bubbles float inward toward the open felt of the table so they NEVER get clipped by screen edges!
     const slotMaps = {
       4: [
-        { rx: 50, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 95, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
-        { rx: 50, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+        { rx: 50, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
+        { rx: 50, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
       ],
       5: [
-        { rx: 34, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 66, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 95, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
-        { rx: 50, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+        { rx: 32, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 68, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
+        { rx: 50, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
       ],
       6: [
-        { rx: 34, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 66, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 95, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
-        { rx: 66, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 34, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+        { rx: 32, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 68, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
+        { rx: 68, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 32, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
       ],
       7: [
-        { rx: 32, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 68, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 95, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
-        { rx: 95, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
-        { rx: 68, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 32, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+        { rx: 30, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 70, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
+        { rx: 88, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
+        { rx: 70, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 30, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
       ],
       8: [
-        { rx: 28, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 50, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 72, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 95, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
-        { rx: 72, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 50, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 28, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+        { rx: 26, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 50, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 74, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 50, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
+        { rx: 74, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 50, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 26, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
       ],
       9: [
-        { rx: 28, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 50, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 72, ry: 5, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
-        { rx: 95, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
-        { rx: 95, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-right' },
-        { rx: 72, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 50, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 28, ry: 95, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-bottom' },
-        { rx: 5, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-left' }
+        { rx: 26, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 50, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 74, ry: 9, posClass: 'seat-pos-top', bubblePosClass: 'bubble-pos-top' },
+        { rx: 88, ry: 35, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
+        { rx: 88, ry: 65, posClass: 'seat-pos-right', bubblePosClass: 'bubble-pos-inward-left' },
+        { rx: 74, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 50, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 26, ry: 89, posClass: 'seat-pos-bottom', bubblePosClass: 'bubble-pos-inward-top' },
+        { rx: 12, ry: 50, posClass: 'seat-pos-left', bubblePosClass: 'bubble-pos-inward-right' }
       ]
     };
 
@@ -2374,10 +2373,12 @@ class DeceptionAppController {
             <span class="bubble-icon">${activity.icon}</span>
             <span class="bubble-text">${activity.text}</span>
           </div>
-          <div class="workstation-chair"></div>
-          <div class="table-seat-avatar">${p.avatar}</div>
-          <div class="workstation-desk-pod">
-            <i class="fa-solid fa-laptop-code desk-laptop-icon"></i>
+          <div class="table-seat-avatar-shell">
+            <div class="table-seat-avatar">${p.avatar}</div>
+            <div class="seat-device-badge" title="IT Terminal Active">
+              <i class="fa-solid fa-laptop-code"></i>
+            </div>
+            ${p.role === 'FORENSIC_SCIENTIST' ? '<span class="seat-badge-lead" title="Tech Lead">🎯</span>' : ''}
           </div>
           <span class="lobby-seat-label">${p.isHuman ? (this.isVi ? 'BẠN' : 'YOU') : this.escapeHtml(p.displayName)}</span>
         </div>
