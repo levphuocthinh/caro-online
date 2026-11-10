@@ -1121,12 +1121,16 @@ class DeceptionAppController {
             }
           });
         }
+        const showdownCand = this.state.finalShowdown?.candidates?.find(c => c.playerId === data.chosenPlayerId);
+        const mCard = data.meansCard || showdownCand?.meansCard || data.chosenPlayer?.meansCards?.[0] || { vi: 'Hành vi gây lỗi', en: 'Trigger' };
+        const cCard = data.clueCard || showdownCand?.clueCard || data.chosenPlayer?.clueCards?.[0] || { vi: 'Dấu vết Log', en: 'Log Trace' };
+
         this.showAccusationCastingModal({
           accuserName: this.isVi ? 'Hội Đồng Phán Quyết' : 'Final Council',
           accuserAvatar: '⚖️',
           targetPlayer: data.chosenPlayer,
-          meansCard: data.chosenPlayer?.meansCards?.[0] || { vi: 'Hành vi gây lỗi', en: 'Trigger' },
-          clueCard: data.chosenPlayer?.clueCards?.[0] || { vi: 'Dấu vết Log', en: 'Log Trace' },
+          meansCard: mCard,
+          clueCard: cCard,
           isCorrect: data.isCorrect
         }, () => {
           if (data.isCorrect) {
@@ -3890,12 +3894,16 @@ class DeceptionAppController {
     const chosen = res.chosenPlayer;
     const isCorrect = res.isCorrect;
 
+    const showdownCand = this.state.finalShowdown?.candidates?.find(c => c.playerId === targetPlayerId);
+    const meansCard = res.meansCard || showdownCand?.meansCard || chosen?.meansCards?.[0] || { vi: 'Hành vi gây lỗi', en: 'Trigger' };
+    const clueCard = res.clueCard || showdownCand?.clueCard || chosen?.clueCards?.[0] || { vi: 'Dấu vết Log', en: 'Log Trace' };
+
     this.showAccusationCastingModal({
       accuserName: this.isVi ? 'Hội Đồng Phán Quyết' : 'Final Council',
       accuserAvatar: '⚖️',
       targetPlayer: chosen,
-      meansCard: chosen?.meansCards?.[0] || { vi: 'Hành vi gây lỗi', en: 'Trigger' },
-      clueCard: chosen?.clueCards?.[0] || { vi: 'Dấu vết Log', en: 'Log Trace' },
+      meansCard,
+      clueCard,
       isCorrect
     }, () => {
       if (isCorrect) {

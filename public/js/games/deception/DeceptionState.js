@@ -2484,7 +2484,16 @@ export class DeceptionState {
       );
     }
 
-    return { isCorrect, chosenPlayer, murderer, phase: this.phase, winnerTeam: this.winnerTeam };
+    const showdownCand = this.finalShowdown?.candidates?.find(c => c.playerId === chosenPlayerId);
+    return {
+      isCorrect,
+      chosenPlayer,
+      murderer,
+      meansCard: showdownCand?.meansCard,
+      clueCard: showdownCand?.clueCard,
+      phase: this.phase,
+      winnerTeam: this.winnerTeam
+    };
   }
 
   /**

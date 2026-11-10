@@ -99,6 +99,7 @@ class DeceptionSocketManager {
         minPlayers: 4,
         maxPlayers: 9,
         gameMode: data.gameMode || 'BLITZ_2MIN',
+        preferredRole: data.preferredRole || 'RANDOM',
         players: [hostPlayer],
         chatMessages: [],
         gameState: null
@@ -749,7 +750,7 @@ class DeceptionSocketManager {
 
       const playerIdx = room.players.findIndex(p => p.id === socket.id);
       const voter = state.players[playerIdx];
-      if (!voter || voter.role === 'FORENSIC_SCIENTIST') return;
+      if (!voter) return;
 
       const res = state.resolveFinalShowdown(candidatePlayerId, socket.id);
       if (res) {
@@ -758,6 +759,8 @@ class DeceptionSocketManager {
           isCorrect: res.isCorrect,
           chosenPlayerId: candidatePlayerId,
           chosenPlayer: { id: res.chosenPlayer?.id, displayName: res.chosenPlayer?.displayName, avatar: res.chosenPlayer?.avatar },
+          meansCard: res.meansCard,
+          clueCard: res.clueCard,
           phase: state.phase,
           winnerTeam: state.winnerTeam,
           winReasonKey: state.winReasonKey,
@@ -938,6 +941,8 @@ class DeceptionSocketManager {
     state.config.gameMode = options.gameMode || room.gameMode || 'BLITZ_2MIN';
     if (options && options.preferredRole) {
       state.config.preferredRole = options.preferredRole;
+    } else if (room.preferredRole) {
+      state.config.preferredRole = room.preferredRole;
     }
     state.startNewGame();
     // Đồng bộ thông tin thực tế từ room.players vào state.players (tên, avatar, isHuman)
