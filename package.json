@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "online": ".\\cloudflared.exe tunnel --url http://localhost:3000",
-    "test": "node tests/runner.js"
+    "test": "node tests/runner.js",
+    "record:demo": "node scripts/record_demo_video.js"
   },
   "dependencies": {
     "@iconify-json/game-icons": "^1.2.4",
@@ -16,6 +17,8 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "puppeteer-core": "^25.17.0",
     "socket.io-client": "^4.8.4"
   }
 }

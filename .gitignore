@@ -13,7 +13,10 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
-# Agent files & Temporary scratch files
+# Media & Recordings
+*.mp4
+*.webm
+
 .agents/
 scratch_*.js
 *.tmp
