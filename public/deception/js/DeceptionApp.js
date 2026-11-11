@@ -228,11 +228,6 @@ class DeceptionAppController {
       this.openModal('modal-rules');
     });
 
-    // Kịch bản Video Demo 90s cho BTC
-    document.getElementById('btn-open-demo-guide')?.addEventListener('click', () => {
-      this.openModal('modal-demo-guide');
-    });
-
     // Bấm vào bất kỳ ghế trống nào để thêm Bot AI (Chủ phòng)
     document.addEventListener('click', (e) => {
       const addBotSlot = e.target.closest('[data-action="add-bot"]');

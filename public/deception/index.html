@@ -68,10 +68,6 @@
         <button type="button" class="btn-hdr-action" id="btn-toggle-sound" title="Bật/Tắt âm thanh">
           <i class="fa-solid fa-volume-high" id="icon-sound"></i>
         </button>
-        <button type="button" class="btn-hdr-action btn-hdr-demo" id="btn-open-demo-guide" title="Xem Kịch Bản & Hướng Dẫn Quay Video Demo 90s Cho BTC">
-          <i class="fa-solid fa-video"></i>
-          <span>Demo 90s</span>
-        </button>
         <button type="button" class="btn-hdr-action" id="btn-open-rules" title="Xem Sách Luật & 9 Vai Trò">
           <i class="fa-solid fa-book-skull"></i>
           <span>Luật Chơi</span>
@@ -1353,104 +1349,6 @@
         <span class="showdown-instruction-text" id="showdown-instruction-text">
           ⚖️ Bấm chọn đúng 1 Nghi phạm bên trên để chốt đơn phán quyết. Nếu chọn nhầm người vô tội, Thủ phạm sẽ tẩu thoát!
         </span>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: KỊCH BẢN & HƯỚNG DẪN QUAY VIDEO DEMO 90S DÀNH CHO BTC -->
-  <div class="noir-modal-overlay" id="modal-demo-guide">
-    <div class="noir-modal-card modal-wide demo-guide-modal-card">
-      <div class="noir-modal-header">
-        <div class="modal-title-wrap">
-          <span class="modal-tag text-gold"><i class="fa-solid fa-video"></i> CUỘC THI FPT • HACKATHON & DEMO PITCH</span>
-          <h3 class="modal-heading">Kịch Bản & Hướng Dẫn Quay Video Demo (Tối Đa 90 Giây)</h3>
-        </div>
-        <button type="button" class="btn-modal-close" data-close="modal-demo-guide"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="modal-body-scroll demo-guide-body">
-        <!-- Quick Recording Box -->
-        <div class="demo-recording-tips-box">
-          <div class="tip-badge"><i class="fa-brands fa-windows"></i> CÁCH QUAY TRỰC TIẾP NHANH NHẤT TRÊN WINDOWS:</div>
-          <div class="tip-content">
-            <p>1. Nhấn <b>F11</b> trên trình duyệt để mở chế độ Toàn Màn Hình (Full HD sắc nét).</p>
-            <p>2. Nhấn tổ hợp phím <b>Win + Alt + R</b> để bắt đầu quay màn hình ngay lập tức (không cần cài thêm phần mềm).</p>
-            <p>3. Thao tác theo 4 mốc thời gian bên dưới, khi đến <b>01:28</b> nhấn lại <b>Win + Alt + R</b> để hoàn tất. Video tự động lưu tại thư mục <code>Videos\Captures</code> của máy tính.</p>
-          </div>
-        </div>
-
-        <!-- 4-Phase Timeline Cards -->
-        <div class="demo-timeline-grid">
-          <!-- Phase 1 -->
-          <div class="demo-phase-card">
-            <div class="demo-phase-header">
-              <span class="phase-badge phase-1">00:00 - 00:20 (20s)</span>
-              <h4 class="phase-title">1. Giới Thiệu & Cách Vận Hành</h4>
-            </div>
-            <div class="phase-section">
-              <span class="phase-subhead"><i class="fa-solid fa-desktop"></i> Thao tác màn hình:</span>
-              <p>Mở Sảnh War Room, lướt chuột qua bàn họp Cyber, đèn LED Server Rack, nhấn bắt đầu sự cố.</p>
-            </div>
-            <div class="phase-section">
-              <span class="phase-subhead"><i class="fa-solid fa-microphone-lines"></i> Lời bình (Voiceover):</span>
-              <blockquote class="phase-quote">"Chào Ban Giám Khảo! Đến với Who Broke Prod?, quý vị sẽ trải nghiệm tựa game suy luận ẩn vai trò theo phong cách IT War Room thời gian thực. Hệ thống hỗ trợ chơi online đa người chơi mượt mà qua Socket.io hoặc đấu trí tức thì với Bot AI thông minh."</blockquote>
-            </div>
-          </div>
-
-          <!-- Phase 2 -->
-          <div class="demo-phase-card">
-            <div class="demo-phase-header">
-              <span class="phase-badge phase-2">00:20 - 00:45 (25s)</span>
-              <h4 class="phase-title">2. Luật Chơi Cơ Bản & Ghim Chỉ Dấu</h4>
-            </div>
-            <div class="phase-section">
-              <span class="phase-subhead"><i class="fa-solid fa-desktop"></i> Thao tác màn hình:</span>
-              <p>Rê chuột qua bảng thông số kỹ thuật (Root Cause, Tầng sập), Tech Lead ghim các viên đạn gỗ chỉ dấu.</p>
-            </div>
-            <div class="phase-section">
-              <span class="phase-subhead"><i class="fa-solid fa-microphone-lines"></i> Lời bình (Voiceover):</span>
-              <blockquote class="phase-quote">"Một kẻ phá hoại đã lén làm sập Production bằng cặp bài bí mật gồm: Hành Vi Lỗi và Dấu Vết Log. Tech Lead biết sự thật nhưng phải giữ im lặng, chỉ được ghim đạn gỗ lên các bảng thông số kỹ thuật để định hướng đồng đội."</blockquote>
-            </div>
-          </div>
-
-          <!-- Phase 3 -->
-          <div class="demo-phase-card">
-            <div class="demo-phase-header">
-              <span class="phase-badge phase-3">00:45 - 00:70 (25s)</span>
-              <h4 class="phase-title">3. Trải Nghiệm Thực Tế & Phản Biện</h4>
-            </div>
-            <div class="phase-section">
-              <span class="phase-subhead"><i class="fa-solid fa-desktop"></i> Thao tác màn hình:</span>
-              <p>Mở kênh Đàm Thoại War Room chat với đồng nghiệp/bot AI, soi chi tiết các thẻ bài IT độc đáo.</p>
-            </div>
-            <div class="phase-section">
-              <span class="phase-subhead"><i class="fa-solid fa-microphone-lines"></i> Lời bình (Voiceover):</span>
-              <blockquote class="phase-quote">"Trải nghiệm thực tế diễn ra vô cùng sôi nổi: các kỹ sư mở kênh đàm thoại, phân tích log, đối chiếu chỉ dấu với bài của nghi phạm. Kẻ phá hoại sẽ tìm cách ngụy tạo bằng chứng, tạo nên màn đấu trí tâm lý gay cấn."</blockquote>
-            </div>
-          </div>
-
-          <!-- Phase 4 -->
-          <div class="demo-phase-card">
-            <div class="demo-phase-header">
-              <span class="phase-badge phase-4">00:70 - 00:90 (20s)</span>
-              <h4 class="phase-title">4. Phán Án Sinh Tử & Kết Thúc</h4>
-            </div>
-            <div class="phase-section">
-              <span class="phase-subhead"><i class="fa-solid fa-desktop"></i> Thao tác màn hình:</span>
-              <p>Bật pop-up Phán Quyết Sinh Tử (Final Showdown 50/50), chọn đúng thủ phạm, màn hình ăn mừng Confetti rực rỡ.</p>
-            </div>
-            <div class="phase-section">
-              <span class="phase-subhead"><i class="fa-solid fa-microphone-lines"></i> Lời bình (Voiceover):</span>
-              <blockquote class="phase-quote">"Ở vòng phán án sinh tử 50/50, đội ngũ biểu quyết bắt trúng thủ phạm và cặp bug, hệ thống được khôi phục thành công! Who Broke Prod? mang lại tinh thần đồng đội đậm chất công nghệ. Xin cảm ơn Ban Giám Khảo!"</blockquote>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="noir-modal-footer">
-        <button type="button" class="btn-noir-hero" data-close="modal-demo-guide">
-          <i class="fa-solid fa-check"></i> Đã Hiểu - Bắt Đầu Quay Ngay
-        </button>
       </div>
     </div>
   </div>
