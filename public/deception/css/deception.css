@@ -298,6 +298,19 @@ body.deception-app {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
+.btn-hdr-demo {
+  background: rgba(241, 196, 15, 0.15) !important;
+  border-color: rgba(241, 196, 15, 0.5) !important;
+  color: #f1c40f !important;
+}
+
+.btn-hdr-demo:hover {
+  background: rgba(241, 196, 15, 0.28) !important;
+  border-color: #f1c40f !important;
+  color: #fff !important;
+  box-shadow: 0 0 14px rgba(241, 196, 15, 0.5) !important;
+}
+
 /* ==========================================================================
    VIEWPORT & STAGE ARCHITECTURE (Zero Clutter!)
    ========================================================================== */
@@ -8379,6 +8392,160 @@ body.deception-app {
 
 @media (max-width: 640px) {
   .showdown-candidates-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================================
+   MODAL: KỊCH BẢN & HƯỚNG DẪN QUAY VIDEO DEMO 90S DÀNH CHO BTC
+   ========================================================================= */
+
+.demo-guide-modal-card {
+  max-width: 900px;
+  width: 95vw;
+}
+
+.demo-recording-tips-box {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1.5px solid rgba(0, 210, 211, 0.45);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.demo-recording-tips-box .tip-badge {
+  font-size: 13px;
+  font-weight: 900;
+  color: #00d2d3;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+}
+
+.demo-recording-tips-box .tip-content p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #e2e8f0;
+  line-height: 1.5;
+}
+
+.demo-recording-tips-box .tip-content code {
+  background: rgba(0, 0, 0, 0.6);
+  color: #f1c40f;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.demo-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.demo-phase-card {
+  background: rgba(18, 25, 40, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.demo-phase-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(241, 196, 15, 0.5);
+}
+
+.demo-phase-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.phase-badge {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+}
+
+.phase-badge.phase-1 {
+  background: rgba(0, 210, 211, 0.2);
+  color: #00d2d3;
+  border: 1px solid rgba(0, 210, 211, 0.4);
+}
+
+.phase-badge.phase-2 {
+  background: rgba(241, 196, 15, 0.2);
+  color: #f1c40f;
+  border: 1px solid rgba(241, 196, 15, 0.4);
+}
+
+.phase-badge.phase-3 {
+  background: rgba(231, 76, 60, 0.2);
+  color: #ff7675;
+  border: 1px solid rgba(231, 76, 60, 0.4);
+}
+
+.phase-badge.phase-4 {
+  background: linear-gradient(135deg, rgba(46, 213, 115, 0.25), rgba(0, 210, 211, 0.25));
+  color: #2ed573;
+  border: 1px solid rgba(46, 213, 115, 0.5);
+}
+
+.phase-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.phase-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.phase-subhead {
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+}
+
+.phase-section p {
+  margin: 0;
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.phase-quote {
+  margin: 0;
+  padding: 8px 10px;
+  border-left: 3px solid #f1c40f;
+  background: rgba(241, 196, 15, 0.08);
+  border-radius: 0 6px 6px 0;
+  font-size: 12px;
+  font-style: italic;
+  color: #fef08a;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .demo-timeline-grid {
     grid-template-columns: 1fr;
   }
 }
