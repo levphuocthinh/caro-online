@@ -2245,6 +2245,7 @@ export class DeceptionState {
     if (
       this.phase === GAME_PHASES.GAME_OVER ||
       this.phase === GAME_PHASES.WITNESS_REVERSAL ||
+      this.phase === GAME_PHASES.FINAL_SHOWDOWN ||
       this.phase === GAME_PHASES.ROLE_CASTING
     ) {
       return { valid: false };
@@ -2252,8 +2253,16 @@ export class DeceptionState {
 
     const accuser = this.getPlayerById(accuserId);
     const suspect = this.getPlayerById(suspectId);
-    if (!accuser || !suspect || !accuser.hasBadge || accuser.role === 'FORENSIC_SCIENTIST') {
+    if (!accuser || !suspect) {
+      return { valid: false };
+    }
+
+    if (accuser.role === 'FORENSIC_SCIENTIST') {
       return { valid: false, reason: 'FORENSIC_CANNOT_ACCUSE' };
+    }
+
+    if (!accuser.hasBadge) {
+      return { valid: false };
     }
 
     const meansCard = suspect.meansCards.find(c => c.id === meansId);

@@ -82,7 +82,8 @@ describe('FPT Audit & Deep Verification Suite', () => {
       await waitForEvent(guest, 'deception:room_updated');
 
       // Host starts game
-      host.emit('deception:start_game');
+      // Host requests INVESTIGATOR so they can freely debate and query clues without Taboo Silence violation
+      host.emit('deception:start_game', { preferredRole: 'INVESTIGATOR' });
       const [hostGameData, guestGameData] = await Promise.all([
         waitForEvent(host, 'deception:game_started'),
         waitForEvent(guest, 'deception:game_started')
@@ -115,7 +116,8 @@ describe('FPT Audit & Deep Verification Suite', () => {
         await waitForEvent(host, 'deception:room_updated');
       }
 
-      host.emit('deception:start_game');
+      // Host requests INVESTIGATOR so they can freely debate and query clues without Taboo Silence violation
+      host.emit('deception:start_game', { preferredRole: 'INVESTIGATOR' });
       await waitForEvent(host, 'deception:game_started');
 
       const deceptionMgr = testServer.server.socketController.deceptionSocketManager;
@@ -204,7 +206,8 @@ describe('FPT Audit & Deep Verification Suite', () => {
         await waitForEvent(host, 'deception:room_updated');
       }
 
-      host.emit('deception:start_game');
+      // Host requests INVESTIGATOR so they can freely debate and query clues without Taboo Silence violation
+      host.emit('deception:start_game', { preferredRole: 'INVESTIGATOR' });
       await waitForEvent(host, 'deception:game_started');
 
       // Host sends chat questioning clues

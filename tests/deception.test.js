@@ -128,16 +128,16 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     const causeTile = state.activeSceneTiles.find(t => t.id === 'tile_cause_01');
     assert.ok(causeTile, 'Cause of death tile must be present');
 
-    // Test with Poisoning Means card
-    const poisonCard = MEANS_CARDS.find(m => m.category === 'Poisoning');
+    // Test with Security / Permission Means card (M002: Hardcode mật khẩu Root trong code)
+    const secCard = MEANS_CARDS.find(m => m.id === 'M002');
     const dummyClue = CLUE_CARDS[0];
     const murderer = state.getMurdererPlayer();
-    murderer.meansCards[0] = { ...poisonCard, type: 'MEANS' };
+    murderer.meansCards[0] = { ...secCard, type: 'MEANS' };
     murderer.clueCards[0] = { ...dummyClue, type: 'CLUE' };
-    state.commitMurdererSelection(poisonCard.id, dummyClue.id);
+    state.commitMurdererSelection(secCard.id, dummyClue.id);
 
     const calculatedOpt = state.computeSmartBulletOption(causeTile);
-    assert.equal(calculatedOpt, 4, 'Option 4 in tile_cause_01 is Poisoning / Trúng độc');
+    assert.equal(calculatedOpt, 4, 'Option 4 in tile_cause_01 is Security / Permission Breach (Lỗi phân quyền / Bảo mật)');
   });
 
   await t.test('Witness Reversal: Murderer shooting wrong target awards victory to Investigation', () => {
@@ -547,10 +547,17 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     game.startPresentationPhase();
     game.advanceAfterPresentation();
 
+    // Round timeout triggers Final Showdown 50/50 vote
+    assert.equal(game.phase, GAME_PHASES.FINAL_SHOWDOWN);
+    const showdown = game.finalShowdown;
+    assert.ok(showdown, 'Final showdown should be active');
+    const wrongCandidate = showdown.candidates.find(c => c.playerId !== game.solution.murdererPlayerId);
+    game.resolveFinalShowdown(wrongCandidate.playerId);
+
     // Game Over: Criminal Win
     assert.equal(game.phase, GAME_PHASES.GAME_OVER);
     assert.equal(game.winnerTeam, 'CRIMINAL');
-    assert.equal(game.winReasonKey, 'TIME_EXPIRED');
+    assert.equal(game.winReasonKey, 'FINAL_VERDICT_WRONG');
   });
 
   await t.test('Adversarial Edge Cases: Invalid Accusations and Non-existent Targets', () => {

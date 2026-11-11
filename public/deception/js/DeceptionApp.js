@@ -3470,7 +3470,7 @@ class DeceptionAppController {
         `;
       } else if (isWitness) {
         const witnessSuspects = (this.onlineSecretIntel && this.onlineSecretIntel.seenCulprits) ||
-          this.state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
+          this.state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE' || p.role === 'INSIDE_MAN');
         if (witnessSuspects && witnessSuspects.length > 0) {
           secretIntelBar.style.display = 'block';
           const culpritsList = witnessSuspects.map(c => `<b>${c.avatar || '👤'} ${c.displayName}</b>`).join(' & ');

@@ -219,9 +219,11 @@ describe('Tier 4 Scenario: Deception Gameplay Simulation & Multi-Role Player Jou
       const forensicPublic = hostGame.publicState.players.find(p => p.role === 'FORENSIC_SCIENTIST');
       assert(forensicPublic, 'Forensic role must be public');
 
-      // Both clients receive live chat
-      host.emit('deception:send_chat', { message: 'Toàn đội bắt đầu phá án!' });
-      const chatItem = await waitForEvent(guest, 'deception:new_chat');
+      // Both clients receive live chat (sent by non-forensic investigator under taboo silence rule)
+      const chatSender = hostGame.yourSecretRole.role === 'FORENSIC_SCIENTIST' ? guest : host;
+      const chatReceiver = chatSender === host ? guest : host;
+      chatSender.emit('deception:send_chat', { message: 'Toàn đội bắt đầu phá án!' });
+      const chatItem = await waitForEvent(chatReceiver, 'deception:new_chat');
       assertEqual(chatItem.text, 'Toàn đội bắt đầu phá án!');
 
       // Test real-time bullet placement sync

@@ -392,6 +392,18 @@ class DeceptionSocketManager {
       const text = (data.message || '').trim();
       if (!text) return;
 
+      // Luật Cấm Kỵ (Taboo Silence): Tech Lead tuyệt đối không được chat trong lúc ván đấu đang diễn ra
+      if (room.status === 'PLAYING' && room.gameState && room.gameState.phase !== 'GAME_OVER') {
+        const playerIdx = room.players.findIndex(p => p.id === socket.id);
+        const gp = room.gameState.players[playerIdx];
+        if (gp && gp.role === 'FORENSIC_SCIENTIST') {
+          socket.emit('deception:error', {
+            message: 'Tech Lead / Incident Commander phải tuyệt đối giữ im lặng theo luật cấm kỵ (Taboo Silence)! Mọi hướng dẫn chỉ qua đạn gỗ!'
+          });
+          return;
+        }
+      }
+
       const now = Date.now();
       let record = this.chatLimits.get(socket.id);
       if (!record) {
@@ -592,7 +604,7 @@ class DeceptionSocketManager {
 
       const playerIdx = room.players.findIndex(p => p.id === socket.id);
       const shooterGp = room.gameState.players[playerIdx];
-      if (!shooterGp || (shooterGp.role !== 'MURDERER' && shooterGp.role !== 'ACCOMPLICE')) return;
+      if (!shooterGp || shooterGp.team !== 'CRIMINAL') return;
 
       const { targetId } = data;
       const shotRes = room.gameState.resolveWitnessShot(targetId);
@@ -1189,7 +1201,7 @@ class DeceptionSocketManager {
         ];
         msg = accs[Math.floor(Math.random() * accs.length)];
       } else if (role === 'WITNESS') {
-        const culprits = state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
+        const culprits = state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE' || p.role === 'INSIDE_MAN');
         const names = culprits.map(c => c.displayName).join(' hoặc ');
         msg = `Theo trace log telemetry của tôi, luồng crash trùng khớp kỳ lạ với hướng của ${names}. Anh em dồn nghi vấn vào đây!`;
       } else {
@@ -1300,7 +1312,7 @@ class DeceptionSocketManager {
         } else if (role === 'ACCOMPLICE') {
           replyText = `Tôi thấy nhận định của bác ${player.displayName} cần xem lại. Cứ bám sát thông số Tech Lead đưa ra ở tầng [${layerText}] đã!`;
         } else if (role === 'WITNESS') {
-          const culprits = state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE');
+          const culprits = state.players.filter(p => p.role === 'MURDERER' || p.role === 'ACCOMPLICE' || p.role === 'INSIDE_MAN');
           const names = culprits.map(c => c.displayName).join(' hoặc ');
           replyText = `Theo telemetry log tôi soi được, dấu vết crash chỉ phát ra từ nhóm của ${names}. Mọi người hãy đối chiếu cặp thẻ của nhóm này!`;
         } else {
