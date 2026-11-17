@@ -15,7 +15,7 @@ def set_cell_background(cell, fill_hex):
     shd.set(qn('w:fill'), fill_hex)
     tcPr.append(shd)
 
-def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
+def set_cell_margins(cell, top=80, bottom=80, left=110, right=110):
     tcPr = cell._tc.get_or_add_tcPr()
     tcMar = OxmlElement('w:tcMar')
     for m, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
@@ -35,13 +35,13 @@ def add_header_styled_paragraph(doc, text, level=1):
     run.bold = True
     if level == 1:
         run.font.size = Pt(16)
-        run.font.color.rgb = RGBColor(15, 23, 42) # Slate 900
+        run.font.color.rgb = RGBColor(15, 23, 42)
     elif level == 2:
         run.font.size = Pt(13)
-        run.font.color.rgb = RGBColor(14, 165, 233) # Cyber Cyan
+        run.font.color.rgb = RGBColor(14, 165, 233)
     elif level == 3:
         run.font.size = Pt(11)
-        run.font.color.rgb = RGBColor(30, 41, 59) # Slate 800
+        run.font.color.rgb = RGBColor(30, 41, 59)
     return p
 
 def add_body_p(doc, text, bold_prefix="", italic=False, space_after=6):
@@ -59,7 +59,7 @@ def add_body_p(doc, text, bold_prefix="", italic=False, space_after=6):
     r_body.font.name = 'Arial'
     r_body.font.size = Pt(10.5)
     r_body.italic = italic
-    r_body.font.color.rgb = RGBColor(51, 65, 85) # Slate 700
+    r_body.font.color.rgb = RGBColor(51, 65, 85)
     return p
 
 def add_bullet_p(doc, bold_prefix, text):
@@ -81,8 +81,8 @@ def add_bullet_p(doc, bold_prefix, text):
 
 def style_table_header(row, col_widths=None):
     for i, cell in enumerate(row.cells):
-        set_cell_background(cell, '0F172A') # Dark Navy
-        set_cell_margins(cell, top=120, bottom=120, left=140, right=140)
+        set_cell_background(cell, '0F172A')
+        set_cell_margins(cell, top=110, bottom=110, left=120, right=120)
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         for p in cell.paragraphs:
             p.paragraph_format.space_before = Pt(0)
@@ -101,7 +101,7 @@ def style_table_row(row, is_even=False, col_widths=None):
     for i, cell in enumerate(row.cells):
         if is_even:
             set_cell_background(cell, bg_color)
-        set_cell_margins(cell, top=80, bottom=80, left=120, right=120)
+        set_cell_margins(cell, top=75, bottom=75, left=100, right=100)
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         for p in cell.paragraphs:
             p.paragraph_format.space_before = Pt(0)
@@ -113,6 +113,36 @@ def style_table_row(row, is_even=False, col_widths=None):
         if col_widths and i < len(col_widths):
             cell.width = col_widths[i]
 
+MEANS_CATEGORY_VI = {
+    'Poisoning': 'Nhiễm độc hệ thống / Config & Dependency sai',
+    'Suffocation': 'Nghẽn cổ chai / Treo hệ thống / Chết tiến trình',
+    'Loss of Blood': 'Rò rỉ dữ liệu / Xóa mất tài nguyên (Drop/Leak)',
+    'Severe Injury': 'Sập cứng nghiêm trọng / Phá hủy hạ tầng',
+    'Accident': 'Sơ suất vận hành / Thao tác nhầm của con người',
+    'Illness': 'Lỗi ngầm tích tụ / Suy thoái hiệu năng lâu ngày',
+}
+
+CLUE_CATEGORY_VI = {
+    'Written': 'Bản ghi văn bản / Log / Email / Tài liệu / Lịch sử Commit',
+    'Personal': 'Vật dụng & thói quen cá nhân của Kỹ sư',
+    'Natural': 'Yếu tố sinh học / Đồ ăn uống / Văn phòng phẩm tự nhiên',
+    'Synthetic': 'Thiết bị phần cứng / Phụ kiện mạng / Màn hình',
+    'Artistic': 'Hình ảnh / Sticker / Thiết kế UI / Đồ trang trí',
+    'Unrelated': 'Tác nhân ngoại cảnh / Tình huống ngẫu nhiên tại văn phòng',
+}
+
+def translate_category(cat, mapping):
+    if not cat:
+        return 'Khác'
+    parts = [mapping.get(p.strip(), p.strip()) for p in cat.split('/')]
+    return f"[{cat}] " + " + ".join(parts)
+
+SCENE_TYPE_VI = {
+    'CAUSE_OF_DEATH': 'Root Cause (Nguyên nhân gốc - Cố định)',
+    'LOCATION_OF_CRIME': 'Tầng Hệ Thống Bị Sập (Cố định 1/4)',
+    'SCENE_TILE': 'Thông Số Hiện Trường Sự Cố (Rút ngẫu nhiên)',
+}
+
 def main():
     print("Loading data JSON...")
     json_path = os.path.join(os.path.dirname(__file__), 'deception_full_data.json')
@@ -121,56 +151,56 @@ def main():
 
     doc = docx.Document()
 
-    # Set page margins to standard 1 inch
     for section in doc.sections:
-        section.top_margin = Inches(1.0)
-        section.bottom_margin = Inches(1.0)
-        section.left_margin = Inches(1.0)
-        section.right_margin = Inches(1.0)
+        section.top_margin = Inches(0.85)
+        section.bottom_margin = Inches(0.85)
+        section.left_margin = Inches(0.85)
+        section.right_margin = Inches(0.85)
 
     # -------------------------------------------------------------
     # TRANG BÌA (COVER PAGE)
     # -------------------------------------------------------------
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_title.paragraph_format.space_before = Pt(36)
-    p_title.paragraph_format.space_after = Pt(12)
+    p_title.paragraph_format.space_before = Pt(32)
+    p_title.paragraph_format.space_after = Pt(10)
     r_super = p_title.add_run("TÀI LIỆU THIẾT KẾ & TỔNG QUAN DỰ ÁN GAME\n")
     r_super.font.name = 'Arial'
     r_super.font.size = Pt(13)
     r_super.bold = True
-    r_super.font.color.rgb = RGBColor(14, 165, 233) # Cyber Cyan
+    r_super.font.color.rgb = RGBColor(14, 165, 233)
 
     r_main = p_title.add_run("WHO BROKE PROD?\nAI ĐÃ LÀM SẬP PRODUCTION?")
     r_main.font.name = 'Arial'
     r_main.font.size = Pt(24)
     r_main.bold = True
-    r_main.font.color.rgb = RGBColor(15, 23, 42) # Dark Navy
+    r_main.font.color.rgb = RGBColor(15, 23, 42)
 
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_sub.paragraph_format.space_before = Pt(6)
-    p_sub.paragraph_format.space_after = Pt(24)
-    r_sub = p_sub.add_run("IT Incident War Room Social Deduction Board Game\nChi Tiết Luật Chơi • 9 Vai Trò • Nguồn Gốc 290 Thẻ Bài • Kiến Trúc & Báo Cáo QA")
+    p_sub.paragraph_format.space_after = Pt(20)
+    r_sub = p_sub.add_run(
+        "IT Incident War Room Social Deduction Board Game\n"
+        "Chi Tiết Luật Chơi • 9 Vai Trò • Nguồn Gốc & Danh Mục 290 Thẻ Bài • Kiến Trúc & Báo Cáo QA"
+    )
     r_sub.font.name = 'Arial'
     r_sub.font.size = Pt(11)
     r_sub.italic = True
     r_sub.font.color.rgb = RGBColor(100, 116, 139)
 
-    # Add Hero Banner
     banner_img = os.path.join(os.path.dirname(__file__), '../DOCS_WHO_BROKE_PROD/HINH_ANH/banner_who_broke_prod.jpg')
     if os.path.exists(banner_img):
         p_banner = doc.add_paragraph()
         p_banner.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p_banner.paragraph_format.space_after = Pt(24)
+        p_banner.paragraph_format.space_after = Pt(20)
         run_img = p_banner.add_run()
         run_img.add_picture(banner_img, width=Inches(6.2))
 
-    # Meta Info Block
     p_meta = doc.add_paragraph()
     p_meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_meta.paragraph_format.space_after = Pt(18)
-    r_meta = p_meta.add_run("Phiên Bản: 2.0 (Men Gen Game Edition)  |  Ngôn Ngữ: Node.js & Vanilla ES6+  |  Năm 2026")
+    p_meta.paragraph_format.space_after = Pt(16)
+    r_meta = p_meta.add_run("Phiên Bản: 2.0 (IT War Room Edition)  |  Công Nghệ: Node.js, Socket.IO & Vanilla ES6+  |  Năm 2026")
     r_meta.font.name = 'Arial'
     r_meta.font.size = Pt(10)
     r_meta.bold = True
@@ -179,72 +209,68 @@ def main():
     doc.add_page_break()
 
     # -------------------------------------------------------------
-    # MỤC LỤC & TỔNG QUAN
+    # MỤC LỤC
     # -------------------------------------------------------------
     add_header_styled_paragraph(doc, "MỤC LỤC NỘI DUNG TÀI LIỆU", level=1)
-    add_body_p(doc, "Tài liệu này cung cấp cái nhìn toàn diện, thấu đáo và chuyên sâu về mọi khía cạnh của tựa game 'Who Broke Prod? • AI Đã Làm Sập Production?': từ bối cảnh văn hóa khởi nguồn, nguồn gốc tài nguyên thẻ bài, thiết kế luật chơi, đến kiến trúc kỹ thuật và kết quả kiểm thử tự động.")
-    
+    add_body_p(doc, "Tài liệu này cung cấp cái nhìn toàn diện và chi tiết nhất về tựa game 'Who Broke Prod? • AI Đã Làm Sập Production?': từ bối cảnh sáng tạo, nguồn gốc tài nguyên thẻ bài, bộ ảnh chụp màn hình thực tế, thiết kế 9 vai trò, danh mục trọn vẹn 26 bảng hiện trường và 290 thẻ bài, đến kiến trúc kỹ thuật và báo cáo kiểm thử.")
+
     add_bullet_p(doc, "Chương 1: ", "Tổng Quan Dự Án & Bối Cảnh Sáng Tạo IT War Room")
     add_bullet_p(doc, "Chương 2: ", "Nguồn Gốc Sáng Tạo, Bản Quyền & Xuất Xứ Tài Nguyên Trò Chơi")
-    add_bullet_p(doc, "Chương 3: ", "Bộ Sưu Tập Hình Ảnh Giao Diện Thực Tế Của Game")
+    add_bullet_p(doc, "Chương 3: ", "Bộ Sưu Tập 9 Hình Ảnh Giao Diện Thực Tế Của Game")
     add_bullet_p(doc, "Chương 4: ", "Thiết Kế Game & Đặc Tả Chi Tiết 9 Vai Trò Chiến Thuật")
-    add_bullet_p(doc, "Chương 5: ", "Danh Mục Chi Tiết Toàn Bộ 26 Bảng Hiện Trường & 290 Thẻ Bài")
+    add_bullet_p(doc, "Chương 5: ", "Danh Mục Chi Tiết Toàn Bộ 26 Bảng Hiện Trường, 7 Sự Kiện & 290 Thẻ Bài")
     add_bullet_p(doc, "Chương 6: ", "Kiến Trúc Kỹ Thuật, Công Nghệ & An Ninh Zero-Leak")
-    add_bullet_p(doc, "Chương 7: ", "Báo Cáo Kiểm Thử Chất Lượng & Hướng Dẫn Vận Hành")
+    add_bullet_p(doc, "Chương 7: ", "Báo Cáo Kiểm Thử Chất Lượng (96/96 Tests) & Hướng Dẫn Vận Hành")
 
     # -------------------------------------------------------------
-    # CHƯƠNG 1: TỔNG QUAN DỰ ÁN & BỐI CẢNH SÁNG TẠO
+    # CHƯƠNG 1
     # -------------------------------------------------------------
     add_header_styled_paragraph(doc, "CHƯƠNG 1: TỔNG QUAN DỰ ÁN & BỐI CẢNH SÁNG TẠO", level=1)
     add_body_p(doc, "Trong môi trường phát triển phần mềm doanh nghiệp, sự cố Production nghiêm trọng (SEV-1 Critical Incident) là tình huống căng thẳng nhất đối với các kỹ sư: hệ thống ngừng hoạt động, người dùng phàn nàn, và áp lực thời gian để khôi phục dịch vụ đè nặng lên từng cá nhân.")
     add_body_p(doc, "Khi sự cố xảy ra, một phòng tác chiến khẩn cấp ('War Room') được triệu tập ngay lập tức:")
-    add_bullet_p(doc, "Tech Lead / Incident Commander: ", "Người nắm rõ bức tranh toàn cảnh và phân tích nhật ký (log) hệ thống, nhưng phải giữ cái đầu lạnh và không được phát biểu suy diễn để tránh gây hoang mang cho đội ngũ.")
+    add_bullet_p(doc, "Tech Lead / Incident Commander: ", "Người nắm rõ bức tranh toàn cảnh và phân tích nhật ký (log) hệ thống, nhưng phải giữ im lặng tuyệt đối (Taboo Silence) và chỉ được dẫn dắt đội ngũ thông qua 6 viên đạn gỗ ghim trên bảng thông số.")
     add_bullet_p(doc, "Đội ngũ Dev, DevOps, QA, Support: ", "Phải chạy đua với thời gian, xâu chuỗi từng dòng trace log, đối chiếu mã nguồn và đặt câu hỏi phản biện để tìm ra nguyên nhân gốc (Root Cause Analysis - RCA).")
-    add_bullet_p(doc, "Nhân vật bí ẩn: ", "Trong số các đồng nghiệp đang ngồi quanh bàn họp, có một người đã lỡ tay (hoặc cố ý) đẩy đoạn code lỗi lên Production lúc 2h sáng rồi tìm cách xóa dấu vết để chối tội!")
-
-    add_body_p(doc, "'Who Broke Prod?' ra đời từ việc chuyển hóa chính xác 100% không khí chân thực, kịch tính và hài hước của văn hóa IT thành một trò chơi suy luận xã hội (Social Deduction) đỉnh cao. Trò chơi vừa mang tính giải trí thư giãn, vừa rèn luyện kỹ năng phân tích phản biện và tinh thần phối hợp đồng đội.")
+    add_bullet_p(doc, "Nhân vật bí ẩn (The Culprit): ", "Trong số các đồng nghiệp đang ngồi quanh bàn họp, có một người đã lén đẩy đoạn code lỗi lên Production lúc 2h sáng rồi tìm cách xóa dấu vết để chối tội!")
+    add_body_p(doc, "'Who Broke Prod?' chuyển hóa chính xác không khí chân thực, kịch tính và hài hước của văn hóa IT thành một trò chơi suy luận xã hội (Social Deduction) chạy mượt mà trên trình duyệt Web đa nền tảng.")
 
     # -------------------------------------------------------------
-    # CHƯƠNG 2: NGUỒN GỐC SÁNG TẠO, BẢN QUYỀN & TÀI NGUYÊN
+    # CHƯƠNG 2: NGUỒN GỐC
     # -------------------------------------------------------------
     add_header_styled_paragraph(doc, "CHƯƠNG 2: NGUỒN GỐC SÁNG TẠO, BẢN QUYỀN & XUẤT XỨ TÀI NGUYÊN", level=1)
-    add_body_p(doc, "Một trong những yếu tố làm nên chất lượng và tính chuyên nghiệp của 'Who Broke Prod?' là sự minh bạch về nguồn gốc ý tưởng, giấy phép bản quyền và tính sáng tạo độc bản trong thiết kế.")
+    add_body_p(doc, "Dưới đây là giải trình chi tiết nguồn gốc ý tưởng, xuất xứ hệ thống thẻ bài, biểu tượng đồ họa, âm thanh và trí tuệ nhân tạo của trò chơi:")
 
-    add_header_styled_paragraph(doc, "2.1. Nguồn Gốc Ý Tưởng Trò Chơi (Core Game Mechanics)", level=2)
-    add_bullet_p(doc, "Cảm hứng cơ chế gốc: ", "Trò chơi lấy cảm hứng từ cấu trúc luật chơi suy luận phá án kinh điển của board game 'Deception: Murder in Hong Kong' do nhà thiết kế Tobey Ho sáng tạo và Grey Fox Games xuất bản (tác phẩm thuộc Top 50 Party Games xuất sắc nhất toàn cầu trên BoardGameGeek).")
-    add_bullet_p(doc, "Tính sáng tạo & bản địa hóa 100% IT: ", "Thay vì bối cảnh án mạng hình sự truyền thống, đội ngũ đã tái cấu trúc và sáng tạo mới hoàn toàn thành cuộc điều tra sự cố IT Production. Toàn bộ 26 Bảng thông số, 90 Thẻ Phương Thức và 200 Thẻ Dấu Vết đều là các khái niệm, câu chuyện và 'nỗi đau' thực tế của lập trình viên (OOM Kill, SQL Deadlock, Git Blame, Con dấu Approve PR...).")
+    add_header_styled_paragraph(doc, "2.1. Nguồn Gốc Cơ Chế Luật Chơi & Hệ Thống Thẻ Bài", level=2)
+    add_bullet_p(doc, "Cảm hứng cơ chế gốc: ", "Trò chơi kế thừa tinh hoa cơ chế suy luận phá án đồng đội của board game nổi tiếng 'Deception: Murder in Hong Kong' (Tác giả: Tobey Ho, Nhà xuất bản: Grey Fox Games) — tác phẩm nằm trong Top Party/Deduction Board Games toàn cầu trên BoardGameGeek.")
+    add_bullet_p(doc, "Cấu trúc phân nhóm ngữ nghĩa (Semantic Buckets): ", "Các nhóm phân loại ẩn phía dưới của 90 thẻ Phương thức (Poisoning, Suffocation, Loss of Blood, Severe Injury, Accident, Illness) và 200 thẻ Dấu vết (Written, Personal, Natural, Synthetic, Artistic, Unrelated) được giữ nguyên cấu trúc cân bằng xác suất từ hệ thống chuẩn, sau đó ánh xạ 100% sang ngữ cảnh kỹ thuật phần mềm.")
+    add_bullet_p(doc, "Nội dung thẻ bài tự sáng tạo 100%: ", "Toàn bộ 26 Bảng Hiện Trường (156 tùy chọn song ngữ), 7 Thẻ Sự Kiện, 90 Thẻ Hành Vi Lỗi (M001–M090) và 200 Thẻ Dấu Vết Log (C001–C200) được đội ngũ tự biên soạn mới hoàn toàn từ thực tế các sự cố Production trong ngành công nghệ thông tin Việt Nam (VD: 'Bắn JMeter Stress Test thẳng vào Prod', 'Push nhầm file .env lên GitHub Public', 'Truncate sạch bảng tài khoản khách hàng', 'Ly mì tôm úp dở cạnh màn hình'...).")
 
-    add_header_styled_paragraph(doc, "2.2. Nguồn Gốc Hệ Thống Biểu Tượng & Vector Art", level=2)
-    add_bullet_p(doc, "Thư viện Game-Icons.net: ", "Sử dụng các biểu tượng vector đồ họa chuyên nghiệp từ cộng đồng Game-Icons.net, được cấp phép theo tiêu chuẩn quốc tế Creative Commons CC-BY 3.0 (tác giả Lorc, Delapouite, sbed...).")
-    add_bullet_p(doc, "Hệ thống Unicode Emojis & Font Awesome 6: ", "Tích hợp bộ ký tự biểu cảm và font icon chuẩn mực để tối ưu hóa khả năng hiển thị đồng nhất trên mọi hệ điều hành (Windows, macOS, iOS, Android).")
-    add_bullet_p(doc, "Đồ họa 3D Cyberpunk War Room: ", "Toàn bộ bàn hội nghị elip dạ quang, hiệu ứng lưới hologram và particle phát sáng được đội ngũ lập trình trực tiếp bằng Three.js WebGL procedural shaders, không sao chép asset 3D từ bên ngoài.")
+    add_header_styled_paragraph(doc, "2.2. Nguồn Gốc Hệ Thống Biểu Tượng (Icons) & Đồ Họa", level=2)
+    add_bullet_p(doc, "Game-Icons.net (Creative Commons CC-BY 3.0): ", "Toàn bộ vector SVG trên các thẻ bài và bảng vai trò sử dụng bộ icon từ cộng đồng mã nguồn mở Game-Icons.net (các họa sĩ Lorc, Delapouite, sbed...) thông qua hệ thống CDN Iconify, tuân thủ giấy phép CC-BY 3.0.")
+    add_bullet_p(doc, "Font Awesome 6 Free & Unicode Emojis: ", "Các nút điều hướng, huy hiệu và biểu tượng phụ trợ sử dụng Font Awesome 6 (SIL OFL 1.1 / MIT) kết hợp bảng mã Unicode Emoji 15.0.")
+    add_bullet_p(doc, "Đồ họa 3D Cyberpunk War Room: ", "Bàn hội nghị elip dạ quang, hiệu ứng mưa noir và các hạt hologram được lập trình thủ tục trực tiếp bằng Three.js WebGL & Canvas 2D.")
 
-    add_header_styled_paragraph(doc, "2.3. Nguồn Gốc Âm Thanh Trực Tuyến (Procedural Audio)", level=2)
-    add_body_p(doc, "Trò chơi áp dụng công nghệ âm thanh thủ tục (Procedural Sound Synthesis) thông qua W3C Web Audio API:")
-    add_bullet_p(doc, "Không dùng file MP3/WAV bản quyền: ", "Toàn bộ tiếng còi báo động sự cố SEV-1, tiếng ghim đạn cắc bụp, tiếng click thẻ bài và tiếng pháo hoa ăn mừng được tổng hợp bằng dao động sóng âm (Oscillator Nodes) thời gian thực.")
-    add_bullet_p(doc, "Lợi ích kỹ thuật: ", "Loại bỏ hoàn toàn rủi ro vi phạm bản quyền âm nhạc thương mại, đồng thời giảm dung lượng tải trang xuống 0 byte cho tài nguyên âm thanh.")
-
-    add_header_styled_paragraph(doc, "2.4. Nguồn Gốc Thuật Toán Trí Tuệ Nhân Tạo (AI)", level=2)
-    add_bullet_p(doc, "AI Forensic Master: ", "Thuật toán Semantic NLP Word-Boundary Matcher do đội ngũ tự tay phát triển, phân tích từ khóa chuyên ngành trong thẻ lỗi để gợi ý các bảng hiện trường phù hợp nhất.")
-    add_bullet_p(doc, "Hệ thống Bot AI: ", "Xây dựng trên máy trạng thái hữu hạn (Finite State Machine) kết hợp heuristic xác suất, mô phỏng sinh động hành vi tranh luận và suy luận của các kỹ sư IT thực thụ.")
+    add_header_styled_paragraph(doc, "2.3. Nguồn Gốc Âm Thanh & Trí Tuệ Nhân Tạo", level=2)
+    add_bullet_p(doc, "Âm thanh thủ tục (Web Audio API): ", "100% âm thanh (còi báo động SEV-1, tiếng click thẻ, tiếng ghim đạn, hiệu ứng thắng cuộc) được tổng hợp trực tiếp bằng dao động sóng âm (OscillatorNode) trên trình duyệt thông qua W3C Web Audio API, không dùng bất kỳ file nhạc MP3/WAV có bản quyền nào.")
+    add_bullet_p(doc, "Thuật toán AI Forensic Master & Bot AI: ", "Do đội ngũ tự thiết kế bằng JavaScript thuần, sử dụng bộ đối chiếu từ khóa ranh giới từ (Word-Boundary Semantic Matcher) và máy trạng thái xác suất để Bot tự ghim đạn, tranh luận chat và phán án.")
 
     # -------------------------------------------------------------
-    # CHƯƠNG 3: BỘ SƯU TẬP HÌNH ẢNH GIAO DIỆN THỰC TẾ
+    # CHƯƠNG 3: BỘ SƯU TẬP 9 HÌNH ẢNH CHỤP THỰC TẾ
     # -------------------------------------------------------------
     doc.add_page_break()
-    add_header_styled_paragraph(doc, "CHƯƠNG 3: BỘ SƯU TẬP HÌNH ẢNH GIAO DIỆN THỰC TẾ", level=1)
-    add_body_p(doc, "Dưới đây là hình ảnh chụp trực tiếp từ ứng dụng thực tế đang chạy trên máy chủ tại địa chỉ http://localhost:3000/deception/, thể hiện đầy đủ các góc nhìn từ sảnh chờ, cẩm nang vai trò, ca trực đêm, bàn họp War Room đến kênh đàm thoại tương tác.")
+    add_header_styled_paragraph(doc, "CHƯƠNG 3: BỘ SƯU TẬP 9 HÌNH ẢNH GIAO DIỆN THỰC TẾ", level=1)
+    add_body_p(doc, "Toàn bộ hình ảnh dưới đây được chụp trực tiếp trên trình duyệt Chrome ở độ phân giải cao (1440x960) từ phiên bản đang vận hành tại http://localhost:3000/deception/:")
 
     img_dir = os.path.join(os.path.dirname(__file__), '../DOCS_WHO_BROKE_PROD/HINH_ANH')
-    
     screenshots = [
-        ("01_sanh_choi_lobby.png", "Hình 1: Giao diện Sảnh Chờ (Lobby) — Bàn Hologram, chọn vai trò và cấu hình phòng"),
-        ("02_bang_huong_dan_9_vai_tro.png", "Hình 2: Cẩm nang Luật Chơi & Đặc tả 9 Vai Trò Kỹ Sư"),
-        ("03_giai_doan_dem_toi_chon_bai.png", "Hình 3: Ca Trực Đêm (Night Phase) — Giao diện bí mật chọn cặp bài gây án của Thủ Phạm"),
-        ("04_ban_hop_war_room_tong_the.png", "Hình 4: Toàn cảnh Bàn Họp War Room — Ghế ngồi kỹ sư, bảng SEV-1: DOWN, CPU 99%, RAM 98%"),
-        ("05_chi_tiet_the_bai_means_clues.png", "Hình 5: Cận cảnh Thẻ Bài — 4 Thẻ Hành Vi Lỗi (Xanh) và 4 Thẻ Dấu Vết Log (Đỏ) trước mỗi kỹ sư"),
-        ("06_bang_hien_truong_va_dan_go.png", "Hình 6: Bảng Hiện Trường Thông Số Sự Cố & Các viên đạn gỗ chỉ dấu của Tech Lead"),
-        ("07_kenh_dam_thoai_chat_war_room.png", "Hình 7: Kênh Đàm Thoại Thời Gian Thực — Tranh luận, đối chất và phân tích log cùng Bot AI")
+        ("01_sanh_choi_lobby.png", "Hình 1: Sảnh Chờ Chính (Lobby) — Bàn War Room Hologram, chế độ Solo Bot AI & Online Multiplayer, chọn vai trò"),
+        ("02_bang_huong_dan_9_vai_tro.png", "Hình 2: Sách Luật Chơi & Bảng Đặc Tả 9 Vai Trò Kỹ Sư"),
+        ("03_ho_so_vai_tro_role_reveal.png", "Hình 3: Màn Hình Nhận Hồ Sơ Vai Trò Bí Mật (Role Reveal Dossier) — Cẩm nang hành động 3 bước & mẹo sống còn"),
+        ("04_giai_doan_dem_toi_chon_bai.png", "Hình 4: Ca Trực Đêm 02:00 AM (Night Phase) — Giao diện Thủ phạm bí mật chọn 1 Hành Vi Lỗi (Xanh) & 1 Dấu Vết Log (Đỏ)"),
+        ("05_ban_hop_war_room_tong_the.png", "Hình 5: Toàn Cảnh Bàn Họp War Room — Hiển thị đồng hồ đếm ngược, AI Log Analyzer, các ghế ngồi và bộ bài công khai"),
+        ("06_bang_hien_truong_va_dan_go.png", "Hình 6: Chế Độ Xem Pháp Y (6 Thẻ) — Bảng Tím Root Cause, Bảng Xanh Tầng Sập & 4 Bảng Nâu cùng 6 viên đạn gỗ đã ghim"),
+        ("07_chi_tiet_the_bai_means_clues.png", "Hình 7: Chế Độ Xem Nghi Phạm — Cận cảnh 4 Thẻ Hành Vi Lỗi và 4 Thẻ Dấu Vết Log của từng kỹ sư quanh bàn"),
+        ("08_kenh_dam_thoai_chat_war_room.png", "Hình 8: Kênh Đàm Thoại Trọng Án Trực Tuyến — Người chơi thảo luận và Bot AI phản hồi phân tích dấu vết thời gian thực"),
+        ("09_bang_dap_ban_pha_an.png", "Hình 9: Bảng Đập Bàn Phá Án (Accusation Modal) — Chỉ định Thủ phạm và cặp bài Hành Vi + Dấu Vết Log gây sập Prod")
     ]
 
     for fname, caption in screenshots:
@@ -257,10 +283,10 @@ def main():
             p_img.paragraph_format.keep_with_next = True
             run_img = p_img.add_run()
             run_img.add_picture(fpath, width=Inches(5.8))
-            
+
             p_cap = doc.add_paragraph()
             p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            p_cap.paragraph_format.space_after = Pt(14)
+            p_cap.paragraph_format.space_after = Pt(12)
             r_cap = p_cap.add_run(caption)
             r_cap.font.name = 'Arial'
             r_cap.font.size = Pt(9)
@@ -268,101 +294,103 @@ def main():
             r_cap.font.color.rgb = RGBColor(100, 116, 139)
 
     # -------------------------------------------------------------
-    # CHƯƠNG 4: THIẾT KẾ GAME & ĐẶC TẢ 9 VAI TRÒ
+    # CHƯƠNG 4: THIẾT KẾ GAME & 9 VAI TRÒ
     # -------------------------------------------------------------
     doc.add_page_break()
     add_header_styled_paragraph(doc, "CHƯƠNG 4: THIẾT KẾ GAME & ĐẶC TẢ 9 VAI TRÒ CHIẾN THUẬT", level=1)
-    add_body_p(doc, "'Who Broke Prod?' phân bổ người chơi thành 2 phe đối đầu kịch tính: Phe Điều Tra (Investigation Team) và Phe Tội Phạm (Criminal Team). Số lượng vai trò tự động co giãn từ 4 đến 9 người chơi:")
+    add_body_p(doc, "Trò chơi hỗ trợ 4 đến 9 người chơi, chia làm 2 phe: Phe Điều Tra (Investigation Team) và Phe Gây Lỗi/Tội Phạm (Criminal Team):")
 
-    # Table of Roles
     roles = data['roles']
     t_roles = doc.add_table(rows=1, cols=5)
     t_roles.alignment = WD_TABLE_ALIGNMENT.CENTER
     t_roles.style = 'Table Grid'
     hdr_cells = t_roles.rows[0].cells
-    hdr_cells[0].text = "Biểu Tượng"
+    hdr_cells[0].text = "Icon"
     hdr_cells[1].text = "Tên Vai Trò"
     hdr_cells[2].text = "Phe"
-    hdr_cells[3].text = "Số Người"
+    hdr_cells[3].text = "Tối Thiểu"
     hdr_cells[4].text = "Nhiệm Vụ & Cơ Chế Đặc Thù"
-    style_table_header(t_roles.rows[0], [Inches(0.8), Inches(1.5), Inches(1.0), Inches(0.8), Inches(2.3)])
+    style_table_header(t_roles.rows[0], [Inches(0.6), Inches(1.6), Inches(0.9), Inches(0.8), Inches(2.9)])
 
     for idx, (rk, rv) in enumerate(roles.items()):
         row = t_roles.add_row()
-        row_cells = row.cells
-        row_cells[0].text = rv.get('icon', '👤')
-        row_cells[1].text = f"{rv.get('name_vi', '')}\n({rv.get('name_en', '')})"
-        row_cells[2].text = "Điều Tra" if rv.get('team') == 'INVESTIGATION' else "Tội Phạm"
-        row_cells[3].text = f"{rv.get('minPlayers', 4)}+"
-        row_cells[4].text = rv.get('desc_vi', '')
-        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(0.8), Inches(1.5), Inches(1.0), Inches(0.8), Inches(2.3)])
+        rc = row.cells
+        rc[0].text = rv.get('icon', '👤')
+        rc[1].text = f"{rv.get('name_vi', '')}\n({rv.get('name_en', '')})"
+        rc[2].text = "Phe Ứng Phó\n(Investigation)" if rv.get('team') == 'INVESTIGATION' else "Phe Gây Lỗi\n(Criminal)"
+        rc[3].text = f"{rv.get('minPlayers', 4)} người"
+        rc[4].text = rv.get('desc_vi', '')
+        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(0.6), Inches(1.6), Inches(0.9), Inches(0.8), Inches(2.9)])
 
     add_body_p(doc, "")
-    add_header_styled_paragraph(doc, "4.1. Quy Trình Vận Hành 3 Vòng War Room", level=2)
-    add_bullet_p(doc, "Ca Trực Đêm (Deployment Night): ", "Kẻ Phá Hoại bí mật chọn 1 Thẻ Hành Vi Lỗi + 1 Thẻ Dấu Vết Log. Tech Lead và Đồng Phạm nắm rõ đáp án. Nhân Chứng nhận diện danh sách phe Tội Phạm.")
-    add_bullet_p(doc, "Vòng 1 (Khởi Động): ", "Tech Lead ghim 6 đạn gỗ lên 6 bảng thông số. Các kỹ sư có 2 phút thảo luận tự do, đọc log và dùng Huy hiệu Phá án để bắt lỗi.")
-    add_bullet_p(doc, "Vòng 2 & Vòng 3 (Đổi Bảng): ", "Ở mỗi vòng mới, Tech Lead rút bỏ 1 bảng cũ và bốc 1 bảng mới, ghim thêm 1 đạn gỗ để thu hẹp phạm vi nghi vấn.")
-    add_bullet_p(doc, "Bắn Nhân Chứng (Witness Reversal): ", "Nếu phe Điều Tra phá án thành công, Kẻ Phá Hoại có 60 giây hội ý để bắn 1 phát duy nhất chỉ đích danh Nhân Chứng. Nếu bắn trúng, phe Tội Phạm lật kèo chiến thắng!")
-    add_bullet_p(doc, "Chung Kết 50/50 (Final Showdown): ", "Nếu hết 3 vòng hoặc cạn huy hiệu, hệ thống lọc 2 nghi phạm cao nhất để toàn thể kỹ sư biểu quyết sinh tử.")
+    add_header_styled_paragraph(doc, "4.1. Tiến Trình Vận Hành & Cơ Chế Đột Phá", level=2)
+    add_bullet_p(doc, "Ca Trực Đêm (Deployment Night): ", "Thủ phạm chọn bí mật 1 Thẻ Hành Vi (Xanh) + 1 Thẻ Dấu Vết Log (Đỏ). Tech Lead và Đồng lõa biết rõ cặp bài; Whistleblower nhìn thấy mặt 2 nghi phạm phe Gây lỗi nhưng không biết ai cầm lệnh.")
+    add_bullet_p(doc, "Vòng 1 – Vòng 3 (War Room): ", "Tech Lead ghim 6 đạn gỗ lên 6 bảng thông số. Ở vòng 2 và vòng 3, Tech Lead bỏ đi 1 bảng Nâu cũ và rút 1 bảng Nâu mới để bổ sung manh mối. Người chơi thảo luận và dùng Huy hiệu Phá án.")
+    add_bullet_p(doc, "Đảo Ngược Nhân Chứng (Witness Reversal): ", "Nếu bị bắt đúng, Thủ phạm và Đồng lõa có 1 phát súng cuối cùng để chỉ điểm Whistleblower — nếu đoán trúng, phe Gây lỗi lật kèo chiến thắng!")
+    add_bullet_p(doc, "Hội Đồng Phán Quyết 50/50 (Final Showdown): ", "Khi hết 3 vòng hoặc hết sạch Huy hiệu, hệ thống mở cuộc bỏ phiếu sinh tử giữa 2 nghi phạm đáng ngờ nhất.")
 
     # -------------------------------------------------------------
-    # CHƯƠNG 5: DANH MỤC CHI TIẾT THẺ BÀI & HIỆN TRƯỜNG
+    # CHƯƠNG 5: DANH MỤC CHI TIẾT TOÀN BỘ THẺ BÀI
     # -------------------------------------------------------------
     doc.add_page_break()
-    add_header_styled_paragraph(doc, "CHƯƠNG 5: DANH MỤC CHI TIẾT 26 BẢNG HIỆN TRƯỜNG & 290 THẺ BÀI", level=1)
-    add_body_p(doc, "Dưới đây là bộ dữ liệu đầy đủ nhất của 'Who Broke Prod?', bao gồm toàn bộ 26 Bảng Hiện Trường, 7 Thẻ Sự Kiện, 90 Thẻ Phương Thức và 200 Thẻ Dấu Vết kèm giải thích ngữ nghĩa chuyên môn IT thực tế.")
+    add_header_styled_paragraph(doc, "CHƯƠNG 5: DANH MỤC ĐẦY ĐỦ 26 BẢNG HIỆN TRƯỜNG, 7 SỰ KIỆN & 290 THẺ BÀI", level=1)
 
-    # 5.1 BẢNG HIỆN TRƯỜNG
-    add_header_styled_paragraph(doc, "5.1. Danh Sách 26 Bảng Thông Số Sự Cố (Scene Tiles)", level=2)
+    # 5.1 Scene Tiles
+    add_header_styled_paragraph(doc, "5.1. Toàn Bộ 26 Bảng Thông Số Sự Cố (Scene Tiles — 156 Tùy Chọn)", level=2)
     scene_tiles = data.get('sceneTiles', [])
     t_tiles = doc.add_table(rows=1, cols=4)
     t_tiles.alignment = WD_TABLE_ALIGNMENT.CENTER
     t_tiles.style = 'Table Grid'
     h_tiles = t_tiles.rows[0].cells
-    h_tiles[0].text = "Phân Loại"
-    h_tiles[1].text = "Tên Bảng (Tiếng Việt / Anh)"
-    h_tiles[2].text = "Màu Sắc"
-    h_tiles[3].text = "6 Tiêu Chí Lựa Chọn Trong Bảng"
-    style_table_header(t_tiles.rows[0], [Inches(1.2), Inches(1.8), Inches(0.8), Inches(2.6)])
+    h_tiles[0].text = "Mã / Loại"
+    h_tiles[1].text = "Tên Bảng (VI / EN)"
+    h_tiles[2].text = "Màu"
+    h_tiles[3].text = "6 Tiêu Chí Ghim Đạn Gỗ Trong Bảng"
+    style_table_header(t_tiles.rows[0], [Inches(1.2), Inches(1.7), Inches(0.8), Inches(3.1)])
 
     for idx, st in enumerate(scene_tiles):
         row = t_tiles.add_row()
-        r_cells = row.cells
-        r_cells[0].text = st.get('category', st.get('type', ''))
-        r_cells[1].text = f"{st.get('name_vi', '')}\n({st.get('name_en', '')})"
-        r_cells[2].text = st.get('color', '')
-        # List options
-        opts = [f"{o.get('vi', o.get('text', ''))}" for o in st.get('options', [])]
-        r_cells[3].text = " • " + "\n • ".join(opts)
-        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(1.2), Inches(1.8), Inches(0.8), Inches(2.6)])
+        rc = row.cells
+        rc[0].text = f"{st.get('id', '')}\n{SCENE_TYPE_VI.get(st.get('type', ''), st.get('type', ''))}"
+        rc[1].text = f"{st.get('name_vi', '')}\n({st.get('name_en', '')})"
+        rc[2].text = st.get('color', '')
+        opts_vi = st.get('options_vi', [])
+        opts_en = st.get('options_en', [])
+        lines = []
+        for i in range(max(len(opts_vi), len(opts_en))):
+            v = opts_vi[i] if i < len(opts_vi) else ''
+            e = opts_en[i] if i < len(opts_en) else ''
+            lines.append(f"{i+1}. {v} ({e})" if e else f"{i+1}. {v}")
+        rc[3].text = "\n".join(lines)
+        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(1.2), Inches(1.7), Inches(0.8), Inches(3.1)])
 
-    # 5.2 THẺ SỰ KIỆN
+    # 5.2 Event Tiles
     doc.add_page_break()
-    add_header_styled_paragraph(doc, "5.2. Danh Sách 7 Thẻ Sự Kiện Ngẫu Nhiên (Event Tiles)", level=2)
+    add_header_styled_paragraph(doc, "5.2. Toàn Bộ 7 Thẻ Sự Kiện Ngẫu Nhiên (Event Tiles)", level=2)
     event_tiles = data.get('eventTiles', [])
     t_events = doc.add_table(rows=1, cols=4)
     t_events.alignment = WD_TABLE_ALIGNMENT.CENTER
     t_events.style = 'Table Grid'
     h_ev = t_events.rows[0].cells
     h_ev[0].text = "Mã"
-    h_ev[1].text = "Biểu Tượng"
-    h_ev[2].text = "Tên Sự Kiện"
-    h_ev[3].text = "Tác Động Lên Ván Đấu"
-    style_table_header(t_events.rows[0], [Inches(0.8), Inches(0.8), Inches(2.0), Inches(2.8)])
+    h_ev[1].text = "Icon"
+    h_ev[2].text = "Tên Sự Kiện (VI / EN)"
+    h_ev[3].text = "Mô Tả Tác Động Lên Ván Đấu"
+    style_table_header(t_events.rows[0], [Inches(0.9), Inches(0.6), Inches(1.9), Inches(3.4)])
 
     for idx, ev in enumerate(event_tiles):
         row = t_events.add_row()
-        r_cells = row.cells
-        r_cells[0].text = ev.get('id', '')
-        r_cells[1].text = ev.get('icon', '⚡')
-        r_cells[2].text = f"{ev.get('name_vi', '')}\n({ev.get('name_en', '')})"
-        r_cells[3].text = ev.get('desc_vi', '')
-        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(0.8), Inches(0.8), Inches(2.0), Inches(2.8)])
+        rc = row.cells
+        rc[0].text = ev.get('id', '')
+        rc[1].text = ev.get('icon', '⚡')
+        rc[2].text = f"{ev.get('name_vi', '')}\n({ev.get('name_en', '')})"
+        rc[3].text = ev.get('desc_vi', '')
+        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(0.9), Inches(0.6), Inches(1.9), Inches(3.4)])
 
-    # 5.3 90 THẺ PHƯƠNG THỨC (MEANS CARDS)
+    # 5.3 90 Means Cards
     doc.add_page_break()
-    add_header_styled_paragraph(doc, "5.3. Chi Tiết Toàn Bộ 90 Thẻ Phương Thức Gây Lỗi (Means Cards: M001 – M090)", level=2)
-    add_body_p(doc, "Thẻ Phương Thức (Means Cards - Viền Xanh/Cam) đại diện cho hành vi kỹ thuật hoặc công cụ cụ thể đã kích hoạt sự cố sập hệ thống. Dưới đây là danh sách đầy đủ 90 thẻ:")
+    add_header_styled_paragraph(doc, "5.3. Danh Mục Đầy Đủ 90 Thẻ Hành Vi Gây Lỗi (Means Cards: M001 – M090)", level=2)
+    add_body_p(doc, "Mỗi thẻ Hành Vi (Xanh) đại diện cho một thao tác, dòng lệnh hoặc sự cố kỹ thuật trực tiếp kích hoạt sập Production:")
 
     means_cards = data.get('meansCards', [])
     t_means = doc.add_table(rows=1, cols=5)
@@ -371,28 +399,25 @@ def main():
     h_m = t_means.rows[0].cells
     h_m[0].text = "Mã"
     h_m[1].text = "Icon"
-    h_m[2].text = "Tên Hành Vi Gây Lỗi"
+    h_m[2].text = "Tên Hành Vi (Tiếng Việt)"
     h_m[3].text = "Tên Tiếng Anh"
-    h_m[4].text = "Ngữ Nghĩa / Tác Động Trong IT"
-    style_table_header(t_means.rows[0], [Inches(0.7), Inches(0.6), Inches(1.8), Inches(1.5), Inches(1.8)])
+    h_m[4].text = "Nhóm Ngữ Nghĩa & Bản Chất Kỹ Thuật"
+    style_table_header(t_means.rows[0], [Inches(0.65), Inches(0.55), Inches(1.85), Inches(1.55), Inches(2.2)])
 
     for idx, mc in enumerate(means_cards):
         row = t_means.add_row()
-        r_cells = row.cells
-        r_cells[0].text = mc.get('id', '')
-        r_cells[1].text = mc.get('icon', '💻')
-        r_cells[2].text = mc.get('name_vi', '')
-        r_cells[3].text = mc.get('name_en', '')
-        desc = mc.get('desc_vi', mc.get('category', ''))
-        if not desc and 'tags' in mc:
-            desc = "Tags: " + ", ".join(mc['tags'])
-        r_cells[4].text = desc or "Hành vi gây lỗi hệ thống"
-        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(0.7), Inches(0.6), Inches(1.8), Inches(1.5), Inches(1.8)])
+        rc = row.cells
+        rc[0].text = mc.get('id', '')
+        rc[1].text = mc.get('icon', '💻')
+        rc[2].text = mc.get('vi', '')
+        rc[3].text = mc.get('en', '')
+        rc[4].text = translate_category(mc.get('category', ''), MEANS_CATEGORY_VI)
+        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(0.65), Inches(0.55), Inches(1.85), Inches(1.55), Inches(2.2)])
 
-    # 5.4 200 THẺ DẤU VẾT LOG (CLUE CARDS)
+    # 5.4 200 Clue Cards
     doc.add_page_break()
-    add_header_styled_paragraph(doc, "5.4. Chi Tiết Toàn Bộ 200 Thẻ Dấu Vết Hiện Trường (Clue Cards: C001 – C200)", level=2)
-    add_body_p(doc, "Thẻ Dấu Vết Hiện Trường (Clue Cards - Viền Đỏ) đại diện cho bằng chứng số, log trace, hoặc vật chứng mà thủ phạm để lại tại hiện trường. Dưới đây là danh sách đầy đủ 200 thẻ:")
+    add_header_styled_paragraph(doc, "5.4. Danh Mục Đầy Đủ 200 Thẻ Dấu Vết Log (Clue Cards: C001 – C200)", level=2)
+    add_body_p(doc, "Mỗi thẻ Dấu Vết (Đỏ) đại diện cho bằng chứng log, thiết bị hoặc dấu tích vật lý để lại tại hiện trường:")
 
     clue_cards = data.get('clueCards', [])
     t_clues = doc.add_table(rows=1, cols=5)
@@ -401,65 +426,55 @@ def main():
     h_c = t_clues.rows[0].cells
     h_c[0].text = "Mã"
     h_c[1].text = "Icon"
-    h_c[2].text = "Tên Dấu Vết Hiện Trường"
+    h_c[2].text = "Tên Dấu Vết (Tiếng Việt)"
     h_c[3].text = "Tên Tiếng Anh"
-    h_c[4].text = "Ngữ Nghĩa / Bằng Chứng Log"
-    style_table_header(t_clues.rows[0], [Inches(0.7), Inches(0.6), Inches(1.8), Inches(1.5), Inches(1.8)])
+    h_c[4].text = "Nhóm Ngữ Nghĩa & Bản Chất Bằng Chứng"
+    style_table_header(t_clues.rows[0], [Inches(0.65), Inches(0.55), Inches(1.85), Inches(1.55), Inches(2.2)])
 
     for idx, cc in enumerate(clue_cards):
         row = t_clues.add_row()
-        r_cells = row.cells
-        r_cells[0].text = cc.get('id', '')
-        r_cells[1].text = cc.get('icon', '🔍')
-        r_cells[2].text = cc.get('name_vi', '')
-        r_cells[3].text = cc.get('name_en', '')
-        desc = cc.get('desc_vi', cc.get('category', ''))
-        if not desc and 'tags' in cc:
-            desc = "Tags: " + ", ".join(cc['tags'])
-        r_cells[4].text = desc or "Dấu vết log hiện trường"
-        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(0.7), Inches(0.6), Inches(1.8), Inches(1.5), Inches(1.8)])
+        rc = row.cells
+        rc[0].text = cc.get('id', '')
+        rc[1].text = cc.get('icon', '🔍')
+        rc[2].text = cc.get('vi', '')
+        rc[3].text = cc.get('en', '')
+        rc[4].text = translate_category(cc.get('category', ''), CLUE_CATEGORY_VI)
+        style_table_row(row, is_even=(idx % 2 == 1), col_widths=[Inches(0.65), Inches(0.55), Inches(1.85), Inches(1.55), Inches(2.2)])
 
     # -------------------------------------------------------------
-    # CHƯƠNG 6: KIẾN TRÚC KỸ THUẬT & BẢO MẬT ZERO-LEAK
+    # CHƯƠNG 6: KIẾN TRÚC KỸ THUẬT
     # -------------------------------------------------------------
     doc.add_page_break()
-    add_header_styled_paragraph(doc, "CHƯƠNG 6: KIẾN TRÚC KỸ THUẬT & AN NINH MẠNG ZERO-LEAK", level=1)
-    add_body_p(doc, "'Who Broke Prod?' được xây dựng trên triết lý kỹ thuật hiện đại: tốc độ phản hồi tính bằng mili-giây, không phụ thuộc framework cồng kềnh và bảo mật chống gian lận tuyệt đối.")
+    add_header_styled_paragraph(doc, "CHƯƠNG 6: KIẾN TRÚC KỸ THUẬT & AN NINH ZERO-LEAK", level=1)
+    add_body_p(doc, "'Who Broke Prod?' sử dụng kiến trúc Client-Server Fullstack JavaScript (Node.js + Express + Socket.IO ở backend; Vanilla ES6 Modules + Three.js WebGL + Web Audio API ở frontend), đảm bảo tốc độ tải dưới 1 giây và không phụ thuộc framework nặng nề.")
 
     add_header_styled_paragraph(doc, "6.1. Nguyên Lý Bảo Mật Zero-Leak Boundary", level=2)
-    add_body_p(doc, "Trong các game ẩn vai trò trực tuyến, người chơi có trình độ kỹ thuật thường mở Chrome DevTools (F12) để soi gói tin mạng (Network WebSocket) hoặc kiểm tra mã nguồn (DOM Inspector). 'Who Broke Prod?' ngăn chặn triệt để hành vi này:")
-    add_bullet_p(doc, "Phân tách dữ liệu trên Server: ", "Cặp bài gây lỗi và vai trò bí mật chỉ lưu trữ trên RAM máy chủ. Không bao giờ gửi danh sách đáp án về client khi chia bài.")
-    add_bullet_p(doc, "Lọc dữ liệu theo quyền (Scrubbing): ", "Mỗi người chơi chỉ nhận thông tin của chính mình. Whistleblower chỉ nhận ID người phe Tội Phạm mà không biết bài.")
-    add_bullet_p(doc, "Cưỡng chế Luật Cấm Kỵ (Taboo Silence): ", "Máy chủ tự động chặn và trả lỗi nếu Tech Lead phát lệnh chat, ngăn ngừa việc gian lận phím bấm.")
+    add_bullet_p(doc, "Phân tách dữ liệu trên RAM Server: ", "Cặp bài gây lỗi và vai trò ẩn chỉ tồn tại trong bộ nhớ máy chủ (DeceptionSocketManager.js), tuyệt đối không phát tán danh sách đáp án về client.")
+    add_bullet_p(doc, "Lọc gói tin theo thẩm quyền (Role-Based Scrubbing): ", "Whistleblower chỉ nhận danh sách ID các thành viên phe Tội Phạm; bài gây lỗi được ẩn hoàn toàn khỏi người điều tra và người xem.")
+    add_bullet_p(doc, "Cưỡng chế Luật Cấm Kỵ (Taboo Silence): ", "Server chặn cứng mọi gói tin chat gửi từ socket của Tech Lead và trả về sự kiện lỗi, chống gian lận văn bản.")
 
-    add_header_styled_paragraph(doc, "6.2. Thuật Toán AI Forensic Master (Semantic NLP)", level=2)
-    add_body_p(doc, "Thuật toán NLP tự động phân tích độ tương đồng từ vựng kỹ thuật giữa Thẻ Phương Thức/Dấu Vết và 26 Bảng Hiện Trường bằng cơ chế trọng số ranh giới từ (Word-Boundary Boundary Weighting). Nhờ đó, AI có thể tự động đề xuất hoặc thay thế Tech Lead ghim các chỉ dấu có tính logic cao nhất.")
+    add_header_styled_paragraph(doc, "6.2. Trí Tuệ Nhân Tạo AI Forensic Master", level=2)
+    add_body_p(doc, "Thuật toán Semantic NLP Word-Boundary Matcher phân tích độ tương quan từ khóa giữa 2 lá bài phạm tội và 26 Bảng thông số sự cố, tự động định vị Bảng Tím/Xanh/Nâu và gợi ý đạn gỗ chính xác cho người chơi cũng như Bot AI.")
 
     # -------------------------------------------------------------
-    # CHƯƠNG 7: BÁO CÁO KIỂM THỬ QA & HƯỚNG DẪN VẬN HÀNH
+    # CHƯƠNG 7: QA & VẬN HÀNH
     # -------------------------------------------------------------
-    doc.add_page_break()
     add_header_styled_paragraph(doc, "CHƯƠNG 7: BÁO CÁO KIỂM THỬ QA & HƯỚNG DẪN VẬN HÀNH", level=1)
-    
-    add_header_styled_paragraph(doc, "7.1. Báo Cáo Kiểm Thử Tự Động (96 / 96 Test Cases Pass 100%)", level=2)
-    add_body_p(doc, "Dự án sở hữu 6 bộ test suite tự động chuyên sâu kiểm tra toàn diện mọi khía cạnh của game:")
-    add_bullet_p(doc, "Deception Roles & Gameplay Deep Suite: ", "27 tests PASS — Bao phủ toàn diện 9 vai trò, luật cấm kỵ, bắn nhân chứng và chung kết 50/50.")
-    add_bullet_p(doc, "Deception Multiplayer Suite: ", "21 tests PASS — Mô phỏng phòng chơi 4 đến 9 người thật qua WebSocket.")
-    add_bullet_p(doc, "QA Deep Audit Suite: ", "15 tests PASS — Kiểm tra tính toàn vẹn sự kiện và dọn dẹp bộ nhớ.")
-    add_bullet_p(doc, "Core Deception Database Suite: ", "17 tests PASS — Xác thực đủ 26 bảng, 90 thẻ phương thức, 200 thẻ dấu vết.")
-    add_bullet_p(doc, "FPT Audit & 50/50 Verification: ", "16 tests PASS — Kiểm tra hành vi Bot AI và vòng quyết định.")
-    add_body_p(doc, "Kiểm thử chịu tải: Chạy lặp 10 vòng liên tục không xuất hiện bất kỳ lỗi timeout socket hay rò rỉ bộ nhớ nào.")
+    add_header_styled_paragraph(doc, "7.1. Kết Quả Kiểm Thử Tự Động (96 / 96 Test Cases Pass 100%)", level=2)
+    add_bullet_p(doc, "Deception Roles & Gameplay Deep Suite (27 tests): ", "Kiểm thử toàn diện 9 vai trò, Zero-Leak ban đêm, Taboo Silence, Witness Reversal và 50/50 Showdown — 27/27 PASS.")
+    add_bullet_p(doc, "Deception Multiplayer WebSocket Suite (21 tests): ", "Mô phỏng phòng chơi 4–9 người thời gian thực — 21/21 PASS.")
+    add_bullet_p(doc, "QA Deep Audit Suite (15 tests): ", "Kiểm tra tính toàn vẹn sự kiện, giải phóng socket & bộ nhớ — 15/15 PASS.")
+    add_bullet_p(doc, "Core Database & State Machine (17 tests): ", "Xác thực đủ 9 vai trò, 26 bảng, 90 thẻ phương thức, 200 thẻ dấu vết — 17/17 PASS.")
+    add_bullet_p(doc, "FPT Audit & Final Showdown Verification (16 tests): ", "Kiểm tra tương tác Bot AI và vòng bỏ phiếu 50/50 — 16/16 PASS.")
 
-    add_header_styled_paragraph(doc, "7.2. Hướng Dẫn Khởi Động & Trải Nghiệm", level=2)
-    add_bullet_p(doc, "Bước 1: ", "Cài đặt phụ thuộc: npm install")
-    add_bullet_p(doc, "Bước 2: ", "Khởi động máy chủ: node server.js (hoặc npm start)")
-    add_bullet_p(doc, "Bước 3: ", "Truy cập trình duyệt: http://localhost:3000/deception/")
-    add_bullet_p(doc, "Bước 4: ", "Chọn chế độ Solo (đấu cùng Bot AI) hoặc Tạo phòng Multiplayer để mời bạn bè qua mã PIN.")
+    add_header_styled_paragraph(doc, "7.2. Hướng Dẫn Khởi Chạy Nhanh", level=2)
+    add_bullet_p(doc, "Bước 1: ", "Chạy lệnh 'npm install' để cài đặt các gói phụ thuộc.")
+    add_bullet_p(doc, "Bước 2: ", "Khởi động máy chủ bằng lệnh 'node server.js' (cổng mặc định 3000).")
+    add_bullet_p(doc, "Bước 3: ", "Mở trình duyệt tại địa chỉ http://localhost:3000/deception/ để chơi Solo cùng Bot AI hoặc tạo phòng Online.")
 
-    # Save document
     out_docx = os.path.join(os.path.dirname(__file__), '../DOCS_WHO_BROKE_PROD/TAI_LIEU_TONG_QUAN_DU_AN_WHO_BROKE_PROD.docx')
     doc.save(out_docx)
-    print("🎉 Successfully generated complete Word Document at:", out_docx)
+    print("🎉 Rebuilt complete Word Document with ALL populated tables & 9 genuine screenshots:", out_docx)
 
 if __name__ == '__main__':
     main()

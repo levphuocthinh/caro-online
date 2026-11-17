@@ -21,12 +21,13 @@ Toàn bộ tài liệu chi tiết về dự án được phân chia thành các 
 
 | Tệp Tài Liệu | Nội Dung Chính |
 |---|---|
-| [`01_TONG_QUAN_DU_AN.md`](file:///c:/Users/Thinh/Documents/code/caro/DOCS_WHO_BROKE_PROD/01_TONG_QUAN_DU_AN.md) | **Tổng quan dự án**: Bối cảnh sáng tạo, ý tưởng cốt lõi, giá trị gắn kết đồng đội (Team Bonding) và tính thực tiễn của sản phẩm. |
-| [`02_THIET_KE_GAME_VA_LUAT_CHOI.md`](file:///c:/Users/Thinh/Documents/code/caro/DOCS_WHO_BROKE_PROD/02_THIET_KE_GAME_VA_LUAT_CHOI.md) | **Game Design Document (GDD)**: Chi tiết 9 vai trò ẩn, 26 Bảng hiện trường, 290 thẻ bài, tiến trình 3 vòng đấu, cơ chế Bắn Nhân Chứng và Vòng Chung Kết 50/50 Showdown. |
-| [`03_KIEN_TRUC_HE_THONG_VA_CONG_NGHE.md`](file:///c:/Users/Thinh/Documents/code/caro/DOCS_WHO_BROKE_PROD/03_KIEN_TRUC_HE_THONG_VA_CONG_NGHE.md) | **Kiến trúc kỹ thuật**: Client-Server Fullstack JavaScript, Three.js WebGL bàn họp Cyberpunk, tổng hợp âm thanh Web Audio API, thuật toán AI Semantic NLP và bảo mật Zero-Leak Data Boundary. |
-| [`04_BAO_CAO_KIEM_THU_CHAT_LUONG.md`](file:///c:/Users/Thinh/Documents/code/caro/DOCS_WHO_BROKE_PROD/04_BAO_CAO_KIEM_THU_CHAT_LUONG.md) | **Đảm bảo chất lượng (QA)**: Bộ kiểm thử tự động chuyên sâu các vai trò và WebSocket, tỷ lệ đạt 100%, kiểm thử áp lực chịu tải và độ ổn định bộ nhớ. |
-| [`05_HUONG_DAN_CAI_DAT_VA_VAN_HANH.md`](file:///c:/Users/Thinh/Documents/code/caro/DOCS_WHO_BROKE_PROD/05_HUONG_DAN_CAI_DAT_VA_VAN_HANH.md) | **Hướng dẫn vận hành**: Các bước cài đặt môi trường, chạy máy chủ, trải nghiệm chế độ Solo cùng Bot AI hoặc tạo phòng chơi mạng nhiều người (Multiplayer). |
-| [`HINH_ANH/`](file:///c:/Users/Thinh/Documents/code/caro/DOCS_WHO_BROKE_PROD/HINH_ANH) | Thư viện hình ảnh minh họa chất lượng cao về giao diện bàn game War Room, thẻ bài và các góc nhìn thiết bị. |
+| [`TAI_LIEU_TONG_QUAN_DU_AN_WHO_BROKE_PROD.docx`](./TAI_LIEU_TONG_QUAN_DU_AN_WHO_BROKE_PROD.docx) | **Bản Word Đầy Đủ Nhất (Full .DOCX)**: Tổng hợp trọn vẹn 7 chương, nhúng 10 hình ảnh thực tế, bảng chi tiết 9 vai trò, 26 bảng hiện trường, 7 thẻ sự kiện và đầy đủ 290 thẻ bài kèm nguồn gốc xuất xứ. |
+| [`01_TONG_QUAN_DU_AN.md`](./01_TONG_QUAN_DU_AN.md) | **Tổng quan dự án**: Bối cảnh sáng tạo, ý tưởng cốt lõi, giá trị gắn kết đồng đội (Team Bonding) và tính thực tiễn của sản phẩm. |
+| [`02_THIET_KE_GAME_VA_LUAT_CHOI.md`](./02_THIET_KE_GAME_VA_LUAT_CHOI.md) | **Game Design Document (GDD)**: Chi tiết 9 vai trò ẩn, 26 Bảng hiện trường, 290 thẻ bài, tiến trình 3 vòng đấu, cơ chế Bắn Nhân Chứng và Vòng Chung Kết 50/50 Showdown. |
+| [`03_KIEN_TRUC_HE_THONG_VA_CONG_NGHE.md`](./03_KIEN_TRUC_HE_THONG_VA_CONG_NGHE.md) | **Kiến trúc kỹ thuật**: Client-Server Fullstack JavaScript, Three.js WebGL bàn họp Cyberpunk, tổng hợp âm thanh Web Audio API, thuật toán AI Semantic NLP và bảo mật Zero-Leak Data Boundary. |
+| [`04_BAO_CAO_KIEM_THU_CHAT_LUONG.md`](./04_BAO_CAO_KIEM_THU_CHAT_LUONG.md) | **Đảm bảo chất lượng (QA)**: Bộ kiểm thử tự động chuyên sâu các vai trò và WebSocket, tỷ lệ đạt 100%, kiểm thử áp lực chịu tải và độ ổn định bộ nhớ. |
+| [`05_HUONG_DAN_CAI_DAT_VA_VAN_HANH.md`](./05_HUONG_DAN_CAI_DAT_VA_VAN_HANH.md) | **Hướng dẫn vận hành**: Các bước cài đặt môi trường, chạy máy chủ, trải nghiệm chế độ Solo cùng Bot AI hoặc tạo phòng chơi mạng nhiều người (Multiplayer). |
+| [`HINH_ANH/`](./HINH_ANH) | Thư viện 10 hình ảnh chất lượng cao chụp trực tiếp từ giao diện game đang vận hành. |
 
 ---
 

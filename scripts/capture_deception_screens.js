@@ -11,8 +11,17 @@ if (!fs.existsSync(outDir)) {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function skipCutsceneIfVisible(page) {
+  await page.evaluate(() => {
+    const skipBtn = document.getElementById('btn-cutscene-skip');
+    if (skipBtn && skipBtn.offsetParent !== null) {
+      skipBtn.click();
+    }
+  });
+}
+
 async function run() {
-  console.log('🚀 Launching Chrome to capture full game screenshots...');
+  console.log('🚀 Launching Chrome to capture genuine, distinct gameplay screenshots...');
   const browser = await puppeteer.launch({
     executablePath: chromePath,
     headless: 'new',
@@ -33,7 +42,7 @@ async function run() {
     await page.setViewport({ width: 1440, height: 960 });
 
     console.log('Navigating to http://localhost:3000/deception/ ...');
-    await page.goto('http://localhost:3000/deception/', { waitUntil: 'networkidle0', timeout: 15000 });
+    await page.goto('http://localhost:3000/deception/', { waitUntil: 'networkidle2', timeout: 20000 });
     await sleep(2000);
 
     // 1. Sảnh chờ chính (Lobby)
@@ -42,85 +51,152 @@ async function run() {
 
     // 2. Mở bảng Sách Luật & 9 Vai Trò
     console.log('📸 2. Capturing Rules & 9 Roles Modal...');
-    await page.evaluate(() => {
-      const btn = document.getElementById('btn-open-rules');
-      if (btn) btn.click();
-    });
-    await sleep(1500);
+    await page.click('#btn-open-rules');
+    await sleep(1000);
     await page.screenshot({ path: path.join(outDir, '02_bang_huong_dan_9_vai_tro.png') });
-
-    // Đóng modal rules
     await page.evaluate(() => {
+      const btnClose = document.querySelector('[data-close="modal-rules"]');
+      if (btnClose) btnClose.click();
       const modal = document.getElementById('modal-rules');
       if (modal) modal.classList.remove('active');
     });
-    await sleep(800);
+    await sleep(600);
 
-    // 3. Chọn vai trò Tech Lead và bấm Bắt đầu sự cố
-    console.log('Starting Solo Game...');
-    await page.evaluate(() => {
-      const tabSolo = document.getElementById('tab-btn-solo');
-      if (tabSolo) tabSolo.click();
-      const btnStart = document.getElementById('btn-start-game');
-      if (btnStart) btnStart.click();
+    // 3. Chọn vai trò MURDERER (Thủ phạm) để trải nghiệm đầy đủ chọn bài Đêm tối + War Room
+    console.log('Selecting MURDERER role and clicking #btn-start-investigation...');
+    await page.select('#cfg-preferred-role', 'MURDERER');
+    await sleep(300);
+    await page.click('#btn-start-investigation');
+    await sleep(1500);
+    await skipCutsceneIfVisible(page);
+    await sleep(1200);
+
+    // Verify active view
+    const viewAfterStart = await page.evaluate(() => {
+      const active = document.querySelector('.noir-view.active');
+      return active ? active.id : null;
     });
-    await sleep(3000);
+    console.log('Active view after start:', viewAfterStart);
 
-    // 4. Màn hình Ban đêm bí mật (Night Phase Modal nếu có)
-    console.log('📸 3. Capturing Night Phase or Table...');
-    await page.screenshot({ path: path.join(outDir, '03_giai_doan_dem_toi_chon_bai.png') });
+    // 3. Hồ sơ vai trò (Role Reveal)
+    console.log('📸 3. Capturing Role Reveal Dossier...');
+    await page.screenshot({ path: path.join(outDir, '03_ho_so_vai_tro_role_reveal.png') });
 
-    // Đóng hoặc submit night modal nếu có
+    // Click Đã hiểu nhiệm vụ -> Ca trực đêm
+    const hasRoleAck = await page.$('#btn-role-ack');
+    if (hasRoleAck) {
+      await page.evaluate(() => {
+        const btn = document.getElementById('btn-role-ack');
+        if (btn) btn.click();
+      });
+      await sleep(1500);
+      await skipCutsceneIfVisible(page);
+      await sleep(1200);
+    }
+
+    const viewNight = await page.evaluate(() => {
+      const active = document.querySelector('.noir-view.active');
+      return active ? active.id : null;
+    });
+    console.log('Active view at Night:', viewNight);
+
+    // 4. Giao diện Ca Trực Đêm chọn bài
+    console.log('📸 4. Capturing Night Phase Card Selection...');
     await page.evaluate(() => {
-      const nightModal = document.getElementById('modal-night');
-      if (nightModal && nightModal.classList.contains('active')) {
-        const means = document.querySelector('.night-card-option[data-type="MEANS"]');
-        const clues = document.querySelector('.night-card-option[data-type="CLUE"]');
-        if (means) means.click();
-        if (clues) clues.click();
-        const btnSubmit = document.getElementById('btn-night-confirm');
-        if (btnSubmit) btnSubmit.click();
-        nightModal.classList.remove('active');
+      const firstMean = document.querySelector('#night-means-grid > *');
+      const firstClue = document.querySelector('#night-clues-grid > *');
+      if (firstMean) firstMean.click();
+      if (firstClue) firstClue.click();
+    });
+    await sleep(600);
+    await page.screenshot({ path: path.join(outDir, '04_giai_doan_dem_toi_chon_bai.png') });
+
+    // Confirm Night Crime
+    await page.evaluate(() => {
+      const confirmBtn = document.getElementById('btn-night-confirm-crime');
+      if (confirmBtn) confirmBtn.click();
+    });
+    await sleep(1500);
+    await skipCutsceneIfVisible(page);
+    await sleep(1200);
+
+    // Click #btn-night-proceed if visible
+    await page.evaluate(() => {
+      const proceedBtn = document.getElementById('btn-night-proceed');
+      if (proceedBtn && proceedBtn.offsetParent !== null) {
+        proceedBtn.click();
       }
     });
-    await sleep(3000);
+    await sleep(1500);
+    await skipCutsceneIfVisible(page);
+    await sleep(2500); // Wait for Bot Tech Lead to place markers
 
-    // 5. Toàn cảnh bàn họp War Room
-    console.log('📸 4. Capturing War Room Table view...');
-    await page.screenshot({ path: path.join(outDir, '04_ban_hop_war_room_tong_the.png') });
-
-    // 6. Cận cảnh các thẻ bài
-    console.log('📸 5. Capturing Clue & Means Cards...');
-    await page.evaluate(() => {
-      const cardsGrid = document.querySelector('.players-cards-grid') || document.querySelector('.table-surround-wrapper');
-      if (cardsGrid) cardsGrid.scrollIntoView({ behavior: 'smooth' });
+    const viewInv = await page.evaluate(() => {
+      const active = document.querySelector('.noir-view.active');
+      return active ? active.id : null;
     });
-    await sleep(1000);
-    await page.screenshot({ path: path.join(outDir, '05_chi_tiet_the_bai_means_clues.png') });
+    console.log('Active view at Investigation:', viewInv);
 
-    // 7. Bảng hiện trường thông số sự cố
-    console.log('📸 6. Capturing Scene Tiles board...');
+    // 5. Toàn cảnh Bàn Họp War Room (Panoramic)
+    console.log('📸 5. Capturing War Room Table Panoramic view...');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await sleep(600);
+    await page.screenshot({ path: path.join(outDir, '05_ban_hop_war_room_tong_the.png'), fullPage: false });
+
+    // 6. Cận cảnh 6 Bảng Hiện Trường & Đạn Gỗ (Forensic View Mode)
+    console.log('📸 6. Capturing Forensic 6 Scene Tiles & Wooden Bullets...');
     await page.evaluate(() => {
-      const sceneSection = document.getElementById('scene-tiles-board') || document.querySelector('.scene-tiles-container');
-      if (sceneSection) sceneSection.scrollIntoView({ behavior: 'smooth' });
+      const btn = document.querySelector('.table-switch-btn[data-view-mode="forensic"]');
+      if (btn) btn.click();
+      const center = document.getElementById('table-center-forensics');
+      if (center) center.scrollIntoView({ block: 'center' });
     });
-    await sleep(1000);
+    await sleep(800);
     await page.screenshot({ path: path.join(outDir, '06_bang_hien_truong_va_dan_go.png') });
 
-    // 8. Khung chat War Room
-    console.log('📸 7. Capturing War Room Chat...');
+    // 7. Cận cảnh Thẻ Bài của các Nghi Phạm (Suspects View Mode)
+    console.log('📸 7. Capturing Suspects Means & Clues Cards...');
     await page.evaluate(() => {
-      const chatInput = document.getElementById('deception-chat-input');
-      if (chatInput) {
-        chatInput.value = 'Nghi vấn Senior Tuấn lúc 2h sáng đẩy code thiếu WHERE gây sập Database!';
+      const btn = document.querySelector('.table-switch-btn[data-view-mode="suspects"]');
+      if (btn) btn.click();
+      const topRow = document.getElementById('table-suspects-top');
+      if (topRow) topRow.scrollIntoView({ block: 'start' });
+    });
+    await sleep(800);
+    await page.screenshot({ path: path.join(outDir, '07_chi_tiet_the_bai_means_clues.png') });
+
+    // Switch back to panoramic and open Chat Drawer
+    console.log('📸 8. Capturing Live War Room Discussion Chat...');
+    await page.evaluate(() => {
+      const btnPan = document.querySelector('.table-switch-btn[data-view-mode="panoramic"]');
+      if (btnPan) btnPan.click();
+      const btnChat = document.getElementById('btn-toggle-ingame-chat');
+      if (btnChat) btnChat.click();
+    });
+    await sleep(800);
+    await page.evaluate(() => {
+      const inp = document.getElementById('input-ingame-chat');
+      const form = document.getElementById('form-ingame-chat');
+      if (inp && form) {
+        inp.value = 'Các anh em check kỹ xem Tech Lead ghim 6 đạn gỗ chỉ hướng nào nhé!';
+        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
       }
-      const btnSend = document.getElementById('btn-deception-send-chat');
-      if (btnSend) btnSend.click();
     });
     await sleep(2500);
-    await page.screenshot({ path: path.join(outDir, '07_kenh_dam_thoai_chat_war_room.png') });
+    await page.screenshot({ path: path.join(outDir, '08_kenh_dam_thoai_chat_war_room.png') });
 
-    console.log('✅ All screenshots captured successfully into DOCS_WHO_BROKE_PROD/HINH_ANH!');
+    // Close chat and open Accuse Modal
+    console.log('📸 9. Capturing Accusation Modal...');
+    await page.evaluate(() => {
+      const btnCloseChat = document.getElementById('btn-close-ingame-chat');
+      if (btnCloseChat) btnCloseChat.click();
+      const btnAccuse = document.getElementById('btn-hud-accuse');
+      if (btnAccuse) btnAccuse.click();
+    });
+    await sleep(800);
+    await page.screenshot({ path: path.join(outDir, '09_bang_dap_ban_pha_an.png') });
+
+    console.log('✅ All 9 distinct screenshots captured successfully!');
   } catch (err) {
     console.error('Error capturing screenshots:', err);
   } finally {

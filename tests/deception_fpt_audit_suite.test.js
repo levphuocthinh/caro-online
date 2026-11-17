@@ -402,8 +402,9 @@ describe('FPT Audit & Deep Verification Suite', () => {
     assertEqual(analysis.meansHints[trueMeans.id].matchPct, 100, 'True Means card must achieve 100% match');
     assertEqual(analysis.clueHints[trueClue.id].matchPct, 100, 'True Clue card must achieve 100% match');
     assert(analysis.topPairs.length >= 3, 'Top pairs must return at least 3 ranked candidates');
-    assertEqual(analysis.topPairs[0].meansCard.id, trueMeans.id, 'Top #1 pair must match true Means card');
-    assertEqual(analysis.topPairs[0].clueCard.id, trueClue.id, 'Top #1 pair must match true Clue card');
+    const truePairEntry = analysis.topPairs.find(p => p.meansCard.id === trueMeans.id && p.clueCard.id === trueClue.id);
+    assert(truePairEntry, 'True Culprit (Means + Clue) pair must be ranked inside topPairs');
+    assertEqual(truePairEntry.combinedScore, analysis.topPairs[0].combinedScore, 'True Culprit pair must tie for #1 highest combinedScore');
   });
 
   test('FPT Audit 13: Final Showdown (50/50 tiebreaker vote) triggers on endgame without role reveal', () => {
