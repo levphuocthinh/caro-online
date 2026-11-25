@@ -309,6 +309,7 @@ export class DeceptionPixelNoir {
   startLoop() {
     this.elapsed = 0;
     this.isPlaying = true;
+    deceptionAudio.setBgmDucked(true);
 
     if (typeof document === 'undefined') {
       return;
@@ -368,6 +369,7 @@ export class DeceptionPixelNoir {
 
   stop(triggerCallback = true) {
     this.isPlaying = false;
+    deceptionAudio.setBgmDucked(false);
     if (this.animId && typeof cancelAnimationFrame !== 'undefined') {
       cancelAnimationFrame(this.animId);
       this.animId = null;

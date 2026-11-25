@@ -5701,6 +5701,151 @@ body.deception-app {
 }
 
 
+/* =========================================================================
+   COMPACT & CLEAN GAMEPLAY UI OVERRIDES (Giảm rối mắt, tối ưu không gian bàn chơi)
+   ========================================================================= */
+
+#btn-toggle-music {
+  color: #f1c40f;
+  border-color: rgba(241, 196, 15, 0.4);
+}
+
+#btn-toggle-music.music-muted {
+  color: var(--text-muted);
+  border-color: rgba(255, 255, 255, 0.12);
+  opacity: 0.6;
+}
+
+#btn-toggle-music.music-muted i::after {
+  content: '';
+}
+
+/* 1. Thu gọn thanh tiến trình & thanh điều hành thảo luận thành 1 dải gọn gàng */
+.noir-header {
+  flex-wrap: nowrap !important;
+  padding: 8px 16px !important;
+  gap: 10px !important;
+}
+
+.noir-header .header-right {
+  flex-wrap: nowrap !important;
+  gap: 6px !important;
+}
+
+.noir-header .btn-hdr-action {
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+}
+
+.investigation-timeline-bar {
+  display: none !important;
+}
+
+.free-discussion-hud {
+  padding: 6px 12px !important;
+  margin-bottom: 6px !important;
+  gap: 10px !important;
+  border-radius: 10px !important;
+}
+
+/* Ẩn đoạn văn hướng dẫn dài dòng và nút vai trò/luật chơi bị trùng với thanh Header trên cùng */
+.free-discussion-hud .discussion-guidance-text,
+.free-discussion-hud #btn-quick-guide,
+.free-discussion-hud #btn-hud-my-role {
+  display: none !important;
+}
+
+/* 2. Thu gọn thanh Tình Báo Mật thành 1 dòng ngang tinh gọn */
+.criminal-secret-dossier-pill {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  padding: 6px 12px !important;
+  margin-bottom: 6px !important;
+  border-radius: 10px !important;
+}
+
+.criminal-secret-dossier-pill .dossier-pill-header,
+.criminal-secret-dossier-pill .dossier-pill-solution {
+  margin: 0 !important;
+  gap: 8px !important;
+}
+
+/* 3. Thu gọn thanh AI Forensic Master thành 1 dòng ticker gọn nhẹ */
+.ai-forensic-analyzer-banner {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 7px 14px !important;
+  margin: 0 0 8px 0 !important;
+  border-radius: 10px !important;
+}
+
+.ai-forensic-analyzer-banner .ai-forensic-badge {
+  flex-shrink: 0;
+  margin: 0 !important;
+}
+
+.ai-forensic-analyzer-banner .ai-forensic-message {
+  font-size: 12.5px !important;
+  line-height: 1.35 !important;
+  margin: 0 !important;
+}
+
+/* 4. Ẩn dải băng vàng cảnh báo chiếm diện tích và thanh dock lặp nút ở dưới trên PC */
+.crime-scene-master-table .tape-strip.tape-horizontal-center {
+  display: none !important;
+}
+
+@media (min-width: 769px) {
+  .floating-action-dock {
+    display: none !important;
+  }
+}
+
+/* 5. Tinh gọn Thẻ Nghi Phạm & Thẻ Hiện Trường (bỏ nhãn lặp lại & phụ đề tiếng Anh rườm rà) */
+.table-card-item .card-type-tag,
+.table-card-item .card-name-en,
+.scene-tile-card .tile-title-en,
+.scene-tile-card .tile-opt-en {
+  display: none !important;
+}
+
+.table-card-item {
+  padding: 6px 7px !important;
+  min-height: 76px !important;
+  justify-content: center !important;
+}
+
+.table-card-item .card-name-vi {
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+}
+
+.scene-tile-card {
+  padding: 8px 10px !important;
+}
+
+.scene-tile-card .tile-target-indicator {
+  font-size: 10px !important;
+  padding: 2px 6px !important;
+  margin-bottom: 4px !important;
+}
+
+.scene-tile-card .tile-opt-btn {
+  padding: 4px 8px !important;
+  min-height: 28px !important;
+}
+
+.table-view-switch-bar {
+  margin-bottom: 6px !important;
+}
+
 /* 2-Column Split */
 .online-room-split {
   display: grid;

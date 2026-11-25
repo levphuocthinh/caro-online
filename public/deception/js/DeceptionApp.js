@@ -207,11 +207,42 @@ class DeceptionAppController {
       this.renderCurrentView();
     });
 
+    // Nhạc nền Trinh Thám (Detective Noir BGM)
+    document.getElementById('btn-toggle-music')?.addEventListener('click', () => {
+      if (typeof deceptionAudio !== 'undefined' && deceptionAudio) {
+        deceptionAudio.bgmEnabled = !deceptionAudio.bgmEnabled;
+        if (deceptionAudio.bgmEnabled && this.soundEnabled) {
+          deceptionAudio.startDetectiveBgm();
+        } else {
+          deceptionAudio.stopDetectiveBgm();
+        }
+        const btn = document.getElementById('btn-toggle-music');
+        if (btn) btn.classList.toggle('music-muted', !deceptionAudio.bgmEnabled);
+      }
+      this.playAudio('click');
+    });
+
+    // Tự động kích hoạt Nhạc nền Trinh Thám ngay khi người chơi tương tác lần đầu
+    const autoBootBgm = () => {
+      if (this.soundEnabled && typeof deceptionAudio !== 'undefined' && deceptionAudio && deceptionAudio.bgmEnabled) {
+        deceptionAudio.startDetectiveBgm();
+      }
+      document.removeEventListener('pointerdown', autoBootBgm);
+      document.removeEventListener('keydown', autoBootBgm);
+    };
+    document.addEventListener('pointerdown', autoBootBgm, { once: true });
+    document.addEventListener('keydown', autoBootBgm, { once: true });
+
     // Âm thanh
     document.getElementById('btn-toggle-sound')?.addEventListener('click', () => {
       this.soundEnabled = !this.soundEnabled;
       if (typeof deceptionAudio !== 'undefined' && deceptionAudio) {
         deceptionAudio.enabled = this.soundEnabled;
+        if (!this.soundEnabled) {
+          deceptionAudio.stopDetectiveBgm();
+        } else if (deceptionAudio.bgmEnabled) {
+          deceptionAudio.startDetectiveBgm();
+        }
       }
       const cutsceneVideo = document.getElementById('cutscene-video');
       if (cutsceneVideo) {
@@ -3541,7 +3572,7 @@ class DeceptionAppController {
           </div>
           ${targetIndicatorHtml}
           <div class="tile-title">
-            <span class="tile-title-vi">${tile.name_vi}</span>
+            <span class="tile-title-vi">${this.isVi ? tile.name_vi : (tile.name_en || tile.name_vi)}</span>
             <span class="tile-title-en">${tile.name_en}</span>
           </div>
           <div class="tile-options-list">
@@ -3552,7 +3583,7 @@ class DeceptionAppController {
                 <button type="button" class="tile-opt-btn ${isMarked ? 'is-marked' : ''}" data-tile-idx="${tIdx}" data-opt-idx="${optIdx}">
                   <span class="bullet-marker">${isMarked ? '🎯' : '•'}</span>
                   <div class="tile-opt-texts">
-                    <span class="tile-opt-vi">${viText}</span>
+                    <span class="tile-opt-vi">${this.isVi ? viText : (enText || viText)}</span>
                     <span class="tile-opt-en">${enText}</span>
                   </div>
                 </button>
@@ -3716,7 +3747,7 @@ class DeceptionAppController {
                         <i class="fa-solid fa-magnifying-glass"></i>
                       </button>
                     </div>
-                    <div class="card-name-vi">${m.vi}</div>
+                    <div class="card-name-vi">${this.isVi ? m.vi : (m.en || m.vi)}</div>
                     <div class="card-name-en">${m.en}</div>
                     ${isSolutionMeans ? `
                       <span class="crime-solution-banner banner-means" title="${this.isVi ? (isMurderer ? 'Hành vi gây lỗi bí mật bạn đã chọn' : 'Hành vi gây lỗi của Thủ phạm') : 'Secret incident trigger'}">
@@ -3743,7 +3774,7 @@ class DeceptionAppController {
                         <i class="fa-solid fa-magnifying-glass"></i>
                       </button>
                     </div>
-                    <div class="card-name-vi">${c.vi}</div>
+                    <div class="card-name-vi">${this.isVi ? c.vi : (c.en || c.vi)}</div>
                     <div class="card-name-en">${c.en}</div>
                     ${isSolutionClue ? `
                       <span class="crime-solution-banner banner-clue" title="${this.isVi ? (isMurderer ? 'Dấu vết Log bí mật bạn đã chọn' : 'Dấu vết Log của Thủ phạm') : 'Secret log trace'}">

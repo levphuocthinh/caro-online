@@ -262,6 +262,16 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.ACCUSATION_DUEL);
     assert.ok(fs.existsSync(path.join(__dirname, '..', 'public', 'deception', 'videos', 'accusation-duel.mp4')), 'accusation-duel.mp4 must exist');
     noir.stop(false);
+
+    // Verify Detective Noir Background Music Engine
+    const { deceptionAudio } = await import('../public/js/games/deception/DeceptionAudio.js');
+    assert.equal(typeof deceptionAudio.startDetectiveBgm, 'function');
+    assert.equal(typeof deceptionAudio.stopDetectiveBgm, 'function');
+    assert.equal(typeof deceptionAudio.setBgmDucked, 'function');
+    deceptionAudio.setBgmDucked(true);
+    assert.equal(deceptionAudio.bgmDucked, true);
+    deceptionAudio.setBgmDucked(false);
+    assert.equal(deceptionAudio.bgmDucked, false);
     noir.playMotorbikeHitAndRun();
     assert.equal(noir.murderMode, 'MOTORBIKE_HIT_RUN');
     assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.MOTORBIKE_HIT_RUN);
