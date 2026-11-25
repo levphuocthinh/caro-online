@@ -300,8 +300,12 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     assert.equal(noir.currentVideoSrc, '/deception/videos/incident-db-wipe.mp4');
 
     noir.playPoliceArrest({ murdererName: 'DevOps_Suspect' });
-    assert.equal(noir.currentVideoSrc, '/deception/videos/incident-trace-culprit.mp4');
+    assert.equal(noir.currentVideoSrc, '/deception/videos/incident-culprit-caught.mp4');
     assert.ok(noir.duration >= 10.03, 'Default duration must be >= 10.03s so 10.03s MP4 videos are not cut off early');
+    noir.stop(false);
+
+    noir.playAirplaneEscape({ murdererName: 'DevOps_Suspect' });
+    assert.equal(noir.currentVideoSrc, '/deception/videos/incident-trace-culprit.mp4');
     noir.stop(false);
 
     // Verify all mapped MP4 video files exist on disk, are non-empty, and match duration expectations
