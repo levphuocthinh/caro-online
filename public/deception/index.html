@@ -336,9 +336,9 @@
                 <i class="fa-solid fa-link"></i>
                 <span>Sao Chép Link</span>
               </button>
-              <button type="button" class="btn-room-action-pill btn-pill-invite-modal" id="btn-open-online-invite-modal" title="Xem mã và link mời bạn">
-                <i class="fa-solid fa-share-nodes"></i>
-                <span>Mời Bạn</span>
+              <button type="button" class="btn-room-action-pill btn-pill-invite-modal" id="btn-open-online-invite-modal" title="Xem mã QR, mã phòng và link mời bạn">
+                <i class="fa-solid fa-qrcode"></i>
+                <span>Mã QR &amp; Mời Bạn</span>
               </button>
               <div class="room-occupancy-pill">
                 <i class="fa-solid fa-users"></i>
@@ -372,6 +372,9 @@
                     <input type="text" readonly class="input-banner-invite-link" id="banner-online-room-link" value="" placeholder="Đang tạo link tham gia...">
                     <button type="button" class="btn-banner-copy btn-highlight" id="btn-banner-copy-link" title="Sao chép link tham gia">
                       <i class="fa-solid fa-clone"></i> <span>Sao Chép Link</span>
+                    </button>
+                    <button type="button" class="btn-banner-copy btn-banner-qr" id="btn-banner-open-qr" title="Hiện mã QR quét vào phòng">
+                      <i class="fa-solid fa-qrcode"></i> <span>Mã QR</span>
                     </button>
                     <button type="button" class="btn-banner-share" id="btn-banner-share" title="Chia sẻ qua Zalo, Messenger, tin nhắn...">
                       <i class="fa-solid fa-share-nodes"></i>
@@ -1218,7 +1221,7 @@
 
       <div class="modal-body-scroll room-invite-body">
         <p class="room-invite-lead">
-          Phòng điều tra trực tuyến đã sẵn sàng! Bạn hãy gửi <b>Mã Phòng</b> hoặc <b>Link tham gia trực tiếp</b> dưới đây cho bạn bè cùng vào bàn:
+          Phòng điều tra trực tuyến đã sẵn sàng! Bạn hãy gửi <b>Mã Phòng</b>, <b>Link tham gia</b> hoặc cho bạn bè <b>Quét Mã QR</b> dưới đây để cùng vào bàn:
         </p>
 
         <!-- Box 1: Mã Phòng -->
@@ -1253,6 +1256,36 @@
             <i class="fa-solid fa-share-nodes"></i>
             <span>Gửi Qua Zalo / Messenger / Tin Nhắn</span>
           </button>
+        </div>
+
+        <!-- Box 3: Mã QR Quét Tham Gia Nhanh -->
+        <div class="invite-share-card invite-qr-share-card" id="invite-qr-card">
+          <div class="invite-share-hdr">
+            <i class="fa-solid fa-qrcode text-gold"></i>
+            <span>Mã QR Tham Gia Phòng (Quét Camera / Zalo Vào Thẳng Phòng):</span>
+          </div>
+          <div class="invite-qr-content-row">
+            <div class="invite-qr-frame" id="invite-modal-qr-box" aria-label="Mã QR tham gia phòng"></div>
+            <div class="invite-qr-details">
+              <div class="invite-qr-room-pill">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                <span>Quét vào ngay bàn <b id="invite-qr-room-label">#DEC---</b></span>
+              </div>
+              <p class="invite-qr-desc" id="invite-qr-hint-text">
+                Mở Camera điện thoại hoặc Zalo quét mã QR này để tự động điền sẵn mã phòng và vào bàn chờ ngay lập tức!
+              </p>
+              <div class="invite-qr-actions">
+                <button type="button" class="btn-noir-copy-big btn-qr-download" id="btn-modal-download-qr">
+                  <i class="fa-solid fa-download"></i>
+                  <span id="lbl-modal-download-qr">Tải Ảnh QR</span>
+                </button>
+                <button type="button" class="btn-noir-copy-big btn-qr-copy-img" id="btn-modal-copy-qr">
+                  <i class="fa-solid fa-images"></i>
+                  <span id="lbl-modal-copy-qr">Chép Ảnh QR</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="invite-guide-tip">

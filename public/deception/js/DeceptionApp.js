@@ -20,6 +20,7 @@ import {
 import { DeceptionState, GAME_PHASES } from '/js/games/deception/DeceptionState.js';
 import { deceptionPixelNoir } from '/js/games/deception/DeceptionPixelNoir.js';
 import { deceptionAudio } from '/js/games/deception/DeceptionAudio.js';
+import { renderQRSvg, renderQRShareCanvas } from '/js/games/deception/DeceptionQRCode.js';
 
 class DeceptionAppController {
   constructor() {
@@ -463,6 +464,20 @@ class DeceptionAppController {
     // Chia sẻ từ banner (Zalo/Messenger/WebShare)
     document.getElementById('btn-banner-share')?.addEventListener('click', () => {
       this.shareRoomInvite();
+    });
+
+    // Mở mã QR từ banner phòng chờ
+    document.getElementById('btn-banner-open-qr')?.addEventListener('click', () => {
+      this.openRoomInviteModal();
+    });
+
+    // Tải ảnh QR & Chép ảnh QR trong Modal Mời Bạn Bè
+    document.getElementById('btn-modal-download-qr')?.addEventListener('click', () => {
+      this.downloadRoomQRCode();
+    });
+
+    document.getElementById('btn-modal-copy-qr')?.addEventListener('click', () => {
+      this.copyRoomQRImage();
     });
 
     // Các nút trong Modal Mời Bạn Bè
@@ -1274,6 +1289,8 @@ class DeceptionAppController {
     const modalLink = document.getElementById('invite-modal-link');
     if (modalLink) modalLink.value = inviteLink;
 
+    this.renderRoomQRCode(roomCode);
+
     const isHost = this.onlineRoom.hostId === this.myPlayerId;
     const me = this.onlineRoom.players.find(p => p.id === this.myPlayerId);
 
@@ -1449,6 +1466,133 @@ class DeceptionAppController {
     }
   }
 
+  async ensureLanOriginLoaded() {
+    if (this._lanOriginChecked) return this.lanOrigin;
+    this._lanOriginChecked = true;
+    try {
+      const host = window.location.hostname;
+      if ((host === 'localhost' || host === '127.0.0.1') && typeof fetch === 'function') {
+        const res = await fetch('/api/server-info');
+        if (res.ok) {
+          const info = await res.json();
+          if (info && Array.isArray(info.localIps) && info.localIps.length > 0) {
+            const portPart = window.location.port ? `:${window.location.port}` : (info.port ? `:${info.port}` : '');
+            this.lanOrigin = `${window.location.protocol}//${info.localIps[0]}${portPart}`;
+          }
+        }
+      }
+    } catch (_) {}
+    return this.lanOrigin || null;
+  }
+
+  getQrInviteLink(roomCode) {
+    const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
+    if (!code) return '';
+    const baseOrigin = this.lanOrigin || window.location.origin;
+    try {
+      const url = new URL('/deception/', baseOrigin);
+      url.searchParams.set('room', code);
+      return url.toString();
+    } catch {
+      return `${baseOrigin}/deception/?room=${encodeURIComponent(code)}`;
+    }
+  }
+
+  renderRoomQRCode(roomCode) {
+    const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
+    if (!code) return;
+    const qrBox = document.getElementById('invite-modal-qr-box');
+    const qrRoomLbl = document.getElementById('invite-qr-room-label');
+    const qrHint = document.getElementById('invite-qr-hint-text');
+    if (qrRoomLbl) qrRoomLbl.textContent = `#${code}`;
+
+    const drawQr = () => {
+      const qrLink = this.getQrInviteLink(code);
+      if (qrBox && qrLink) {
+        try {
+          qrBox.innerHTML = renderQRSvg(qrLink, { pixelSize: 140 });
+          qrBox.dataset.qrUrl = qrLink;
+        } catch (err) {
+          console.error('[DeceptionQR] Failed to render QR:', err);
+        }
+      }
+      if (qrHint) {
+        if (this.lanOrigin && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+          qrHint.textContent = `Đã tự động dùng IP Wi-Fi (${this.lanOrigin.replace(/^https?:\/\//, '')}) để điện thoại cùng mạng quét vào thẳng phòng!`;
+        } else {
+          qrHint.textContent = 'Mở Camera điện thoại hoặc Zalo quét mã QR này để tự động điền sẵn mã phòng và vào bàn chờ ngay lập tức!';
+        }
+      }
+    };
+
+    drawQr();
+    if (!this._lanOriginChecked && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      this.ensureLanOriginLoaded().then((lan) => {
+        if (lan) drawQr();
+      });
+    }
+  }
+
+  downloadRoomQRCode(roomCode) {
+    const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
+    if (!code) return;
+    const qrLink = this.getQrInviteLink(code);
+    if (!qrLink) return;
+    try {
+      const canvas = renderQRShareCanvas(qrLink, code);
+      const dataUrl = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `QR-Phong-${code}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      this.playAudio('chime');
+      this.showToast(`Đã tải ảnh mã QR phòng #${code}!`);
+      const lbl = document.getElementById('lbl-modal-download-qr');
+      if (lbl) {
+        lbl.textContent = '✓ Đã Tải QR!';
+        setTimeout(() => { lbl.textContent = 'Tải Ảnh QR'; }, 2200);
+      }
+    } catch (_) {
+      this.copyInviteLink(code);
+    }
+  }
+
+  copyRoomQRImage(roomCode) {
+    const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
+    if (!code) return;
+    const qrLink = this.getQrInviteLink(code);
+    if (!qrLink) return;
+    try {
+      const canvas = renderQRShareCanvas(qrLink, code);
+      if (navigator.clipboard && typeof window.ClipboardItem !== 'undefined' && canvas.toBlob) {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            this.downloadRoomQRCode(code);
+            return;
+          }
+          const item = new window.ClipboardItem({ 'image/png': blob });
+          navigator.clipboard.write([item]).then(() => {
+            this.playAudio('chime');
+            this.showToast(`Đã chép ảnh QR phòng #${code}! Dán (Ctrl+V) ngay vào Zalo hoặc Messenger.`);
+            const lbl = document.getElementById('lbl-modal-copy-qr');
+            if (lbl) {
+              lbl.textContent = '✓ Đã Chép Ảnh!';
+              setTimeout(() => { lbl.textContent = 'Chép Ảnh QR'; }, 2200);
+            }
+          }).catch(() => {
+            this.downloadRoomQRCode(code);
+          });
+        }, 'image/png');
+      } else {
+        this.downloadRoomQRCode(code);
+      }
+    } catch (_) {
+      this.downloadRoomQRCode(code);
+    }
+  }
+
   openRoomInviteModal(roomCode) {
     const code = roomCode || (this.onlineRoom ? this.onlineRoom.roomCode : '');
     if (!code) return;
@@ -1465,6 +1609,8 @@ class DeceptionAppController {
 
     const lblLink = document.getElementById('lbl-modal-copy-link-text');
     if (lblLink) lblLink.textContent = 'Sao Chép Link';
+
+    this.renderRoomQRCode(code);
 
     this.playAudio('chime');
     this.openModal('modal-room-invite');

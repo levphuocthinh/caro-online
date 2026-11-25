@@ -298,10 +298,22 @@ describe('Deception Online Multiplayer & WebSocket Suite', () => {
     assert(decHtml.includes('id="modal-room-invite"'), 'Deception must include modal-room-invite');
     assert(decHtml.includes('id="invite-modal-code"'), 'Deception modal must display room code');
     assert(decHtml.includes('id="invite-modal-link"'), 'Deception modal must display join link input');
+    assert(decHtml.includes('id="invite-modal-qr-box"'), 'Deception modal must display QR code box');
+    assert(decHtml.includes('id="btn-modal-download-qr"'), 'Deception modal must include download QR button');
+    assert(decHtml.includes('id="btn-modal-copy-qr"'), 'Deception modal must include copy QR image button');
+    assert(decHtml.includes('id="btn-banner-open-qr"'), 'Waiting room invite banner must include open QR button');
     assert(decHtml.includes('id="online-invite-banner"'), 'Deception must have online-invite-banner in waiting room');
     assert(decHtml.includes('id="banner-online-room-code"'), 'Invite banner must display room code');
     assert(decHtml.includes('id="banner-online-room-link"'), 'Invite banner must display join link input');
     assert(decHtml.includes('id="btn-copy-online-room-link"'), 'Header must have copy invite link button');
+
+    // Verify QR Code generator module encodes room join links cleanly into SVG
+    const { encodeQRMatrix, renderQRSvg } = await import('../public/js/games/deception/DeceptionQRCode.js');
+    const sampleUrl = 'https://caro-online-4m79.onrender.com/deception/?room=DECUCX';
+    const qrMatrix = encodeQRMatrix(sampleUrl);
+    assert(qrMatrix.size >= 21 && qrMatrix.modules.length === qrMatrix.size, 'QR matrix must have valid square dimensions');
+    const qrSvg = renderQRSvg(sampleUrl, { pixelSize: 140 });
+    assert(qrSvg.startsWith('<svg') && qrSvg.includes('<path d="M'), 'renderQRSvg must output valid crisp vector SVG');
 
     // 2. DeceptionApp JS contains copy, share, link generation, and URL parameter check
     const decJs = fs.readFileSync(path.join(__dirname, '../public/deception/js/DeceptionApp.js'), 'utf8');
