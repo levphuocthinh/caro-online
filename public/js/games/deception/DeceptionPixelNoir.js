@@ -8,8 +8,9 @@
  *    - POISONING (Poisoning / Security Breach): Rò rỉ dữ liệu mật & Cài cắm Backdoor (/deception/videos/incident-data-leak.mp4)
  *    - STREET_BRAWL (Severe Injury / System Crash): Sập Data Pipeline & Làm giả Dashboard xanh (/deception/videos/incident-pipeline-crash.mp4)
  *    - MOTORBIKE_HIT_RUN (Accident / Suffocation / Overload): Quá tải Server 503 & Cô lập Node (/deception/videos/incident-server-overload.mp4)
- *    - POLICE_ARREST (Incident Response Wins): Bắt được Thủ phạm & Giải trình 5 WHYs (/deception/videos/incident-culprit-caught.mp4)
+ *    - POLICE_ARREST (Incident Response Wins): Chuỗi 2 video (202611251846.mp4 -> Bắt được Thủ phạm & Giải trình 5 WHYs)
  *    - AIRPLANE_ESCAPE (Culprit Wins): Không tìm được Thủ phạm (/deception/videos/incident-trace-culprit.mp4)
+ *    - ACCUSATION_DUEL: Báo động chốt phá án It's Time To Duel (/deception/videos/accusation-duel.mp4)
  * 2. Tự động đồng bộ trạng thái âm thanh với DeceptionAudio và hỗ trợ fallback autoplay an toàn.
  */
 
@@ -21,15 +22,10 @@ export const INCIDENT_VIDEOS = {
   STREET_BRAWL: '/deception/videos/incident-pipeline-crash.mp4',
   MOTORBIKE_HIT_RUN: '/deception/videos/incident-server-overload.mp4',
   POLICE_ARREST: '/deception/videos/incident-culprit-caught.mp4',
+  POLICE_ARREST_INTRO: '/deception/videos/accusation-duel-2.mp4',
   AIRPLANE_ESCAPE: '/deception/videos/incident-trace-culprit.mp4',
-  ACCUSATION_DUEL: '/deception/videos/accusation-duel.mp4',
-  ACCUSATION_DUEL_ALT: '/deception/videos/accusation-duel-2.mp4'
+  ACCUSATION_DUEL: '/deception/videos/accusation-duel.mp4'
 };
-
-export const ACCUSATION_DUEL_VIDEOS = [
-  INCIDENT_VIDEOS.ACCUSATION_DUEL,
-  INCIDENT_VIDEOS.ACCUSATION_DUEL_ALT
-];
 
 export class DeceptionPixelNoir {
   constructor() {
@@ -40,6 +36,7 @@ export class DeceptionPixelNoir {
     this.fallbackTimer = null;
     this.isPlaying = false;
     this.onFinishCallback = null;
+    this.videoQueue = [];
 
     this.W = 480;
     this.H = 270;
@@ -207,7 +204,8 @@ export class DeceptionPixelNoir {
     this.sceneData = {
       murdererName: options.murdererName || 'The Culprit'
     };
-    this.currentVideoSrc = INCIDENT_VIDEOS.POLICE_ARREST;
+    this.currentVideoSrc = INCIDENT_VIDEOS.POLICE_ARREST_INTRO;
+    this.videoQueue = [INCIDENT_VIDEOS.POLICE_ARREST];
 
     const titleEl = typeof document !== 'undefined' ? document.getElementById('cutscene-title') : null;
     const subEl = typeof document !== 'undefined' ? document.getElementById('cutscene-sub') : null;
@@ -270,7 +268,7 @@ export class DeceptionPixelNoir {
       targetName: options.targetName || 'Suspect',
       isVi: options.isVi !== false
     };
-    this.currentVideoSrc = ACCUSATION_DUEL_VIDEOS[Math.floor(Math.random() * ACCUSATION_DUEL_VIDEOS.length)];
+    this.currentVideoSrc = INCIDENT_VIDEOS.ACCUSATION_DUEL;
 
     const overlay = typeof document !== 'undefined' ? document.getElementById('cutscene-overlay') : null;
     const titleEl = typeof document !== 'undefined' ? document.getElementById('cutscene-title') : null;
@@ -343,38 +341,54 @@ export class DeceptionPixelNoir {
       };
       this.video.onended = () => {
         if (this.isPlaying) {
-          this.stop(true);
+          this._handleVideoSegmentEnd();
         }
       };
       this.video.onerror = () => {
         if (this.isPlaying) {
-          this.stop(true);
+          this._handleVideoSegmentEnd();
         }
       };
 
-      if (this.video.getAttribute('src') !== this.currentVideoSrc) {
-        this.video.setAttribute('src', this.currentVideoSrc);
-        this.video.load();
-      } else {
-        try {
-          this.video.currentTime = 0;
-        } catch (_) {}
-      }
-
-      this.video.muted = !deceptionAudio.enabled;
-      const playPromise = this.video.play();
-      if (playPromise && typeof playPromise.catch === 'function') {
-        playPromise.catch(() => {
-          if (!this.video || !this.isPlaying) return;
-          this.video.muted = true;
-          this.video.play().catch(() => {});
-        });
-      }
+      this._playVideoSrc(this.currentVideoSrc);
     }
+  }
+
+  _playVideoSrc(src) {
+    if (!this.video || !src) return;
+    if (this.video.getAttribute('src') !== src) {
+      this.video.setAttribute('src', src);
+      this.video.load();
+    } else {
+      try {
+        this.video.currentTime = 0;
+      } catch (_) {}
+    }
+
+    this.video.muted = !deceptionAudio.enabled;
+    const playPromise = this.video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {
+        if (!this.video || !this.isPlaying) return;
+        this.video.muted = true;
+        this.video.play().catch(() => {});
+      });
+    }
+  }
+
+  _handleVideoSegmentEnd() {
+    if (this.videoQueue && this.videoQueue.length > 0) {
+      this.currentVideoSrc = this.videoQueue.shift();
+      this._scheduleFallbackTimer(10.5);
+      this._playVideoSrc(this.currentVideoSrc);
+      return;
+    }
+    this.stop(true);
   }
 
   stop(triggerCallback = true) {
     this.isPlaying = false;
+    this.videoQueue = [];
     deceptionAudio.setBgmDucked(false);
     if (this.animId && typeof cancelAnimationFrame !== 'undefined') {
       cancelAnimationFrame(this.animId);
