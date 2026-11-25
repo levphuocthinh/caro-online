@@ -42,6 +42,10 @@ class DeceptionAppController {
     this.isOnlineMatch = false;
     this.onlineSecretIntel = null;
     this.roundTileSwapped = false;
+    this.mobileForensicIdx = 0;
+    this.mobileForensicAnim = '';
+    this.mobileSuspectIdx = 0;
+    this.mobileSuspectAnim = '';
 
     // Cache các phần tử DOM thường xuyên truy vấn để tối ưu hiệu năng
     this.dom = {};
@@ -806,10 +810,25 @@ class DeceptionAppController {
         const masterTable = document.getElementById('crime-scene-master-table');
         if (masterTable) {
           masterTable.dataset.viewMode = mode;
+          masterTable.dataset.userPickedMode = mode;
         }
         this.playAudio('click');
       });
     });
+
+    // Mở Nhật Ký từ thanh HUD gộp gọn
+    document.getElementById('btn-hud-dossier')?.addEventListener('click', () => {
+      this.renderDossierLogs();
+      this.openModal('modal-dossier');
+    });
+
+    // Khởi tạo vuốt Tinder trên Mobile & tự động chuyển Tab phù hợp kích thước màn hình
+    this.initMobileTinderSwipe();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => {
+        this.syncResponsiveTableViewMode();
+      });
+    }
 
     // Điều khiển Đồng Hồ Đếm Ngược Vòng Thảo Luận Tự Do
     document.getElementById('btn-timer-toggle-pause')?.addEventListener('click', () => {
@@ -3227,12 +3246,176 @@ class DeceptionAppController {
   }
 
   renderInvestigationTable() {
+    this.syncResponsiveTableViewMode();
     this.updateRoleBadges();
+    this.renderInvestigationHud();
     this.updateInvestigationTimeline();
     this.updateDiscussionHud();
     this.renderActiveSceneTiles();
     this.renderAiForensicBanner();
     this.renderAuthenticSuspectsTable();
+  }
+
+  syncResponsiveTableViewMode() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    const masterTable = document.getElementById('crime-scene-master-table');
+    if (!masterTable) return;
+    const isMobile = window.innerWidth <= 768;
+    const currentMode = masterTable.dataset.viewMode || 'panoramic';
+
+    if (isMobile) {
+      const human = this.state.getHumanPlayer();
+      const isHumanForensicPlacing = human && !human.isBot && human.role === 'FORENSIC_SCIENTIST' && this.state.phase.includes('EVIDENCE');
+      let nextMode = currentMode;
+      if (masterTable.dataset.userPickedMode && masterTable.dataset.userPickedMode !== 'panoramic') {
+        nextMode = masterTable.dataset.userPickedMode;
+      } else if (isHumanForensicPlacing) {
+        nextMode = 'forensic';
+      } else if (currentMode === 'panoramic') {
+        nextMode = 'forensic';
+      }
+      masterTable.dataset.viewMode = nextMode;
+      document.querySelectorAll('.table-switch-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.viewMode === nextMode);
+      });
+    } else if (!masterTable.dataset.userPickedMode && currentMode !== 'panoramic') {
+      masterTable.dataset.viewMode = 'panoramic';
+      document.querySelectorAll('.table-switch-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.viewMode === 'panoramic');
+      });
+    }
+  }
+
+  stepMobileForensicCard(delta) {
+    const total = this.state.activeSceneTiles?.length || 0;
+    if (total <= 1) return;
+    this.mobileForensicIdx = (this.mobileForensicIdx + delta + total) % total;
+    this.mobileForensicAnim = delta >= 0 ? 'tinder-slide-next' : 'tinder-slide-prev';
+    this.playAudio('click');
+    this.renderActiveSceneTiles();
+  }
+
+  goToMobileForensicCard(idx) {
+    const total = this.state.activeSceneTiles?.length || 0;
+    if (idx < 0 || idx >= total || idx === this.mobileForensicIdx) return;
+    this.mobileForensicAnim = idx > this.mobileForensicIdx ? 'tinder-slide-next' : 'tinder-slide-prev';
+    this.mobileForensicIdx = idx;
+    this.playAudio('click');
+    this.renderActiveSceneTiles();
+  }
+
+  stepMobileSuspectCard(delta) {
+    const suspects = this.state.players.filter(p => p.role !== 'FORENSIC_SCIENTIST');
+    const total = suspects.length;
+    if (total <= 1) return;
+    this.mobileSuspectIdx = (this.mobileSuspectIdx + delta + total) % total;
+    this.mobileSuspectAnim = delta >= 0 ? 'tinder-slide-next' : 'tinder-slide-prev';
+    this.playAudio('click');
+    this.renderAuthenticSuspectsTable();
+  }
+
+  goToMobileSuspectCard(idx) {
+    const suspects = this.state.players.filter(p => p.role !== 'FORENSIC_SCIENTIST');
+    if (idx < 0 || idx >= suspects.length || idx === this.mobileSuspectIdx) return;
+    this.mobileSuspectAnim = idx > this.mobileSuspectIdx ? 'tinder-slide-next' : 'tinder-slide-prev';
+    this.mobileSuspectIdx = idx;
+    this.playAudio('click');
+    this.renderAuthenticSuspectsTable();
+  }
+
+  initMobileTinderSwipe() {
+    const masterTable = document.getElementById('crime-scene-master-table');
+    if (!masterTable || this._tinderBound) return;
+    this._tinderBound = true;
+
+    masterTable.addEventListener('click', (e) => {
+      const fNav = e.target.closest('[data-forensic-step]');
+      if (fNav) {
+        e.stopPropagation();
+        this.stepMobileForensicCard(parseInt(fNav.dataset.forensicStep, 10) || 1);
+        return;
+      }
+      const fJump = e.target.closest('[data-forensic-jump]');
+      if (fJump) {
+        e.stopPropagation();
+        this.goToMobileForensicCard(parseInt(fJump.dataset.forensicJump, 10));
+        return;
+      }
+      const sNav = e.target.closest('[data-suspect-step]');
+      if (sNav) {
+        e.stopPropagation();
+        this.stepMobileSuspectCard(parseInt(sNav.dataset.suspectStep, 10) || 1);
+        return;
+      }
+      const sJump = e.target.closest('[data-suspect-jump]');
+      if (sJump) {
+        e.stopPropagation();
+        this.goToMobileSuspectCard(parseInt(sJump.dataset.suspectJump, 10));
+      }
+    });
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let activeCard = null;
+    let cardKind = '';
+    let swipingHorizontal = false;
+
+    masterTable.addEventListener('touchstart', (e) => {
+      if (typeof window !== 'undefined' && window.innerWidth > 768) return;
+      if (!e.touches || e.touches.length !== 1) return;
+      const sceneCard = e.target.closest('.scene-tile-card.is-tinder-active');
+      const suspectCard = e.target.closest('.suspect-station-box.is-tinder-active');
+      activeCard = sceneCard || suspectCard;
+      cardKind = sceneCard ? 'forensic' : (suspectCard ? 'suspect' : '');
+      if (!activeCard) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      swipingHorizontal = false;
+      activeCard.style.transition = 'none';
+    }, { passive: true });
+
+    masterTable.addEventListener('touchmove', (e) => {
+      if (!activeCard || !e.touches || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (!swipingHorizontal) {
+        if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+          swipingHorizontal = true;
+        } else if (Math.abs(dy) > 16) {
+          activeCard.style.transition = '';
+          activeCard = null;
+          return;
+        }
+      }
+      if (swipingHorizontal && activeCard) {
+        const clampedDx = Math.max(-130, Math.min(130, dx * 0.72));
+        const rot = clampedDx * 0.04;
+        activeCard.style.transform = `translate3d(${clampedDx}px, 0, 0) rotate(${rot}deg)`;
+      }
+    }, { passive: true });
+
+    const finishSwipe = (e) => {
+      if (!activeCard) return;
+      const card = activeCard;
+      const kind = cardKind;
+      activeCard = null;
+      card.style.transition = 'transform 0.22s ease';
+      card.style.transform = '';
+
+      if (!swipingHorizontal || !e.changedTouches || e.changedTouches.length === 0) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy)) {
+        if (kind === 'forensic') {
+          this.stepMobileForensicCard(dx < 0 ? 1 : -1);
+        } else if (kind === 'suspect') {
+          this.stepMobileSuspectCard(dx < 0 ? 1 : -1);
+        }
+      }
+    };
+
+    masterTable.addEventListener('touchend', finishSwipe, { passive: true });
+    masterTable.addEventListener('touchcancel', finishSwipe, { passive: true });
   }
 
   renderAiForensicBanner() {
@@ -3413,23 +3596,27 @@ class DeceptionAppController {
       }
     });
 
-    // Consulting Detective button
+    // Consulting Detective button (Dock + HUD)
     const btnConsulting = document.getElementById('btn-dock-consulting');
-    if (btnConsulting) {
-      if (human.role === 'CONSULTING_DETECTIVE' && human.hasBadge && !human.isRoleRevealed) {
-        btnConsulting.style.display = 'inline-flex';
-        btnConsulting.onclick = () => {
-          this.state.activateConsultingDetectiveReveal(human.id);
-          this.playAudio('chime');
-          if (this.isOnlineMatch && this.socket) {
-            this.socket.emit('deception:consulting_reveal');
-          }
-          this.renderInvestigationTable();
-        };
-      } else {
-        btnConsulting.style.display = 'none';
+    const btnHudConsulting = document.getElementById('btn-hud-consulting');
+    const canRevealConsulting = Boolean(human.role === 'CONSULTING_DETECTIVE' && human.hasBadge && !human.isRoleRevealed);
+    const triggerConsultingReveal = () => {
+      this.state.activateConsultingDetectiveReveal(human.id);
+      this.playAudio('chime');
+      if (this.isOnlineMatch && this.socket) {
+        this.socket.emit('deception:consulting_reveal');
       }
-    }
+      this.renderInvestigationTable();
+    };
+    [btnConsulting, btnHudConsulting].forEach(btn => {
+      if (!btn) return;
+      if (canRevealConsulting) {
+        btn.style.display = 'inline-flex';
+        btn.onclick = triggerConsultingReveal;
+      } else {
+        btn.style.display = 'none';
+      }
+    });
   }
 
   startRoundTimer() {
@@ -3679,6 +3866,10 @@ class DeceptionAppController {
       }
     }
 
+    const tilesCount = this.state.activeSceneTiles.length;
+    if (this.mobileForensicIdx >= tilesCount) this.mobileForensicIdx = 0;
+    if (this.mobileForensicIdx < 0) this.mobileForensicIdx = 0;
+
     grid.innerHTML = this.state.activeSceneTiles.map((tile, tIdx) => {
       const colorClass =
         tile.color === 'PURPLE' ? 'tile-purple' :
@@ -3694,8 +3885,12 @@ class DeceptionAppController {
         ? `<div class="tile-target-indicator target-is-clue" title="${this.isVi ? 'Thẻ này dùng để đối chiếu với Thẻ Dấu Vết Log (Màu Đỏ)' : 'This parameter describes the Log Trace / Clue card (Red)'}">🧾 ${this.isVi ? 'SOI THẺ DẤU VẾT LOG (ĐỎ)' : 'MATCHES LOG TRACE (RED)'}</div>`
         : `<div class="tile-target-indicator target-is-means" title="${this.isVi ? 'Thẻ này dùng để đối chiếu với Thẻ Hành Vi Lỗi (Màu Xanh)' : 'This parameter describes the Trigger / Means card (Blue)'}">🎯 ${this.isVi ? 'SOI THẺ HÀNH VI LỖI (XANH)' : 'MATCHES TRIGGER (BLUE)'}</div>`;
 
+      const tinderClass = tIdx === this.mobileForensicIdx
+        ? `is-tinder-active ${this.mobileForensicAnim || ''}`.trim()
+        : 'is-tinder-hidden';
+
       return `
-        <div class="scene-tile-card ${colorClass} ${isClueTarget ? 'tile-for-clue' : 'tile-for-means'}">
+        <div class="scene-tile-card ${colorClass} ${isClueTarget ? 'tile-for-clue' : 'tile-for-means'} ${tinderClass}" data-tinder-idx="${tIdx}">
           <div class="tile-header">
             <span class="tile-badge"><span class="tile-icon-area">${renderTileIconHtml(tile.id, 'tile-svg')}</span> ${badgeName}</span>
             ${(isHumanForensic && (this.state.phase === GAME_PHASES.ROUND_2_EVIDENCE || this.state.phase === GAME_PHASES.ROUND_3_EVIDENCE) && tile.color === 'BROWN') ? `
@@ -3727,6 +3922,39 @@ class DeceptionAppController {
         </div>
       `;
     }).join('');
+
+    this.mobileForensicAnim = '';
+
+    const forensicTinderBar = document.getElementById('mobile-forensic-tinder-bar');
+    const forensicTinderFooter = document.getElementById('mobile-forensic-tinder-footer');
+    if (forensicTinderBar && tilesCount > 0) {
+      const activeTile = this.state.activeSceneTiles[this.mobileForensicIdx];
+      forensicTinderBar.innerHTML = `
+        <div class="tinder-top-meta">
+          <span class="tinder-counter-pill"><i class="fa-solid fa-layer-group"></i> ${this.isVi ? `Thẻ Pháp Y ${this.mobileForensicIdx + 1} / ${tilesCount}` : `Forensic Card ${this.mobileForensicIdx + 1} / ${tilesCount}`}</span>
+          <span class="tinder-swipe-hint">${this.isVi ? '👆 Vuốt trái/phải để lật thẻ' : '👆 Swipe left/right'}</span>
+        </div>
+        <div class="tinder-dots-row">
+          ${this.state.activeSceneTiles.map((t, idx) => {
+            const hasMark = t.selectedOptionIndex !== null && t.selectedOptionIndex !== undefined;
+            return `<button type="button" class="tinder-step-chip ${idx === this.mobileForensicIdx ? 'active' : ''} ${hasMark ? 'is-marked' : ''}" data-forensic-jump="${idx}">${idx + 1}${hasMark ? '🎯' : ''}</button>`;
+          }).join('')}
+        </div>
+      `;
+      if (forensicTinderFooter) {
+        forensicTinderFooter.innerHTML = `
+          <button type="button" class="btn-tinder-nav btn-tinder-prev" data-forensic-step="-1">
+            <i class="fa-solid fa-chevron-left"></i>
+            <span>${this.isVi ? 'Thẻ trước' : 'Prev Card'}</span>
+          </button>
+          <span class="tinder-footer-title">${activeTile ? (this.isVi ? activeTile.name_vi : activeTile.name_en) : ''}</span>
+          <button type="button" class="btn-tinder-nav btn-tinder-next" data-forensic-step="1">
+            <span>${this.isVi ? 'Thẻ tiếp' : 'Next Card'}</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        `;
+      }
+    }
   }
 
   renderAuthenticSuspectsTable() {
@@ -3809,12 +4037,14 @@ class DeceptionAppController {
 
     const suspects = this.state.players.filter(p => p.role !== 'FORENSIC_SCIENTIST');
     const currentSpeaker = this.state.getCurrentSpeaker();
+    if (this.mobileSuspectIdx >= suspects.length) this.mobileSuspectIdx = 0;
+    if (this.mobileSuspectIdx < 0) this.mobileSuspectIdx = 0;
 
     const half = Math.ceil(suspects.length / 2);
     const topSuspects = suspects.slice(0, half);
     const bottomSuspects = suspects.slice(half);
 
-    const renderSuspectBox = (s) => {
+    const renderSuspectBox = (s, sIdx) => {
       const isSelf = s.id === human.id;
       const isSpeaker = (this.state.phase.includes('PRESENTATION')) && currentSpeaker && currentSpeaker.id === s.id;
 
@@ -3844,8 +4074,12 @@ class DeceptionAppController {
         }
       }
 
+      const tinderClass = sIdx === this.mobileSuspectIdx
+        ? `is-tinder-active ${this.mobileSuspectAnim || ''}`.trim()
+        : 'is-tinder-hidden';
+
       return `
-        <div class="suspect-station-box ${isSelf ? 'is-self' : ''} ${isSpeaker ? 'is-speaker' : ''} ${isReadyToAccuse ? 'has-ready-pair' : ''}" data-station-id="${s.id}" data-player-id="${s.id}">
+        <div class="suspect-station-box ${isSelf ? 'is-self' : ''} ${isSpeaker ? 'is-speaker' : ''} ${isReadyToAccuse ? 'has-ready-pair' : ''} ${tinderClass}" data-station-id="${s.id}" data-player-id="${s.id}" data-suspect-idx="${sIdx}">
           <div class="suspect-station-badge-col">
             <div class="police-badge-gold ${s.hasBadge ? 'badge-active' : 'badge-spent'}" title="${s.hasBadge ? 'Huy hiệu phá án còn hiệu lực' : 'Đã sử dụng huy hiệu'}">
               <i class="fa-solid fa-shield-halved"></i>
@@ -3855,7 +4089,7 @@ class DeceptionAppController {
             ${human.hasBadge && !isSelf ? (
               isReadyToAccuse ? `
                 <button type="button" class="btn-accuse-badge is-ready" data-accuse-suspect="${s.id}" data-means-id="${pinnedMeans.id}" data-clue-id="${pinnedClue.id}" title="${this.isVi ? `⚡ Bấm để PHÁ ÁN NGAY: ${pinnedMeans.vi} + ${pinnedClue.vi}!` : `⚡ Click to ACCUSE IMMEDIATELY: ${pinnedMeans.en} + ${pinnedClue.en}!`}">
-                  <i class="fa-solid fa-bolt"></i> <span>${this.isVi ? '⚡ Phá án ngay' : '⚡ Accuse now'}</span>
+                  <i class="fa-solid fa-bolt"></i> <span>${this.isVi ? 'Phá án ngay' : 'Accuse now'}</span>
                 </button>
               ` : `
                 <button type="button" class="btn-accuse-badge" data-accuse-suspect="${s.id}" title="${this.isVi ? 'Chọn 1 Hung khí & 1 Manh mối để phá án ngay, hoặc bấm để mở hộp thoại' : 'Select 1 Means & 1 Clue to accuse instantly, or click to open dialog'}">
@@ -3924,8 +4158,49 @@ class DeceptionAppController {
       `;
     };
 
-    topContainer.innerHTML = topSuspects.map(renderSuspectBox).join('');
-    bottomContainer.innerHTML = bottomSuspects.map(renderSuspectBox).join('');
+    topContainer.innerHTML = topSuspects.map((s, idx) => renderSuspectBox(s, idx)).join('');
+    bottomContainer.innerHTML = bottomSuspects.map((s, idx) => renderSuspectBox(s, half + idx)).join('');
+    topContainer.classList.toggle('mobile-row-inactive', this.mobileSuspectIdx >= half);
+    bottomContainer.classList.toggle('mobile-row-inactive', this.mobileSuspectIdx < half);
+    this.mobileSuspectAnim = '';
+
+    const suspectTinderBar = document.getElementById('mobile-suspects-tinder-bar');
+    const suspectTinderFooter = document.getElementById('mobile-suspects-tinder-footer');
+    if (suspectTinderBar && suspects.length > 0) {
+      const activeSuspect = suspects[this.mobileSuspectIdx];
+      suspectTinderBar.innerHTML = `
+        <div class="tinder-top-meta">
+          <span class="tinder-counter-pill"><i class="fa-solid fa-user-secret"></i> ${this.isVi ? `Nghi phạm ${this.mobileSuspectIdx + 1} / ${suspects.length}` : `Suspect ${this.mobileSuspectIdx + 1} / ${suspects.length}`}</span>
+          <span class="tinder-swipe-hint">${this.isVi ? '👆 Vuốt trái/phải đổi người' : '👆 Swipe left/right'}</span>
+        </div>
+        <div class="tinder-avatars-strip">
+          ${suspects.map((sp, idx) => {
+            const hasPin = sp.meansCards.some(m => this.state.pinnedCardIds.has(m.id)) || sp.clueCards.some(c => this.state.pinnedCardIds.has(c.id));
+            const shortName = sp.id === human.id ? (this.isVi ? 'Bạn' : 'You') : sp.displayName.split(' ').slice(-1)[0];
+            return `
+              <button type="button" class="tinder-suspect-pill ${idx === this.mobileSuspectIdx ? 'active' : ''} ${hasPin ? 'has-pin' : ''}" data-suspect-jump="${idx}">
+                <span>${sp.avatar || '🕵️'}</span>
+                <span>${shortName}</span>
+                ${hasPin ? '<span class="pin-dot">📌</span>' : ''}
+              </button>
+            `;
+          }).join('')}
+        </div>
+      `;
+      if (suspectTinderFooter) {
+        suspectTinderFooter.innerHTML = `
+          <button type="button" class="btn-tinder-nav btn-tinder-prev" data-suspect-step="-1">
+            <i class="fa-solid fa-chevron-left"></i>
+            <span>${this.isVi ? 'Người trước' : 'Prev'}</span>
+          </button>
+          <span class="tinder-footer-title">${activeSuspect ? `${activeSuspect.avatar || '🕵️'} ${activeSuspect.displayName}` : ''}</span>
+          <button type="button" class="btn-tinder-nav btn-tinder-next" data-suspect-step="1">
+            <span>${this.isVi ? 'Người tiếp' : 'Next'}</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        `;
+      }
+    }
   }
 
   openCardInspectModal(cardId, ownerName = '') {

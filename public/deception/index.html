@@ -762,6 +762,14 @@
               <span>Trò Chuyện</span>
               <span class="chat-badge-dot" id="hud-chat-badge" style="display: none;"></span>
             </button>
+            <button type="button" class="btn-hud-guide" id="btn-hud-dossier" title="Xem Nhật Ký Biên Bản Vụ Án">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span>Nhật Ký</span>
+            </button>
+            <button type="button" class="btn-hud-guide" id="btn-hud-consulting" style="display: none;" title="Lật thẻ Thám Tử Cố Vấn chứng minh vô tội">
+              <i class="fa-solid fa-id-badge"></i>
+              <span>Cố Vấn</span>
+            </button>
             <button type="button" class="btn-hud-guide" id="btn-quick-guide" title="Xem hướng dẫn cách chơi Deception">
               <i class="fa-solid fa-circle-question"></i>
               <span>Luật Chơi</span>
@@ -776,7 +784,7 @@
         <div class="table-view-switch-bar">
           <button type="button" class="table-switch-btn active" data-view-mode="panoramic" title="Xem trọn vẹn cả bàn phá án gồm Bảng Pháp Y và Bàn Nghi Phạm">
             <i class="fa-solid fa-table-cells"></i>
-            <span class="lbl-switch-full">Bàn Toàn Cảnh (Ảnh Mẫu)</span>
+            <span class="lbl-switch-full">Bàn Toàn Cảnh</span>
             <span class="lbl-switch-short">Toàn Cảnh</span>
           </button>
           <button type="button" class="table-switch-btn" data-view-mode="forensic" title="Chỉ phóng to 6 Thẻ Hiện Trường Pháp Y để soi kỹ manh mối">
@@ -813,6 +821,9 @@
             <span class="tape-text">FSOFT INCIDENT WAR ROOM • CẢNH BÁO SEV-1: PRODUCTION DOWN • ĐỘI ỨNG PHÓ KHẨN CẤP • WHO BROKE PROD? DO NOT PUSH TO MASTER</span>
           </div>
 
+          <!-- MOBILE TINDER HEADER CHO BÀN NGHI PHẠM (1 NGƯỜI / LƯỢT) -->
+          <div class="mobile-tinder-deck-bar mobile-suspect-tinder-bar" id="mobile-suspects-tinder-bar"></div>
+
           <!-- TIER 1: HÀNG NGHI PHẠM PHÍA TRÊN (TOP SUSPECTS ROW) -->
           <div class="table-suspects-row table-suspects-top" id="table-suspects-top">
             <!-- Rendered dynamically -->
@@ -825,16 +836,25 @@
               <div class="bullet-rack-pegs" id="bullet-rack-pegs"></div>
             </div>
 
+            <!-- MOBILE TINDER HEADER CHO BẢNG PHÁP Y (1 THẺ / LƯỢT) -->
+            <div class="mobile-tinder-deck-bar mobile-forensic-tinder-bar" id="mobile-forensic-tinder-bar"></div>
+
             <!-- 6 Thẻ Hiện Trường Nằm Ngang -->
             <div class="scene-tiles-row" id="active-scene-tiles-grid">
               <!-- Rendered dynamically -->
             </div>
+
+            <!-- MOBILE TINDER FOOTER NÚT QUA / LẠI CHO BẢNG PHÁP Y -->
+            <div class="mobile-tinder-footer-bar mobile-forensic-tinder-footer" id="mobile-forensic-tinder-footer"></div>
           </div>
 
           <!-- TIER 3: HÀNG NGHI PHẠM PHÍA DƯỚI (BOTTOM SUSPECTS ROW) -->
           <div class="table-suspects-row table-suspects-bottom" id="table-suspects-bottom">
             <!-- Rendered dynamically -->
           </div>
+
+          <!-- MOBILE TINDER FOOTER NÚT QUA / LẠI CHO BÀN NGHI PHẠM -->
+          <div class="mobile-tinder-footer-bar mobile-suspect-tinder-footer" id="mobile-suspects-tinder-footer"></div>
         </div>
 
         <!-- BOTTOM ACTION DOCK -->

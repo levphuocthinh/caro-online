@@ -8738,6 +8738,7 @@ body.deception-app {
 @media (max-width: 768px) {
   .noir-header .header-right {
     flex-wrap: wrap;
+    gap: 8px;
   }
   .noir-header .header-right #btn-hdr-my-role {
     flex: 1 1 100%;
@@ -8745,5 +8746,407 @@ body.deception-app {
     justify-content: center;
   }
 }
+
+/* =========================================================================
+   CONSOLIDATED CLEAN UI & MOBILE TINDER CARD DECK (PHÁP Y & NGHI PHẠM)
+   - Lược bỏ các thanh trùng lặp / chữ thừa không liên quan, giữ nút bấm thoáng đẹp
+   - Điện thoại (<= 768px): Chế độ lướt thẻ Tinder 1 thẻ / 1 người mỗi lượt (Vuốt + Nút ◀ ▶)
+   ========================================================================= */
+
+/* 1. Ẩn các thành phần dư thừa / trùng lặp trên cả Desktop & Mobile */
+.noir-header .case-file-tag,
+#view-lobby .room-share-badge,
+#view-lobby .office-prop,
+#view-lobby .online-perks-row,
+.investigation-timeline-bar,
+.free-discussion-hud .discussion-guidance-text,
+.free-discussion-hud #btn-hud-my-role,
+.free-discussion-hud #btn-quick-guide,
+.crime-scene-master-table .tape-strip.tape-horizontal-center,
+.floating-action-dock,
+.table-card-item .card-type-tag,
+.table-card-item .card-name-en,
+.scene-tile-card .tile-title-en,
+.scene-tile-card .tile-opt-en {
+  display: none !important;
+}
+
+/* Giữ khoảng cách nút bấm trên thanh điều hành thoáng, rõ ràng, không dính nhau */
+.free-discussion-hud {
+  padding: 10px 16px;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
+.discussion-hud-right {
+  gap: 10px;
+}
+
+.table-card-item {
+  justify-content: center;
+  gap: 4px;
+  padding: 7px 6px;
+}
+
+.table-card-item.is-crime-solution {
+  padding-bottom: 24px !important;
+}
+
+.table-card-item .card-name-vi {
+  font-size: 11.5px;
+  line-height: 1.3;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* Mặc định trên Desktop (> 768px): ẩn thanh điều hướng Tinder của Mobile */
+.mobile-tinder-deck-bar,
+.mobile-tinder-footer-bar {
+  display: none;
+}
+
+/* 2. Giao diện Mobile (<= 768px): Chế độ Lướt Thẻ Tinder (1 Thẻ Pháp Y / 1 Nghi Phạm) */
+@media (max-width: 768px) {
+  .noir-view#view-investigation {
+    padding-bottom: max(28px, env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Thanh HUD trên điện thoại: nút thoáng, cách nhau 8px-10px, dễ bấm */
+  .free-discussion-hud {
+    padding: 12px !important;
+    gap: 10px !important;
+  }
+
+  .discussion-hud-right {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .discussion-hud-right #btn-hud-accuse {
+    grid-column: 1 / -1;
+    min-height: 46px;
+    font-size: 14px;
+  }
+
+  /* Ẩn nút Toàn Cảnh trên điện thoại, chỉ giữ 2 Tab lớn: 🎯 Pháp Y | 🕵️ Nghi Phạm */
+  .table-view-switch-bar {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    padding: 5px !important;
+    border-radius: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .table-view-switch-bar .table-switch-btn[data-view-mode="panoramic"] {
+    display: none !important;
+  }
+
+  .table-view-switch-bar .table-switch-btn {
+    max-width: 100% !important;
+    width: 100% !important;
+    min-height: 44px !important;
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+    border-radius: 12px !important;
+    justify-content: center !important;
+    gap: 6px !important;
+  }
+
+  /* Ẩn các thẻ không thuộc lượt hiển thị hiện tại (Kiểu Tinder 1 thẻ / lượt) */
+  .scene-tile-card.is-tinder-hidden,
+  .suspect-station-box.is-tinder-hidden,
+  .table-suspects-row.mobile-row-inactive {
+    display: none !important;
+  }
+
+  /* Khi xem Pháp Y thì ẩn thanh Tinder Nghi Phạm và ngược lại */
+  .crime-scene-master-table[data-view-mode="forensic"] .mobile-suspect-tinder-bar,
+  .crime-scene-master-table[data-view-mode="forensic"] .mobile-suspect-tinder-footer {
+    display: none !important;
+  }
+
+  .crime-scene-master-table[data-view-mode="suspects"] .mobile-forensic-tinder-bar,
+  .crime-scene-master-table[data-view-mode="suspects"] .mobile-forensic-tinder-footer {
+    display: none !important;
+  }
+
+  .crime-scene-master-table {
+    padding: 12px 10px !important;
+    gap: 10px !important;
+    border-radius: 16px !important;
+  }
+
+  .crime-scene-master-table[data-view-mode="forensic"] .table-center-forensics {
+    padding: 8px 4px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Bố cục 1 cột cho thẻ Tinder đang mở */
+  .scene-tiles-row,
+  .table-suspects-row {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Hiệu ứng chồng bài Tinder + chuyển thẻ mượt */
+  @keyframes tinderSlideNext {
+    from { opacity: 0.35; transform: translate3d(34px, 0, 0) rotate(2deg); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+  }
+
+  @keyframes tinderSlidePrev {
+    from { opacity: 0.35; transform: translate3d(-34px, 0, 0) rotate(-2deg); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+  }
+
+  .tinder-slide-next {
+    animation: tinderSlideNext 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .tinder-slide-prev {
+    animation: tinderSlidePrev 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .scene-tile-card.is-tinder-active {
+    padding: 14px 12px !important;
+    border-radius: 16px !important;
+    box-shadow:
+      0 6px 0 -2px rgba(255, 255, 255, 0.06),
+      0 12px 0 -5px rgba(255, 255, 255, 0.03),
+      0 16px 34px rgba(0, 0, 0, 0.8) !important;
+    touch-action: pan-y;
+  }
+
+  .scene-tile-card.is-tinder-active .tile-title-vi {
+    font-size: 15px !important;
+    margin: 4px 0 6px 0 !important;
+  }
+
+  .scene-tile-card.is-tinder-active .tile-opt-btn {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 10px 12px !important;
+    min-height: 44px !important;
+    border-radius: 10px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .scene-tile-card.is-tinder-active .tile-opt-vi {
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Thẻ Nghi Phạm Tinder (1 người: 2x2 Xanh + 2x2 Đỏ to rõ trên 1 màn hình) */
+  .suspect-station-box.is-tinder-active {
+    padding: 14px 12px !important;
+    border-radius: 16px !important;
+    gap: 12px !important;
+    box-shadow:
+      0 6px 0 -2px rgba(255, 255, 255, 0.06),
+      0 12px 0 -5px rgba(255, 255, 255, 0.03),
+      0 16px 34px rgba(0, 0, 0, 0.85) !important;
+    touch-action: pan-y;
+  }
+
+  .suspect-station-box.is-tinder-active .suspect-station-badge-col {
+    padding-bottom: 10px !important;
+    gap: 8px !important;
+  }
+
+  .suspect-station-box.is-tinder-active .suspect-station-name {
+    font-size: 15px !important;
+  }
+
+  .suspect-station-box.is-tinder-active .btn-accuse-badge {
+    min-height: 40px !important;
+    padding: 6px 14px !important;
+    font-size: 12.5px !important;
+    border-radius: 10px !important;
+  }
+
+  .suspect-station-box.is-tinder-active .suspect-station-cards-col {
+    gap: 10px !important;
+  }
+
+  .suspect-station-box.is-tinder-active .suspect-cards-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .suspect-station-box.is-tinder-active .table-card-item {
+    min-height: 76px !important;
+    padding: 8px 8px 10px 8px !important;
+    border-radius: 12px !important;
+  }
+
+  .suspect-station-box.is-tinder-active .table-card-item.is-crime-solution {
+    padding-bottom: 24px !important;
+    min-height: 88px !important;
+  }
+
+  .suspect-station-box.is-tinder-active .table-card-item .card-name-vi {
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Thanh Header & Footer Điều Hướng Tinder trên Mobile */
+  .mobile-tinder-deck-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .tinder-top-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .tinder-counter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 900;
+    color: #f1c40f;
+    background: rgba(241, 196, 15, 0.14);
+    border: 1px solid rgba(241, 196, 15, 0.4);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .tinder-swipe-hint {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 700;
+  }
+
+  /* Dải chấm nhảy nhanh 6 thẻ Pháp Y */
+  .tinder-dots-row {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+
+  .tinder-step-chip {
+    min-height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(15, 23, 42, 0.8);
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .tinder-step-chip.active {
+    background: linear-gradient(135deg, #f1c40f, #e67e22);
+    border-color: #ffeaa7;
+    color: #111;
+    box-shadow: 0 3px 10px rgba(241, 196, 15, 0.4);
+  }
+
+  /* Dải chọn nhanh Avatar Nghi Phạm */
+  .tinder-avatars-strip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 2px 4px 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .tinder-avatars-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tinder-suspect-pill {
+    flex-shrink: 0;
+    min-height: 38px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(15, 23, 42, 0.85);
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  .tinder-suspect-pill.active {
+    background: linear-gradient(135deg, #0984e3, #00d2d3);
+    border-color: #74b9ff;
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(0, 210, 211, 0.4);
+  }
+
+  .tinder-suspect-pill.has-pin {
+    border-color: #f1c40f;
+  }
+
+  /* Cụm nút ◀ Quay Lại / Qua Thẻ Tiếp ▶ to rõ, thoáng đẹp */
+  .mobile-tinder-footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    width: 100%;
+  }
+
+  .btn-tinder-nav {
+    flex: 0 0 auto;
+    min-height: 46px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+    border: 1.5px solid rgba(241, 196, 15, 0.5);
+    color: #ffeaa7;
+    font-size: 13px;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+  }
+
+  .btn-tinder-nav:active {
+    transform: scale(0.96);
+    background: rgba(241, 196, 15, 0.22);
+  }
+
+  .tinder-footer-title {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #cbd5e1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 
 
