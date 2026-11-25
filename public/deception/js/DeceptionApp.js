@@ -2733,7 +2733,19 @@ class DeceptionAppController {
     const stepsTag = document.getElementById('lbl-role-steps-tag');
 
     if (ico) ico.innerHTML = `<div class="role-reveal-icon-badge">${renderRoleIconHtml(roleDef.id, 'role-svg')}</div>`;
-    if (title) title.textContent = `${this.isVi ? roleDef.name_vi : roleDef.name_en} (${this.isVi ? roleDef.name_en : roleDef.name_vi})`;
+    if (title) {
+      const primaryName = this.isVi ? roleDef.name_vi : roleDef.name_en;
+      const secondaryName = this.isVi ? roleDef.name_en : roleDef.name_vi;
+      title.textContent = primaryName.includes('(') || primaryName.toLowerCase().includes(secondaryName.toLowerCase())
+        ? primaryName
+        : `${primaryName} (${secondaryName})`;
+    }
+    const folderCaseLbl = document.getElementById('dossier-folder-case-label');
+    const hdrCaseLbl = document.getElementById('lbl-case-id');
+    if (folderCaseLbl && hdrCaseLbl) {
+      const caseTag = hdrCaseLbl.textContent.trim();
+      folderCaseLbl.innerHTML = `<i class="fa-solid fa-folder-closed"></i> ${this.isVi ? 'HỒ SƠ SỰ CỐ PRODUCTION' : 'PRODUCTION INCIDENT DOSSIER'} ${caseTag}`;
+    }
     if (faction) {
       const isCrim = human.team === 'CRIMINAL';
       faction.className = `role-faction-pill ${isCrim ? 'pill-crim' : 'pill-pol'}`;
