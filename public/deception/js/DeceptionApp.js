@@ -1298,7 +1298,8 @@ class DeceptionAppController {
           targetPlayer: data.chosenPlayer,
           meansCard: mCard,
           clueCard: cCard,
-          isCorrect: data.isCorrect
+          isCorrect: data.isCorrect,
+          skipDuelVideo: true
         }, () => {
           if (data.isCorrect) {
             if (this.state.phase === GAME_PHASES.WITNESS_REVERSAL) {
@@ -4202,7 +4203,8 @@ class DeceptionAppController {
       targetPlayer: chosen,
       meansCard,
       clueCard,
-      isCorrect
+      isCorrect,
+      skipDuelVideo: true
     }, () => {
       if (isCorrect) {
         if (this.state.phase === GAME_PHASES.WITNESS_REVERSAL) {
@@ -4561,54 +4563,63 @@ class DeceptionAppController {
     deceptionAudio.play('siren');
     this.triggerScreenShake(450);
 
-    // Sau 900ms báo động -> Chạy video đối chất "It's Time To Duel!"
+    const shouldSkipDuelVideo = Boolean(data.skipDuelVideo || this.state.phase === GAME_PHASES.GAME_OVER);
+
+    const revealStampAndFinish = () => {
+      if (overlay) overlay.classList.remove('alarm-active');
+      if (suspensePulse) {
+        suspensePulse.style.display = 'none';
+        suspensePulse.classList.remove('alarm-flashing');
+      }
+
+      if (stampResult) {
+        stampResult.style.display = 'inline-block';
+        if (data.isCorrect) {
+          stampResult.className = 'casting-stamp-result stamp-correct';
+          stampResult.textContent = this.isVi ? '✓ CHÍNH XÁC! CHỐT ĐÚNG ROOT CAUSE!' : '✓ CONFIRMED! ROOT CAUSE MATCHED!';
+          deceptionAudio.play('correctFanfare');
+          this.triggerScreenShake(350);
+        } else {
+          stampResult.className = 'casting-stamp-result stamp-wrong';
+          stampResult.textContent = this.isVi ? '✗ BÁC BỎ! MẤT 1 QUYỀN CHỈ ĐỊNH!' : '✗ DISMISSED! BADGE LOST!';
+          deceptionAudio.play('errorBuzzer');
+          this.triggerScreenShake(200);
+        }
+
+        const noticeText = this.isVi
+          ? `⚖️ [CHỐT RCA] ${data.accuserName} đã chỉ định nghi phạm ${data.targetPlayer?.displayName || 'Nghi phạm'} với [${data.meansCard?.vi || 'Hành vi gây lỗi'} + ${data.clueCard?.vi || 'Dấu vết Log'}]. Kết quả: ${data.isCorrect ? 'CHÍNH XÁC 🎉' : 'SAI LẦM ❌'}`
+          : `⚖️ [RCA ACCUSATION] ${data.accuserName} accused ${data.targetPlayer?.displayName || 'Suspect'} with [${data.meansCard?.en || 'Trigger'} + ${data.clueCard?.en || 'Log Trace'}]. Result: ${data.isCorrect ? 'CORRECT 🎉' : 'FAILED ❌'}`;
+
+        this.handleNewChat({
+          id: `sys_acc_${Date.now()}`,
+          senderId: 'system',
+          senderName: 'Hệ thống',
+          avatar: '⚖️',
+          text: noticeText,
+          isSystem: true,
+          timestamp: Date.now()
+        });
+      }
+
+      // Sau thêm 1.6s xem dấu mộc kết quả -> Ẩn overlay và gọi tiếp
+      setTimeout(() => {
+        if (overlay) overlay.classList.remove('active');
+        if (typeof onDone === 'function') onDone();
+      }, 1600);
+    };
+
+    // Ở các vòng đầu: sau 900ms báo động -> Chạy video đối chất "It's Time To Duel!"
+    // Ở pha kết thúc game / Hội Đồng Phán Quyết cuối cùng: bỏ qua Yu-Gi-Oh để vào thẳng video 202611251846 -> kết thúc
     setTimeout(() => {
+      if (shouldSkipDuelVideo) {
+        revealStampAndFinish();
+        return;
+      }
       deceptionPixelNoir.playAccusationDuel({
         accuserName: data.accuserName || 'Kỹ sư Điều tra',
         targetName: data.targetPlayer?.displayName || 'Nghi phạm',
         isVi: this.isVi
-      }, () => {
-        if (overlay) overlay.classList.remove('alarm-active');
-        if (suspensePulse) {
-          suspensePulse.style.display = 'none';
-          suspensePulse.classList.remove('alarm-flashing');
-        }
-
-        if (stampResult) {
-          stampResult.style.display = 'inline-block';
-          if (data.isCorrect) {
-            stampResult.className = 'casting-stamp-result stamp-correct';
-            stampResult.textContent = this.isVi ? '✓ CHÍNH XÁC! CHỐT ĐÚNG ROOT CAUSE!' : '✓ CONFIRMED! ROOT CAUSE MATCHED!';
-            deceptionAudio.play('correctFanfare');
-            this.triggerScreenShake(350);
-          } else {
-            stampResult.className = 'casting-stamp-result stamp-wrong';
-            stampResult.textContent = this.isVi ? '✗ BÁC BỎ! MẤT 1 QUYỀN CHỈ ĐỊNH!' : '✗ DISMISSED! BADGE LOST!';
-            deceptionAudio.play('errorBuzzer');
-            this.triggerScreenShake(200);
-          }
-
-          const noticeText = this.isVi
-            ? `⚖️ [CHỐT RCA] ${data.accuserName} đã chỉ định nghi phạm ${data.targetPlayer?.displayName || 'Nghi phạm'} với [${data.meansCard?.vi || 'Hành vi gây lỗi'} + ${data.clueCard?.vi || 'Dấu vết Log'}]. Kết quả: ${data.isCorrect ? 'CHÍNH XÁC 🎉' : 'SAI LẦM ❌'}`
-            : `⚖️ [RCA ACCUSATION] ${data.accuserName} accused ${data.targetPlayer?.displayName || 'Suspect'} with [${data.meansCard?.en || 'Trigger'} + ${data.clueCard?.en || 'Log Trace'}]. Result: ${data.isCorrect ? 'CORRECT 🎉' : 'FAILED ❌'}`;
-
-          this.handleNewChat({
-            id: `sys_acc_${Date.now()}`,
-            senderId: 'system',
-            senderName: 'Hệ thống',
-            avatar: '⚖️',
-            text: noticeText,
-            isSystem: true,
-            timestamp: Date.now()
-          });
-        }
-
-        // Sau thêm 1.6s xem dấu mộc kết quả -> Ẩn overlay và gọi tiếp
-        setTimeout(() => {
-          if (overlay) overlay.classList.remove('active');
-          if (typeof onDone === 'function') onDone();
-        }, 1600);
-      });
+      }, revealStampAndFinish);
     }, 900);
   }
 
