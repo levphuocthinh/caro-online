@@ -4575,7 +4575,14 @@ class DeceptionAppController {
     deceptionAudio.play('siren');
     this.triggerScreenShake(450);
 
-    const shouldSkipDuelVideo = Boolean(data.skipDuelVideo || this.state.phase === GAME_PHASES.GAME_OVER);
+    const shouldSkipDuelVideo = Boolean(
+      data.skipDuelVideo ||
+      data.isCorrect ||
+      this.state.phase === GAME_PHASES.GAME_OVER ||
+      this.state.phase === GAME_PHASES.WITNESS_REVERSAL ||
+      this.state.phase === 'FINAL_SHOWDOWN' ||
+      (this.state.maxRounds > 1 && this.state.round >= this.state.maxRounds)
+    );
 
     const revealStampAndFinish = () => {
       if (overlay) overlay.classList.remove('alarm-active');

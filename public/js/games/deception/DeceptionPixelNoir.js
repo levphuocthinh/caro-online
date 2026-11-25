@@ -62,7 +62,7 @@ export class DeceptionPixelNoir {
 
     const skipBtn = document.getElementById('btn-cutscene-skip');
     if (skipBtn) {
-      skipBtn.onclick = () => this.stop(true);
+      skipBtn.onclick = () => this._handleVideoSegmentEnd();
     }
   }
 
@@ -303,7 +303,7 @@ export class DeceptionPixelNoir {
     const waitMs = Math.max(2000, Math.ceil((durationSec || this.duration) * 1000) + 1500);
     this.fallbackTimer = setTimeout(() => {
       if (this.isPlaying) {
-        this.stop(true);
+        this._handleVideoSegmentEnd();
       }
     }, waitMs);
     if (this.fallbackTimer && typeof this.fallbackTimer.unref === 'function') {
