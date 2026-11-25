@@ -9,7 +9,7 @@
  *    - STREET_BRAWL (Severe Injury / System Crash): Sập Data Pipeline & Làm giả Dashboard xanh (/deception/videos/incident-pipeline-crash.mp4)
  *    - MOTORBIKE_HIT_RUN (Accident / Suffocation / Overload): Quá tải Server 503 & Cô lập Node (/deception/videos/incident-server-overload.mp4)
  *    - POLICE_ARREST (Incident Response Wins): Chuỗi 2 video (202611251846.mp4 -> Bắt được Thủ phạm & Giải trình 5 WHYs)
- *    - AIRPLANE_ESCAPE (Culprit Wins): Không tìm được Thủ phạm (/deception/videos/incident-trace-culprit.mp4)
+ *    - AIRPLANE_ESCAPE (Culprit Wins): Chuỗi 2 video (202611251846.mp4 -> Không tìm được Thủ phạm /incident-trace-culprit.mp4)
  *    - ACCUSATION_DUEL: Báo động chốt phá án It's Time To Duel (/deception/videos/accusation-duel.mp4)
  * 2. Tự động đồng bộ trạng thái âm thanh với DeceptionAudio và hỗ trợ fallback autoplay an toàn.
  */
@@ -234,7 +234,8 @@ export class DeceptionPixelNoir {
     this.sceneData = {
       murdererName: options.murdererName || 'The Culprit'
     };
-    this.currentVideoSrc = INCIDENT_VIDEOS.AIRPLANE_ESCAPE;
+    this.currentVideoSrc = INCIDENT_VIDEOS.POLICE_ARREST_INTRO;
+    this.videoQueue = [INCIDENT_VIDEOS.AIRPLANE_ESCAPE];
 
     const titleEl = typeof document !== 'undefined' ? document.getElementById('cutscene-title') : null;
     const subEl = typeof document !== 'undefined' ? document.getElementById('cutscene-sub') : null;

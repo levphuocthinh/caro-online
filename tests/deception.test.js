@@ -307,7 +307,8 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     noir.stop(false);
 
     noir.playAirplaneEscape({ murdererName: 'DevOps_Suspect' });
-    assert.equal(noir.currentVideoSrc, '/deception/videos/incident-trace-culprit.mp4');
+    assert.equal(noir.currentVideoSrc, '/deception/videos/accusation-duel-2.mp4');
+    assert.deepEqual(noir.videoQueue, ['/deception/videos/incident-trace-culprit.mp4']);
     noir.stop(false);
 
     // Verify all mapped MP4 video files exist on disk, are non-empty, and match duration expectations
