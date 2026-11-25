@@ -4384,58 +4384,80 @@ class DeceptionAppController {
     if (castClueIcon) castClueIcon.innerHTML = `<span class="evidence-chip-icon">${renderCardIconHtml(data.clueCard, 'chip-svg')}</span>`;
     if (castClueName) castClueName.textContent = (data.clueCard?.vi || 'Dấu vết Log') + (data.clueCard?.en ? ` (${data.clueCard.en})` : '');
 
-    if (suspensePulse) suspensePulse.style.display = 'inline-flex';
+    if (suspensePulse) {
+      suspensePulse.style.display = 'inline-flex';
+      suspensePulse.classList.add('alarm-flashing');
+    }
+    const suspenseText = document.getElementById('cast-suspense-text');
+    if (suspenseText) {
+      suspenseText.textContent = this.isVi
+        ? '🚨 BÁO ĐỘNG ĐỎ! ĐANG KÍCH HOẠT LỆNH CHỐT PHÁ ÁN...'
+        : '🚨 RED ALERT! TRIGGERING ACCUSATION PROTOCOL...';
+    }
     if (stampResult) {
       stampResult.style.display = 'none';
       stampResult.className = 'casting-stamp-result';
     }
 
-    if (overlay) overlay.classList.add('active');
+    if (overlay) {
+      overlay.classList.add('active');
+      overlay.classList.add('alarm-active');
+    }
 
-    // Âm thanh nhịp tim dồn dập và tiếng rít kịch tính
-    deceptionAudio.startHeartbeatLoop(550);
-    deceptionAudio.play('suspenseRiser');
+    // Âm thanh còi báo động khẩn cấp + đập bàn + rung màn hình
+    deceptionAudio.play('gavel');
+    deceptionAudio.play('siren');
+    this.triggerScreenShake(450);
 
-    // Sau 1.5s hồi hộp -> Đóng dấu kết quả
+    // Sau 900ms báo động -> Chạy video đối chất "It's Time To Duel!"
     setTimeout(() => {
-      deceptionAudio.stopHeartbeatLoop();
-      if (suspensePulse) suspensePulse.style.display = 'none';
-
-      if (stampResult) {
-        stampResult.style.display = 'inline-block';
-        if (data.isCorrect) {
-          stampResult.className = 'casting-stamp-result stamp-correct';
-          stampResult.textContent = this.isVi ? '✓ CHÍNH XÁC! CHỐT ĐÚNG ROOT CAUSE!' : '✓ CONFIRMED! ROOT CAUSE MATCHED!';
-          deceptionAudio.play('correctFanfare');
-          this.triggerScreenShake(350);
-        } else {
-          stampResult.className = 'casting-stamp-result stamp-wrong';
-          stampResult.textContent = this.isVi ? '✗ BÁC BỎ! MẤT 1 QUYỀN CHỈ ĐỊNH!' : '✗ DISMISSED! BADGE LOST!';
-          deceptionAudio.play('errorBuzzer');
-          this.triggerScreenShake(200);
+      deceptionPixelNoir.playAccusationDuel({
+        accuserName: data.accuserName || 'Kỹ sư Điều tra',
+        targetName: data.targetPlayer?.displayName || 'Nghi phạm',
+        isVi: this.isVi
+      }, () => {
+        if (overlay) overlay.classList.remove('alarm-active');
+        if (suspensePulse) {
+          suspensePulse.style.display = 'none';
+          suspensePulse.classList.remove('alarm-flashing');
         }
 
-        const noticeText = this.isVi
-          ? `⚖️ [CHỐT RCA] ${data.accuserName} đã chỉ định nghi phạm ${data.targetPlayer?.displayName || 'Nghi phạm'} với [${data.meansCard?.vi || 'Hành vi gây lỗi'} + ${data.clueCard?.vi || 'Dấu vết Log'}]. Kết quả: ${data.isCorrect ? 'CHÍNH XÁC 🎉' : 'SAI LẦM ❌'}`
-          : `⚖️ [RCA ACCUSATION] ${data.accuserName} accused ${data.targetPlayer?.displayName || 'Suspect'} with [${data.meansCard?.en || 'Trigger'} + ${data.clueCard?.en || 'Log Trace'}]. Result: ${data.isCorrect ? 'CORRECT 🎉' : 'FAILED ❌'}`;
+        if (stampResult) {
+          stampResult.style.display = 'inline-block';
+          if (data.isCorrect) {
+            stampResult.className = 'casting-stamp-result stamp-correct';
+            stampResult.textContent = this.isVi ? '✓ CHÍNH XÁC! CHỐT ĐÚNG ROOT CAUSE!' : '✓ CONFIRMED! ROOT CAUSE MATCHED!';
+            deceptionAudio.play('correctFanfare');
+            this.triggerScreenShake(350);
+          } else {
+            stampResult.className = 'casting-stamp-result stamp-wrong';
+            stampResult.textContent = this.isVi ? '✗ BÁC BỎ! MẤT 1 QUYỀN CHỈ ĐỊNH!' : '✗ DISMISSED! BADGE LOST!';
+            deceptionAudio.play('errorBuzzer');
+            this.triggerScreenShake(200);
+          }
 
-        this.handleNewChat({
-          id: `sys_acc_${Date.now()}`,
-          senderId: 'system',
-          senderName: 'Hệ thống',
-          avatar: '⚖️',
-          text: noticeText,
-          isSystem: true,
-          timestamp: Date.now()
-        });
-      }
+          const noticeText = this.isVi
+            ? `⚖️ [CHỐT RCA] ${data.accuserName} đã chỉ định nghi phạm ${data.targetPlayer?.displayName || 'Nghi phạm'} với [${data.meansCard?.vi || 'Hành vi gây lỗi'} + ${data.clueCard?.vi || 'Dấu vết Log'}]. Kết quả: ${data.isCorrect ? 'CHÍNH XÁC 🎉' : 'SAI LẦM ❌'}`
+            : `⚖️ [RCA ACCUSATION] ${data.accuserName} accused ${data.targetPlayer?.displayName || 'Suspect'} with [${data.meansCard?.en || 'Trigger'} + ${data.clueCard?.en || 'Log Trace'}]. Result: ${data.isCorrect ? 'CORRECT 🎉' : 'FAILED ❌'}`;
 
-      // Sau thêm 1.8s nữa -> Ẩn overlay và gọi tiếp
-      setTimeout(() => {
-        if (overlay) overlay.classList.remove('active');
-        if (typeof onDone === 'function') onDone();
-      }, 1800);
-    }, 1500);
+          this.handleNewChat({
+            id: `sys_acc_${Date.now()}`,
+            senderId: 'system',
+            senderName: 'Hệ thống',
+            avatar: '⚖️',
+            text: noticeText,
+            isSystem: true,
+            timestamp: Date.now()
+          });
+        }
+
+        // Sau thêm 1.6s xem dấu mộc kết quả -> Ẩn overlay và gọi tiếp
+        setTimeout(() => {
+          if (overlay) overlay.classList.remove('active');
+          if (typeof onDone === 'function') onDone();
+        }, 1600);
+      });
+    }, 900);
   }
 
   executeAccusation(targetId, meansId, clueId) {

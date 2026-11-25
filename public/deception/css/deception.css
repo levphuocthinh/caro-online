@@ -2122,7 +2122,7 @@ body.deception-app {
 .noir-cutscene-overlay {
   position: fixed;
   inset: 0;
-  z-index: 3000;
+  z-index: 12000;
   background: rgba(0, 0, 0, 0.88);
   backdrop-filter: blur(10px);
   display: none;
@@ -2133,6 +2133,51 @@ body.deception-app {
 
 .noir-cutscene-overlay.active {
   display: flex;
+}
+
+.noir-cutscene-overlay.cutscene-alarm-active {
+  animation: emergencyAlarmBg 0.45s ease-in-out infinite alternate;
+}
+
+.noir-cutscene-overlay.cutscene-alarm-active .cutscene-box {
+  border-color: #ff4757;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 55px rgba(255, 71, 87, 0.75), inset 0 0 25px rgba(255, 71, 87, 0.2);
+}
+
+.badge-alarm-pulse {
+  background: rgba(255, 71, 87, 0.25) !important;
+  border-color: #ff4757 !important;
+  color: #ff6b81 !important;
+  animation: alarmTextPulse 0.5s ease-in-out infinite alternate;
+}
+
+.accusation-casting-overlay.alarm-active {
+  animation: emergencyAlarmBg 0.4s ease-in-out infinite alternate;
+}
+
+.accusation-casting-overlay.alarm-active .casting-modal-card {
+  border-color: #ff4757;
+  box-shadow: 0 0 60px rgba(255, 71, 87, 0.7), 0 24px 60px rgba(0, 0, 0, 0.9);
+}
+
+.casting-suspense-pulse.alarm-flashing {
+  color: #ff6b81;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+@keyframes emergencyAlarmBg {
+  0% {
+    background: rgba(120, 12, 24, 0.85);
+  }
+  100% {
+    background: rgba(10, 16, 40, 0.9);
+  }
+}
+
+@keyframes alarmTextPulse {
+  0% { transform: scale(1); opacity: 0.85; }
+  100% { transform: scale(1.04); opacity: 1; }
 }
 
 .cutscene-box {

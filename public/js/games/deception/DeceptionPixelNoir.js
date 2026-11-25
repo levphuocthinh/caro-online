@@ -21,7 +21,8 @@ export const INCIDENT_VIDEOS = {
   STREET_BRAWL: '/deception/videos/incident-pipeline-crash.mp4',
   MOTORBIKE_HIT_RUN: '/deception/videos/incident-server-overload.mp4',
   POLICE_ARREST: '/deception/videos/incident-trace-culprit.mp4',
-  AIRPLANE_ESCAPE: '/deception/videos/incident-data-leak.mp4'
+  AIRPLANE_ESCAPE: '/deception/videos/incident-data-leak.mp4',
+  ACCUSATION_DUEL: '/deception/videos/accusation-duel.mp4'
 };
 
 export class DeceptionPixelNoir {
@@ -250,6 +251,45 @@ export class DeceptionPixelNoir {
     this.startLoop();
   }
 
+  /**
+   * 6. Cutscene Báo Động & Video Chốt Phá Án ("It's Time To Duel!")
+   */
+  playAccusationDuel(options = {}, onComplete = null) {
+    this.stop(false);
+    this.sceneType = 'ACCUSATION_DUEL';
+    this.duration = 5.2;
+    this.onFinishCallback = onComplete;
+    this.sceneData = {
+      accuserName: options.accuserName || 'Responder',
+      targetName: options.targetName || 'Suspect',
+      isVi: options.isVi !== false
+    };
+    this.currentVideoSrc = INCIDENT_VIDEOS.ACCUSATION_DUEL;
+
+    const overlay = typeof document !== 'undefined' ? document.getElementById('cutscene-overlay') : null;
+    const titleEl = typeof document !== 'undefined' ? document.getElementById('cutscene-title') : null;
+    const subEl = typeof document !== 'undefined' ? document.getElementById('cutscene-sub') : null;
+    const tagEl = typeof document !== 'undefined' ? document.getElementById('cutscene-tag') : null;
+
+    if (overlay) overlay.classList.add('cutscene-alarm-active');
+    if (titleEl) {
+      titleEl.textContent = this.sceneData.isVi
+        ? `🚨 BÁO ĐỘNG PHÁ ÁN! ${this.sceneData.accuserName} ⚔️ ${this.sceneData.targetName}`
+        : `🚨 ACCUSATION ALERT! ${this.sceneData.accuserName} ⚔️ ${this.sceneData.targetName}`;
+    }
+    if (subEl) {
+      subEl.textContent = this.sceneData.isVi
+        ? "IT'S TIME TO DUEL! Hệ thống đang kích hoạt đối chất khẩn cấp..."
+        : "IT'S TIME TO DUEL! Emergency War Room confrontation triggered...";
+    }
+    if (tagEl) {
+      tagEl.textContent = "🚨 RED ALERT • IT'S TIME TO DUEL!";
+      tagEl.className = 'cutscene-tag badge-criminal badge-alarm-pulse';
+    }
+
+    this.startLoop();
+  }
+
   _scheduleFallbackTimer(durationSec) {
     if (this.fallbackTimer) {
       clearTimeout(this.fallbackTimer);
@@ -348,7 +388,10 @@ export class DeceptionPixelNoir {
     }
 
     const overlay = typeof document !== 'undefined' ? document.getElementById('cutscene-overlay') : null;
-    if (overlay) overlay.classList.remove('active');
+    if (overlay) {
+      overlay.classList.remove('active');
+      overlay.classList.remove('cutscene-alarm-active');
+    }
 
     if (triggerCallback && typeof this.onFinishCallback === 'function') {
       const cb = this.onFinishCallback;

@@ -254,6 +254,14 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     noir.playBackStab();
     assert.equal(noir.murderMode, 'BACK_STAB');
     assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.BACK_STAB);
+
+    // Verify Accusation Duel Alarm + Video Cutscene mode
+    assert.equal(typeof noir.playAccusationDuel, 'function');
+    noir.playAccusationDuel({ accuserName: 'Alice', targetName: 'Bob' });
+    assert.equal(noir.sceneType, 'ACCUSATION_DUEL');
+    assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.ACCUSATION_DUEL);
+    assert.ok(fs.existsSync(path.join(__dirname, '..', 'public', 'deception', 'videos', 'accusation-duel.mp4')), 'accusation-duel.mp4 must exist');
+    noir.stop(false);
     noir.playMotorbikeHitAndRun();
     assert.equal(noir.murderMode, 'MOTORBIKE_HIT_RUN');
     assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.MOTORBIKE_HIT_RUN);
