@@ -185,6 +185,61 @@ class DeceptionAppController {
     document.getElementById(modalId)?.classList.add('active');
   }
 
+  loadAudioPreferences() {
+    try {
+      const raw = localStorage.getItem('deception_audio_prefs');
+      if (!raw) return;
+      const prefs = JSON.parse(raw);
+      if (typeof deceptionAudio !== 'undefined' && deceptionAudio) {
+        if (typeof prefs.bgmVolume === 'number') deceptionAudio.setBgmVolume(prefs.bgmVolume);
+        if (typeof prefs.sfxVolume === 'number') deceptionAudio.setSfxVolume(prefs.sfxVolume);
+        if (typeof prefs.bgmEnabled === 'boolean') deceptionAudio.bgmEnabled = prefs.bgmEnabled;
+        if (typeof prefs.bgmStyle === 'string') deceptionAudio.bgmStyle = prefs.bgmStyle;
+      }
+      this.syncAudioSettingsModalUI();
+    } catch (_) {}
+  }
+
+  saveAudioPreferences() {
+    try {
+      if (typeof deceptionAudio === 'undefined' || !deceptionAudio) return;
+      localStorage.setItem('deception_audio_prefs', JSON.stringify({
+        bgmVolume: deceptionAudio.bgmVolume,
+        sfxVolume: deceptionAudio.sfxVolume,
+        bgmEnabled: deceptionAudio.bgmEnabled,
+        bgmStyle: deceptionAudio.bgmStyle
+      }));
+    } catch (_) {}
+  }
+
+  syncAudioSettingsModalUI() {
+    if (typeof deceptionAudio === 'undefined' || !deceptionAudio) return;
+    const bgmPct = Math.round((deceptionAudio.bgmVolume ?? 0.8) * 100);
+    const sfxPct = Math.round((deceptionAudio.sfxVolume ?? 0.85) * 100);
+
+    const sliderBgm = document.getElementById('slider-bgm-volume');
+    if (sliderBgm) sliderBgm.value = String(bgmPct);
+    const lblBgm = document.getElementById('lbl-bgm-vol-pct');
+    if (lblBgm) lblBgm.textContent = `${bgmPct}%`;
+
+    const sliderSfx = document.getElementById('slider-sfx-volume');
+    if (sliderSfx) sliderSfx.value = String(sfxPct);
+    const lblSfx = document.getElementById('lbl-sfx-vol-pct');
+    if (lblSfx) lblSfx.textContent = `${sfxPct}%`;
+
+    const btnMuteBgm = document.getElementById('btn-modal-mute-bgm');
+    const lblMuteBgm = document.getElementById('lbl-modal-mute-bgm');
+    if (btnMuteBgm) btnMuteBgm.classList.toggle('is-muted', !deceptionAudio.bgmEnabled);
+    if (lblMuteBgm) lblMuteBgm.textContent = deceptionAudio.bgmEnabled ? 'Đang Bật' : 'Đã Tắt';
+
+    const hdrMusicBtn = document.getElementById('btn-toggle-music');
+    if (hdrMusicBtn) hdrMusicBtn.classList.toggle('music-muted', !deceptionAudio.bgmEnabled || !this.soundEnabled);
+
+    document.querySelectorAll('#bgm-style-picker .bgm-style-btn').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.bgmStyle === deceptionAudio.bgmStyle);
+    });
+  }
+
   closeModal(modalId) {
     this.playAudio('click');
     document.getElementById(modalId)?.classList.remove('active');
@@ -207,8 +262,36 @@ class DeceptionAppController {
       this.renderCurrentView();
     });
 
-    // Nhạc nền Trinh Thám (Detective Noir BGM)
+    // Mở bảng Cài Đặt Nhạc Trinh Thám Pixel & Âm Lượng
+    this.loadAudioPreferences();
     document.getElementById('btn-toggle-music')?.addEventListener('click', () => {
+      if (typeof deceptionAudio !== 'undefined' && deceptionAudio && this.soundEnabled && deceptionAudio.bgmEnabled && !deceptionAudio.bgmPlaying) {
+        deceptionAudio.startDetectiveBgm();
+      }
+      this.syncAudioSettingsModalUI();
+      this.openModal('modal-audio-settings');
+    });
+
+    // Thanh trượt âm lượng Nhạc nền (BGM)
+    document.getElementById('slider-bgm-volume')?.addEventListener('input', (e) => {
+      const pct = parseInt(e.target.value, 10) || 0;
+      const lbl = document.getElementById('lbl-bgm-vol-pct');
+      if (lbl) lbl.textContent = `${pct}%`;
+      if (typeof deceptionAudio !== 'undefined' && deceptionAudio) {
+        deceptionAudio.setBgmVolume(pct / 100);
+        if (pct > 0 && !deceptionAudio.bgmEnabled) {
+          deceptionAudio.bgmEnabled = true;
+        }
+        if (pct > 0 && this.soundEnabled && !deceptionAudio.bgmPlaying) {
+          deceptionAudio.startDetectiveBgm();
+        }
+        this.syncAudioSettingsModalUI();
+        this.saveAudioPreferences();
+      }
+    });
+
+    // Nút Bật/Tắt nhanh Nhạc nền trong Modal
+    document.getElementById('btn-modal-mute-bgm')?.addEventListener('click', () => {
       if (typeof deceptionAudio !== 'undefined' && deceptionAudio) {
         deceptionAudio.bgmEnabled = !deceptionAudio.bgmEnabled;
         if (deceptionAudio.bgmEnabled && this.soundEnabled) {
@@ -216,10 +299,46 @@ class DeceptionAppController {
         } else {
           deceptionAudio.stopDetectiveBgm();
         }
-        const btn = document.getElementById('btn-toggle-music');
-        if (btn) btn.classList.toggle('music-muted', !deceptionAudio.bgmEnabled);
+        this.syncAudioSettingsModalUI();
+        this.saveAudioPreferences();
       }
       this.playAudio('click');
+    });
+
+    // Chọn Giai Điệu Nhạc Trinh Thám Pixel (3 Styles)
+    document.querySelectorAll('#bgm-style-picker .bgm-style-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const style = btn.dataset.bgmStyle || 'PIXEL_DETECTIVE';
+        if (typeof deceptionAudio !== 'undefined' && deceptionAudio) {
+          deceptionAudio.bgmEnabled = true;
+          this.soundEnabled = true;
+          deceptionAudio.enabled = true;
+          deceptionAudio.setBgmStyle(style);
+          if (!deceptionAudio.bgmPlaying) {
+            deceptionAudio.startDetectiveBgm();
+          }
+          this.syncAudioSettingsModalUI();
+          this.saveAudioPreferences();
+        }
+      });
+    });
+
+    // Thanh trượt âm lượng Hiệu ứng & Video (SFX)
+    document.getElementById('slider-sfx-volume')?.addEventListener('input', (e) => {
+      const pct = parseInt(e.target.value, 10) || 0;
+      const lbl = document.getElementById('lbl-sfx-vol-pct');
+      if (lbl) lbl.textContent = `${pct}%`;
+      if (typeof deceptionAudio !== 'undefined' && deceptionAudio) {
+        deceptionAudio.setSfxVolume(pct / 100);
+        const cutsceneVideo = document.getElementById('cutscene-video');
+        if (cutsceneVideo) cutsceneVideo.volume = Math.max(0, Math.min(1, pct / 100));
+        this.saveAudioPreferences();
+      }
+    });
+
+    // Nút Nghe Thử Hiệu Ứng
+    document.getElementById('btn-modal-test-sfx')?.addEventListener('click', () => {
+      deceptionAudio.play('correctFanfare');
     });
 
     // Tự động kích hoạt Nhạc nền Trinh Thám ngay khi người chơi tương tác lần đầu
@@ -233,7 +352,7 @@ class DeceptionAppController {
     document.addEventListener('pointerdown', autoBootBgm, { once: true });
     document.addEventListener('keydown', autoBootBgm, { once: true });
 
-    // Âm thanh
+    // Âm thanh tổng
     document.getElementById('btn-toggle-sound')?.addEventListener('click', () => {
       this.soundEnabled = !this.soundEnabled;
       if (typeof deceptionAudio !== 'undefined' && deceptionAudio) {
@@ -243,6 +362,8 @@ class DeceptionAppController {
         } else if (deceptionAudio.bgmEnabled) {
           deceptionAudio.startDetectiveBgm();
         }
+        this.syncAudioSettingsModalUI();
+        this.saveAudioPreferences();
       }
       const cutsceneVideo = document.getElementById('cutscene-video');
       if (cutsceneVideo) {

@@ -65,9 +65,9 @@
           <i class="fa-solid fa-globe"></i>
           <span id="lbl-lang">VI</span>
         </button>
-        <button type="button" class="btn-hdr-action" id="btn-toggle-music" title="Bật/Tắt nhạc nền trinh thám">
-          <i class="fa-solid fa-music" id="icon-music"></i>
-          <span class="hdr-music-lbl">Nhạc</span>
+        <button type="button" class="btn-hdr-action" id="btn-toggle-music" title="Cài đặt Nhạc Pixel Trinh Thám & Âm lượng">
+          <i class="fa-solid fa-sliders" id="icon-music"></i>
+          <span class="hdr-music-lbl">Nhạc &amp; Âm Thanh</span>
         </button>
         <button type="button" class="btn-hdr-action" id="btn-toggle-sound" title="Bật/Tắt âm thanh">
           <i class="fa-solid fa-volume-high" id="icon-sound"></i>
@@ -1302,6 +1302,97 @@
         <button type="button" class="btn-noir-hero" data-close="modal-room-invite">
           <i class="fa-solid fa-door-open"></i>
           <span>Vào Bàn Chờ Ngay</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CÀI ĐẶT NHẠC TRINH THÁM PIXEL & ÂM LƯỢNG (AUDIO SETTINGS) -->
+  <div class="noir-modal-overlay" id="modal-audio-settings">
+    <div class="noir-modal-card audio-settings-modal-card">
+      <div class="noir-modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-tag text-gold"><i class="fa-solid fa-music"></i> SOUND &amp; 8-BIT CHIPTUNE STUDIO</span>
+          <h3 class="modal-heading">Cài Đặt Nhạc Trinh Thám &amp; Âm Thanh</h3>
+        </div>
+        <button type="button" class="btn-modal-close" data-close="modal-audio-settings"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body-scroll audio-settings-body">
+        <!-- 1. Âm lượng Nhạc nền -->
+        <div class="audio-setting-group">
+          <div class="audio-setting-header">
+            <div class="audio-setting-label">
+              <i class="fa-solid fa-compact-disc text-gold"></i>
+              <span>Nhạc Nền Trinh Thám (BGM)</span>
+            </div>
+            <div class="audio-setting-controls-inline">
+              <span class="audio-vol-badge" id="lbl-bgm-vol-pct">80%</span>
+              <button type="button" class="btn-audio-mute-pill" id="btn-modal-mute-bgm">
+                <i class="fa-solid fa-volume-high"></i>
+                <span id="lbl-modal-mute-bgm">Đang Bật</span>
+              </button>
+            </div>
+          </div>
+          <input type="range" id="slider-bgm-volume" class="audio-range-slider" min="0" max="100" step="1" value="80">
+        </div>
+
+        <!-- 2. Chọn Phong cách Nhạc Trinh Thám Pixel -->
+        <div class="audio-setting-group">
+          <div class="audio-setting-header">
+            <div class="audio-setting-label">
+              <i class="fa-solid fa-gamepad text-gold"></i>
+              <span>Giai Điệu Nhạc Trinh Thám (Bấm để đổi ngay):</span>
+            </div>
+          </div>
+          <div class="bgm-style-cards" id="bgm-style-picker">
+            <button type="button" class="bgm-style-btn active" data-bgm-style="PIXEL_DETECTIVE">
+              <span class="style-icon">🎮</span>
+              <div class="style-texts">
+                <strong>Pixel Trinh Thám 8-Bit (Ace Attorney Style)</strong>
+                <span>Chiptune điều tra sôi động, tiếng bass &amp; arpeggio 8-bit rõ nét</span>
+              </div>
+            </button>
+            <button type="button" class="bgm-style-btn" data-bgm-style="PIXEL_PURSUIT">
+              <span class="style-icon">⚡</span>
+              <div class="style-texts">
+                <strong>Pixel Đối Chất Cao Trào (Cornered 8-Bit)</strong>
+                <span>Nhịp độ nhanh 142 BPM dồn dập khi truy lùng Thủ phạm</span>
+              </div>
+            </button>
+            <button type="button" class="bgm-style-btn" data-bgm-style="NOIR_JAZZ">
+              <span class="style-icon">🎷</span>
+              <div class="style-texts">
+                <strong>Noir Trinh Thám Cổ Điển (Mystery Vibes)</strong>
+                <span>Giai điệu trầm ấm, bí ẩn phong cách thám tử đêm mưa</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Âm lượng Hiệu ứng & Video -->
+        <div class="audio-setting-group">
+          <div class="audio-setting-header">
+            <div class="audio-setting-label">
+              <i class="fa-solid fa-bullhorn text-gold"></i>
+              <span>Âm Lượng Hiệu Ứng &amp; Video Phá Án (SFX)</span>
+            </div>
+            <div class="audio-setting-controls-inline">
+              <span class="audio-vol-badge" id="lbl-sfx-vol-pct">85%</span>
+              <button type="button" class="btn-audio-mute-pill" id="btn-modal-test-sfx">
+                <i class="fa-solid fa-bell"></i>
+                <span>Nghe Thử</span>
+              </button>
+            </div>
+          </div>
+          <input type="range" id="slider-sfx-volume" class="audio-range-slider" min="0" max="100" step="1" value="85">
+        </div>
+      </div>
+
+      <div class="noir-modal-footer">
+        <button type="button" class="btn-noir-hero" data-close="modal-audio-settings">
+          <i class="fa-solid fa-check"></i>
+          <span>Lưu &amp; Đóng</span>
         </button>
       </div>
     </div>

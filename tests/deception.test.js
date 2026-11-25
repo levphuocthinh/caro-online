@@ -268,6 +268,15 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     assert.equal(typeof deceptionAudio.startDetectiveBgm, 'function');
     assert.equal(typeof deceptionAudio.stopDetectiveBgm, 'function');
     assert.equal(typeof deceptionAudio.setBgmDucked, 'function');
+    assert.equal(typeof deceptionAudio.setBgmVolume, 'function');
+    assert.equal(typeof deceptionAudio.setSfxVolume, 'function');
+    assert.equal(typeof deceptionAudio.setBgmStyle, 'function');
+    assert.equal(deceptionAudio.bgmStyle, 'PIXEL_DETECTIVE');
+    deceptionAudio.setBgmVolume(0.95);
+    assert.equal(deceptionAudio.bgmVolume, 0.95);
+    deceptionAudio.setBgmStyle('PIXEL_PURSUIT');
+    assert.equal(deceptionAudio.bgmStyle, 'PIXEL_PURSUIT');
+    deceptionAudio.setBgmStyle('PIXEL_DETECTIVE');
     deceptionAudio.setBgmDucked(true);
     assert.equal(deceptionAudio.bgmDucked, true);
     deceptionAudio.setBgmDucked(false);
