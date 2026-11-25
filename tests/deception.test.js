@@ -241,7 +241,7 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
   await t.test('DeceptionPixelNoir cutscene modes & dedicated methods', async () => {
     const fs = await import('node:fs');
     const path = await import('node:path');
-    const { DeceptionPixelNoir, INCIDENT_VIDEOS } = await import('../public/js/games/deception/DeceptionPixelNoir.js');
+    const { DeceptionPixelNoir, INCIDENT_VIDEOS, ACCUSATION_DUEL_VIDEOS } = await import('../public/js/games/deception/DeceptionPixelNoir.js');
     const noir = new DeceptionPixelNoir();
 
     // Verify dedicated methods
@@ -255,12 +255,14 @@ test('Deception Database & State Machine (4-9 Players, 9 Roles, 26 Scene Tiles, 
     assert.equal(noir.murderMode, 'BACK_STAB');
     assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.BACK_STAB);
 
-    // Verify Accusation Duel Alarm + Video Cutscene mode
+    // Verify Accusation Duel Alarm + Random Video Cutscene mode
     assert.equal(typeof noir.playAccusationDuel, 'function');
+    assert.equal(ACCUSATION_DUEL_VIDEOS.length, 2);
     noir.playAccusationDuel({ accuserName: 'Alice', targetName: 'Bob' });
     assert.equal(noir.sceneType, 'ACCUSATION_DUEL');
-    assert.equal(noir.currentVideoSrc, INCIDENT_VIDEOS.ACCUSATION_DUEL);
+    assert.ok(ACCUSATION_DUEL_VIDEOS.includes(noir.currentVideoSrc), 'Accusation duel must pick one of the configured duel videos');
     assert.ok(fs.existsSync(path.join(__dirname, '..', 'public', 'deception', 'videos', 'accusation-duel.mp4')), 'accusation-duel.mp4 must exist');
+    assert.ok(fs.existsSync(path.join(__dirname, '..', 'public', 'deception', 'videos', 'accusation-duel-2.mp4')), 'accusation-duel-2.mp4 must exist');
     noir.stop(false);
 
     // Verify Detective Noir Background Music Engine

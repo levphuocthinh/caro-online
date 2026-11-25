@@ -22,8 +22,14 @@ export const INCIDENT_VIDEOS = {
   MOTORBIKE_HIT_RUN: '/deception/videos/incident-server-overload.mp4',
   POLICE_ARREST: '/deception/videos/incident-culprit-caught.mp4',
   AIRPLANE_ESCAPE: '/deception/videos/incident-trace-culprit.mp4',
-  ACCUSATION_DUEL: '/deception/videos/accusation-duel.mp4'
+  ACCUSATION_DUEL: '/deception/videos/accusation-duel.mp4',
+  ACCUSATION_DUEL_ALT: '/deception/videos/accusation-duel-2.mp4'
 };
+
+export const ACCUSATION_DUEL_VIDEOS = [
+  INCIDENT_VIDEOS.ACCUSATION_DUEL,
+  INCIDENT_VIDEOS.ACCUSATION_DUEL_ALT
+];
 
 export class DeceptionPixelNoir {
   constructor() {
@@ -264,7 +270,7 @@ export class DeceptionPixelNoir {
       targetName: options.targetName || 'Suspect',
       isVi: options.isVi !== false
     };
-    this.currentVideoSrc = INCIDENT_VIDEOS.ACCUSATION_DUEL;
+    this.currentVideoSrc = ACCUSATION_DUEL_VIDEOS[Math.floor(Math.random() * ACCUSATION_DUEL_VIDEOS.length)];
 
     const overlay = typeof document !== 'undefined' ? document.getElementById('cutscene-overlay') : null;
     const titleEl = typeof document !== 'undefined' ? document.getElementById('cutscene-title') : null;
